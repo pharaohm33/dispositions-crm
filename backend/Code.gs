@@ -116,8 +116,12 @@ const PITCH_COLUMNS = ['PitchID', 'BuyerLeadID', 'DealID', 'Username', 'GivenAt'
 // even after the Pitch itself has been withdrawn.
 const BUYER_LEAD_CONTACT_COLUMNS = ['ContactID', 'PitchID', 'BuyerLeadID', 'DealID', 'Username', 'Method', 'ContactedAt', 'Responded', 'Notes'];
 
+// e is undefined if you click "Run" on doGet directly in the Apps Script
+// editor (it doesn't simulate a real request) -- guarded so that doesn't
+// throw. A real web request always supplies e.parameter, so this doesn't
+// affect the deployed app at all.
 function doGet(e) {
-  const action = e.parameter.action;
+  const action = e && e.parameter && e.parameter.action;
   if (action === 'ping') {
     return jsonOut({ ok: true, message: 'Dispositions CRM backend is alive.' });
   }
@@ -127,7 +131,7 @@ function doGet(e) {
 function doPost(e) {
   let body;
   try {
-    body = JSON.parse(e.postData.contents);
+    body = JSON.parse(e.postData.contents); // throws (caught below) if e/e.postData is missing, e.g. run manually in the editor
   } catch (err) {
     return jsonOut({ ok: false, error: 'Bad request body.' });
   }
