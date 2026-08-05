@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dispositions CRM</title>
+<style>
+  :root {
+    --navy: #10233c;
+    --navy-light: #16324f;
+    --accent: #1f7a5c;
+    --accent-light: #e7f4ef;
+    --danger: #b3372c;
+    --danger-light: #fbeceb;
+    --warn: #a5680f;
+    --warn-light: #fdf3e2;
+    --border: #d8dee5;
+    --text: #1c2733;
+    --muted: #5b6b7a;
+    --bg: #f4f6f8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  header.top {
+    background: var(--navy);
+    color: #fff;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  header.top h1 { font-size: 18px; margin: 0; font-weight: 600; white-space: nowrap; }
+  header.top .who { font-size: 13px; opacity: 0.85; margin-right: 10px; }
+  header.top button {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.4);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  header.top button:hover { background: rgba(255,255,255,0.1); }
+  @media (max-width: 480px) {
+    header.top { padding: 12px 14px; }
+    header.top h1 { font-size: 14px; }
+    header.top button { padding: 6px 9px; font-size: 11px; }
+  }
+
+  .wrap { max-width: 480px; margin: 0 auto; padding: 40px 16px; }
+  .admin-wrap { max-width: 1100px; margin: 0 auto; padding: 20px 16px 80px; }
+  .rep-wrap { max-width: 800px; margin: 0 auto; padding: 20px 16px 80px; }
+
+  .card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  h2.step-title { margin: 0 0 4px; font-size: 20px; }
+  p.step-sub { margin: 0 0 20px; color: var(--muted); font-size: 14px; }
+
+  label.field-label { display: block; font-weight: 600; font-size: 14px; margin: 16px 0 6px; }
+  label.field-label:first-child { margin-top: 0; }
+  input[type=text], input[type=email], input[type=tel], input[type=number], input[type=password], select, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  textarea { resize: vertical; min-height: 70px; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .row3 { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; }
+  label.checkbox-row { display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 14px; margin: 10px 0; }
+  label.checkbox-row input { width: auto; }
+
+  .banner { border-radius: 8px; padding: 12px 14px; font-size: 13px; margin-bottom: 16px; }
+  .banner.info { background: var(--accent-light); color: #145039; border: 1px solid #b8ddcc; }
+  .banner.warn { background: var(--warn-light); color: #7a4d0a; border: 1px solid #f0d9a6; }
+  .banner.danger { background: var(--danger-light); color: #7d2820; border: 1px solid #edc0bb; }
+
+  .error-text { color: var(--danger); font-size: 13px; margin-top: 6px; display: none; }
+  .error-text.show { display: block; }
+
+  .nav-row { display: flex; justify-content: space-between; margin-top: 24px; gap: 10px; }
+  button.btn { padding: 11px 22px; border-radius: 6px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; }
+  button.btn.primary { background: var(--accent); color: #fff; }
+  button.btn.primary:hover { background: #17614a; }
+  button.btn.secondary { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  button.btn.secondary:hover { background: #eee; }
+  button.btn.danger { background: var(--danger); color: #fff; }
+  button.btn.small { padding: 6px 12px; font-size: 12px; }
+  .link-btn { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 13px; padding: 0; }
+
+  .tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .tab-btn {
+    background: none; border: none; padding: 10px 16px; font-size: 14px; cursor: pointer;
+    color: var(--muted); border-bottom: 2px solid transparent; font-weight: 600;
+  }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  table.crm-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  table.crm-table th, table.crm-table td { padding: 10px 12px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  table.crm-table th { background: #eef1f4; color: var(--muted); font-weight: 600; }
+  table.crm-table tr:last-child td { border-bottom: none; }
+  table.crm-table tr.clickable:hover td { background: #fafbfc; cursor: pointer; }
+
+  .status-pill { padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; white-space: nowrap; }
+  .status-active { background: var(--accent-light); color: #145039; }
+  .status-sold { background: #e6e9ef; color: #33415c; }
+  .status-dead { background: var(--danger-light); color: #7d2820; }
+  .status-undercontract, .status-under-contract { background: var(--warn-light); color: #7a4d0a; }
+  .status-onhold, .status-on-hold { background: #eef1f4; color: var(--muted); }
+  .status-default { background: #eef1f4; color: var(--muted); }
+
+  .deal-card {
+    background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px;
+    margin-bottom: 12px; cursor: pointer;
+  }
+  .deal-card:hover { border-color: var(--accent); }
+  .deal-card .addr { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .deal-card .meta { font-size: 13px; color: var(--muted); }
+
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(10,20,30,0.55);
+    display: flex; align-items: center; justify-content: center; z-index: 50; padding: 16px;
+  }
+  .modal-box { background: #fff; border-radius: 10px; padding: 24px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+  .modal-box h3 { margin-top: 0; }
+
+  .detail-overlay {
+    position: fixed; inset: 0; background: rgba(10,20,30,0.55);
+    display: flex; justify-content: flex-end; z-index: 60;
+  }
+  .detail-panel { background: #fff; width: 100%; max-width: 560px; height: 100%; overflow-y: auto; padding: 24px; }
+
+  .section-title { font-size: 15px; font-weight: 700; margin: 24px 0 10px; }
+  .section-title:first-child { margin-top: 0; }
+  .item-row {
+    background: #f7f8fa; border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; font-size: 13px;
+  }
+  .item-row .ts { color: var(--muted); font-size: 11px; display: block; margin-bottom: 2px; }
+  .item-row .actions { margin-top: 6px; display: flex; gap: 6px; }
+
+  .chip-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip {
+    background: var(--accent-light); color: #145039; border-radius: 20px; padding: 4px 10px 4px 12px;
+    font-size: 12px; display: flex; align-items: center; gap: 6px;
+  }
+  .chip button { background: none; border: none; cursor: pointer; color: #145039; font-weight: 700; font-size: 13px; padding: 0; }
+
+  .toggle-row { display: flex; align-items: center; gap: 8px; }
+  .small-muted { font-size: 12px; color: var(--muted); }
+
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>Dispositions CRM</h1>
+  <div id="header-right" style="display:flex; align-items:center; gap:8px;">
+    <span class="who" id="who-label" hidden></span>
+    <button id="logout-btn" hidden>Log Out</button>
+  </div>
+</header>
+
+<!-- ================= LOGIN ================= -->
+<div class="wrap" id="login-view">
+  <div class="card">
+    <h2 class="step-title">Log In</h2>
+    <p class="step-sub">Enter the username and password your admin set up for you.</p>
+    <label class="field-label">Username</label>
+    <input type="text" id="login-username" autocomplete="username">
+    <label class="field-label">Password</label>
+    <input type="password" id="login-password" autocomplete="current-password">
+    <div class="error-text" id="login-error"></div>
+    <div class="nav-row" style="justify-content:flex-end;">
+      <button class="btn primary" id="login-btn">Log In</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= REP VIEW ================= -->
+<div class="rep-wrap" id="rep-view" hidden>
+  <div class="banner info" id="sop-banner">
+    <strong>How to work a deal:</strong>
+    <div style="margin-top:8px;">
+      <strong>Step 1.</strong> Contact buyers from our lead list, or send us your Facebook post for approval before posting it
+      (including which groups you intend to post it to) using the form on a deal below.
+    </div>
+    <div style="margin-top:8px;">
+      <strong>Step 2.</strong> Once you get an interested buyer who says the deal may work but wants the address,
+      add their name under "Interested Buyers" on that deal.
+    </div>
+  </div>
+  <div style="display:flex; gap:8px; margin-bottom:16px;">
+    <input type="text" id="rep-search-input" placeholder="Search deals by address, city, or asset type..." style="flex:1;">
+  </div>
+  <div id="rep-deals-container"></div>
+  <div id="rep-deals-empty" class="small-muted" style="padding:20px;" hidden>No deals assigned to you yet — check back soon.</div>
+</div>
+
+<!-- ================= ADMIN VIEW ================= -->
+<div class="admin-wrap" id="admin-view" hidden>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="deals">Deals</button>
+    <button class="tab-btn" data-tab="team">Team</button>
+    <button class="tab-btn" data-tab="fb">Facebook Approvals</button>
+    <button class="tab-btn" data-tab="statuses">Status Categories</button>
+  </div>
+  <div id="admin-message" class="banner info" hidden></div>
+
+  <!-- Deals tab -->
+  <div id="tab-deals">
+    <div style="display:flex; justify-content:space-between; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+      <input type="text" id="admin-deal-search" placeholder="Search deals..." style="flex:1; min-width:200px;">
+      <button class="btn primary" id="add-deal-btn">+ Add Deal</button>
+    </div>
+    <table class="crm-table">
+      <thead><tr><th>Address</th><th>Asset Type</th><th>Price</th><th>Status</th><th>Access</th></tr></thead>
+      <tbody id="admin-deals-tbody"></tbody>
+    </table>
+    <div id="admin-deals-empty" class="small-muted" style="padding:20px;" hidden>No deals yet.</div>
+  </div>
+
+  <!-- Team tab -->
+  <div id="tab-team" hidden>
+    <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
+      <button class="btn primary" id="add-rep-btn">+ Add Team Member</button>
+    </div>
+    <table class="crm-table">
+      <thead><tr><th>Name</th><th>Username</th><th>All-Deal Access</th><th>Admin</th><th>Active</th><th>Actions</th></tr></thead>
+      <tbody id="reps-tbody"></tbody>
+    </table>
+    <div id="reps-empty" class="small-muted" style="padding:20px;" hidden>No team members yet.</div>
+  </div>
+
+  <!-- Facebook approvals tab -->
+  <div id="tab-fb" hidden>
+    <div id="fb-list"></div>
+    <div id="fb-empty" class="small-muted" style="padding:20px;" hidden>No Facebook post requests yet.</div>
+  </div>
+
+  <!-- Status categories tab -->
+  <div id="tab-statuses" hidden>
+    <div class="card" style="max-width:420px;">
+      <label class="field-label">Add a new status category</label>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="new-status-input" placeholder="e.g. Assignment Pending" style="flex:1;">
+        <button class="btn primary" id="add-status-btn">Add</button>
+      </div>
+      <div class="chip-list" id="status-chip-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Deal modal -->
+<div class="modal-backdrop" id="deal-modal" hidden>
+  <div class="modal-box">
+    <h3>Add Deal</h3>
+    <label class="field-label">Address <span style="color:var(--danger)">*</span></label>
+    <input type="text" id="deal-address-input">
+    <div class="row3">
+      <div><label class="field-label">City</label><input type="text" id="deal-city-input"></div>
+      <div><label class="field-label">State</label><input type="text" id="deal-state-input"></div>
+      <div><label class="field-label">Zip</label><input type="text" id="deal-zip-input"></div>
+    </div>
+    <div class="row2">
+      <div><label class="field-label">Asset Type</label><input type="text" id="deal-assettype-input" placeholder="e.g. SFR, Multifamily, Commercial"></div>
+      <div><label class="field-label">Price</label><input type="text" id="deal-price-input"></div>
+    </div>
+    <label class="field-label">Status</label>
+    <select id="deal-status-input"></select>
+    <label class="field-label">Description / Notes</label>
+    <textarea id="deal-description-input"></textarea>
+    <div class="error-text" id="deal-modal-error"></div>
+    <div class="nav-row">
+      <button class="btn secondary" id="deal-modal-cancel">Cancel</button>
+      <button class="btn primary" id="deal-modal-save">Save Deal</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Rep modal -->
+<div class="modal-backdrop" id="rep-modal" hidden>
+  <div class="modal-box">
+    <h3>Add Team Member</h3>
+    <label class="field-label">Full Name</label>
+    <input type="text" id="rep-name-input">
+    <label class="field-label">Username</label>
+    <input type="text" id="rep-username-input" autocomplete="off">
+    <label class="field-label">Temporary Password</label>
+    <input type="text" id="rep-password-input" autocomplete="off">
+    <label class="checkbox-row"><input type="checkbox" id="rep-allaccess-input"> Give access to all deals (not just assigned ones)</label>
+    <label class="checkbox-row"><input type="checkbox" id="rep-isadmin-input"> Make this person an admin</label>
+    <div class="error-text" id="rep-modal-error"></div>
+    <div class="nav-row">
+      <button class="btn secondary" id="rep-modal-cancel">Cancel</button>
+      <button class="btn primary" id="rep-modal-save">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reset password modal -->
+<div class="modal-backdrop" id="reset-modal" hidden>
+  <div class="modal-box" style="max-width:340px;">
+    <h3>Reset Password</h3>
+    <p class="small-muted" id="reset-modal-who"></p>
+    <label class="field-label">New Password</label>
+    <input type="text" id="reset-password-input" autocomplete="off">
+    <div class="error-text" id="reset-modal-error"></div>
+    <div class="nav-row">
+      <button class="btn secondary" id="reset-modal-cancel">Cancel</button>
+      <button class="btn primary" id="reset-modal-save">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Deal detail slide-over (used by both rep + admin) -->
+<div class="detail-overlay" id="detail-overlay" hidden>
+  <div class="detail-panel" id="detail-panel"></div>
+</div>
+
+<script src="config.js?v=1"></script>
+<script src="app.js?v=1"></script>
+</body>
+</html>
