@@ -30,6 +30,13 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
 - Every Facebook post submission and every interested buyer submission emails
   the admin automatically, and shows the rep its own Pending/Approved/Rejected
   status (with the admin's note, if rejected).
+- **Buyer Leads** — a separate "Buyer Leads" tab holds their own personal
+  batch of buyer/LLC contacts to call or text, each showing a phone-type hint
+  (Landline = call only, Mobile = call or text) and a status (Not Contacted,
+  Awaiting Response, Follow-Up Due, Responded, Fully Worked). Logging a
+  contact records the method, whether the buyer responded, which deal (if
+  any) was discussed, and freeform notes — that history is what builds a
+  most-active-buyers picture over time and by area.
 
 **Admin side** (behind the same login, when marked as admin):
 
@@ -44,6 +51,13 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
 - **Buyer Approvals** — every pending interested-buyer submission across all
   deals in one place; approving one is what unlocks that rep's view of that
   deal's exact address.
+- **Buyer Leads** — paste-import a batch of buyer/LLC contacts (Name, Phone,
+  Phone Type, City, State, Zip); hand out leads to a specific rep individually
+  or in bulk (optionally filtered by city/state/zip — leads are never shared
+  between reps unless you deliberately reassign one); set a rep's preferred
+  working area on the Team tab; and turn on **Auto-Feed** to automatically top
+  up any rep who's worked through everything assigned to them, so the calling
+  queue never runs dry without you manually re-assigning batches.
 - **Status Categories** — add or remove the status options offered in the
   Deals dropdowns.
 

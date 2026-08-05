@@ -59,6 +59,22 @@ To sanity-check the deployment on its own, paste the Web App URL into a
 browser tab with `?action=ping` on the end — you should see
 `{"ok":true,"message":"Dispositions CRM backend is alive."}`.
 
+## Optional: automatic auto-feed (time-driven trigger)
+
+The **Buyer Leads → Auto-Feed** toggle in the admin panel works on its own
+whenever you click "Run Auto-Feed Now." If you'd rather it run in the
+background without you clicking anything:
+
+1. In the Apps Script editor, use the function dropdown at the top to select
+   **installAutoFeedHourlyTrigger**, then click **Run**.
+2. That's it — it creates an hourly time-driven trigger for you. You can
+   confirm it under **Triggers** (the clock icon on the left).
+3. It only actually assigns anything when the Auto-Feed toggle is on and a
+   team member has run out of leads needing action — running the trigger
+   costs nothing otherwise. Don't run `installAutoFeedHourlyTrigger` more
+   than once, or you'll end up with duplicate hourly triggers (check
+   Triggers first if unsure).
+
 ## Redeploying after a change
 
 If you (or I) ever change `Code.gs`, you must redeploy for it to take effect:
@@ -109,3 +125,11 @@ to the `Reps` sheet tab yourself, once, directly in Google Sheets:
 - **StatusOptions** — the list of deal-status categories offered in dropdowns
   (Active, Under Contract, Sold, Dead, On Hold by default). Editable from the
   **Status Categories** admin tab.
+- **BuyerLeads** — the master buyer/LLC calling list, imported by pasting
+  CSV/spreadsheet text into the **Buyer Leads** admin tab (Name, Phone, Phone
+  Type, City, State, Zip). `AssignedTo` is blank until you (or auto-feed)
+  hand it to one specific rep — leads are never shared between reps.
+- **BuyerLeadContacts** — every call/text a rep logs against a buyer lead,
+  optionally tied to a specific deal, with free-text notes on the buyer's
+  feedback. This is both the 24-hour-response SOP tracker and the running
+  history that builds your most-active-buyers picture over time.

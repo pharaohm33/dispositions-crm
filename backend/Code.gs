@@ -3,12 +3,16 @@
  *
  * Deploy this bound to a Google Sheet (see SETUP.md). It is the entire
  * "server": rep + admin login, deal management, per-deal access control,
- * interested-buyer logging, and Facebook post approvals all live here.
+ * interested-buyer logging, Facebook post approvals, and the master buyer
+ * leads calling list (with its own call/text-response SOP and auto-feed)
+ * all live here.
  *
  * Required Script Properties (Project Settings -> Script Properties):
  *   SESSION_SECRET      - random long string, used to sign session tokens
  *   ADMIN_NOTIFY_EMAIL  - where "new Facebook post request" and
  *                         "new interested buyer" emails are sent
+ *   AUTO_FEED_ENABLED, AUTO_FEED_BATCH_SIZE - set via the admin panel, not
+ *                         by hand; see adminSetAutoFeed
  *
  * Address secrecy model: a deal's exact street Address is never sent to a
  * non-admin session until that specific rep has at least one Approved
@@ -24,14 +28,29 @@ const ASSIGNMENTS_SHEET = 'Assignments';
 const BUYERS_SHEET = 'InterestedBuyers';
 const FB_SHEET = 'FBPostRequests';
 const STATUS_SHEET = 'StatusOptions';
+const BUYER_LEADS_SHEET = 'BuyerLeads';
+const BUYER_LEAD_CONTACTS_SHEET = 'BuyerLeadContacts';
 const SESSION_HOURS = 12;
 const DEFAULT_STATUSES = ['Active', 'Under Contract', 'Sold', 'Dead', 'On Hold'];
+const FOLLOWUP_HOURS = 24;
 
-const REP_COLUMNS = ['Username', 'Name', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt'];
+const REP_COLUMNS = ['Username', 'Name', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'PreferredCity', 'PreferredState', 'PreferredZip'];
 const DEAL_COLUMNS = ['DealID', 'Address', 'City', 'State', 'Zip', 'AssetType', 'Price', 'Status', 'Description', 'CreatedAt', 'UpdatedAt'];
 const ASSIGNMENT_COLUMNS = ['DealID', 'Username', 'AssignedAt'];
 const BUYER_COLUMNS = ['BuyerID', 'DealID', 'Username', 'BuyerName', 'BuyerContact', 'Notes', 'Status', 'AdminNote', 'CreatedAt', 'DecidedAt'];
 const FB_COLUMNS = ['RequestID', 'DealID', 'Username', 'PostText', 'TargetGroups', 'Status', 'AdminNote', 'CreatedAt', 'DecidedAt'];
+
+// One row per buyer/LLC on the master calling list. AssignedTo is blank
+// until an admin (or auto-feed) hands it to a specific rep -- there's no
+// concept of shared/pooled leads, by design, so two reps never call the
+// same buyer unless an admin deliberately reassigns it.
+const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'City', 'State', 'Zip', 'AssignedTo', 'AssignedAt', 'CreatedAt'];
+
+// One row per contact attempt against a BuyerLeadID -- this is both the
+// call/text touchpoint log that drives computeLeadStatus's 24/48-hour SOP,
+// and the running feedback history ("buyer said X about deal Y") that's the
+// whole point of building a most-active-buyers picture over time.
+const BUYER_LEAD_CONTACT_COLUMNS = ['ContactID', 'BuyerLeadID', 'Username', 'Method', 'ContactedAt', 'Responded', 'DealID', 'Notes'];
 
 function doGet(e) {
   const action = e.parameter.action;
@@ -70,6 +89,12 @@ function doPost(e) {
         return jsonOut(withSession(body, submitFbPostRequest));
       case 'getMyFbRequests':
         return jsonOut(withSession(body, getMyFbRequests));
+      case 'getMyBuyerLeads':
+        return jsonOut(withSession(body, getMyBuyerLeads));
+      case 'getBuyerLeadContacts':
+        return jsonOut(withSession(body, getBuyerLeadContacts));
+      case 'addBuyerLeadContact':
+        return jsonOut(withSession(body, addBuyerLeadContact));
 
       // ---- admin only ----
       case 'adminAddDeal':
@@ -100,6 +125,26 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminGetBuyerRequests));
       case 'adminDecideBuyer':
         return jsonOut(withAdminSession(body, adminDecideBuyer));
+      case 'adminImportBuyerLeads':
+        return jsonOut(withAdminSession(body, adminImportBuyerLeads));
+      case 'adminGetBuyerLeads':
+        return jsonOut(withAdminSession(body, adminGetBuyerLeads));
+      case 'adminAssignBuyerLead':
+        return jsonOut(withAdminSession(body, adminAssignBuyerLead));
+      case 'adminUnassignBuyerLead':
+        return jsonOut(withAdminSession(body, adminUnassignBuyerLead));
+      case 'adminAssignBuyerLeadsBulk':
+        return jsonOut(withAdminSession(body, adminAssignBuyerLeadsBulk));
+      case 'adminGetBuyerLeadContacts':
+        return jsonOut(withAdminSession(body, adminGetBuyerLeadContacts));
+      case 'adminSetRepPreferredArea':
+        return jsonOut(withAdminSession(body, adminSetRepPreferredArea));
+      case 'adminGetAutoFeedSettings':
+        return jsonOut(withAdminSession(body, adminGetAutoFeedSettings));
+      case 'adminSetAutoFeed':
+        return jsonOut(withAdminSession(body, adminSetAutoFeed));
+      case 'adminRunAutoFeedNow':
+        return jsonOut(withAdminSession(body, adminRunAutoFeedNow));
       case 'adminAddStatusOption':
         return jsonOut(withAdminSession(body, adminAddStatusOption));
       case 'adminRemoveStatusOption':
@@ -424,7 +469,8 @@ function adminGetReps(body) {
       allAccess: r['AllAccess'] === true || r['AllAccess'] === 'TRUE',
       isAdmin: r['IsAdmin'] === true || r['IsAdmin'] === 'TRUE',
       active: !(r['Active'] === false || r['Active'] === 'FALSE'),
-      createdAt: r['CreatedAt']
+      createdAt: r['CreatedAt'],
+      preferredCity: r['PreferredCity'] || '', preferredState: r['PreferredState'] || '', preferredZip: r['PreferredZip'] || ''
     };
   });
   return { ok: true, reps: reps };
@@ -668,4 +714,327 @@ function adminDecideBuyer(body) {
   sheet.getRange(match._row, getColumnIndex(sheet, 'AdminNote')).setValue(body.note || '');
   sheet.getRange(match._row, getColumnIndex(sheet, 'DecidedAt')).setValue(new Date().toISOString());
   return { ok: true };
+}
+
+// ---------- Buyer leads (master calling list) ----------
+//
+// Status SOP, derived fresh on every read rather than stored, so it can
+// never drift from the actual contact log:
+//   Not Contacted        - nothing logged yet
+//   Awaiting Response     - one contact logged, under 24 hours ago
+//   Follow-Up In Progress - past 24h, but the required second-touch method(s)
+//                           for this phone type aren't all logged yet
+//   Follow-Up Due         - past 24h and no follow-up attempted at all
+//   Responded             - any contact was marked as getting a response
+//   Fully Worked          - the phone-type-appropriate two-touch SOP is
+//                           complete (two calls for a landline; a call AND
+//                           a text for a mobile) with no response -- this
+//                           lead no longer blocks that rep from auto-feed
+//
+// Landlines can only ever be called (never texted), so their SOP is two
+// calls; mobiles can be called or texted, and the required follow-up
+// specifically pairs a call with a text (per the dispositions SOP: if no
+// response in 24h, call again and follow up with a text).
+function computeLeadStatus(phoneType, contacts) {
+  if (!contacts || contacts.length === 0) return 'Not Contacted';
+  const responded = contacts.some(function (c) { return c['Responded'] === true || c['Responded'] === 'TRUE'; });
+  if (responded) return 'Responded';
+
+  const sorted = contacts.slice().sort(function (a, b) { return new Date(a['ContactedAt']) - new Date(b['ContactedAt']); });
+  const hoursSinceFirst = (Date.now() - new Date(sorted[0]['ContactedAt']).getTime()) / (60 * 60 * 1000);
+  const methodsUsed = {};
+  contacts.forEach(function (c) { methodsUsed[c['Method']] = true; });
+  const isLandline = String(phoneType || '').trim().toLowerCase() === 'landline';
+  const followUpSatisfied = isLandline ? contacts.length >= 2 : (methodsUsed['Call'] && methodsUsed['Text']);
+
+  if (followUpSatisfied) return 'Fully Worked';
+  if (hoursSinceFirst < FOLLOWUP_HOURS) return contacts.length === 1 ? 'Awaiting Response' : 'Follow-Up In Progress';
+  return 'Follow-Up Due';
+}
+
+function leadNeedsAction(status) {
+  return status === 'Not Contacted' || status === 'Awaiting Response' || status === 'Follow-Up Due' || status === 'Follow-Up In Progress';
+}
+
+// Parses pasted CSV/TSV/spreadsheet text: BuyerName, Phone, PhoneType,
+// City, State, Zip -- comma or tab separated, one buyer per line. Skips a
+// header row if the first cell of the first line isn't a phone-looking
+// value. PhoneType is normalized to exactly 'Mobile' or 'Landline'; any
+// other value is kept as typed so an admin notices and fixes it rather
+// than having it silently miscategorized as one or the other.
+function parseBuyerLeadRows(text) {
+  const lines = String(text || '').split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+  if (lines.length === 0) return [];
+  const splitLine = function (line) { return line.indexOf('\t') !== -1 ? line.split('\t') : line.split(','); };
+
+  let startIdx = 0;
+  const firstCells = splitLine(lines[0]).map(function (c) { return c.trim(); });
+  if (firstCells[0] && !/\d/.test(firstCells[0])) startIdx = 1; // looks like a header row
+
+  const rows = [];
+  for (let i = startIdx; i < lines.length; i++) {
+    const cells = splitLine(lines[i]).map(function (c) { return c.trim(); });
+    if (cells.length === 0 || !cells[0]) continue;
+    const rawType = (cells[2] || '').trim().toLowerCase();
+    const phoneType = rawType === 'mobile' ? 'Mobile' : rawType === 'landline' ? 'Landline' : (cells[2] || '');
+    rows.push({
+      buyerName: cells[0] || '', phone: cells[1] || '', phoneType: phoneType,
+      city: cells[3] || '', state: cells[4] || '', zip: cells[5] || ''
+    });
+  }
+  return rows;
+}
+
+function adminImportBuyerLeads(body) {
+  const rows = body.pasteText ? parseBuyerLeadRows(body.pasteText) : (body.rows || []);
+  if (rows.length === 0) return { ok: false, error: 'No rows found to import.' };
+
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const existing = sheetToObjects(sheet);
+  const existingPhones = {};
+  existing.forEach(function (l) { existingPhones[String(l['Phone'] || '').replace(/\D/g, '')] = true; });
+
+  let imported = 0;
+  let skippedDuplicates = 0;
+  const now = new Date().toISOString();
+  rows.forEach(function (r) {
+    if (!r.buyerName || !r.phone) return;
+    const normalizedPhone = String(r.phone).replace(/\D/g, '');
+    if (existingPhones[normalizedPhone]) { skippedDuplicates++; return; }
+    existingPhones[normalizedPhone] = true;
+    appendRowByHeaders(sheet, {
+      'BuyerLeadID': Utilities.getUuid(), 'BuyerName': r.buyerName, 'Phone': r.phone, 'PhoneType': r.phoneType || '',
+      'City': r.city || '', 'State': r.state || '', 'Zip': r.zip || '', 'AssignedTo': '', 'AssignedAt': '', 'CreatedAt': now
+    });
+    imported++;
+  });
+
+  return { ok: true, imported: imported, skippedDuplicates: skippedDuplicates };
+}
+
+function buyerLeadsWithStatus(leadRows, allContacts) {
+  const contactsByLead = {};
+  allContacts.forEach(function (c) {
+    if (!contactsByLead[c['BuyerLeadID']]) contactsByLead[c['BuyerLeadID']] = [];
+    contactsByLead[c['BuyerLeadID']].push(c);
+  });
+  return leadRows.map(function (l) {
+    const contacts = contactsByLead[l['BuyerLeadID']] || [];
+    const copy = Object.assign({}, l);
+    copy.status = computeLeadStatus(l['PhoneType'], contacts);
+    copy.contactCount = contacts.length;
+    return copy;
+  });
+}
+
+function adminGetBuyerLeads(body) {
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  let leads = sheetToObjects(sheet);
+  const f = body.filters || {};
+  if (f.assignedTo) leads = leads.filter(function (l) { return String(l['AssignedTo'] || '').toLowerCase() === String(f.assignedTo).toLowerCase(); });
+  if (f.unassignedOnly) leads = leads.filter(function (l) { return !l['AssignedTo']; });
+  if (f.city) leads = leads.filter(function (l) { return String(l['City'] || '').toLowerCase() === String(f.city).toLowerCase(); });
+  if (f.state) leads = leads.filter(function (l) { return String(l['State'] || '').toLowerCase() === String(f.state).toLowerCase(); });
+  if (f.zip) leads = leads.filter(function (l) { return String(l['Zip'] || '') === String(f.zip); });
+
+  const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
+  const allContacts = sheetToObjects(contactsSheet);
+  return { ok: true, leads: buyerLeadsWithStatus(leads, allContacts) };
+}
+
+function adminAssignBuyerLead(body) {
+  if (!body.buyerLeadId || !body.username) return { ok: false, error: 'Missing buyerLeadId or username.' };
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const leads = sheetToObjects(sheet);
+  const match = leads.find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
+  if (!match) return { ok: false, error: 'Lead not found.' };
+  sheet.getRange(match._row, getColumnIndex(sheet, 'AssignedTo')).setValue(String(body.username).trim().toLowerCase());
+  sheet.getRange(match._row, getColumnIndex(sheet, 'AssignedAt')).setValue(new Date().toISOString());
+  return { ok: true };
+}
+
+function adminUnassignBuyerLead(body) {
+  if (!body.buyerLeadId) return { ok: false, error: 'Missing buyerLeadId.' };
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const leads = sheetToObjects(sheet);
+  const match = leads.find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
+  if (!match) return { ok: false, error: 'Lead not found.' };
+  sheet.getRange(match._row, getColumnIndex(sheet, 'AssignedTo')).setValue('');
+  sheet.getRange(match._row, getColumnIndex(sheet, 'AssignedAt')).setValue('');
+  return { ok: true };
+}
+
+// Hands the next N unassigned leads (optionally filtered by area) to one
+// rep in one shot -- e.g. "give Jordan the next 50 unassigned leads in
+// Phoenix, AZ." Oldest-imported leads go out first.
+function adminAssignBuyerLeadsBulk(body) {
+  if (!body.username || !body.count) return { ok: false, error: 'Missing username or count.' };
+  const username = String(body.username).trim().toLowerCase();
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  let pool = sheetToObjects(sheet).filter(function (l) { return !l['AssignedTo']; });
+  if (body.city) pool = pool.filter(function (l) { return String(l['City'] || '').toLowerCase() === String(body.city).toLowerCase(); });
+  if (body.state) pool = pool.filter(function (l) { return String(l['State'] || '').toLowerCase() === String(body.state).toLowerCase(); });
+  if (body.zip) pool = pool.filter(function (l) { return String(l['Zip'] || '') === String(body.zip); });
+
+  const batch = pool.slice(0, Number(body.count));
+  const now = new Date().toISOString();
+  batch.forEach(function (l) {
+    sheet.getRange(l._row, getColumnIndex(sheet, 'AssignedTo')).setValue(username);
+    sheet.getRange(l._row, getColumnIndex(sheet, 'AssignedAt')).setValue(now);
+  });
+  return { ok: true, assignedCount: batch.length, remainingInPool: pool.length - batch.length };
+}
+
+function adminGetBuyerLeadContacts(body) {
+  if (!body.buyerLeadId) return { ok: false, error: 'Missing buyerLeadId.' };
+  const sheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
+  const contacts = sheetToObjects(sheet).filter(function (c) { return c['BuyerLeadID'] === body.buyerLeadId; });
+  return { ok: true, contacts: contacts };
+}
+
+function adminSetRepPreferredArea(body) {
+  if (!body.username) return { ok: false, error: 'Missing username.' };
+  const username = String(body.username).trim().toLowerCase();
+  const sheet = getSheet(REPS_SHEET, REP_COLUMNS);
+  const reps = sheetToObjects(sheet);
+  const match = reps.find(function (r) { return String(r['Username'] || '').trim().toLowerCase() === username; });
+  if (!match) return { ok: false, error: 'Rep not found.' };
+  sheet.getRange(match._row, getColumnIndex(sheet, 'PreferredCity')).setValue(body.city || '');
+  sheet.getRange(match._row, getColumnIndex(sheet, 'PreferredState')).setValue(body.state || '');
+  sheet.getRange(match._row, getColumnIndex(sheet, 'PreferredZip')).setValue(body.zip || '');
+  return { ok: true };
+}
+
+// ---------- Auto-feed ----------
+// When enabled, tops up any active non-admin rep who has zero buyer leads
+// still needing action (see leadNeedsAction) with more unassigned leads,
+// matched to that rep's PreferredCity/State/Zip when set. A rep who's never
+// been assigned anything also qualifies (zero leads trivially need no
+// action), so turning this on for a brand-new rep with a preferred area set
+// will seed their very first batch too. Callable on demand via
+// adminRunAutoFeedNow, or on a schedule if you install a time-driven
+// trigger calling autoFeedCheck (see SETUP.md).
+function adminGetAutoFeedSettings(body) {
+  const props = PropertiesService.getScriptProperties();
+  return {
+    ok: true,
+    enabled: props.getProperty('AUTO_FEED_ENABLED') === 'TRUE',
+    batchSize: Number(props.getProperty('AUTO_FEED_BATCH_SIZE') || '50')
+  };
+}
+
+function adminSetAutoFeed(body) {
+  const props = PropertiesService.getScriptProperties();
+  props.setProperty('AUTO_FEED_ENABLED', body.enabled ? 'TRUE' : 'FALSE');
+  if (body.batchSize) props.setProperty('AUTO_FEED_BATCH_SIZE', String(Number(body.batchSize)));
+  return { ok: true };
+}
+
+function adminRunAutoFeedNow(body) {
+  return autoFeedCheck();
+}
+
+function autoFeedCheck() {
+  const props = PropertiesService.getScriptProperties();
+  if (props.getProperty('AUTO_FEED_ENABLED') !== 'TRUE') return { ok: true, fed: [], reason: 'Auto-feed is turned off.' };
+  const batchSize = Number(props.getProperty('AUTO_FEED_BATCH_SIZE') || '50');
+
+  const repsSheet = getSheet(REPS_SHEET, REP_COLUMNS);
+  const reps = sheetToObjects(repsSheet).filter(function (r) {
+    const active = !(r['Active'] === false || r['Active'] === 'FALSE');
+    const isAdmin = r['IsAdmin'] === true || r['IsAdmin'] === 'TRUE';
+    return active && !isAdmin;
+  });
+
+  const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
+  const allLeads = sheetToObjects(leadsSheet);
+  const allContacts = sheetToObjects(contactsSheet);
+  const contactsByLead = {};
+  allContacts.forEach(function (c) {
+    if (!contactsByLead[c['BuyerLeadID']]) contactsByLead[c['BuyerLeadID']] = [];
+    contactsByLead[c['BuyerLeadID']].push(c);
+  });
+
+  const fed = [];
+  reps.forEach(function (rep) {
+    const username = rep['Username'];
+    const myLeads = allLeads.filter(function (l) { return String(l['AssignedTo'] || '').toLowerCase() === username; });
+    const stillNeedsAction = myLeads.some(function (l) {
+      return leadNeedsAction(computeLeadStatus(l['PhoneType'], contactsByLead[l['BuyerLeadID']] || []));
+    });
+    if (stillNeedsAction) return;
+
+    let pool = allLeads.filter(function (l) { return !l['AssignedTo']; });
+    if (rep['PreferredCity']) pool = pool.filter(function (l) { return String(l['City'] || '').toLowerCase() === String(rep['PreferredCity']).toLowerCase(); });
+    if (rep['PreferredState']) pool = pool.filter(function (l) { return String(l['State'] || '').toLowerCase() === String(rep['PreferredState']).toLowerCase(); });
+    if (rep['PreferredZip']) pool = pool.filter(function (l) { return String(l['Zip'] || '') === String(rep['PreferredZip']); });
+    if (pool.length === 0) return;
+
+    const batch = pool.slice(0, batchSize);
+    const now = new Date().toISOString();
+    batch.forEach(function (l) {
+      leadsSheet.getRange(l._row, getColumnIndex(leadsSheet, 'AssignedTo')).setValue(username);
+      leadsSheet.getRange(l._row, getColumnIndex(leadsSheet, 'AssignedAt')).setValue(now);
+      l['AssignedTo'] = username; // keep in-memory allLeads consistent for subsequent reps in this same run
+    });
+    fed.push({ username: username, name: rep['Name'], count: batch.length });
+  });
+
+  return { ok: true, fed: fed };
+}
+
+// One-time convenience: run manually from the Apps Script editor to create
+// an hourly time-driven trigger for autoFeedCheck, so auto-feed runs on its
+// own instead of only when the admin clicks "Run Auto-Feed Now." Safe to
+// run once; re-running adds a duplicate trigger, so check Triggers (clock
+// icon) in the editor first if unsure whether it's already installed.
+function installAutoFeedHourlyTrigger() {
+  ScriptApp.newTrigger('autoFeedCheck').timeBased().everyHours(1).create();
+}
+
+// ---------- Rep-facing buyer leads ----------
+
+function getMyBuyerLeads(body, session) {
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const myLeads = sheetToObjects(sheet).filter(function (l) { return String(l['AssignedTo'] || '').toLowerCase() === session.u; });
+  const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
+  const allContacts = sheetToObjects(contactsSheet).filter(function (c) { return String(c['Username'] || '').toLowerCase() === session.u; });
+  return { ok: true, leads: buyerLeadsWithStatus(myLeads, allContacts) };
+}
+
+function ownsLeadOrAdmin(session, lead) {
+  return session.a || String(lead['AssignedTo'] || '').toLowerCase() === session.u;
+}
+
+function getBuyerLeadContacts(body, session) {
+  if (!body.buyerLeadId) return { ok: false, error: 'Missing buyerLeadId.' };
+  const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const lead = sheetToObjects(leadsSheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
+  if (!lead) return { ok: false, error: 'Lead not found.' };
+  if (!ownsLeadOrAdmin(session, lead)) return { ok: false, error: 'This lead is not assigned to you.' };
+  const sheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
+  const contacts = sheet ? sheetToObjects(sheet).filter(function (c) { return c['BuyerLeadID'] === body.buyerLeadId; }) : [];
+  return { ok: true, contacts: contacts };
+}
+
+function addBuyerLeadContact(body, session) {
+  if (!body.buyerLeadId || !body.method) return { ok: false, error: 'Missing buyerLeadId or method.' };
+  if (body.method !== 'Call' && body.method !== 'Text') return { ok: false, error: 'Method must be Call or Text.' };
+
+  const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const lead = sheetToObjects(leadsSheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
+  if (!lead) return { ok: false, error: 'Lead not found.' };
+  if (!ownsLeadOrAdmin(session, lead)) return { ok: false, error: 'This lead is not assigned to you.' };
+  if (body.method === 'Text' && String(lead['PhoneType'] || '').trim().toLowerCase() === 'landline') {
+    return { ok: false, error: 'This is a landline — it can only be called, not texted.' };
+  }
+
+  const sheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
+  const contactId = Utilities.getUuid();
+  appendRowByHeaders(sheet, {
+    'ContactID': contactId, 'BuyerLeadID': body.buyerLeadId, 'Username': session.u, 'Method': body.method,
+    'ContactedAt': new Date().toISOString(), 'Responded': !!body.responded, 'DealID': body.dealId || '', 'Notes': body.notes || ''
+  });
+  return { ok: true, contactId: contactId };
 }
