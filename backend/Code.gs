@@ -47,7 +47,12 @@ const DEFAULT_STATUSES = ['Active', 'Under Contract', 'Sold', 'Dead', 'On Hold']
 const FOLLOWUP_HOURS = 24;
 
 const REP_COLUMNS = ['Username', 'Name', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'PreferredCity', 'PreferredState', 'PreferredZip'];
-const DEAL_COLUMNS = ['DealID', 'Address', 'City', 'State', 'Zip', 'AssetType', 'Price', 'Status', 'Description', 'CreatedAt', 'UpdatedAt'];
+// GeneralDriveLink is visible to any rep with access to the deal;
+// SensitiveDriveLink (contracts, financials, seller personal info, etc.) is
+// stripped out for every non-admin session unconditionally, the same way
+// applyAddressSecrecy strips Address -- there's no rep-facing unlock path
+// for it at all, by design.
+const DEAL_COLUMNS = ['DealID', 'Address', 'City', 'State', 'Zip', 'AssetType', 'Price', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'CreatedAt', 'UpdatedAt'];
 const ASSIGNMENT_COLUMNS = ['DealID', 'Username', 'AssignedAt'];
 const BUYER_COLUMNS = ['BuyerID', 'DealID', 'Username', 'BuyerName', 'BuyerContact', 'Notes', 'Status', 'AdminNote', 'CreatedAt', 'DecidedAt'];
 const FB_COLUMNS = ['RequestID', 'DealID', 'Username', 'PostText', 'TargetGroups', 'Status', 'AdminNote', 'CreatedAt', 'DecidedAt'];
@@ -61,7 +66,12 @@ const FB_COLUMNS = ['RequestID', 'DealID', 'Username', 'PostText', 'TargetGroups
 // persists no matter how many different deals/pitches this buyer goes
 // through over time -- it's what lets a buyer who passed on a Phoenix deal
 // get re-pitched correctly when a matching deal shows up in Dallas instead.
-const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'City', 'State', 'Zip', 'GeneralNotes', 'CreatedAt'];
+// Email is optional (not every source list has one). DriveLink is a folder
+// URL for buyer-specific documents (proof of funds, signed agreements,
+// etc.) -- editable by admin only (adminUpdateBuyerLeadProfile), but any
+// rep with an open pitch on this buyer can see it, same visibility as
+// GeneralNotes.
+const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'Email', 'PhoneType', 'City', 'State', 'Zip', 'GeneralNotes', 'DriveLink', 'CreatedAt'];
 
 // A Pitch is "give this buyer lead to this rep, to work against this one
 // specific deal." This is the only thing that creates an actionable item in
@@ -161,6 +171,8 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminImportBuyerLeads));
       case 'adminGetBuyerLeads':
         return jsonOut(withAdminSession(body, adminGetBuyerLeads));
+      case 'adminUpdateBuyerLeadProfile':
+        return jsonOut(withAdminSession(body, adminUpdateBuyerLeadProfile));
       case 'adminGiveBuyerLeadToRep':
         return jsonOut(withAdminSession(body, adminGiveBuyerLeadToRep));
       case 'adminGiveBuyerLeadsBulk':
@@ -402,6 +414,7 @@ function applyAddressSecrecy(deal, session) {
     copy.AddressLocked = true;
     copy.Address = '';
   }
+  delete copy.SensitiveDriveLink; // admin-only, unconditionally -- see file header comment
   return copy;
 }
 
@@ -425,7 +438,8 @@ function adminAddDeal(body) {
   appendRowByHeaders(sheet, {
     'DealID': dealId, 'Address': d.address, 'City': d.city || '', 'State': d.state || '', 'Zip': d.zip || '',
     'AssetType': d.assetType || '', 'Price': d.price || '', 'Status': d.status || DEFAULT_STATUSES[0],
-    'Description': d.description || '', 'CreatedAt': now, 'UpdatedAt': now
+    'Description': d.description || '', 'GeneralDriveLink': d.generalDriveLink || '', 'SensitiveDriveLink': d.sensitiveDriveLink || '',
+    'CreatedAt': now, 'UpdatedAt': now
   });
   return { ok: true, dealId: dealId };
 }
@@ -437,7 +451,7 @@ function adminUpdateDeal(body) {
   const match = deals.find(function (d) { return d['DealID'] === body.dealId; });
   if (!match) return { ok: false, error: 'Deal not found.' };
   const d = body.data || {};
-  const editable = ['Address', 'City', 'State', 'Zip', 'AssetType', 'Price', 'Description'];
+  const editable = ['Address', 'City', 'State', 'Zip', 'AssetType', 'Price', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink'];
   editable.forEach(function (field) {
     if (d[field] === undefined) return;
     const col = getColumnIndex(sheet, field);
@@ -804,11 +818,15 @@ function dealIsActive(deal) {
 }
 
 // Parses pasted CSV/TSV/spreadsheet text: BuyerName, Phone, PhoneType,
-// City, State, Zip -- comma or tab separated, one buyer per line. Skips a
-// header row if the first cell of the first line isn't a phone-looking
-// value. PhoneType is normalized to exactly 'Mobile' or 'Landline'; any
-// other value is kept as typed so an admin notices and fixes it rather
-// than having it silently miscategorized as one or the other.
+// City, State, Zip, Email -- comma or tab separated, one buyer per line.
+// Email is last and optional specifically so it never shifts the position
+// of the other columns whether or not a given source list has it -- a
+// 6-cell row (no email) and a 7-cell row (with email) both parse the same
+// first six fields identically. Skips a header row if the first cell of
+// the first line isn't a phone-looking value. PhoneType is normalized to
+// exactly 'Mobile' or 'Landline'; any other value is kept as typed so an
+// admin notices and fixes it rather than having it silently
+// miscategorized as one or the other.
 function parseBuyerLeadRows(text) {
   const lines = String(text || '').split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
   if (lines.length === 0) return [];
@@ -826,7 +844,7 @@ function parseBuyerLeadRows(text) {
     const phoneType = rawType === 'mobile' ? 'Mobile' : rawType === 'landline' ? 'Landline' : (cells[2] || '');
     rows.push({
       buyerName: cells[0] || '', phone: cells[1] || '', phoneType: phoneType,
-      city: cells[3] || '', state: cells[4] || '', zip: cells[5] || ''
+      city: cells[3] || '', state: cells[4] || '', zip: cells[5] || '', email: cells[6] || ''
     });
   }
   return rows;
@@ -850,8 +868,8 @@ function adminImportBuyerLeads(body) {
     if (existingPhones[normalizedPhone]) { skippedDuplicates++; return; }
     existingPhones[normalizedPhone] = true;
     appendRowByHeaders(sheet, {
-      'BuyerLeadID': Utilities.getUuid(), 'BuyerName': r.buyerName, 'Phone': r.phone, 'PhoneType': r.phoneType || '',
-      'City': r.city || '', 'State': r.state || '', 'Zip': r.zip || '', 'GeneralNotes': '', 'CreatedAt': now
+      'BuyerLeadID': Utilities.getUuid(), 'BuyerName': r.buyerName, 'Phone': r.phone, 'Email': r.email || '', 'PhoneType': r.phoneType || '',
+      'City': r.city || '', 'State': r.state || '', 'Zip': r.zip || '', 'GeneralNotes': '', 'DriveLink': '', 'CreatedAt': now
     });
     imported++;
   });
@@ -927,6 +945,20 @@ function updateBuyerLeadNotes(body, session) {
     if (!ownsAPitch) return { ok: false, error: 'You need an active pitch on this buyer to edit their notes.' };
   }
   sheet.getRange(match._row, getColumnIndex(sheet, 'GeneralNotes')).setValue(body.notes || '');
+  return { ok: true };
+}
+
+// Admin-only, unlike updateBuyerLeadNotes -- Email and DriveLink (buyer-
+// specific documents: proof of funds, signed agreements, etc.) are set by
+// admin, though any rep with an open pitch on this buyer can still see them
+// once set (see getMyPitches).
+function adminUpdateBuyerLeadProfile(body) {
+  if (!body.buyerLeadId) return { ok: false, error: 'Missing buyerLeadId.' };
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const match = sheetToObjects(sheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
+  if (!match) return { ok: false, error: 'Lead not found.' };
+  if (body.email !== undefined) sheet.getRange(match._row, getColumnIndex(sheet, 'Email')).setValue(body.email || '');
+  if (body.driveLink !== undefined) sheet.getRange(match._row, getColumnIndex(sheet, 'DriveLink')).setValue(body.driveLink || '');
   return { ok: true };
 }
 
@@ -1196,6 +1228,8 @@ function getMyPitches(body, session) {
     p.city = lead ? lead['City'] : '';
     p.state = lead ? lead['State'] : '';
     p.generalNotes = lead ? lead['GeneralNotes'] : '';
+    p.email = lead ? lead['Email'] : '';
+    p.driveLink = lead ? lead['DriveLink'] : '';
   });
   return { ok: true, pitches: withStatus };
 }

@@ -300,8 +300,8 @@
   <div id="tab-buyerleads" hidden>
     <div class="card">
       <div class="section-title" style="margin-top:0;">Import Buyer Leads</div>
-      <p class="small-muted">Paste rows copied from Excel/Sheets/CSV: <strong>Name (or LLC), Phone, Phone Type (Mobile/Landline), City, State, Zip</strong> — comma or tab separated, one buyer per line. A header row is detected and skipped automatically. Duplicate phone numbers are skipped.</p>
-      <textarea id="buyerleads-import-text" style="min-height:120px;" placeholder="Jane Doe LLC, 555-123-4567, Mobile, Phoenix, AZ, 85001"></textarea>
+      <p class="small-muted">Paste rows copied from Excel/Sheets/CSV: <strong>Name (or LLC), Phone, Phone Type (Mobile/Landline), City, State, Zip, Email</strong> — comma or tab separated, one buyer per line. Email is optional and must come last (leave it off entirely, or leave it blank, if a given buyer doesn't have one — the other columns' positions never shift either way). A header row is detected and skipped automatically. Duplicate phone numbers are skipped.</p>
+      <textarea id="buyerleads-import-text" style="min-height:120px;" placeholder="Jane Doe LLC, 555-123-4567, Mobile, Phoenix, AZ, 85001, jane@example.com"></textarea>
       <div class="error-text" id="buyerleads-import-error"></div>
       <div class="nav-row" style="justify-content:flex-end;">
         <button class="btn primary" id="buyerleads-import-btn">Import</button>
@@ -349,7 +349,7 @@
       <input type="text" id="buyerleads-search" placeholder="Search by name, phone, city, state, or zip..." style="flex:1; min-width:240px;">
     </div>
     <table class="crm-table">
-      <thead><tr><th>Buyer / LLC</th><th>Phone</th><th>Type</th><th>Location</th><th>General Notes</th><th>Open Pitches</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Buyer / LLC</th><th>Phone</th><th>Email</th><th>Type</th><th>Location</th><th>General Notes</th><th>Open Pitches</th><th>Actions</th></tr></thead>
       <tbody id="buyerleads-tbody"></tbody>
     </table>
     <div id="buyerleads-admin-empty" class="small-muted" style="padding:20px;" hidden>No buyer leads imported yet.</div>
@@ -387,6 +387,10 @@
     <select id="deal-status-input"></select>
     <label class="field-label">Description / Notes</label>
     <textarea id="deal-description-input"></textarea>
+    <label class="field-label">General Drive Link <span class="small-muted">(visible to your team)</span></label>
+    <input type="text" id="deal-general-drive-input" placeholder="https://drive.google.com/...">
+    <label class="field-label">Sensitive Drive Link <span class="small-muted">(admin only &mdash; contracts, financials, etc.)</span></label>
+    <input type="text" id="deal-sensitive-drive-input" placeholder="https://drive.google.com/...">
     <div class="error-text" id="deal-modal-error"></div>
     <div class="nav-row">
       <button class="btn secondary" id="deal-modal-cancel">Cancel</button>

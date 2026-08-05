@@ -188,6 +188,7 @@ async function openRepDealDetail(dealId) {
       (deal.AssetType ? '<div style="margin-top:8px;"><strong>Asset Type:</strong> ' + esc(deal.AssetType) + '</div>' : "") +
       (deal.Price ? '<div><strong>Price:</strong> ' + esc(deal.Price) + '</div>' : "") +
       (deal.Description ? '<div style="margin-top:8px;">' + esc(deal.Description) + '</div>' : "") +
+      (deal.GeneralDriveLink ? '<div style="margin-top:8px;"><a href="' + esc(deal.GeneralDriveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
     '</div>' +
 
     '<div class="section-title">Step 1 &middot; Submit a Facebook Post for Approval</div>' +
@@ -372,6 +373,8 @@ async function openPitchDetail(pitchId) {
         : '<span class="status-pill status-fully-worked">Deal ' + esc((pitch.dealStatus || "closed").toLowerCase()) + '</span>') +
       '<div style="margin-top:8px;"><strong>Re:</strong> ' + esc(pitch.dealAddress) + '</div>' +
       (isLandline ? '<div style="margin-top:8px;">Landline &mdash; call only, texting isn\'t possible.</div>' : '<div style="margin-top:8px;">Mobile &mdash; you can call or text.</div>') +
+      (pitch.email ? '<div style="margin-top:8px;"><strong>Email:</strong> <a href="mailto:' + esc(pitch.email) + '">' + esc(pitch.email) + '</a></div>' : "") +
+      (pitch.driveLink ? '<div style="margin-top:8px;"><strong>Documents:</strong> <a href="' + esc(pitch.driveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
     '</div>' +
 
     '<div class="section-title">General Buyer Notes</div>' +
@@ -507,6 +510,8 @@ function openDealModal() {
   document.getElementById("deal-assettype-input").value = "";
   document.getElementById("deal-price-input").value = "";
   document.getElementById("deal-description-input").value = "";
+  document.getElementById("deal-general-drive-input").value = "";
+  document.getElementById("deal-sensitive-drive-input").value = "";
   const statusSelect = document.getElementById("deal-status-input");
   statusSelect.innerHTML = statusOptionsCache.map(function (s) { return '<option value="' + esc(s) + '">' + esc(s) + '</option>'; }).join("");
   document.getElementById("deal-modal-error").classList.remove("show");
@@ -534,7 +539,9 @@ document.getElementById("deal-modal-save").addEventListener("click", async funct
     assetType: document.getElementById("deal-assettype-input").value.trim(),
     price: document.getElementById("deal-price-input").value.trim(),
     status: document.getElementById("deal-status-input").value,
-    description: document.getElementById("deal-description-input").value.trim()
+    description: document.getElementById("deal-description-input").value.trim(),
+    generalDriveLink: document.getElementById("deal-general-drive-input").value.trim(),
+    sensitiveDriveLink: document.getElementById("deal-sensitive-drive-input").value.trim()
   };
   const res = await api("adminAddDeal", { data: data });
   if (!res.ok) {
@@ -612,6 +619,15 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     '<textarea id="deal-desc-edit">' + esc(deal.Description || "") + '</textarea>' +
     '<div class="nav-row" style="justify-content:flex-end;">' +
       '<button class="btn secondary" id="save-desc-btn">Save Notes</button>' +
+    '</div>' +
+
+    '<div class="section-title">Documents (Google Drive)</div>' +
+    '<label class="field-label">General Drive Link <span class="small-muted">(visible to your team)</span></label>' +
+    '<input type="text" id="deal-general-drive-edit" value="' + esc(deal.GeneralDriveLink || "") + '" placeholder="https://drive.google.com/...">' +
+    '<label class="field-label">Sensitive Drive Link <span class="small-muted">(admin only)</span></label>' +
+    '<input type="text" id="deal-sensitive-drive-edit" value="' + esc(deal.SensitiveDriveLink || "") + '" placeholder="https://drive.google.com/...">' +
+    '<div class="nav-row" style="justify-content:flex-end;">' +
+      '<button class="btn secondary" id="save-drive-links-btn">Save Drive Links</button>' +
     '</div>';
 
   document.getElementById("close-detail-btn").addEventListener("click", function () { overlay.hidden = true; loadAdminDeals(); });
@@ -639,6 +655,17 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
 
   document.getElementById("save-desc-btn").addEventListener("click", async function () {
     await api("adminUpdateDeal", { dealId: deal.DealID, data: { Description: document.getElementById("deal-desc-edit").value.trim() } });
+    await loadAdminDeals();
+  });
+
+  document.getElementById("save-drive-links-btn").addEventListener("click", async function () {
+    await api("adminUpdateDeal", {
+      dealId: deal.DealID,
+      data: {
+        GeneralDriveLink: document.getElementById("deal-general-drive-edit").value.trim(),
+        SensitiveDriveLink: document.getElementById("deal-sensitive-drive-edit").value.trim()
+      }
+    });
     await loadAdminDeals();
   });
 
@@ -1046,7 +1073,7 @@ function renderBuyerLeadsAdmin() {
   const empty = document.getElementById("buyerleads-admin-empty");
   const filtered = adminBuyerLeads.filter(function (l) {
     if (!q) return true;
-    return [l.BuyerName, l.Phone, l.City, l.State, l.Zip].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; });
+    return [l.BuyerName, l.Phone, l.Email, l.City, l.State, l.Zip].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; });
   });
   empty.hidden = filtered.length > 0;
   tbody.innerHTML = filtered.map(function (l) {
@@ -1054,6 +1081,7 @@ function renderBuyerLeadsAdmin() {
     return '<tr>' +
       '<td>' + esc(l.BuyerName) + '</td>' +
       '<td>' + esc(l.Phone) + '</td>' +
+      '<td>' + esc(l.Email || "") + '</td>' +
       '<td>' + esc(l.PhoneType || "") + '</td>' +
       '<td>' + [l.City, l.State, l.Zip].filter(Boolean).join(", ") + '</td>' +
       '<td class="small-muted">' + esc(notesPreview) + '</td>' +
@@ -1091,7 +1119,15 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
       '<button class="link-btn" id="close-detail-btn">Close</button>' +
     '</div>' +
 
-    '<div class="section-title" style="margin-top:0;">General Buyer Notes</div>' +
+    '<label class="field-label" style="margin-top:0;">Email</label>' +
+    '<input type="text" id="admin-buyer-email-input" value="' + esc(lead.Email || "") + '" placeholder="buyer@example.com">' +
+    '<label class="field-label">Buyer Documents Drive Link <span class="small-muted">(proof of funds, signed agreements, etc.)</span></label>' +
+    '<input type="text" id="admin-buyer-drivelink-input" value="' + esc(lead.DriveLink || "") + '" placeholder="https://drive.google.com/...">' +
+    '<div class="nav-row" style="justify-content:flex-end;">' +
+      '<button class="btn secondary" id="admin-buyer-profile-save-btn">Save Email / Drive Link</button>' +
+    '</div>' +
+
+    '<div class="section-title">General Buyer Notes</div>' +
     '<p class="small-muted">Shared across every deal this buyer is ever pitched — ARV%, price range, areas of interest, cash vs. financed, etc.</p>' +
     '<textarea id="admin-general-notes-input">' + esc(lead.GeneralNotes || "") + '</textarea>' +
     '<div class="nav-row" style="justify-content:flex-end;">' +
@@ -1114,6 +1150,15 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
 
   document.getElementById("admin-general-notes-save-btn").addEventListener("click", async function () {
     await api("updateBuyerLeadNotes", { buyerLeadId: buyerLeadId, notes: document.getElementById("admin-general-notes-input").value.trim() });
+    await loadBuyerLeadsAdmin();
+  });
+
+  document.getElementById("admin-buyer-profile-save-btn").addEventListener("click", async function () {
+    await api("adminUpdateBuyerLeadProfile", {
+      buyerLeadId: buyerLeadId,
+      email: document.getElementById("admin-buyer-email-input").value.trim(),
+      driveLink: document.getElementById("admin-buyer-drivelink-input").value.trim()
+    });
     await loadBuyerLeadsAdmin();
   });
 

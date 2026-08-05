@@ -107,7 +107,12 @@ to the `Reps` sheet tab yourself, once, directly in Google Sheets:
   see every deal regardless of the `Assignments` tab. `IsAdmin` = TRUE gates
   the whole admin panel.
 - **Deals** — one row per property. `Status` is free text but the admin panel
-  only offers whatever's currently listed in `StatusOptions`.
+  only offers whatever's currently listed in `StatusOptions`. `GeneralDriveLink`
+  (any Google Drive folder/file URL) is visible to every rep with access to
+  the deal; `SensitiveDriveLink` (contracts, financials, seller personal
+  info, etc.) is admin-only and is stripped out of every non-admin response
+  server-side, the same way the street Address is — there's no rep-facing
+  unlock for it at all.
 - **Assignments** — which non-all-access reps can see which deals. Managed
   from a deal's detail panel in the admin view.
 - **InterestedBuyers** — logged by whichever rep has access to that deal, per
@@ -128,10 +133,17 @@ to the `Reps` sheet tab yourself, once, directly in Google Sheets:
   **Status Categories** admin tab.
 - **BuyerLeads** — the master buyer/LLC calling list, imported by pasting
   CSV/spreadsheet text into the **Buyer Leads** admin tab (Name, Phone, Phone
-  Type, City, State, Zip). A buyer lead has no assignment of its own —
-  `GeneralNotes` is its only standing field, a free-text cross-deal profile
-  (ARV%, price range, areas of interest, cash vs. financed) that persists no
-  matter how many different deals it's ever pitched against.
+  Type, City, State, Zip, and optionally Email — Email must come last in the
+  pasted row since it's optional, so the other columns' positions never
+  shift whether or not a given row has one). A buyer lead has no assignment
+  of its own — `GeneralNotes` is a free-text cross-deal profile (ARV%, price
+  range, areas of interest, cash vs. financed) that persists no matter how
+  many different deals it's ever pitched against, and `DriveLink` is a
+  Google Drive folder/file URL for that buyer's own documents (proof of
+  funds, signed agreements). `DriveLink` and `Email` are admin-editable only
+  (from a buyer's detail panel in the **Buyer Leads** tab), though any rep
+  with an open pitch on that buyer can see them; `GeneralNotes` stays
+  editable by any rep who's had a pitch on that buyer, same as before.
 - **Pitches** — "give this buyer lead to this rep, for this one specific
   deal." This is the only thing that puts a buyer in a rep's queue or blocks
   Auto-Feed — a buyer lead with no open pitch just sits in the pool,

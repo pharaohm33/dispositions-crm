@@ -42,13 +42,21 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   range, areas of interest, cash vs. financed) travels with the buyer across
   every deal they're ever pitched, anywhere in the country — so a buyer who
   passed on a deal in one city can be correctly re-pitched the moment a
-  matching deal shows up in a different one.
+  matching deal shows up in a different one. If admin's added the buyer's
+  email or a Drive link to their documents (proof of funds, signed
+  agreements), those show up here too.
+- Deals with a General Drive Link show an "Open Drive Folder" link right on
+  the deal — marketing photos, comps, whatever admin's put there. A deal's
+  Sensitive Drive Link (contracts, financials) never appears to reps at all.
 
 **Admin side** (behind the same login, when marked as admin):
 
 - **Deals** — add deals, change a deal's status (Active, Sold, Dead, Under
-  Contract, On Hold, or whatever categories you've defined), and manage
-  exactly which reps can see each deal.
+  Contract, On Hold, or whatever categories you've defined), manage exactly
+  which reps can see each deal, and set two Google Drive links per deal: a
+  **General Drive Link** (visible to your team — photos, comps, marketing)
+  and a **Sensitive Drive Link** (admin-only — contracts, financials, seller
+  personal info).
 - **Team** — add/remove team members, toggle "all-deal access" or admin
   rights per person, reset anyone's password. No email or self-serve signup —
   you create every login yourself.
@@ -58,7 +66,10 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   deals in one place; approving one is what unlocks that rep's view of that
   deal's exact address.
 - **Buyer Leads** — paste-import a batch of buyer/LLC contacts (Name, Phone,
-  Phone Type, City, State, Zip). Give one to a rep individually, or give a
+  Phone Type, City, State, Zip, and optionally Email). Each buyer's profile
+  also holds an editable Email and a Drive Link for their own documents
+  (proof of funds, signed agreements) — visible to any rep who's been given
+  that buyer, editable by admin only. Give one to a rep individually, or give a
   whole batch at once for one specific deal (matched to that deal's own
   city/state/zip automatically) — every "give" pairs one buyer with one deal,
   so nobody's queue ever fills up with buyers there's nothing active to sell
