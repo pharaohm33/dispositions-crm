@@ -166,7 +166,9 @@ async function openRepDealDetail(dealId) {
   const fbRequests = fbRes.ok ? fbRes.requests : [];
 
   const addressBanner = deal.addressGranted && deal.Address
-    ? '<div class="banner danger"><strong>Confidential &mdash; do not share.</strong> Admin has given you access to this deal\'s exact address. Only share it with a legitimate, matched buyer.</div>'
+    ? '<div class="banner danger"><strong>Confidential &mdash; do not share.</strong> Admin has given you access to this deal\'s exact address. Only share it with a legitimate, matched buyer' +
+      ' &mdash; and only with admin approval, once that buyer has expressed real interest and specifically wants to review the full address. Sharing it any earlier, or with anyone else,' +
+      ' risks losing us this deal and getting paid on it, and will get you removed as a dispositions team member.</div>'
     : "";
 
   panel.innerHTML =
