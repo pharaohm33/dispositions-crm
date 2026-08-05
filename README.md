@@ -15,21 +15,22 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
 **Rep side** (after logging in):
 
 - Sees every deal they've been given access to (either specific deals, or
-  "all deals" if the admin granted that).
+  "all deals" if the admin granted that) — identified only by a **Deal Code**
+  (e.g. "A-1") plus City/State/Zip/County/Price. The exact street address is
+  never sent to a rep session at all, full stop — there's no unlock path,
+  server-side or otherwise.
 - Each deal shows the standing SOP:
   1. Contact buyers from the lead list, or submit a Facebook post here for
      admin approval before posting — including which groups you intend to
      post it to.
-  2. Once a buyer says the deal may work but wants the address, log that
-     buyer's name under "Interested Buyers." The deal's exact street address
-     stays hidden (server-side, not just in the UI) until admin approves that
-     specific buyer — once approved, the rep sees the address along with a
-     warning naming exactly who they're allowed to share it with, and a
-     reminder that sharing it with anyone else risks the deal and their
-     standing on the team.
-- Every Facebook post submission and every interested buyer submission emails
-  the admin automatically, and shows the rep its own Pending/Approved/Rejected
-  status (with the admin's note, if rejected).
+  2. As soon as a buyer shows real interest, log them under "Interested
+     Buyers" — this emails admin immediately. Keep pasting conversation
+     updates into that buyer's notes as things progress, and mark the match
+     **Active Match**, **Negotiating**, **Closing**, or **Dead Match** (buyer
+     couldn't agree) as it plays out — an easy-to-follow, deal-by-deal picture
+     of who's actually closing.
+- Every Facebook post submission and every interested-buyer submission emails
+  the admin automatically.
 - **Buyer Leads** — a separate "Buyer Leads" tab shows every buyer they've
   been given for a deal we currently have to sell (never a bare contact list
   with nothing to offer them), each showing a phone-type hint (Landline =
@@ -53,18 +54,24 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
 
 - **Deals** — add deals, change a deal's status (Active, Sold, Dead, Under
   Contract, On Hold, or whatever categories you've defined), manage exactly
-  which reps can see each deal, and set two Google Drive links per deal: a
-  **General Drive Link** (visible to your team — photos, comps, marketing)
-  and a **Sensitive Drive Link** (admin-only — contracts, financials, seller
-  personal info).
+  which reps can see each deal, assign it a **Deal Code** and **County**
+  (what reps actually see instead of the address), and set two Google Drive
+  links: a **General Drive Link** (visible to your team — photos, comps,
+  marketing) and a **Sensitive Drive Link** (admin-only — contracts,
+  financials, seller personal info). A private **Source Link** + **Admin
+  Notes** section on every deal is visible to you alone — paste the original
+  online listing link, track sourcing details, whatever you don't want any
+  rep to ever see.
 - **Team** — add/remove team members, toggle "all-deal access" or admin
   rights per person, reset anyone's password. No email or self-serve signup —
   you create every login yourself.
 - **Facebook Approvals** — every pending post request across all deals in one
   place, approve or reject with an optional note.
-- **Buyer Approvals** — every pending interested-buyer submission across all
-  deals in one place; approving one is what unlocks that rep's view of that
-  deal's exact address.
+- **Buyer Matches** — every interested-buyer match across all deals in one
+  place, so you can see at a glance who's Negotiating or Closing and pick up
+  the conversation (rep's notes are visible to you the moment they're
+  logged) to close the deal yourself, keeping the rep who brought the buyer
+  updated as it moves.
 - **Buyer Leads** — paste-import a batch of buyer/LLC contacts (Name, Phone,
   Phone Type, City, State, Zip, and optionally Email). Each buyer's profile
   also holds an editable Email and a Drive Link for their own documents

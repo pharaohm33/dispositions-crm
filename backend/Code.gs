@@ -14,12 +14,15 @@
  *   AUTO_FEED_ENABLED, AUTO_FEED_BATCH_SIZE - set via the admin panel, not
  *                         by hand; see adminSetAutoFeed
  *
- * Address secrecy model: a deal's exact street Address is never sent to a
- * non-admin session until that specific rep has at least one Approved
- * interested buyer logged against that deal (see repApprovedBuyerNames).
- * Until then getDeals/getDeal strip the Address field entirely rather than
- * relying on the front-end to hide it, since the value would otherwise sit
- * in the browser's network tab regardless of what's rendered.
+ * Address secrecy model: a deal's exact street Address is NEVER sent to any
+ * non-admin session, full stop -- no rep-facing unlock path exists at all.
+ * Reps instead identify a deal by its DealCode (a short admin-assigned
+ * label like "A-1") plus City/State/Zip/County/Price. getDeals/getDeal (and
+ * getMyPitches, for the buyer-leads calling list) strip Address server-side
+ * rather than relying on the front-end to hide it, since the value would
+ * otherwise sit in the browser's network tab regardless of what's rendered.
+ * AdminPrivateNotes and SourceLink on a Deal get the same unconditional
+ * admin-only treatment as SensitiveDriveLink.
  *
  * Buyer leads model: a buyer/LLC on the master calling list (BuyerLeads)
  * only ever becomes a work item once it's paired with one specific active
@@ -45,16 +48,25 @@ const BUYER_LEAD_CONTACTS_SHEET = 'BuyerLeadContacts';
 const SESSION_HOURS = 12;
 const DEFAULT_STATUSES = ['Active', 'Under Contract', 'Sold', 'Dead', 'On Hold'];
 const FOLLOWUP_HOURS = 24;
+const MATCH_STATUSES = ['Active Match', 'Negotiating', 'Closing', 'Dead Match'];
 
 const REP_COLUMNS = ['Username', 'Name', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'PreferredCity', 'PreferredState', 'PreferredZip'];
-// GeneralDriveLink is visible to any rep with access to the deal;
-// SensitiveDriveLink (contracts, financials, seller personal info, etc.) is
-// stripped out for every non-admin session unconditionally, the same way
-// applyAddressSecrecy strips Address -- there's no rep-facing unlock path
-// for it at all, by design.
-const DEAL_COLUMNS = ['DealID', 'Address', 'City', 'State', 'Zip', 'AssetType', 'Price', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'CreatedAt', 'UpdatedAt'];
+// DealCode (e.g. "A-1") plus City/State/Zip/County/Price is everything a
+// rep ever sees to identify a deal -- Address is admin-only, unconditionally
+// (see file header comment). GeneralDriveLink is visible to any rep with
+// access to the deal; SensitiveDriveLink, AdminPrivateNotes, and SourceLink
+// are all admin-only, stripped out for every non-admin session, the same
+// way Address is -- there's no rep-facing unlock path for any of them.
+const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'AssetType', 'Price', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt'];
 const ASSIGNMENT_COLUMNS = ['DealID', 'Username', 'AssignedAt'];
-const BUYER_COLUMNS = ['BuyerID', 'DealID', 'Username', 'BuyerName', 'BuyerContact', 'Notes', 'Status', 'AdminNote', 'CreatedAt', 'DecidedAt'];
+// MatchStatus tracks the buyer<->deal relationship itself ('Active Match' by
+// default, through 'Negotiating'/'Closing', or 'Dead Match' once the buyer
+// couldn't agree) -- separate from the one-time approval gate this used to
+// be, since a deal's address was the only thing that gate ever unlocked and
+// reps never see the address at all anymore. Notes is a running,
+// rep-updatable conversation log ("copy and paste important notes"), not a
+// one-time field; AdminNote is admin's own separate note on the match.
+const BUYER_COLUMNS = ['BuyerID', 'DealID', 'Username', 'BuyerName', 'BuyerContact', 'Notes', 'MatchStatus', 'AdminNote', 'CreatedAt', 'StatusUpdatedAt'];
 const FB_COLUMNS = ['RequestID', 'DealID', 'Username', 'PostText', 'TargetGroups', 'Status', 'AdminNote', 'CreatedAt', 'DecidedAt'];
 
 // One row per buyer/LLC on the master calling list. There is no direct
@@ -125,6 +137,10 @@ function doPost(e) {
         return jsonOut(withSession(body, addInterestedBuyer));
       case 'getInterestedBuyers':
         return jsonOut(withSession(body, getInterestedBuyers));
+      case 'updateInterestedBuyerNotes':
+        return jsonOut(withSession(body, updateInterestedBuyerNotes));
+      case 'updateInterestedBuyerMatchStatus':
+        return jsonOut(withSession(body, updateInterestedBuyerMatchStatus));
       case 'submitFbPostRequest':
         return jsonOut(withSession(body, submitFbPostRequest));
       case 'getMyFbRequests':
@@ -165,8 +181,6 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminDecideFbRequest));
       case 'adminGetBuyerRequests':
         return jsonOut(withAdminSession(body, adminGetBuyerRequests));
-      case 'adminDecideBuyer':
-        return jsonOut(withAdminSession(body, adminDecideBuyer));
       case 'adminImportBuyerLeads':
         return jsonOut(withAdminSession(body, adminImportBuyerLeads));
       case 'adminGetBuyerLeads':
@@ -400,33 +414,19 @@ function getDeal(body, session) {
   return { ok: true, deal: session.a ? deal : applyAddressSecrecy(deal, session) };
 }
 
-// Strips the exact street Address from a deal object for a non-admin
-// session unless that specific rep has at least one Approved buyer logged
-// against it -- see the file header comment for why this happens here
-// rather than just being hidden client-side.
+// Strips every admin-only field from a deal object for a non-admin session
+// -- Address unconditionally (reps identify a deal by DealCode instead),
+// plus SensitiveDriveLink, AdminPrivateNotes, and SourceLink. Done here
+// server-side rather than relying on the front-end to hide them, since the
+// values would otherwise sit in the browser's network tab regardless of
+// what's rendered.
 function applyAddressSecrecy(deal, session) {
-  const approvedNames = repApprovedBuyerNames(session.u, deal['DealID']);
   const copy = Object.assign({}, deal);
-  if (approvedNames.length > 0) {
-    copy.AddressLocked = false;
-    copy.ApprovedBuyerNames = approvedNames;
-  } else {
-    copy.AddressLocked = true;
-    copy.Address = '';
-  }
-  delete copy.SensitiveDriveLink; // admin-only, unconditionally -- see file header comment
+  delete copy.Address;
+  delete copy.SensitiveDriveLink;
+  delete copy.AdminPrivateNotes;
+  delete copy.SourceLink;
   return copy;
-}
-
-function repApprovedBuyerNames(username, dealId) {
-  const sheet = getSheet(BUYERS_SHEET, BUYER_COLUMNS);
-  return sheetToObjects(sheet)
-    .filter(function (r) {
-      return r['DealID'] === dealId &&
-        String(r['Username'] || '').trim().toLowerCase() === username &&
-        r['Status'] === 'Approved';
-    })
-    .map(function (r) { return r['BuyerName']; });
 }
 
 function adminAddDeal(body) {
@@ -436,9 +436,10 @@ function adminAddDeal(body) {
   const dealId = Utilities.getUuid();
   const now = new Date().toISOString();
   appendRowByHeaders(sheet, {
-    'DealID': dealId, 'Address': d.address, 'City': d.city || '', 'State': d.state || '', 'Zip': d.zip || '',
-    'AssetType': d.assetType || '', 'Price': d.price || '', 'Status': d.status || DEFAULT_STATUSES[0],
+    'DealID': dealId, 'DealCode': d.dealCode || '', 'Address': d.address, 'City': d.city || '', 'State': d.state || '', 'Zip': d.zip || '',
+    'County': d.county || '', 'AssetType': d.assetType || '', 'Price': d.price || '', 'Status': d.status || DEFAULT_STATUSES[0],
     'Description': d.description || '', 'GeneralDriveLink': d.generalDriveLink || '', 'SensitiveDriveLink': d.sensitiveDriveLink || '',
+    'AdminPrivateNotes': d.adminPrivateNotes || '', 'SourceLink': d.sourceLink || '',
     'CreatedAt': now, 'UpdatedAt': now
   });
   return { ok: true, dealId: dealId };
@@ -451,7 +452,7 @@ function adminUpdateDeal(body) {
   const match = deals.find(function (d) { return d['DealID'] === body.dealId; });
   if (!match) return { ok: false, error: 'Deal not found.' };
   const d = body.data || {};
-  const editable = ['Address', 'City', 'State', 'Zip', 'AssetType', 'Price', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink'];
+  const editable = ['DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'AssetType', 'Price', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink'];
   editable.forEach(function (field) {
     if (d[field] === undefined) return;
     const col = getColumnIndex(sheet, field);
@@ -609,25 +610,26 @@ function addInterestedBuyer(body, session) {
   if (!canAccessDeal(session, body.dealId)) return { ok: false, error: 'You do not have access to this deal.' };
   const sheet = getSheet(BUYERS_SHEET, BUYER_COLUMNS);
   const buyerId = Utilities.getUuid();
+  const now = new Date().toISOString();
   appendRowByHeaders(sheet, {
     'BuyerID': buyerId, 'DealID': body.dealId, 'Username': session.u,
     'BuyerName': body.buyerName, 'BuyerContact': body.buyerContact || '', 'Notes': body.notes || '',
-    'Status': 'Pending', 'AdminNote': '', 'CreatedAt': new Date().toISOString(), 'DecidedAt': ''
+    'MatchStatus': 'Active Match', 'AdminNote': '', 'CreatedAt': now, 'StatusUpdatedAt': now
   });
 
   const adminEmail = PropertiesService.getScriptProperties().getProperty('ADMIN_NOTIFY_EMAIL');
   if (adminEmail) {
     const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
     const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === body.dealId; });
-    const address = deal ? deal['Address'] : body.dealId;
+    const dealLabel = deal ? (deal['DealCode'] || deal['Address']) : body.dealId;
     MailApp.sendEmail({
       to: adminEmail,
-      subject: 'Dispositions CRM — new interested buyer pending approval',
-      body: session.n + ' (' + session.u + ') logged an interested buyer on:\n\n' + address +
-        '\n\nBuyer name: ' + body.buyerName +
+      subject: 'Dispositions CRM — new interested buyer',
+      body: session.n + ' (' + session.u + ') logged an interested buyer on ' + dealLabel + ':\n\n' +
+        'Buyer name: ' + body.buyerName +
         (body.buyerContact ? '\nBuyer contact: ' + body.buyerContact : '') +
         (body.notes ? '\nNotes: ' + body.notes : '') +
-        '\n\nApprove this buyer in the admin panel before the rep can see the property address.'
+        '\n\nCheck the deal in the admin panel to follow the conversation and pick it up to close.'
     });
   }
 
@@ -640,6 +642,41 @@ function getInterestedBuyers(body, session) {
   const sheet = getSheet(BUYERS_SHEET, BUYER_COLUMNS);
   const rows = sheetToObjects(sheet).filter(function (r) { return r['DealID'] === body.dealId; });
   return { ok: true, buyers: rows };
+}
+
+// Either the admin, or any rep with access to the underlying deal, can
+// update a buyer match's running conversation notes or its MatchStatus --
+// there's no "only the rep who logged it" restriction, since other reps or
+// admin often need to pick up the same conversation (see file header
+// comment: "keep the person updated who brought the buyer").
+function findInterestedBuyerRow(buyerId) {
+  const sheet = getSheet(BUYERS_SHEET, BUYER_COLUMNS);
+  const rows = sheetToObjects(sheet);
+  const match = rows.find(function (r) { return r['BuyerID'] === buyerId; });
+  return { sheet: sheet, match: match };
+}
+
+function updateInterestedBuyerNotes(body, session) {
+  if (!body.buyerId) return { ok: false, error: 'Missing buyerId.' };
+  const found = findInterestedBuyerRow(body.buyerId);
+  if (!found.match) return { ok: false, error: 'Buyer match not found.' };
+  if (!session.a && !canAccessDeal(session, found.match['DealID'])) return { ok: false, error: 'You do not have access to this deal.' };
+  found.sheet.getRange(found.match._row, getColumnIndex(found.sheet, 'Notes')).setValue(body.notes || '');
+  return { ok: true };
+}
+
+function updateInterestedBuyerMatchStatus(body, session) {
+  if (!body.buyerId || !body.matchStatus) return { ok: false, error: 'Missing buyerId or matchStatus.' };
+  if (MATCH_STATUSES.indexOf(body.matchStatus) === -1) return { ok: false, error: 'Invalid match status.' };
+  const found = findInterestedBuyerRow(body.buyerId);
+  if (!found.match) return { ok: false, error: 'Buyer match not found.' };
+  if (!session.a && !canAccessDeal(session, found.match['DealID'])) return { ok: false, error: 'You do not have access to this deal.' };
+  found.sheet.getRange(found.match._row, getColumnIndex(found.sheet, 'MatchStatus')).setValue(body.matchStatus);
+  found.sheet.getRange(found.match._row, getColumnIndex(found.sheet, 'StatusUpdatedAt')).setValue(new Date().toISOString());
+  if (body.adminNote !== undefined && session.a) {
+    found.sheet.getRange(found.match._row, getColumnIndex(found.sheet, 'AdminNote')).setValue(body.adminNote || '');
+  }
+  return { ok: true };
 }
 
 // ---------- Facebook post approvals ----------
@@ -734,10 +771,12 @@ function adminDecideFbRequest(body) {
   return { ok: true };
 }
 
-// ---------- Admin: interested-buyer approvals ----------
-// Approving a buyer here is the only thing that unlocks that specific rep's
-// view of the deal's exact Address (see applyAddressSecrecy) -- rejecting
-// just leaves it hidden and records why, via AdminNote.
+// ---------- Admin: buyer matches overview ----------
+// A read-only, all-deals view of every buyer<->deal match and its
+// MatchStatus, for admin to spot what's negotiating/closing across the
+// board and pick up any conversation. Updating a match (notes or status)
+// happens through updateInterestedBuyerNotes / updateInterestedBuyerMatchStatus,
+// same as reps use, since admin is just another eligible editor for these.
 
 function adminGetBuyerRequests(body) {
   const sheet = getSheet(BUYERS_SHEET, BUYER_COLUMNS);
@@ -749,21 +788,9 @@ function adminGetBuyerRequests(body) {
   rows.forEach(function (r) {
     const deal = dealsById[r['DealID']];
     r.address = deal ? deal['Address'] : '(deleted deal)';
+    r.dealCode = deal ? deal['DealCode'] : '';
   });
   return { ok: true, requests: rows };
-}
-
-function adminDecideBuyer(body) {
-  if (!body.buyerId || !body.decision) return { ok: false, error: 'Missing buyerId or decision.' };
-  if (body.decision !== 'Approved' && body.decision !== 'Rejected') return { ok: false, error: 'Invalid decision.' };
-  const sheet = getSheet(BUYERS_SHEET, BUYER_COLUMNS);
-  const rows = sheetToObjects(sheet);
-  const match = rows.find(function (r) { return r['BuyerID'] === body.buyerId; });
-  if (!match) return { ok: false, error: 'Buyer not found.' };
-  sheet.getRange(match._row, getColumnIndex(sheet, 'Status')).setValue(body.decision);
-  sheet.getRange(match._row, getColumnIndex(sheet, 'AdminNote')).setValue(body.note || '');
-  sheet.getRange(match._row, getColumnIndex(sheet, 'DecidedAt')).setValue(new Date().toISOString());
-  return { ok: true };
 }
 
 // ---------- Buyer leads (master calling list) ----------
@@ -880,6 +907,10 @@ function adminImportBuyerLeads(body) {
 // Joins every pitch to its contacts and computes each one's live status,
 // tagging whether its deal is still active. dealsById must be a map of
 // DealID -> deal object (caller builds this once and reuses it).
+// dealAddress is included here for admin-only callers (adminGetPitchesForBuyerLead)
+// -- getMyPitches (rep-facing) strips it back out before returning, since a
+// rep must never receive a deal's Address at all. dealCode is always safe
+// for either audience.
 function pitchesWithStatus(pitchRows, allContacts, dealsById) {
   const contactsByPitch = {};
   allContacts.forEach(function (c) {
@@ -893,6 +924,7 @@ function pitchesWithStatus(pitchRows, allContacts, dealsById) {
     copy.status = computeLeadStatus(p._phoneType, contacts);
     copy.contactCount = contacts.length;
     copy.dealAddress = deal ? deal['Address'] : '(deleted deal)';
+    copy.dealCode = deal ? deal['DealCode'] : '';
     copy.dealStatus = deal ? deal['Status'] : '';
     copy.dealStillActive = dealIsActive(deal);
     return copy;
@@ -1230,6 +1262,7 @@ function getMyPitches(body, session) {
     p.generalNotes = lead ? lead['GeneralNotes'] : '';
     p.email = lead ? lead['Email'] : '';
     p.driveLink = lead ? lead['DriveLink'] : '';
+    delete p.dealAddress; // rep-facing -- never send the deal's Address, see file header comment
   });
   return { ok: true, pitches: withStatus };
 }

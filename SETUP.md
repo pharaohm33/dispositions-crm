@@ -107,27 +107,29 @@ to the `Reps` sheet tab yourself, once, directly in Google Sheets:
   see every deal regardless of the `Assignments` tab. `IsAdmin` = TRUE gates
   the whole admin panel.
 - **Deals** — one row per property. `Status` is free text but the admin panel
-  only offers whatever's currently listed in `StatusOptions`. `GeneralDriveLink`
-  (any Google Drive folder/file URL) is visible to every rep with access to
-  the deal; `SensitiveDriveLink` (contracts, financials, seller personal
-  info, etc.) is admin-only and is stripped out of every non-admin response
-  server-side, the same way the street Address is — there's no rep-facing
-  unlock for it at all.
+  only offers whatever's currently listed in `StatusOptions`. `DealCode` (a
+  short label like "A-1" you assign) plus City/State/Zip/County/Price is
+  everything a rep ever sees to identify a deal. `GeneralDriveLink` (any
+  Google Drive folder/file URL) is visible to every rep with access to the
+  deal; `Address`, `SensitiveDriveLink` (contracts, financials, seller
+  personal info), `AdminPrivateNotes` (your own scratchpad), and `SourceLink`
+  (where you found the deal online) are all admin-only and stripped out of
+  every non-admin response server-side — there's no rep-facing unlock for
+  any of them, ever.
 - **Assignments** — which non-all-access reps can see which deals. Managed
   from a deal's detail panel in the admin view.
-- **InterestedBuyers** — logged by whichever rep has access to that deal, per
-  your Step 2 SOP (buyer wants the address).
+- **InterestedBuyers** — logged by whichever rep has access to that deal, the
+  moment a buyer shows real interest (Step 2). Submitting one emails
+  `ADMIN_NOTIFY_EMAIL` immediately — there's no approval gate anymore, since
+  reps never see the address regardless. `MatchStatus` (Active Match /
+  Negotiating / Closing / Dead Match) tracks the buyer<->deal relationship
+  itself, editable by admin or any rep with access to that deal; `Notes` is a
+  running conversation log either can keep updating over time ("copy and
+  paste important notes of the conversation"); `AdminNote` is your own
+  separate note on the match, admin-only.
 - **FBPostRequests** — a rep's Step 1 ask for approval before posting to
   Facebook, including which groups they intend to post to. Submitting one
   emails `ADMIN_NOTIFY_EMAIL` automatically.
-- **Address secrecy** — a deal's exact street address is withheld from every
-  non-admin session (stripped server-side, not just hidden in the UI) until
-  that specific rep has at least one interested buyer you've approved on that
-  deal. Submitting an interested buyer emails `ADMIN_NOTIFY_EMAIL` with the
-  buyer's full name; once you approve that buyer from the **Buyer Approvals**
-  tab (or right on the deal's detail panel), the rep sees the address along
-  with a warning naming exactly which buyer(s) they're allowed to share it
-  with.
 - **StatusOptions** — the list of deal-status categories offered in dropdowns
   (Active, Under Contract, Sold, Dead, On Hold by default). Editable from the
   **Status Categories** admin tab.
