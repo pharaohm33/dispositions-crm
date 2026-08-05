@@ -135,10 +135,14 @@ function renderRepDeals() {
   });
   empty.hidden = filtered.length > 0;
   container.innerHTML = filtered.map(function (d) {
+    const heading = d.AddressLocked
+      ? esc(d.AssetType || "Deal") + (d.City ? " &middot; " + esc(d.City) + (d.State ? ", " + esc(d.State) : "") : "")
+      : esc(d.Address) + (d.City ? ", " + esc(d.City) : "");
     return '<div class="deal-card" data-deal-id="' + esc(d.DealID) + '">' +
-      '<div class="addr">' + esc(d.Address) + (d.City ? ", " + esc(d.City) : "") + '</div>' +
+      '<div class="addr">' + heading + '</div>' +
       '<div class="meta">' + esc(d.AssetType || "") + (d.Price ? " &middot; " + esc(d.Price) : "") +
-      ' <span class="status-pill ' + statusClass(d.Status) + '">' + esc(d.Status || "") + '</span></div>' +
+      ' <span class="status-pill ' + statusClass(d.Status) + '">' + esc(d.Status || "") + '</span>' +
+      (d.AddressLocked ? ' <span class="status-pill status-onhold">Address locked</span>' : "") + '</div>' +
       '</div>';
   }).join("");
   Array.from(container.querySelectorAll(".deal-card")).forEach(function (card) {
@@ -147,26 +151,38 @@ function renderRepDeals() {
 }
 
 async function openRepDealDetail(dealId) {
-  const deal = repDeals.find(function (d) { return d.DealID === dealId; });
-  if (!deal) return;
-
   const overlay = document.getElementById("detail-overlay");
   const panel = document.getElementById("detail-panel");
   overlay.hidden = false;
 
-  const [buyersRes, fbRes] = await Promise.all([
+  const [dealRes, buyersRes, fbRes] = await Promise.all([
+    api("getDeal", { dealId: dealId }),
     api("getInterestedBuyers", { dealId: dealId }),
     api("getMyFbRequests", { dealId: dealId })
   ]);
+  if (!dealRes.ok) { overlay.hidden = true; return; }
+  const deal = dealRes.deal;
   const buyers = buyersRes.ok ? buyersRes.buyers : [];
   const fbRequests = fbRes.ok ? fbRes.requests : [];
 
+  const titleHtml = deal.AddressLocked
+    ? '<div><h2 class="step-title">' + esc(deal.AssetType || "Deal") + '</h2>' +
+      '<p class="step-sub">' + esc(deal.City || "") + (deal.State ? ", " + esc(deal.State) : "") + ' ' + esc(deal.Zip || "") + '</p></div>'
+    : '<div><h2 class="step-title">' + esc(deal.Address) + '</h2>' +
+      '<p class="step-sub">' + esc(deal.City || "") + (deal.State ? ", " + esc(deal.State) : "") + ' ' + esc(deal.Zip || "") + '</p></div>';
+
+  const addressBlock = deal.AddressLocked
+    ? '<div class="banner warn"><strong>Address locked.</strong> The exact property address unlocks here once admin approves an interested buyer you log below.</div>'
+    : '<div class="banner danger"><strong>Confidential &mdash; do not share.</strong> You may share this address ONLY with ' +
+      esc((deal.ApprovedBuyerNames || []).join(", ")) +
+      '. Sharing it with anyone else risks losing us this deal and getting paid on it, and will get you removed as a dispositions team member.</div>';
+
   panel.innerHTML =
     '<div style="display:flex; justify-content:space-between; align-items:flex-start;">' +
-      '<div><h2 class="step-title">' + esc(deal.Address) + '</h2>' +
-      '<p class="step-sub">' + esc(deal.City || "") + (deal.State ? ", " + esc(deal.State) : "") + ' ' + esc(deal.Zip || "") + '</p></div>' +
+      titleHtml +
       '<button class="link-btn" id="close-detail-btn">Close</button>' +
     '</div>' +
+    addressBlock +
     '<div class="banner info">' +
       '<span class="status-pill ' + statusClass(deal.Status) + '">' + esc(deal.Status || "") + '</span>' +
       (deal.AssetType ? '<div style="margin-top:8px;"><strong>Asset Type:</strong> ' + esc(deal.AssetType) + '</div>' : "") +
@@ -264,11 +280,14 @@ function renderFbRequestList(requests, showAuthor) {
 function renderBuyerList(buyers) {
   if (buyers.length === 0) return '<p class="small-muted">No interested buyers logged yet.</p>';
   return buyers.slice().reverse().map(function (b) {
+    const pillClass = b.Status === "Approved" ? "status-active" : b.Status === "Rejected" ? "status-dead" : "status-onhold";
     return '<div class="item-row">' +
       '<span class="ts">' + formatDate(b.CreatedAt) + ' &middot; added by ' + esc(b.Username) + '</span>' +
-      '<strong>' + esc(b.BuyerName) + '</strong>' +
-      (b.BuyerContact ? ' &mdash; ' + esc(b.BuyerContact) : "") +
+      '<span class="status-pill ' + pillClass + '">' + esc(b.Status || "Pending") + '</span>' +
+      '<div style="margin-top:6px;"><strong>' + esc(b.BuyerName) + '</strong>' +
+      (b.BuyerContact ? ' &mdash; ' + esc(b.BuyerContact) : "") + '</div>' +
       (b.Notes ? '<div style="margin-top:4px;">' + esc(b.Notes) + '</div>' : "") +
+      (b.AdminNote ? '<div class="small-muted" style="margin-top:4px;">Admin note: ' + esc(b.AdminNote) + '</div>' : "") +
       '</div>';
   }).join("");
 }
@@ -288,11 +307,12 @@ function switchAdminTab(tab) {
   Array.from(document.querySelectorAll(".tab-btn")).forEach(function (btn) {
     btn.classList.toggle("active", btn.getAttribute("data-tab") === tab);
   });
-  ["deals", "team", "fb", "statuses"].forEach(function (t) {
+  ["deals", "team", "fb", "buyers", "statuses"].forEach(function (t) {
     document.getElementById("tab-" + t).hidden = t !== tab;
   });
   if (tab === "team") loadReps();
   if (tab === "fb") loadFbRequests();
+  if (tab === "buyers") loadBuyerRequests();
   if (tab === "statuses") loadStatusOptions();
 }
 
@@ -444,7 +464,7 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     '<div id="admin-fb-list">' + renderAdminFbList(fbRequests) + '</div>' +
 
     '<div class="section-title">Interested Buyers</div>' +
-    renderBuyerList(buyers) +
+    '<div id="admin-buyer-list">' + renderAdminBuyerList(buyers) + '</div>' +
 
     '<label class="field-label" style="margin-top:24px;">Description / Notes</label>' +
     '<textarea id="deal-desc-edit">' + esc(deal.Description || "") + '</textarea>' +
@@ -480,6 +500,16 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     await loadAdminDeals();
   });
 
+  Array.from(panel.querySelectorAll(".buyer-decide-btn")).forEach(function (btn) {
+    btn.addEventListener("click", async function () {
+      const buyerId = btn.getAttribute("data-buyer-id");
+      const decision = btn.getAttribute("data-decision");
+      const note = document.getElementById("buyer-note-" + buyerId).value.trim();
+      await api("adminDecideBuyer", { buyerId: buyerId, decision: decision, note: note });
+      openAdminDealDetail(deal.DealID);
+    });
+  });
+
   Array.from(panel.querySelectorAll(".fb-decide-btn")).forEach(function (btn) {
     btn.addEventListener("click", async function () {
       const requestId = btn.getAttribute("data-request-id");
@@ -509,6 +539,29 @@ function renderAdminFbList(requests) {
             '</div>' +
           '</div>'
         : (r.AdminNote ? '<div class="small-muted" style="margin-top:4px;">Admin note: ' + esc(r.AdminNote) + '</div>' : "")) +
+      '</div>';
+  }).join("");
+}
+
+function renderAdminBuyerList(buyers) {
+  if (buyers.length === 0) return '<p class="small-muted">No interested buyers logged for this deal yet.</p>';
+  return buyers.slice().reverse().map(function (b) {
+    const pillClass = b.Status === "Approved" ? "status-active" : b.Status === "Rejected" ? "status-dead" : "status-onhold";
+    return '<div class="item-row">' +
+      '<span class="ts">' + formatDate(b.CreatedAt) + " &middot; logged by " + esc(b.Username) + '</span>' +
+      '<span class="status-pill ' + pillClass + '">' + esc(b.Status || "Pending") + '</span>' +
+      '<div style="margin-top:6px;"><strong>' + esc(b.BuyerName) + '</strong>' +
+      (b.BuyerContact ? ' &mdash; ' + esc(b.BuyerContact) : "") + '</div>' +
+      (b.Notes ? '<div style="margin-top:4px;">' + esc(b.Notes) + '</div>' : "") +
+      ((b.Status || "Pending") === "Pending"
+        ? '<div style="margin-top:8px;">' +
+            '<input type="text" id="buyer-note-' + esc(b.BuyerID) + '" placeholder="Optional note" style="margin-bottom:6px;">' +
+            '<div class="actions">' +
+              '<button class="btn small primary buyer-decide-btn" data-buyer-id="' + esc(b.BuyerID) + '" data-decision="Approved">Approve &mdash; reveal address</button>' +
+              '<button class="btn small danger buyer-decide-btn" data-buyer-id="' + esc(b.BuyerID) + '" data-decision="Rejected">Reject</button>' +
+            '</div>' +
+          '</div>'
+        : (b.AdminNote ? '<div class="small-muted" style="margin-top:4px;">Admin note: ' + esc(b.AdminNote) + '</div>' : "")) +
       '</div>';
   }).join("");
 }
@@ -659,6 +712,50 @@ async function loadFbRequests() {
       const note = document.getElementById("fbtab-note-" + requestId).value.trim();
       await api("adminDecideFbRequest", { requestId: requestId, decision: decision, note: note });
       loadFbRequests();
+    });
+  });
+}
+
+/* ---------- Buyer Approvals tab ---------- */
+
+async function loadBuyerRequests() {
+  const res = await api("adminGetBuyerRequests", {});
+  const list = document.getElementById("buyers-list");
+  const empty = document.getElementById("buyers-empty");
+  if (!res.ok) return;
+  const requests = res.requests.slice().sort(function (a, b) {
+    if (a.Status === "Pending" && b.Status !== "Pending") return -1;
+    if (a.Status !== "Pending" && b.Status === "Pending") return 1;
+    return new Date(b.CreatedAt) - new Date(a.CreatedAt);
+  });
+  empty.hidden = requests.length > 0;
+  list.innerHTML = requests.map(function (b) {
+    const pillClass = b.Status === "Approved" ? "status-active" : b.Status === "Rejected" ? "status-dead" : "status-onhold";
+    return '<div class="item-row">' +
+      '<span class="ts">' + formatDate(b.CreatedAt) + " &middot; logged by " + esc(b.Username) + " &middot; " + esc(b.address) + '</span>' +
+      '<span class="status-pill ' + pillClass + '">' + esc(b.Status || "Pending") + '</span>' +
+      '<div style="margin-top:6px;"><strong>' + esc(b.BuyerName) + '</strong>' +
+      (b.BuyerContact ? ' &mdash; ' + esc(b.BuyerContact) : "") + '</div>' +
+      (b.Notes ? '<div style="margin-top:4px;">' + esc(b.Notes) + '</div>' : "") +
+      ((b.Status || "Pending") === "Pending"
+        ? '<div style="margin-top:8px;">' +
+            '<input type="text" id="buyertab-note-' + esc(b.BuyerID) + '" placeholder="Optional note" style="margin-bottom:6px;">' +
+            '<div class="actions">' +
+              '<button class="btn small primary buyertab-decide-btn" data-buyer-id="' + esc(b.BuyerID) + '" data-decision="Approved">Approve &mdash; reveal address</button>' +
+              '<button class="btn small danger buyertab-decide-btn" data-buyer-id="' + esc(b.BuyerID) + '" data-decision="Rejected">Reject</button>' +
+            '</div>' +
+          '</div>'
+        : (b.AdminNote ? '<div class="small-muted" style="margin-top:4px;">Admin note: ' + esc(b.AdminNote) + '</div>' : "")) +
+      '</div>';
+  }).join("");
+
+  Array.from(list.querySelectorAll(".buyertab-decide-btn")).forEach(function (btn) {
+    btn.addEventListener("click", async function () {
+      const buyerId = btn.getAttribute("data-buyer-id");
+      const decision = btn.getAttribute("data-decision");
+      const note = document.getElementById("buyertab-note-" + buyerId).value.trim();
+      await api("adminDecideBuyer", { buyerId: buyerId, decision: decision, note: note });
+      loadBuyerRequests();
     });
   });
 }

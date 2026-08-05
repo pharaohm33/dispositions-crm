@@ -7,7 +7,15 @@
  *
  * Required Script Properties (Project Settings -> Script Properties):
  *   SESSION_SECRET      - random long string, used to sign session tokens
- *   ADMIN_NOTIFY_EMAIL  - where "new Facebook post request" emails are sent
+ *   ADMIN_NOTIFY_EMAIL  - where "new Facebook post request" and
+ *                         "new interested buyer" emails are sent
+ *
+ * Address secrecy model: a deal's exact street Address is never sent to a
+ * non-admin session until that specific rep has at least one Approved
+ * interested buyer logged against that deal (see repApprovedBuyerNames).
+ * Until then getDeals/getDeal strip the Address field entirely rather than
+ * relying on the front-end to hide it, since the value would otherwise sit
+ * in the browser's network tab regardless of what's rendered.
  */
 
 const REPS_SHEET = 'Reps';
@@ -22,7 +30,7 @@ const DEFAULT_STATUSES = ['Active', 'Under Contract', 'Sold', 'Dead', 'On Hold']
 const REP_COLUMNS = ['Username', 'Name', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt'];
 const DEAL_COLUMNS = ['DealID', 'Address', 'City', 'State', 'Zip', 'AssetType', 'Price', 'Status', 'Description', 'CreatedAt', 'UpdatedAt'];
 const ASSIGNMENT_COLUMNS = ['DealID', 'Username', 'AssignedAt'];
-const BUYER_COLUMNS = ['BuyerID', 'DealID', 'Username', 'BuyerName', 'BuyerContact', 'Notes', 'CreatedAt'];
+const BUYER_COLUMNS = ['BuyerID', 'DealID', 'Username', 'BuyerName', 'BuyerContact', 'Notes', 'Status', 'AdminNote', 'CreatedAt', 'DecidedAt'];
 const FB_COLUMNS = ['RequestID', 'DealID', 'Username', 'PostText', 'TargetGroups', 'Status', 'AdminNote', 'CreatedAt', 'DecidedAt'];
 
 function doGet(e) {
@@ -88,6 +96,10 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminGetFbRequests));
       case 'adminDecideFbRequest':
         return jsonOut(withAdminSession(body, adminDecideFbRequest));
+      case 'adminGetBuyerRequests':
+        return jsonOut(withAdminSession(body, adminGetBuyerRequests));
+      case 'adminDecideBuyer':
+        return jsonOut(withAdminSession(body, adminDecideBuyer));
       case 'adminAddStatusOption':
         return jsonOut(withAdminSession(body, adminAddStatusOption));
       case 'adminRemoveStatusOption':
@@ -282,6 +294,7 @@ function getDeals(body, session) {
     const ids = accessibleDealIds(session);
     deals = deals.filter(function (d) { return ids[d['DealID']]; });
   }
+  if (!session.a) deals = deals.map(function (d) { return applyAddressSecrecy(d, session); });
   return { ok: true, deals: deals };
 }
 
@@ -291,7 +304,35 @@ function getDeal(body, session) {
   const sheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
   const deal = sheetToObjects(sheet).find(function (d) { return d['DealID'] === body.dealId; });
   if (!deal) return { ok: false, error: 'Deal not found.' };
-  return { ok: true, deal: deal };
+  return { ok: true, deal: session.a ? deal : applyAddressSecrecy(deal, session) };
+}
+
+// Strips the exact street Address from a deal object for a non-admin
+// session unless that specific rep has at least one Approved buyer logged
+// against it -- see the file header comment for why this happens here
+// rather than just being hidden client-side.
+function applyAddressSecrecy(deal, session) {
+  const approvedNames = repApprovedBuyerNames(session.u, deal['DealID']);
+  const copy = Object.assign({}, deal);
+  if (approvedNames.length > 0) {
+    copy.AddressLocked = false;
+    copy.ApprovedBuyerNames = approvedNames;
+  } else {
+    copy.AddressLocked = true;
+    copy.Address = '';
+  }
+  return copy;
+}
+
+function repApprovedBuyerNames(username, dealId) {
+  const sheet = getSheet(BUYERS_SHEET, BUYER_COLUMNS);
+  return sheetToObjects(sheet)
+    .filter(function (r) {
+      return r['DealID'] === dealId &&
+        String(r['Username'] || '').trim().toLowerCase() === username &&
+        r['Status'] === 'Approved';
+    })
+    .map(function (r) { return r['BuyerName']; });
 }
 
 function adminAddDeal(body) {
@@ -475,8 +516,25 @@ function addInterestedBuyer(body, session) {
   appendRowByHeaders(sheet, {
     'BuyerID': buyerId, 'DealID': body.dealId, 'Username': session.u,
     'BuyerName': body.buyerName, 'BuyerContact': body.buyerContact || '', 'Notes': body.notes || '',
-    'CreatedAt': new Date().toISOString()
+    'Status': 'Pending', 'AdminNote': '', 'CreatedAt': new Date().toISOString(), 'DecidedAt': ''
   });
+
+  const adminEmail = PropertiesService.getScriptProperties().getProperty('ADMIN_NOTIFY_EMAIL');
+  if (adminEmail) {
+    const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+    const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === body.dealId; });
+    const address = deal ? deal['Address'] : body.dealId;
+    MailApp.sendEmail({
+      to: adminEmail,
+      subject: 'Dispositions CRM — new interested buyer pending approval',
+      body: session.n + ' (' + session.u + ') logged an interested buyer on:\n\n' + address +
+        '\n\nBuyer name: ' + body.buyerName +
+        (body.buyerContact ? '\nBuyer contact: ' + body.buyerContact : '') +
+        (body.notes ? '\nNotes: ' + body.notes : '') +
+        '\n\nApprove this buyer in the admin panel before the rep can see the property address.'
+    });
+  }
+
   return { ok: true, buyerId: buyerId };
 }
 
@@ -574,6 +632,38 @@ function adminDecideFbRequest(body) {
   const rows = sheetToObjects(sheet);
   const match = rows.find(function (r) { return r['RequestID'] === body.requestId; });
   if (!match) return { ok: false, error: 'Request not found.' };
+  sheet.getRange(match._row, getColumnIndex(sheet, 'Status')).setValue(body.decision);
+  sheet.getRange(match._row, getColumnIndex(sheet, 'AdminNote')).setValue(body.note || '');
+  sheet.getRange(match._row, getColumnIndex(sheet, 'DecidedAt')).setValue(new Date().toISOString());
+  return { ok: true };
+}
+
+// ---------- Admin: interested-buyer approvals ----------
+// Approving a buyer here is the only thing that unlocks that specific rep's
+// view of the deal's exact Address (see applyAddressSecrecy) -- rejecting
+// just leaves it hidden and records why, via AdminNote.
+
+function adminGetBuyerRequests(body) {
+  const sheet = getSheet(BUYERS_SHEET, BUYER_COLUMNS);
+  let rows = sheetToObjects(sheet);
+  if (body.dealId) rows = rows.filter(function (r) { return r['DealID'] === body.dealId; });
+  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const dealsById = {};
+  sheetToObjects(dealsSheet).forEach(function (d) { dealsById[d['DealID']] = d; });
+  rows.forEach(function (r) {
+    const deal = dealsById[r['DealID']];
+    r.address = deal ? deal['Address'] : '(deleted deal)';
+  });
+  return { ok: true, requests: rows };
+}
+
+function adminDecideBuyer(body) {
+  if (!body.buyerId || !body.decision) return { ok: false, error: 'Missing buyerId or decision.' };
+  if (body.decision !== 'Approved' && body.decision !== 'Rejected') return { ok: false, error: 'Invalid decision.' };
+  const sheet = getSheet(BUYERS_SHEET, BUYER_COLUMNS);
+  const rows = sheetToObjects(sheet);
+  const match = rows.find(function (r) { return r['BuyerID'] === body.buyerId; });
+  if (!match) return { ok: false, error: 'Buyer not found.' };
   sheet.getRange(match._row, getColumnIndex(sheet, 'Status')).setValue(body.decision);
   sheet.getRange(match._row, getColumnIndex(sheet, 'AdminNote')).setValue(body.note || '');
   sheet.getRange(match._row, getColumnIndex(sheet, 'DecidedAt')).setValue(new Date().toISOString());

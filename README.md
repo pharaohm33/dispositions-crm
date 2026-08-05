@@ -21,10 +21,15 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
      admin approval before posting — including which groups you intend to
      post it to.
   2. Once a buyer says the deal may work but wants the address, log that
-     buyer's name under "Interested Buyers."
-- Every Facebook post submission emails the admin automatically, and shows
-  the rep its own Pending/Approved/Rejected status (with the admin's note, if
-  rejected).
+     buyer's name under "Interested Buyers." The deal's exact street address
+     stays hidden (server-side, not just in the UI) until admin approves that
+     specific buyer — once approved, the rep sees the address along with a
+     warning naming exactly who they're allowed to share it with, and a
+     reminder that sharing it with anyone else risks the deal and their
+     standing on the team.
+- Every Facebook post submission and every interested buyer submission emails
+  the admin automatically, and shows the rep its own Pending/Approved/Rejected
+  status (with the admin's note, if rejected).
 
 **Admin side** (behind the same login, when marked as admin):
 
@@ -36,6 +41,9 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   you create every login yourself.
 - **Facebook Approvals** — every pending post request across all deals in one
   place, approve or reject with an optional note.
+- **Buyer Approvals** — every pending interested-buyer submission across all
+  deals in one place; approving one is what unlocks that rep's view of that
+  deal's exact address.
 - **Status Categories** — add or remove the status options offered in the
   Deals dropdowns.
 

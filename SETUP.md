@@ -98,6 +98,14 @@ to the `Reps` sheet tab yourself, once, directly in Google Sheets:
 - **FBPostRequests** — a rep's Step 1 ask for approval before posting to
   Facebook, including which groups they intend to post to. Submitting one
   emails `ADMIN_NOTIFY_EMAIL` automatically.
+- **Address secrecy** — a deal's exact street address is withheld from every
+  non-admin session (stripped server-side, not just hidden in the UI) until
+  that specific rep has at least one interested buyer you've approved on that
+  deal. Submitting an interested buyer emails `ADMIN_NOTIFY_EMAIL` with the
+  buyer's full name; once you approve that buyer from the **Buyer Approvals**
+  tab (or right on the deal's detail panel), the rep sees the address along
+  with a warning naming exactly which buyer(s) they're allowed to share it
+  with.
 - **StatusOptions** — the list of deal-status categories offered in dropdowns
   (Active, Under Contract, Sold, Dead, On Hold by default). Editable from the
   **Status Categories** admin tab.
