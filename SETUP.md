@@ -109,15 +109,23 @@ to the `Reps` sheet tab yourself, once, directly in Google Sheets:
 - **Deals** — one row per property. `Status` is free text but the admin panel
   only offers whatever's currently listed in `StatusOptions`. `DealCode` (a
   short label like "A-1" you assign) plus City/State/Zip/County/Price is
-  everything a rep ever sees to identify a deal. `GeneralDriveLink` (any
+  everything a rep sees to identify a deal by default. `GeneralDriveLink` (any
   Google Drive folder/file URL) is visible to every rep with access to the
-  deal; `Address`, `SensitiveDriveLink` (contracts, financials, seller
-  personal info), `AdminPrivateNotes` (your own scratchpad), and `SourceLink`
-  (where you found the deal online) are all admin-only and stripped out of
-  every non-admin response server-side — there's no rep-facing unlock for
-  any of them, ever.
+  deal; `SensitiveDriveLink` (contracts, financials, seller personal info),
+  `AdminPrivateNotes` (your own scratchpad), and `SourceLink` (where you
+  found the deal online) are all admin-only and stripped out of every
+  non-admin response server-side, with no rep-facing unlock at all. `Address`
+  is admin-only by default too, but — unlike those three — it has a
+  deliberate, reversible unlock: see AddressGrants below.
 - **Assignments** — which non-all-access reps can see which deals. Managed
   from a deal's detail panel in the admin view.
+- **AddressGrants** — the one exception to "reps never see the address":
+  admin can explicitly disclose a specific deal's exact address to a
+  specific team member from that deal's **Address Access** section (only
+  offered to reps who already have access to the deal), and revoke it just
+  as easily. Starts empty for every deal — nobody has address access until
+  you deliberately turn it on for them. Doesn't extend to the Buyer Leads
+  calling-list Pitch view, which never shows the address regardless.
 - **InterestedBuyers** — logged by whichever rep has access to that deal, the
   moment a buyer shows real interest (Step 2). Submitting one emails
   `ADMIN_NOTIFY_EMAIL` immediately — there's no approval gate anymore, since

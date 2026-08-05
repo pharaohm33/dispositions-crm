@@ -17,8 +17,10 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
 - Sees every deal they've been given access to (either specific deals, or
   "all deals" if the admin granted that) — identified only by a **Deal Code**
   (e.g. "A-1") plus City/State/Zip/County/Price. The exact street address is
-  never sent to a rep session at all, full stop — there's no unlock path,
-  server-side or otherwise.
+  hidden by default, with one deliberate exception: admin can disclose it to
+  a specific team member for a specific deal (once they've proven they work
+  it correctly), and revoke that access just as easily — see **Address
+  Access** in the admin section below.
 - Each deal shows the standing SOP:
   1. Contact buyers from the lead list, or submit a Facebook post here for
      admin approval before posting — including which groups you intend to
@@ -58,7 +60,10 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   (what reps actually see instead of the address), and set two Google Drive
   links: a **General Drive Link** (visible to your team — photos, comps,
   marketing) and a **Sensitive Drive Link** (admin-only — contracts,
-  financials, seller personal info). A private **Source Link** + **Admin
+  financials, seller personal info). **Address Access** on each deal lets
+  you disclose the exact address to specific team members with a click, and
+  revoke it just as easily — nobody has it by default, and there's a chip
+  list showing exactly who currently does. A private **Source Link** + **Admin
   Notes** section on every deal is visible to you alone — paste the original
   online listing link, track sourcing details, whatever you don't want any
   rep to ever see.

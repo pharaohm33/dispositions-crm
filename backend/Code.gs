@@ -14,15 +14,20 @@
  *   AUTO_FEED_ENABLED, AUTO_FEED_BATCH_SIZE - set via the admin panel, not
  *                         by hand; see adminSetAutoFeed
  *
- * Address secrecy model: a deal's exact street Address is NEVER sent to any
- * non-admin session, full stop -- no rep-facing unlock path exists at all.
- * Reps instead identify a deal by its DealCode (a short admin-assigned
- * label like "A-1") plus City/State/Zip/County/Price. getDeals/getDeal (and
- * getMyPitches, for the buyer-leads calling list) strip Address server-side
+ * Address secrecy model: a deal's exact street Address is stripped from
+ * every non-admin session by default -- reps instead identify a deal by its
+ * DealCode (a short admin-assigned label like "A-1") plus
+ * City/State/Zip/County/Price. The one exception is an explicit, reversible,
+ * per-rep-per-deal grant (AddressGrants sheet; adminGrantAddressAccess /
+ * adminRevokeAddressAccess) -- everyone starts with no address access, and
+ * only sees one after admin deliberately turns it on for that specific
+ * rep+deal, revocable any time. getDeals/getDeal strip Address server-side
  * rather than relying on the front-end to hide it, since the value would
  * otherwise sit in the browser's network tab regardless of what's rendered.
+ * getMyPitches (buyer-leads calling list) never includes Address at all --
+ * grants are deal-detail-only, not plumbed into the calling-list pitch view.
  * AdminPrivateNotes and SourceLink on a Deal get the same unconditional
- * admin-only treatment as SensitiveDriveLink.
+ * admin-only treatment as SensitiveDriveLink (no grant path for those).
  *
  * Buyer leads model: a buyer/LLC on the master calling list (BuyerLeads)
  * only ever becomes a work item once it's paired with one specific active
@@ -45,6 +50,8 @@ const STATUS_SHEET = 'StatusOptions';
 const BUYER_LEADS_SHEET = 'BuyerLeads';
 const PITCHES_SHEET = 'Pitches';
 const BUYER_LEAD_CONTACTS_SHEET = 'BuyerLeadContacts';
+const ADDRESS_GRANTS_SHEET = 'AddressGrants';
+const ADDRESS_GRANT_COLUMNS = ['DealID', 'Username', 'GrantedAt'];
 const SESSION_HOURS = 12;
 const DEFAULT_STATUSES = ['Active', 'Under Contract', 'Sold', 'Dead', 'On Hold'];
 const FOLLOWUP_HOURS = 24;
@@ -175,6 +182,12 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminUnassignRep));
       case 'adminGetAssignments':
         return jsonOut(withAdminSession(body, adminGetAssignments));
+      case 'adminGrantAddressAccess':
+        return jsonOut(withAdminSession(body, adminGrantAddressAccess));
+      case 'adminRevokeAddressAccess':
+        return jsonOut(withAdminSession(body, adminRevokeAddressAccess));
+      case 'adminGetAddressGrants':
+        return jsonOut(withAdminSession(body, adminGetAddressGrants));
       case 'adminGetFbRequests':
         return jsonOut(withAdminSession(body, adminGetFbRequests));
       case 'adminDecideFbRequest':
@@ -401,7 +414,10 @@ function getDeals(body, session) {
     const ids = accessibleDealIds(session);
     deals = deals.filter(function (d) { return ids[d['DealID']]; });
   }
-  if (!session.a) deals = deals.map(function (d) { return applyAddressSecrecy(d, session); });
+  if (!session.a) {
+    const grants = loadAddressGrantsSet();
+    deals = deals.map(function (d) { return applyAddressSecrecy(d, session, grants); });
+  }
   return { ok: true, deals: deals };
 }
 
@@ -411,18 +427,33 @@ function getDeal(body, session) {
   const sheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
   const deal = sheetToObjects(sheet).find(function (d) { return d['DealID'] === body.dealId; });
   if (!deal) return { ok: false, error: 'Deal not found.' };
-  return { ok: true, deal: session.a ? deal : applyAddressSecrecy(deal, session) };
+  return { ok: true, deal: session.a ? deal : applyAddressSecrecy(deal, session, loadAddressGrantsSet()) };
+}
+
+// Every open grant, keyed "dealId::username" for O(1) lookup -- loaded once
+// per request rather than once per deal, since getDeals maps over a whole
+// list.
+function loadAddressGrantsSet() {
+  const sheet = getSheet(ADDRESS_GRANTS_SHEET, ADDRESS_GRANT_COLUMNS);
+  const set = {};
+  sheetToObjects(sheet).forEach(function (r) {
+    set[r['DealID'] + '::' + String(r['Username'] || '').toLowerCase()] = true;
+  });
+  return set;
 }
 
 // Strips every admin-only field from a deal object for a non-admin session
-// -- Address unconditionally (reps identify a deal by DealCode instead),
-// plus SensitiveDriveLink, AdminPrivateNotes, and SourceLink. Done here
-// server-side rather than relying on the front-end to hide them, since the
-// values would otherwise sit in the browser's network tab regardless of
-// what's rendered.
-function applyAddressSecrecy(deal, session) {
+// -- SensitiveDriveLink, AdminPrivateNotes, and SourceLink unconditionally,
+// and Address unless this specific rep has been explicitly granted it for
+// this specific deal (see adminGrantAddressAccess/adminRevokeAddressAccess).
+// Done here server-side rather than relying on the front-end to hide them,
+// since the values would otherwise sit in the browser's network tab
+// regardless of what's rendered.
+function applyAddressSecrecy(deal, session, grants) {
   const copy = Object.assign({}, deal);
-  delete copy.Address;
+  const granted = !!(grants && grants[deal['DealID'] + '::' + session.u]);
+  if (!granted) delete copy.Address;
+  copy.addressGranted = granted;
   delete copy.SensitiveDriveLink;
   delete copy.AdminPrivateNotes;
   delete copy.SourceLink;
@@ -599,6 +630,39 @@ function adminUnassignRep(body) {
 function adminGetAssignments(body) {
   if (!body.dealId) return { ok: false, error: 'Missing dealId.' };
   const sheet = getSheet(ASSIGNMENTS_SHEET, ASSIGNMENT_COLUMNS);
+  const rows = sheetToObjects(sheet).filter(function (r) { return r['DealID'] === body.dealId; });
+  return { ok: true, usernames: rows.map(function (r) { return r['Username']; }) };
+}
+
+// ---------- Address disclosure ----------
+// Deliberately separate from Assignments (deal visibility) -- a rep can
+// work a deal without ever seeing its address, and granting the address is
+// a distinct, explicit, per-rep, per-deal admin action, reversible any time.
+
+function adminGrantAddressAccess(body) {
+  if (!body.dealId || !body.username) return { ok: false, error: 'Missing dealId or username.' };
+  const username = String(body.username).trim().toLowerCase();
+  const sheet = getSheet(ADDRESS_GRANTS_SHEET, ADDRESS_GRANT_COLUMNS);
+  const exists = sheetToObjects(sheet).some(function (r) { return r['DealID'] === body.dealId && String(r['Username'] || '').toLowerCase() === username; });
+  if (exists) return { ok: true };
+  appendRowByHeaders(sheet, { 'DealID': body.dealId, 'Username': username, 'GrantedAt': new Date().toISOString() });
+  return { ok: true };
+}
+
+function adminRevokeAddressAccess(body) {
+  if (!body.dealId || !body.username) return { ok: false, error: 'Missing dealId or username.' };
+  const username = String(body.username).trim().toLowerCase();
+  const sheet = getSheet(ADDRESS_GRANTS_SHEET, ADDRESS_GRANT_COLUMNS);
+  const rows = sheetToObjects(sheet);
+  const match = rows.find(function (r) { return r['DealID'] === body.dealId && String(r['Username'] || '').toLowerCase() === username; });
+  if (!match) return { ok: false, error: 'That grant was not found (already revoked?).' };
+  sheet.deleteRow(match._row);
+  return { ok: true };
+}
+
+function adminGetAddressGrants(body) {
+  if (!body.dealId) return { ok: false, error: 'Missing dealId.' };
+  const sheet = getSheet(ADDRESS_GRANTS_SHEET, ADDRESS_GRANT_COLUMNS);
   const rows = sheetToObjects(sheet).filter(function (r) { return r['DealID'] === body.dealId; });
   return { ok: true, usernames: rows.map(function (r) { return r['Username']; }) };
 }

@@ -135,11 +135,14 @@ function renderRepDeals() {
   });
   empty.hidden = filtered.length > 0;
   container.innerHTML = filtered.map(function (d) {
-    const heading = esc(d.DealCode || "Deal") + (d.City ? " &middot; " + esc(d.City) + (d.State ? ", " + esc(d.State) : "") : "");
+    const heading = d.Address
+      ? esc(d.Address) + (d.City ? ", " + esc(d.City) : "")
+      : esc(d.DealCode || "Deal") + (d.City ? " &middot; " + esc(d.City) + (d.State ? ", " + esc(d.State) : "") : "");
     return '<div class="deal-card" data-deal-id="' + esc(d.DealID) + '">' +
       '<div class="addr">' + heading + '</div>' +
       '<div class="meta">' + esc(d.AssetType || "") + (d.Price ? " &middot; " + esc(d.Price) : "") +
-      ' <span class="status-pill ' + statusClass(d.Status) + '">' + esc(d.Status || "") + '</span></div>' +
+      ' <span class="status-pill ' + statusClass(d.Status) + '">' + esc(d.Status || "") + '</span>' +
+      (d.addressGranted ? ' <span class="status-pill status-active-match">Address disclosed</span>' : "") + '</div>' +
       '</div>';
   }).join("");
   Array.from(container.querySelectorAll(".deal-card")).forEach(function (card) {
@@ -162,13 +165,18 @@ async function openRepDealDetail(dealId) {
   const buyers = buyersRes.ok ? buyersRes.buyers : [];
   const fbRequests = fbRes.ok ? fbRes.requests : [];
 
+  const addressBanner = deal.addressGranted && deal.Address
+    ? '<div class="banner danger"><strong>Confidential &mdash; do not share.</strong> Admin has given you access to this deal\'s exact address. Only share it with a legitimate, matched buyer.</div>'
+    : "";
+
   panel.innerHTML =
     '<div style="display:flex; justify-content:space-between; align-items:flex-start;">' +
-      '<div><h2 class="step-title">' + esc(deal.DealCode || "Deal") + '</h2>' +
+      '<div><h2 class="step-title">' + (deal.Address ? esc(deal.Address) : esc(deal.DealCode || "Deal")) + '</h2>' +
       '<p class="step-sub">' + [deal.City, deal.State].filter(Boolean).join(", ") + (deal.Zip ? " " + esc(deal.Zip) : "") +
       (deal.County ? " &middot; " + esc(deal.County) + " County" : "") + '</p></div>' +
       '<button class="link-btn" id="close-detail-btn">Close</button>' +
     '</div>' +
+    addressBanner +
     '<div class="banner info">' +
       '<span class="status-pill ' + statusClass(deal.Status) + '">' + esc(deal.Status || "") + '</span>' +
       (deal.AssetType ? '<div style="margin-top:8px;"><strong>Asset Type:</strong> ' + esc(deal.AssetType) + '</div>' : "") +
@@ -625,25 +633,34 @@ async function openAdminDealDetail(dealId) {
   const panel = document.getElementById("detail-panel");
   overlay.hidden = false;
 
-  const [repsRes, assignRes, buyersRes, fbRes] = await Promise.all([
+  const [repsRes, assignRes, buyersRes, fbRes, grantsRes] = await Promise.all([
     api("adminGetReps", {}),
     api("adminGetAssignments", { dealId: dealId }),
     api("getInterestedBuyers", { dealId: dealId }),
-    api("adminGetFbRequests", { dealId: dealId })
+    api("adminGetFbRequests", { dealId: dealId }),
+    api("adminGetAddressGrants", { dealId: dealId })
   ]);
-  const allReps = repsRes.ok ? repsRes.reps.filter(function (r) { return r.active && !r.allAccess; }) : [];
+  const activeReps = repsRes.ok ? repsRes.reps.filter(function (r) { return r.active && !r.isAdmin; }) : [];
+  const allReps = activeReps.filter(function (r) { return !r.allAccess; });
   const assignedUsernames = assignRes.ok ? assignRes.usernames : [];
   const buyers = buyersRes.ok ? buyersRes.buyers : [];
   const fbRequests = fbRes.ok ? fbRes.requests : [];
+  const grantedUsernames = grantsRes.ok ? grantsRes.usernames : [];
 
-  renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbRequests);
+  renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbRequests, activeReps, grantedUsernames);
 }
 
-function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbRequests) {
+function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbRequests, activeReps, grantedUsernames) {
   const overlay = document.getElementById("detail-overlay");
   const panel = document.getElementById("detail-panel");
 
   const availableReps = allReps.filter(function (r) { return assignedUsernames.indexOf(r.username) === -1; });
+
+  // Only reps who can actually work this deal (all-access, or specifically
+  // assigned) are eligible to be granted its address -- granting it to
+  // someone with no deal access at all wouldn't make sense.
+  const repsWithDealAccess = activeReps.filter(function (r) { return r.allAccess || assignedUsernames.indexOf(r.username) !== -1; });
+  const ungrantedReps = repsWithDealAccess.filter(function (r) { return grantedUsernames.indexOf(r.username) === -1; });
 
   panel.innerHTML =
     '<div style="display:flex; justify-content:space-between; align-items:flex-start;">' +
@@ -683,6 +700,24 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
           '<button class="btn secondary small" id="assign-rep-btn">Add Access</button>' +
         '</div>'
       : '<p class="small-muted" style="margin-top:8px;">Every non all-access team member is already assigned.</p>') +
+
+    '<div class="section-title">Address Access</div>' +
+    '<p class="small-muted">Nobody sees this deal\'s exact address by default. Grant it to a specific team member once you\'ve seen they can be trusted to work correctly, and revoke it any time.</p>' +
+    '<div class="chip-list" id="address-grant-chip-list">' +
+      grantedUsernames.map(function (u) {
+        return '<span class="chip">' + esc(u) + '<button data-username="' + esc(u) + '" class="revoke-address-btn">&times;</button></span>';
+      }).join("") +
+    '</div>' +
+    (ungrantedReps.length > 0
+      ? '<div style="display:flex; gap:8px; margin-top:10px;">' +
+          '<select id="grant-address-select" style="flex:1;">' +
+            ungrantedReps.map(function (r) { return '<option value="' + esc(r.username) + '">' + esc(r.name) + ' (' + esc(r.username) + ')</option>'; }).join("") +
+          '</select>' +
+          '<button class="btn secondary small" id="grant-address-btn">Disclose Address</button>' +
+        '</div>'
+      : (repsWithDealAccess.length === 0
+          ? '<p class="small-muted" style="margin-top:8px;">No team member has access to this deal yet — add someone under Access above first.</p>'
+          : '<p class="small-muted" style="margin-top:8px;">Everyone with access to this deal already has the address.</p>')) +
 
     '<div class="section-title">Facebook Post Requests</div>' +
     '<div id="admin-fb-list">' + renderAdminFbList(fbRequests) + '</div>' +
@@ -760,6 +795,22 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     assignBtn.addEventListener("click", async function () {
       const username = document.getElementById("assign-rep-select").value;
       await api("adminAssignRep", { dealId: deal.DealID, username: username });
+      openAdminDealDetail(deal.DealID);
+    });
+  }
+
+  Array.from(panel.querySelectorAll(".revoke-address-btn")).forEach(function (btn) {
+    btn.addEventListener("click", async function () {
+      await api("adminRevokeAddressAccess", { dealId: deal.DealID, username: btn.getAttribute("data-username") });
+      openAdminDealDetail(deal.DealID);
+    });
+  });
+
+  const grantAddressBtn = document.getElementById("grant-address-btn");
+  if (grantAddressBtn) {
+    grantAddressBtn.addEventListener("click", async function () {
+      const username = document.getElementById("grant-address-select").value;
+      await api("adminGrantAddressAccess", { dealId: deal.DealID, username: username });
       openAdminDealDetail(deal.DealID);
     });
   }
