@@ -158,3 +158,12 @@ to the `Reps` sheet tab yourself, once, directly in Google Sheets:
   is both the 24-hour-response SOP tracker (scoped to that one buyer+deal
   pairing) and the history that feeds `GeneralNotes` over time. Withdrawing
   a Pitch never deletes this history.
+- **Calling hours + call-first, enforced server-side** — a rep (not admin)
+  can't log a contact outside 8am–7pm in the buyer's own time zone, looked
+  up from their State via a built-in state→timezone table (an approximation
+  — exact city-level lookup would need a paid geocoding API, so states that
+  span multiple zones just get their majority zone). Texting is blocked
+  entirely until that specific buyer has responded to a prior call — high-
+  volume texting with no reply history is what gets a business number
+  flagged or blocked from texting by carriers, so every buyer gets called
+  first, always.

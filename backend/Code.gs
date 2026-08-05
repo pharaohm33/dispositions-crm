@@ -810,10 +810,15 @@ function adminGetBuyerRequests(body) {
 //                           pitch no longer blocks that rep/deal from
 //                           Auto-Feed giving out more
 //
-// Landlines can only ever be called (never texted), so their SOP is two
-// calls; mobiles can be called or texted, and the required follow-up
-// specifically pairs a call with a text (per the dispositions SOP: if no
-// response in 24h, call again and follow up with a text).
+// Landlines can only ever be called (never texted). Mobiles can eventually
+// be texted too, but only after the buyer has responded to a call (see
+// addPitchContact) -- calling first, before any texting, is required
+// regardless of phone type: sending texts to numbers with no reply history
+// is what gets a business number flagged/blocked from texting by carriers.
+// So the "worked, no response" outcome is always two calls -- if a text
+// exists in the log at all, a response must already be on file too (texting
+// pre-response is rejected server-side), which means status would already
+// read 'Responded' above before this even matters.
 function computeLeadStatus(phoneType, contacts) {
   if (!contacts || contacts.length === 0) return 'Not Contacted';
   const responded = contacts.some(function (c) { return c['Responded'] === true || c['Responded'] === 'TRUE'; });
@@ -821,14 +826,47 @@ function computeLeadStatus(phoneType, contacts) {
 
   const sorted = contacts.slice().sort(function (a, b) { return new Date(a['ContactedAt']) - new Date(b['ContactedAt']); });
   const hoursSinceFirst = (Date.now() - new Date(sorted[0]['ContactedAt']).getTime()) / (60 * 60 * 1000);
-  const methodsUsed = {};
-  contacts.forEach(function (c) { methodsUsed[c['Method']] = true; });
-  const isLandline = String(phoneType || '').trim().toLowerCase() === 'landline';
-  const followUpSatisfied = isLandline ? contacts.length >= 2 : (methodsUsed['Call'] && methodsUsed['Text']);
+  const followUpSatisfied = contacts.length >= 2;
 
   if (followUpSatisfied) return 'Fully Worked';
   if (hoursSinceFirst < FOLLOWUP_HOURS) return contacts.length === 1 ? 'Awaiting Response' : 'Follow-Up In Progress';
   return 'Follow-Up Due';
+}
+
+// ---------- Buyer calling hours (8am-7pm in the buyer's own time zone) ----------
+// Approximate: mapped by State only (not exact city), since a real
+// city-level time zone lookup needs a paid geocoding API. Good enough to
+// keep reps from calling someone at 5am or 11pm; states that legitimately
+// span multiple zones (TX, FL, etc.) get their majority zone.
+const STATE_TIMEZONES = {
+  AL: 'America/Chicago', AK: 'America/Anchorage', AZ: 'America/Phoenix', AR: 'America/Chicago',
+  CA: 'America/Los_Angeles', CO: 'America/Denver', CT: 'America/New_York', DE: 'America/New_York',
+  FL: 'America/New_York', GA: 'America/New_York', HI: 'Pacific/Honolulu', ID: 'America/Denver',
+  IL: 'America/Chicago', IN: 'America/New_York', IA: 'America/Chicago', KS: 'America/Chicago',
+  KY: 'America/New_York', LA: 'America/Chicago', ME: 'America/New_York', MD: 'America/New_York',
+  MA: 'America/New_York', MI: 'America/New_York', MN: 'America/Chicago', MS: 'America/Chicago',
+  MO: 'America/Chicago', MT: 'America/Denver', NE: 'America/Chicago', NV: 'America/Los_Angeles',
+  NH: 'America/New_York', NJ: 'America/New_York', NM: 'America/Denver', NY: 'America/New_York',
+  NC: 'America/New_York', ND: 'America/Chicago', OH: 'America/New_York', OK: 'America/Chicago',
+  OR: 'America/Los_Angeles', PA: 'America/New_York', RI: 'America/New_York', SC: 'America/New_York',
+  SD: 'America/Chicago', TN: 'America/Chicago', TX: 'America/Chicago', UT: 'America/Denver',
+  VT: 'America/New_York', VA: 'America/New_York', WA: 'America/Los_Angeles', WV: 'America/New_York',
+  WI: 'America/Chicago', WY: 'America/Denver', DC: 'America/New_York'
+};
+
+function timeZoneForState(state) {
+  const abbr = String(state || '').trim().toUpperCase();
+  return STATE_TIMEZONES[abbr] || null;
+}
+
+// Returns { hour, withinCallingHours, timeZone } for a given US state
+// abbreviation, or null if the state isn't recognized (calling hours can't
+// be checked, so callers should treat that as "allow it" rather than block).
+function callingHoursInfo(state) {
+  const tz = timeZoneForState(state);
+  if (!tz) return null;
+  const hour = Number(Utilities.formatDate(new Date(), tz, 'H'));
+  return { hour: hour, withinCallingHours: hour >= 8 && hour < 19, timeZone: tz };
 }
 
 // A pitch stops requiring action once its deal is no longer active (Sold or
@@ -1262,6 +1300,8 @@ function getMyPitches(body, session) {
     p.generalNotes = lead ? lead['GeneralNotes'] : '';
     p.email = lead ? lead['Email'] : '';
     p.driveLink = lead ? lead['DriveLink'] : '';
+    p.hasResponded = allContacts.some(function (c) { return c['PitchID'] === p['PitchID'] && (c['Responded'] === true || c['Responded'] === 'TRUE'); });
+    p.callingHours = lead ? callingHoursInfo(lead['State']) : null;
     delete p.dealAddress; // rep-facing -- never send the deal's Address, see file header comment
   });
   return { ok: true, pitches: withStatus };
@@ -1293,8 +1333,24 @@ function addPitchContact(body, session) {
 
   const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
   const lead = sheetToObjects(leadsSheet).find(function (l) { return l['BuyerLeadID'] === pitch['BuyerLeadID']; });
-  if (body.method === 'Text' && lead && String(lead['PhoneType'] || '').trim().toLowerCase() === 'landline') {
-    return { ok: false, error: 'This is a landline — it can only be called, not texted.' };
+
+  if (body.method === 'Text') {
+    if (lead && String(lead['PhoneType'] || '').trim().toLowerCase() === 'landline') {
+      return { ok: false, error: 'This is a landline — it can only be called, not texted.' };
+    }
+    const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
+    const priorContacts = sheetToObjects(contactsSheet).filter(function (c) { return c['PitchID'] === body.pitchId; });
+    const alreadyResponded = priorContacts.some(function (c) { return c['Responded'] === true || c['Responded'] === 'TRUE'; });
+    if (!alreadyResponded) {
+      return { ok: false, error: 'Call first — texting isn\'t allowed until this buyer has responded to a call. High-volume texting with no reply history is what gets a number blocked from texting.' };
+    }
+  }
+
+  if (!session.a && lead) {
+    const hours = callingHoursInfo(lead['State']);
+    if (hours && !hours.withinCallingHours) {
+      return { ok: false, error: 'Outside calling hours for this buyer (it\'s currently ' + hours.hour + ':00 there). Contact hours are 8am-7pm in the buyer\'s time zone.' };
+    }
   }
 
   const sheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);

@@ -178,6 +178,7 @@ async function openRepDealDetail(dealId) {
     '</div>' +
 
     '<div class="section-title">Step 1 &middot; Submit a Facebook Post for Approval</div>' +
+    '<p class="small-muted">Want to cold email buyers about this deal instead? Talk to admin first — there\'s a specific approach we use so those emails don\'t land in spam.</p>' +
     '<label class="field-label">Post text</label>' +
     '<textarea id="fb-post-text"></textarea>' +
     '<label class="field-label">Groups you intend to post it to</label>' +
@@ -399,6 +400,15 @@ async function openPitchDetail(pitchId) {
   const contactsRes = await api("getPitchContacts", { pitchId: pitchId });
   const contacts = contactsRes.ok ? contactsRes.contacts : [];
   const isLandline = pitch.phoneType === "Landline";
+  const canText = !isLandline && pitch.hasResponded;
+  const hours = pitch.callingHours;
+
+  let hoursBanner = "";
+  if (hours) {
+    hoursBanner = hours.withinCallingHours
+      ? '<div class="banner info">Within calling hours &mdash; it\'s currently ' + hours.hour + ':00 for this buyer.</div>'
+      : '<div class="banner danger"><strong>Outside calling hours.</strong> It\'s currently ' + hours.hour + ':00 for this buyer &mdash; contact hours are 8am&ndash;7pm their time.</div>';
+  }
 
   panel.innerHTML =
     '<div style="display:flex; justify-content:space-between; align-items:flex-start;">' +
@@ -407,12 +417,17 @@ async function openPitchDetail(pitchId) {
       (pitch.city ? ' &middot; ' + esc(pitch.city) + (pitch.state ? ", " + esc(pitch.state) : "") : "") + '</p></div>' +
       '<button class="link-btn" id="close-detail-btn">Close</button>' +
     '</div>' +
+    hoursBanner +
     '<div class="banner info">' +
       (pitch.dealStillActive
         ? '<span class="status-pill ' + statusClass(pitch.status) + '">' + esc(pitch.status) + '</span>'
         : '<span class="status-pill status-fully-worked">Deal ' + esc((pitch.dealStatus || "closed").toLowerCase()) + '</span>') +
       '<div style="margin-top:8px;"><strong>Re:</strong> ' + esc(pitch.dealCode || "Deal") + '</div>' +
-      (isLandline ? '<div style="margin-top:8px;">Landline &mdash; call only, texting isn\'t possible.</div>' : '<div style="margin-top:8px;">Mobile &mdash; you can call or text.</div>') +
+      (isLandline
+        ? '<div style="margin-top:8px;">Landline &mdash; call only, texting isn\'t possible.</div>'
+        : (canText
+          ? '<div style="margin-top:8px;">Mobile &mdash; they\'ve responded, so you can call or text.</div>'
+          : '<div style="margin-top:8px;">Mobile &mdash; call first. Texting unlocks once they respond to a call (high-volume texting with no reply history gets numbers blocked from texting).</div>')) +
       (pitch.email ? '<div style="margin-top:8px;"><strong>Email:</strong> <a href="mailto:' + esc(pitch.email) + '">' + esc(pitch.email) + '</a></div>' : "") +
       (pitch.driveLink ? '<div style="margin-top:8px;"><strong>Documents:</strong> <a href="' + esc(pitch.driveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
     '</div>' +
@@ -428,7 +443,7 @@ async function openPitchDetail(pitchId) {
     '<label class="field-label">Method</label>' +
     '<select id="contact-method-input">' +
       '<option value="Call">Call</option>' +
-      (isLandline ? '' : '<option value="Text">Text</option>') +
+      (canText ? '<option value="Text">Text</option>' : '') +
     '</select>' +
     '<label class="checkbox-row"><input type="checkbox" id="contact-responded-input"> Buyer responded during this contact</label>' +
     '<label class="field-label">Notes (buyer feedback on this deal specifically)</label>' +
