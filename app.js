@@ -1153,6 +1153,196 @@ async function populateBulkGiveSelects() {
   }
 }
 
+/* ---------- CSV import with auto column matching ---------- */
+
+const CSV_FIELD_OPTIONS = [
+  { value: "", label: "Don't import" },
+  { value: "buyerName", label: "Buyer / LLC Name" },
+  { value: "phone", label: "Phone" },
+  { value: "phoneType", label: "Phone Type (Mobile/Landline)" },
+  { value: "city", label: "City" },
+  { value: "state", label: "State" },
+  { value: "zip", label: "Zip" },
+  { value: "email", label: "Email" }
+];
+
+// Minimal RFC4180-ish CSV parser: handles quoted fields, commas and
+// newlines inside quotes, and "" as an escaped quote. Good enough for
+// exports from Excel/Sheets/most CRMs without pulling in a library.
+function parseCsvText(text) {
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; }
+        else inQuotes = false;
+      } else {
+        field += c;
+      }
+    } else if (c === '"') {
+      inQuotes = true;
+    } else if (c === ",") {
+      row.push(field); field = "";
+    } else if (c === "\n" || c === "\r") {
+      if (c === "\r" && text[i + 1] === "\n") i++;
+      row.push(field); field = "";
+      if (row.length > 1 || row[0] !== "") rows.push(row);
+      row = [];
+    } else {
+      field += c;
+    }
+  }
+  if (field !== "" || row.length > 0) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+// Best-effort guess at which of our fields a CSV column header represents,
+// checked in order from most to least specific so e.g. "Phone Type" matches
+// phoneType rather than phone. Returns "" (Don't import) if nothing matches
+// -- admin picks manually for anything we can't confidently guess.
+function guessCsvField(header) {
+  const h = String(header || "").toLowerCase().trim();
+  if (/e-?mail/.test(h)) return "email";
+  if (/phone.*type|line.*type|landline|mobile.*type/.test(h)) return "phoneType";
+  if (/phone|cell|mobile|tel(ephone)?|number/.test(h)) return "phone";
+  if (/zip|postal/.test(h)) return "zip";
+  if (/^st$|state/.test(h)) return "state";
+  if (/city|town/.test(h)) return "city";
+  if (/name|buyer|llc|company|contact/.test(h)) return "buyerName";
+  return "";
+}
+
+let csvRows = [];
+let csvHeaders = [];
+
+document.getElementById("csv-file-input").addEventListener("change", function (e) {
+  const file = e.target.files[0];
+  const errorEl = document.getElementById("csv-parse-error");
+  errorEl.classList.remove("show");
+  document.getElementById("csv-import-result").textContent = "";
+  document.getElementById("csv-import-error").classList.remove("show");
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function () {
+    const parsed = parseCsvText(String(reader.result || ""));
+    if (parsed.length === 0) {
+      errorEl.textContent = "Couldn't find any rows in that file.";
+      errorEl.classList.add("show");
+      return;
+    }
+    const hasHeader = document.getElementById("csv-has-header").checked;
+    csvHeaders = hasHeader ? parsed[0] : parsed[0].map(function (_, i) { return "Column " + (i + 1); });
+    csvRows = hasHeader ? parsed.slice(1) : parsed;
+    if (csvRows.length === 0) {
+      errorEl.textContent = "That file only has a header row — no buyer rows to import.";
+      errorEl.classList.add("show");
+      return;
+    }
+    renderCsvMapping();
+  };
+  reader.onerror = function () {
+    errorEl.textContent = "Could not read that file.";
+    errorEl.classList.add("show");
+  };
+  reader.readAsText(file);
+});
+
+document.getElementById("csv-has-header").addEventListener("change", function () {
+  const fileInput = document.getElementById("csv-file-input");
+  if (fileInput.files[0]) fileInput.dispatchEvent(new Event("change"));
+});
+
+function renderCsvMapping() {
+  document.getElementById("csv-mapping-section").hidden = false;
+  const tbody = document.querySelector("#csv-mapping-table tbody");
+  tbody.innerHTML = csvHeaders.map(function (header, colIndex) {
+    const guess = guessCsvField(header);
+    const sample = (csvRows[0] && csvRows[0][colIndex]) || "";
+    return '<tr>' +
+      '<td>' + esc(header) + '</td>' +
+      '<td class="small-muted">' + esc(sample) + '</td>' +
+      '<td><select class="csv-col-map" data-col="' + colIndex + '">' +
+        CSV_FIELD_OPTIONS.map(function (opt) { return '<option value="' + opt.value + '"' + (opt.value === guess ? " selected" : "") + '>' + esc(opt.label) + '</option>'; }).join("") +
+      '</select></td>' +
+      '</tr>';
+  }).join("");
+
+  Array.from(tbody.querySelectorAll(".csv-col-map")).forEach(function (select) {
+    select.addEventListener("change", renderCsvPreview);
+  });
+
+  renderCsvPreview();
+}
+
+function currentCsvMapping() {
+  const mapping = {}; // field -> column index
+  Array.from(document.querySelectorAll(".csv-col-map")).forEach(function (select) {
+    if (select.value) mapping[select.value] = Number(select.getAttribute("data-col"));
+  });
+  return mapping;
+}
+
+function mappedCsvRows() {
+  const mapping = currentCsvMapping();
+  return csvRows
+    .filter(function (row) { return row.some(function (cell) { return String(cell || "").trim() !== ""; }); })
+    .map(function (row) {
+      const get = function (field) { return mapping[field] !== undefined ? String(row[mapping[field]] || "").trim() : ""; };
+      const rawType = get("phoneType").toLowerCase();
+      const phoneType = rawType === "mobile" ? "Mobile" : rawType === "landline" ? "Landline" : get("phoneType");
+      return {
+        buyerName: get("buyerName"), phone: get("phone"), phoneType: phoneType,
+        city: get("city"), state: get("state"), zip: get("zip"), email: get("email")
+      };
+    });
+}
+
+function renderCsvPreview() {
+  const rows = mappedCsvRows();
+  const tbody = document.querySelector("#csv-preview-table tbody");
+  tbody.innerHTML = rows.slice(0, 5).map(function (r) {
+    return '<tr>' +
+      '<td>' + esc(r.buyerName) + '</td>' + '<td>' + esc(r.phone) + '</td>' + '<td>' + esc(r.phoneType) + '</td>' +
+      '<td>' + esc(r.city) + '</td>' + '<td>' + esc(r.state) + '</td>' + '<td>' + esc(r.zip) + '</td>' + '<td>' + esc(r.email) + '</td>' +
+      '</tr>';
+  }).join("");
+  const missingBuyerNameOrPhone = rows.filter(function (r) { return !r.buyerName || !r.phone; }).length;
+  document.getElementById("csv-preview-note").textContent =
+    "Showing " + Math.min(5, rows.length) + " of " + rows.length + " row(s)." +
+    (missingBuyerNameOrPhone > 0 ? " " + missingBuyerNameOrPhone + " row(s) are missing a Buyer Name or Phone and will be skipped — make sure those are mapped correctly above." : "");
+}
+
+document.getElementById("csv-import-btn").addEventListener("click", async function () {
+  const errorEl = document.getElementById("csv-import-error");
+  const resultEl = document.getElementById("csv-import-result");
+  errorEl.classList.remove("show");
+  resultEl.textContent = "";
+  const mapping = currentCsvMapping();
+  if (mapping.buyerName === undefined || mapping.phone === undefined) {
+    errorEl.textContent = "At least one column must be mapped to Buyer / LLC Name and one to Phone.";
+    errorEl.classList.add("show");
+    return;
+  }
+  const rows = mappedCsvRows().filter(function (r) { return r.buyerName && r.phone; });
+  if (rows.length === 0) {
+    errorEl.textContent = "No rows have both a Buyer Name and a Phone — nothing to import.";
+    errorEl.classList.add("show");
+    return;
+  }
+  const res = await api("adminImportBuyerLeads", { rows: rows });
+  if (!res.ok) {
+    errorEl.textContent = res.error || "Import failed.";
+    errorEl.classList.add("show");
+    return;
+  }
+  resultEl.textContent = "Imported " + res.imported + " buyer(s)." + (res.skippedDuplicates ? " Skipped " + res.skippedDuplicates + " duplicate phone number(s)." : "");
+  document.getElementById("csv-file-input").value = "";
+  csvRows = []; csvHeaders = [];
+  await loadBuyerLeadsAdmin();
+});
+
 document.getElementById("buyerleads-import-btn").addEventListener("click", async function () {
   const text = document.getElementById("buyerleads-import-text").value;
   const errorEl = document.getElementById("buyerleads-import-error");

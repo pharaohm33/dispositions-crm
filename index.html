@@ -309,8 +309,36 @@
   <!-- Buyer leads tab -->
   <div id="tab-buyerleads" hidden>
     <div class="card">
-      <div class="section-title" style="margin-top:0;">Import Buyer Leads</div>
-      <p class="small-muted">Paste rows copied from Excel/Sheets/CSV: <strong>Name (or LLC), Phone, Phone Type (Mobile/Landline), City, State, Zip, Email</strong> — comma or tab separated, one buyer per line. Email is optional and must come last (leave it off entirely, or leave it blank, if a given buyer doesn't have one — the other columns' positions never shift either way). A header row is detected and skipped automatically. Duplicate phone numbers are skipped.</p>
+      <div class="section-title" style="margin-top:0;">Import Buyer Leads From a CSV File</div>
+      <p class="small-muted">Upload a CSV file in any column order — we'll guess which column is which based on its header, show you the guess, and let you fix anything before importing. Duplicate phone numbers are skipped automatically.</p>
+      <input type="file" id="csv-file-input" accept=".csv,text/csv">
+      <label class="checkbox-row"><input type="checkbox" id="csv-has-header" checked> First row is column headers</label>
+      <div class="error-text" id="csv-parse-error"></div>
+
+      <div id="csv-mapping-section" hidden>
+        <div class="section-title">Match Columns</div>
+        <p class="small-muted">We guessed these from your column headers — check each one and change any that don't look right. Columns set to "Don't import" are left out.</p>
+        <div style="overflow-x:auto;">
+          <table class="crm-table" id="csv-mapping-table"><thead><tr><th>Your Column</th><th>Sample Value</th><th>Maps To</th></tr></thead><tbody></tbody></table>
+        </div>
+
+        <div class="section-title">Preview</div>
+        <div style="overflow-x:auto;">
+          <table class="crm-table" id="csv-preview-table"><thead><tr><th>Buyer / LLC</th><th>Phone</th><th>Type</th><th>City</th><th>State</th><th>Zip</th><th>Email</th></tr></thead><tbody></tbody></table>
+        </div>
+        <p class="small-muted" id="csv-preview-note"></p>
+
+        <div class="error-text" id="csv-import-error"></div>
+        <div class="nav-row" style="justify-content:flex-end;">
+          <button class="btn primary" id="csv-import-btn">Import</button>
+        </div>
+        <div id="csv-import-result" class="small-muted"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title" style="margin-top:0;">Or Paste Rows Directly</div>
+      <p class="small-muted">Paste rows copied from Excel/Sheets/CSV: <strong>Name (or LLC), Phone, Phone Type (Mobile/Landline), City, State, Zip, Email</strong> — comma or tab separated, one buyer per line. Email is optional and must come last. A header row is detected and skipped automatically.</p>
       <textarea id="buyerleads-import-text" style="min-height:120px;" placeholder="Jane Doe LLC, 555-123-4567, Mobile, Phoenix, AZ, 85001, jane@example.com"></textarea>
       <div class="error-text" id="buyerleads-import-error"></div>
       <div class="nav-row" style="justify-content:flex-end;">

@@ -79,8 +79,11 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   the conversation (rep's notes are visible to you the moment they're
   logged) to close the deal yourself, keeping the rep who brought the buyer
   updated as it moves.
-- **Buyer Leads** — paste-import a batch of buyer/LLC contacts (Name, Phone,
-  Phone Type, City, State, Zip, and optionally Email). Each buyer's profile
+- **Buyer Leads** — upload a CSV file in any column order and it guesses
+  which column is which (Name, Phone, Phone Type, City, State, Zip, Email)
+  from your headers, shows you a preview and the guessed mapping so you can
+  fix anything it got wrong, then imports — or just paste rows directly if
+  that's easier for a short list. Each buyer's profile
   also holds an editable Email and a Drive Link for their own documents
   (proof of funds, signed agreements) — visible to any rep who's been given
   that buyer, editable by admin only. Give one to a rep individually, or give a
