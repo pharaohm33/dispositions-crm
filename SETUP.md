@@ -109,7 +109,11 @@ to the `Reps` sheet tab yourself, once, directly in Google Sheets:
 - **Deals** — one row per property. `Status` is free text but the admin panel
   only offers whatever's currently listed in `StatusOptions`. `DealCode` (a
   short label like "A-1" you assign) plus City/State/Zip/County/Price is
-  everything a rep sees to identify a deal by default. `GeneralDriveLink` (any
+  everything a rep sees to identify a deal by default. `ARV` and
+  `RehabEstimate` are visible to reps too (they use these to pitch buyers);
+  `GrossMargin` (ARV − RehabEstimate − Price) is never stored — it's computed
+  fresh on every read from those three fields, so it can't go stale, and
+  shows as "—" until all three are filled in. `GeneralDriveLink` (any
   Google Drive folder/file URL) is visible to every rep with access to the
   deal; `SensitiveDriveLink` (contracts, financials, seller personal info),
   `AdminPrivateNotes` (your own scratchpad), and `SourceLink` (where you

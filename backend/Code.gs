@@ -64,7 +64,12 @@ const REP_COLUMNS = ['Username', 'Name', 'PasswordHash', 'Salt', 'AllAccess', 'I
 // access to the deal; SensitiveDriveLink, AdminPrivateNotes, and SourceLink
 // are all admin-only, stripped out for every non-admin session, the same
 // way Address is -- there's no rep-facing unlock path for any of them.
-const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'AssetType', 'Price', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt'];
+// ARV and RehabEstimate are visible to reps (unlike Address/SensitiveDriveLink/
+// AdminPrivateNotes/SourceLink) -- reps use them to pitch buyers. GrossMargin
+// (ARV - RehabEstimate - Price) is never stored; it's computed fresh on every
+// read by withComputedFields so it can't drift out of sync with the three
+// inputs it depends on.
+const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'AssetType', 'Price', 'ARV', 'RehabEstimate', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt'];
 const ASSIGNMENT_COLUMNS = ['DealID', 'Username', 'AssignedAt'];
 // MatchStatus tracks the buyer<->deal relationship itself ('Active Match' by
 // default, through 'Negotiating'/'Closing', or 'Dead Match' once the buyer
@@ -414,6 +419,7 @@ function getDeals(body, session) {
     const ids = accessibleDealIds(session);
     deals = deals.filter(function (d) { return ids[d['DealID']]; });
   }
+  deals = deals.map(withComputedFields);
   if (!session.a) {
     const grants = loadAddressGrantsSet();
     deals = deals.map(function (d) { return applyAddressSecrecy(d, session, grants); });
@@ -425,9 +431,37 @@ function getDeal(body, session) {
   if (!body.dealId) return { ok: false, error: 'Missing dealId.' };
   if (!canAccessDeal(session, body.dealId)) return { ok: false, error: 'You do not have access to this deal.' };
   const sheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
-  const deal = sheetToObjects(sheet).find(function (d) { return d['DealID'] === body.dealId; });
-  if (!deal) return { ok: false, error: 'Deal not found.' };
+  const rawDeal = sheetToObjects(sheet).find(function (d) { return d['DealID'] === body.dealId; });
+  if (!rawDeal) return { ok: false, error: 'Deal not found.' };
+  const deal = withComputedFields(rawDeal);
   return { ok: true, deal: session.a ? deal : applyAddressSecrecy(deal, session, loadAddressGrantsSet()) };
+}
+
+// GrossMargin = ARV - RehabEstimate - Price, computed fresh on every read
+// (never stored) so it can't go stale relative to those three inputs.
+// Visible to reps, same as ARV/RehabEstimate themselves -- unlike Address
+// and the admin-only fields, there's no stripping needed here.
+function withComputedFields(deal) {
+  const copy = Object.assign({}, deal);
+  copy.GrossMargin = computeGrossMargin(deal);
+  return copy;
+}
+
+function computeGrossMargin(deal) {
+  const arv = parseMoney(deal['ARV']);
+  const rehab = parseMoney(deal['RehabEstimate']);
+  const price = parseMoney(deal['Price']);
+  if (arv === null || rehab === null || price === null) return null;
+  return arv - rehab - price;
+}
+
+// Strips $ signs, commas, and other formatting so "$250,000" and "250000"
+// both parse the same way. Returns null (not 0) for blank/non-numeric input
+// so computeGrossMargin can tell "missing" apart from "actually zero."
+function parseMoney(v) {
+  if (v === undefined || v === null || v === '') return null;
+  const num = Number(String(v).replace(/[^0-9.\-]/g, ''));
+  return isNaN(num) ? null : num;
 }
 
 // Every open grant, keyed "dealId::username" for O(1) lookup -- loaded once
@@ -468,7 +502,8 @@ function adminAddDeal(body) {
   const now = new Date().toISOString();
   appendRowByHeaders(sheet, {
     'DealID': dealId, 'DealCode': d.dealCode || '', 'Address': d.address, 'City': d.city || '', 'State': d.state || '', 'Zip': d.zip || '',
-    'County': d.county || '', 'AssetType': d.assetType || '', 'Price': d.price || '', 'Status': d.status || DEFAULT_STATUSES[0],
+    'County': d.county || '', 'AssetType': d.assetType || '', 'Price': d.price || '', 'ARV': d.arv || '', 'RehabEstimate': d.rehabEstimate || '',
+    'Status': d.status || DEFAULT_STATUSES[0],
     'Description': d.description || '', 'GeneralDriveLink': d.generalDriveLink || '', 'SensitiveDriveLink': d.sensitiveDriveLink || '',
     'AdminPrivateNotes': d.adminPrivateNotes || '', 'SourceLink': d.sourceLink || '',
     'CreatedAt': now, 'UpdatedAt': now
@@ -483,7 +518,7 @@ function adminUpdateDeal(body) {
   const match = deals.find(function (d) { return d['DealID'] === body.dealId; });
   if (!match) return { ok: false, error: 'Deal not found.' };
   const d = body.data || {};
-  const editable = ['DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'AssetType', 'Price', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink'];
+  const editable = ['DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'AssetType', 'Price', 'ARV', 'RehabEstimate', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink'];
   editable.forEach(function (field) {
     if (d[field] === undefined) return;
     const col = getColumnIndex(sheet, field);

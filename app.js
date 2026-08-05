@@ -34,6 +34,15 @@ function esc(s) {
   });
 }
 
+// GrossMargin comes from the backend as a plain number (or null if ARV/
+// RehabEstimate/Price aren't all set yet) -- this just formats it for
+// display, with a distinct message for the "not enough info yet" case.
+function formatGrossMargin(value) {
+  if (value === null || value === undefined) return "&mdash; (needs ARV, Rehab Estimate, and Price)";
+  const rounded = Math.round(value);
+  return (rounded < 0 ? "-$" + Math.abs(rounded).toLocaleString() : "$" + rounded.toLocaleString());
+}
+
 function formatDate(iso) {
   if (!iso) return "";
   const d = new Date(iso);
@@ -183,6 +192,9 @@ async function openRepDealDetail(dealId) {
       '<span class="status-pill ' + statusClass(deal.Status) + '">' + esc(deal.Status || "") + '</span>' +
       (deal.AssetType ? '<div style="margin-top:8px;"><strong>Asset Type:</strong> ' + esc(deal.AssetType) + '</div>' : "") +
       (deal.Price ? '<div><strong>Price:</strong> ' + esc(deal.Price) + '</div>' : "") +
+      (deal.ARV ? '<div><strong>ARV:</strong> ' + esc(deal.ARV) + '</div>' : "") +
+      (deal.RehabEstimate ? '<div><strong>Rehab Estimate:</strong> ' + esc(deal.RehabEstimate) + '</div>' : "") +
+      (deal.ARV || deal.RehabEstimate ? '<div><strong>Gross Margin:</strong> ' + formatGrossMargin(deal.GrossMargin) + '</div>' : "") +
       (deal.Description ? '<div style="margin-top:8px;">' + esc(deal.Description) + '</div>' : "") +
       (deal.GeneralDriveLink ? '<div style="margin-top:8px;"><a href="' + esc(deal.GeneralDriveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
     '</div>' +
@@ -577,6 +589,8 @@ function openDealModal() {
   document.getElementById("deal-county-input").value = "";
   document.getElementById("deal-assettype-input").value = "";
   document.getElementById("deal-price-input").value = "";
+  document.getElementById("deal-arv-input").value = "";
+  document.getElementById("deal-rehab-input").value = "";
   document.getElementById("deal-description-input").value = "";
   document.getElementById("deal-general-drive-input").value = "";
   document.getElementById("deal-sensitive-drive-input").value = "";
@@ -610,6 +624,8 @@ document.getElementById("deal-modal-save").addEventListener("click", async funct
     county: document.getElementById("deal-county-input").value.trim(),
     assetType: document.getElementById("deal-assettype-input").value.trim(),
     price: document.getElementById("deal-price-input").value.trim(),
+    arv: document.getElementById("deal-arv-input").value.trim(),
+    rehabEstimate: document.getElementById("deal-rehab-input").value.trim(),
     status: document.getElementById("deal-status-input").value,
     description: document.getElementById("deal-description-input").value.trim(),
     generalDriveLink: document.getElementById("deal-general-drive-input").value.trim(),
@@ -685,6 +701,17 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     '</div>' +
     '<div class="nav-row" style="justify-content:flex-end;">' +
       '<button class="btn secondary small" id="save-code-btn">Save Deal Code / County</button>' +
+    '</div>' +
+
+    '<div class="section-title">Financials</div>' +
+    '<div class="row3">' +
+      '<div><label class="field-label">ARV <span class="small-muted">(after-repair value)</span></label><input type="text" id="deal-arv-edit" value="' + esc(deal.ARV || "") + '"></div>' +
+      '<div><label class="field-label">Rehab Estimate</label><input type="text" id="deal-rehab-edit" value="' + esc(deal.RehabEstimate || "") + '"></div>' +
+      '<div><label class="field-label">Price</label><input type="text" id="deal-price-edit" value="' + esc(deal.Price || "") + '"></div>' +
+    '</div>' +
+    '<p class="small-muted">Gross Margin (ARV &minus; Rehab Estimate &minus; Price): <strong>' + formatGrossMargin(deal.GrossMargin) + '</strong></p>' +
+    '<div class="nav-row" style="justify-content:flex-end;">' +
+      '<button class="btn secondary small" id="save-financials-btn">Save Financials</button>' +
     '</div>' +
 
     '<div class="section-title">Access &mdash; who can work this deal</div>' +
@@ -764,6 +791,19 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
       data: {
         DealCode: document.getElementById("deal-code-edit").value.trim(),
         County: document.getElementById("deal-county-edit").value.trim()
+      }
+    });
+    await loadAdminDeals();
+    openAdminDealDetail(deal.DealID);
+  });
+
+  document.getElementById("save-financials-btn").addEventListener("click", async function () {
+    await api("adminUpdateDeal", {
+      dealId: deal.DealID,
+      data: {
+        ARV: document.getElementById("deal-arv-edit").value.trim(),
+        RehabEstimate: document.getElementById("deal-rehab-edit").value.trim(),
+        Price: document.getElementById("deal-price-edit").value.trim()
       }
     });
     await loadAdminDeals();
