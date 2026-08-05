@@ -10,8 +10,9 @@ own. You only need to do this once.
 1. Go to [sheets.google.com](https://sheets.google.com) and create a new blank
    spreadsheet. Name it something like **Dispositions CRM — Data**.
 2. Leave it empty — the script creates its own tabs (`Reps`, `Deals`,
-   `Assignments`, `InterestedBuyers`, `FBPostRequests`, `StatusOptions`)
-   automatically the first time it runs.
+   `Assignments`, `InterestedBuyers`, `FBPostRequests`, `StatusOptions`,
+   `BuyerLeads`, `Pitches`, `BuyerLeadContacts`) automatically the first time
+   it runs.
 
 ## 2. Add the script
 
@@ -127,9 +128,19 @@ to the `Reps` sheet tab yourself, once, directly in Google Sheets:
   **Status Categories** admin tab.
 - **BuyerLeads** — the master buyer/LLC calling list, imported by pasting
   CSV/spreadsheet text into the **Buyer Leads** admin tab (Name, Phone, Phone
-  Type, City, State, Zip). `AssignedTo` is blank until you (or auto-feed)
-  hand it to one specific rep — leads are never shared between reps.
-- **BuyerLeadContacts** — every call/text a rep logs against a buyer lead,
-  optionally tied to a specific deal, with free-text notes on the buyer's
-  feedback. This is both the 24-hour-response SOP tracker and the running
-  history that builds your most-active-buyers picture over time.
+  Type, City, State, Zip). A buyer lead has no assignment of its own —
+  `GeneralNotes` is its only standing field, a free-text cross-deal profile
+  (ARV%, price range, areas of interest, cash vs. financed) that persists no
+  matter how many different deals it's ever pitched against.
+- **Pitches** — "give this buyer lead to this rep, for this one specific
+  deal." This is the only thing that puts a buyer in a rep's queue or blocks
+  Auto-Feed — a buyer lead with no open pitch just sits in the pool,
+  generating no follow-up pressure for anyone, so nobody's queue fills up
+  with buyers there's nothing currently for sale to offer them. Give pitches
+  from the **Buyer Leads** admin tab, individually or in bulk per deal;
+  reassign or withdraw them from a buyer's detail panel.
+- **BuyerLeadContacts** — every call/text a rep logs against one specific
+  Pitch, with free-text notes on the buyer's feedback about that deal. This
+  is both the 24-hour-response SOP tracker (scoped to that one buyer+deal
+  pairing) and the history that feeds `GeneralNotes` over time. Withdrawing
+  a Pitch never deletes this history.

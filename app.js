@@ -296,7 +296,7 @@ function renderBuyerList(buyers) {
    REP VIEW — BUYER LEADS
    ============================================================ */
 
-let myBuyerLeads = [];
+let myPitches = [];
 
 Array.from(document.querySelectorAll("#rep-view .tab-btn")).forEach(function (btn) {
   btn.addEventListener("click", function () { switchRepTab(btn.getAttribute("data-rep-tab")); });
@@ -308,60 +308,77 @@ function switchRepTab(tab) {
   });
   document.getElementById("rep-tab-deals").hidden = tab !== "deals";
   document.getElementById("rep-tab-buyerleads").hidden = tab !== "buyerleads";
-  if (tab === "buyerleads") loadMyBuyerLeads();
+  if (tab === "buyerleads") loadMyPitches();
 }
 
 const LEAD_STATUS_PRIORITY = ["Follow-Up Due", "Follow-Up In Progress", "Awaiting Response", "Not Contacted", "Responded", "Fully Worked"];
 
-async function loadMyBuyerLeads() {
-  const res = await api("getMyBuyerLeads", {});
+async function loadMyPitches() {
+  const res = await api("getMyPitches", {});
   if (!res.ok) return;
-  myBuyerLeads = res.leads;
-  renderMyBuyerLeads();
+  myPitches = res.pitches;
+  renderMyPitches();
 }
 
-function renderMyBuyerLeads() {
+function renderMyPitches() {
   const container = document.getElementById("buyerleads-list");
   const empty = document.getElementById("buyerleads-empty");
-  empty.hidden = myBuyerLeads.length > 0;
-  const sorted = myBuyerLeads.slice().sort(function (a, b) {
+  empty.hidden = myPitches.length > 0;
+  const sorted = myPitches.slice().sort(function (a, b) {
+    if (a.dealStillActive !== b.dealStillActive) return a.dealStillActive ? -1 : 1;
     return LEAD_STATUS_PRIORITY.indexOf(a.status) - LEAD_STATUS_PRIORITY.indexOf(b.status);
   });
-  container.innerHTML = sorted.map(function (l) {
-    const typeHint = l.PhoneType === "Landline" ? "Landline &middot; Call Only" : l.PhoneType === "Mobile" ? "Mobile &middot; Call or Text" : (l.PhoneType || "");
-    return '<div class="deal-card" data-lead-id="' + esc(l.BuyerLeadID) + '">' +
-      '<div class="addr">' + esc(l.BuyerName) + '</div>' +
-      '<div class="meta">' + esc(l.Phone) + (typeHint ? " &middot; " + typeHint : "") +
-      (l.City ? " &middot; " + esc(l.City) + (l.State ? ", " + esc(l.State) : "") : "") + '</div>' +
-      '<div style="margin-top:6px;"><span class="status-pill ' + statusClass(l.status) + '">' + esc(l.status) + '</span></div>' +
+  container.innerHTML = sorted.map(function (p) {
+    const typeHint = p.phoneType === "Landline" ? "Landline &middot; Call Only" : p.phoneType === "Mobile" ? "Mobile &middot; Call or Text" : (p.phoneType || "");
+    return '<div class="deal-card" data-pitch-id="' + esc(p.PitchID) + '">' +
+      '<div class="addr">' + esc(p.buyerName) + '</div>' +
+      '<div class="meta">Re: ' + esc(p.dealAddress) + '</div>' +
+      '<div class="meta">' + esc(p.phone) + (typeHint ? " &middot; " + typeHint : "") +
+      (p.city ? " &middot; " + esc(p.city) + (p.state ? ", " + esc(p.state) : "") : "") + '</div>' +
+      '<div style="margin-top:6px;">' +
+      (p.dealStillActive
+        ? '<span class="status-pill ' + statusClass(p.status) + '">' + esc(p.status) + '</span>'
+        : '<span class="status-pill status-fully-worked">Deal ' + esc((p.dealStatus || "closed").toLowerCase()) + ' &mdash; no action needed</span>') +
+      '</div>' +
       '</div>';
   }).join("");
   Array.from(container.querySelectorAll(".deal-card")).forEach(function (card) {
-    card.addEventListener("click", function () { openBuyerLeadDetail(card.getAttribute("data-lead-id")); });
+    card.addEventListener("click", function () { openPitchDetail(card.getAttribute("data-pitch-id")); });
   });
 }
 
-async function openBuyerLeadDetail(buyerLeadId) {
-  const lead = myBuyerLeads.find(function (l) { return l.BuyerLeadID === buyerLeadId; });
-  if (!lead) return;
+async function openPitchDetail(pitchId) {
+  const pitch = myPitches.find(function (p) { return p.PitchID === pitchId; });
+  if (!pitch) return;
 
   const overlay = document.getElementById("detail-overlay");
   const panel = document.getElementById("detail-panel");
   overlay.hidden = false;
 
-  const contactsRes = await api("getBuyerLeadContacts", { buyerLeadId: buyerLeadId });
+  const contactsRes = await api("getPitchContacts", { pitchId: pitchId });
   const contacts = contactsRes.ok ? contactsRes.contacts : [];
-  const isLandline = lead.PhoneType === "Landline";
+  const isLandline = pitch.phoneType === "Landline";
 
   panel.innerHTML =
     '<div style="display:flex; justify-content:space-between; align-items:flex-start;">' +
-      '<div><h2 class="step-title">' + esc(lead.BuyerName) + '</h2>' +
-      '<p class="step-sub">' + esc(lead.Phone) + ' &middot; ' + esc(lead.PhoneType || "") +
-      (lead.City ? ' &middot; ' + esc(lead.City) + (lead.State ? ", " + esc(lead.State) : "") : "") + '</p></div>' +
+      '<div><h2 class="step-title">' + esc(pitch.buyerName) + '</h2>' +
+      '<p class="step-sub">' + esc(pitch.phone) + ' &middot; ' + esc(pitch.phoneType || "") +
+      (pitch.city ? ' &middot; ' + esc(pitch.city) + (pitch.state ? ", " + esc(pitch.state) : "") : "") + '</p></div>' +
       '<button class="link-btn" id="close-detail-btn">Close</button>' +
     '</div>' +
-    '<div class="banner info"><span class="status-pill ' + statusClass(lead.status) + '">' + esc(lead.status) + '</span>' +
+    '<div class="banner info">' +
+      (pitch.dealStillActive
+        ? '<span class="status-pill ' + statusClass(pitch.status) + '">' + esc(pitch.status) + '</span>'
+        : '<span class="status-pill status-fully-worked">Deal ' + esc((pitch.dealStatus || "closed").toLowerCase()) + '</span>') +
+      '<div style="margin-top:8px;"><strong>Re:</strong> ' + esc(pitch.dealAddress) + '</div>' +
       (isLandline ? '<div style="margin-top:8px;">Landline &mdash; call only, texting isn\'t possible.</div>' : '<div style="margin-top:8px;">Mobile &mdash; you can call or text.</div>') +
+    '</div>' +
+
+    '<div class="section-title">General Buyer Notes</div>' +
+    '<p class="small-muted">Shared across every deal this buyer is ever pitched — ARV%, price range, areas of interest, cash vs. financed, etc.</p>' +
+    '<textarea id="general-notes-input">' + esc(pitch.generalNotes || "") + '</textarea>' +
+    '<div class="nav-row" style="justify-content:flex-end;">' +
+      '<button class="btn secondary" id="general-notes-save-btn">Save Notes</button>' +
     '</div>' +
 
     '<div class="section-title">Log a Contact</div>' +
@@ -370,13 +387,8 @@ async function openBuyerLeadDetail(buyerLeadId) {
       '<option value="Call">Call</option>' +
       (isLandline ? '' : '<option value="Text">Text</option>') +
     '</select>' +
-    '<label class="field-label">Which deal did you present? (optional)</label>' +
-    '<select id="contact-deal-input">' +
-      '<option value="">&mdash; none / general outreach &mdash;</option>' +
-      repDeals.map(function (d) { return '<option value="' + esc(d.DealID) + '">' + esc(d.Address || d.AssetType || d.DealID) + '</option>'; }).join("") +
-    '</select>' +
     '<label class="checkbox-row"><input type="checkbox" id="contact-responded-input"> Buyer responded during this contact</label>' +
-    '<label class="field-label">Notes (buyer feedback, what they\'re looking for, etc.)</label>' +
+    '<label class="field-label">Notes (buyer feedback on this deal specifically)</label>' +
     '<textarea id="contact-notes-input"></textarea>' +
     '<div class="error-text" id="contact-add-error"></div>' +
     '<div class="nav-row" style="justify-content:flex-end;">' +
@@ -385,16 +397,19 @@ async function openBuyerLeadDetail(buyerLeadId) {
     '<div class="section-title">Contact History</div>' +
     '<div id="contact-history-list">' + renderContactHistory(contacts) + '</div>';
 
-  document.getElementById("close-detail-btn").addEventListener("click", function () { overlay.hidden = true; loadMyBuyerLeads(); });
+  document.getElementById("close-detail-btn").addEventListener("click", function () { overlay.hidden = true; loadMyPitches(); });
+
+  document.getElementById("general-notes-save-btn").addEventListener("click", async function () {
+    await api("updateBuyerLeadNotes", { buyerLeadId: pitch.BuyerLeadID, notes: document.getElementById("general-notes-input").value.trim() });
+  });
 
   document.getElementById("contact-add-submit").addEventListener("click", async function () {
     const method = document.getElementById("contact-method-input").value;
-    const dealId = document.getElementById("contact-deal-input").value;
     const responded = document.getElementById("contact-responded-input").checked;
     const notes = document.getElementById("contact-notes-input").value.trim();
     const errorEl = document.getElementById("contact-add-error");
     errorEl.classList.remove("show");
-    const res = await api("addBuyerLeadContact", { buyerLeadId: buyerLeadId, method: method, dealId: dealId, responded: responded, notes: notes });
+    const res = await api("addPitchContact", { pitchId: pitchId, method: method, responded: responded, notes: notes });
     if (!res.ok) {
       errorEl.textContent = res.error || "Could not log contact.";
       errorEl.classList.add("show");
@@ -402,7 +417,7 @@ async function openBuyerLeadDetail(buyerLeadId) {
     }
     document.getElementById("contact-notes-input").value = "";
     document.getElementById("contact-responded-input").checked = false;
-    const fresh = await api("getBuyerLeadContacts", { buyerLeadId: buyerLeadId });
+    const fresh = await api("getPitchContacts", { pitchId: pitchId });
     document.getElementById("contact-history-list").innerHTML = renderContactHistory(fresh.ok ? fresh.contacts : []);
   });
 }
@@ -410,11 +425,9 @@ async function openBuyerLeadDetail(buyerLeadId) {
 function renderContactHistory(contacts) {
   if (contacts.length === 0) return '<p class="small-muted">No contact logged yet.</p>';
   return contacts.slice().reverse().map(function (c) {
-    const deal = repDeals.find(function (d) { return d.DealID === c.DealID; });
     return '<div class="item-row">' +
       '<span class="ts">' + formatDate(c.ContactedAt) + ' &middot; ' + esc(c.Username) + ' &middot; ' + esc(c.Method) +
       (c.Responded === true || c.Responded === "TRUE" ? ' &middot; <strong>Responded</strong>' : '') + '</span>' +
-      (deal ? '<div class="small-muted" style="margin-top:4px;">Re: ' + esc(deal.Address || deal.AssetType) + '</div>' : "") +
       (c.Notes ? '<div style="margin-top:4px;">' + esc(c.Notes) + '</div>' : "") +
       '</div>';
   }).join("");
@@ -928,17 +941,27 @@ async function loadBuyerRequests() {
 /* ---------- Buyer Leads tab ---------- */
 
 let adminBuyerLeads = [];
+let buyerLeadsActiveDeals = [];
+let buyerLeadsActiveReps = [];
 
 async function initBuyerLeadsAdminTab() {
-  await Promise.all([loadBuyerLeadsAdmin(), loadAutoFeedSettings(), populateBulkAssignRepSelect()]);
+  await Promise.all([loadBuyerLeadsAdmin(), loadAutoFeedSettings(), populateBulkGiveSelects()]);
 }
 
-async function populateBulkAssignRepSelect() {
-  const res = await api("adminGetReps", {});
-  const select = document.getElementById("bulk-assign-rep-select");
-  if (!res.ok) return;
-  const reps = res.reps.filter(function (r) { return r.active && !r.isAdmin; });
-  select.innerHTML = reps.map(function (r) { return '<option value="' + esc(r.username) + '">' + esc(r.name) + ' (' + esc(r.username) + ')</option>'; }).join("");
+async function populateBulkGiveSelects() {
+  const [repsRes, dealsRes] = await Promise.all([api("adminGetReps", {}), api("getDeals", {})]);
+  if (repsRes.ok) {
+    buyerLeadsActiveReps = repsRes.reps.filter(function (r) { return r.active && !r.isAdmin; });
+    document.getElementById("bulk-give-rep-select").innerHTML = buyerLeadsActiveReps.map(function (r) {
+      return '<option value="' + esc(r.username) + '">' + esc(r.name) + ' (' + esc(r.username) + ')</option>';
+    }).join("");
+  }
+  if (dealsRes.ok) {
+    buyerLeadsActiveDeals = dealsRes.deals.filter(function (d) { return d.Status !== "Sold" && d.Status !== "Dead"; });
+    document.getElementById("bulk-give-deal-select").innerHTML = buyerLeadsActiveDeals.map(function (d) {
+      return '<option value="' + esc(d.DealID) + '">' + esc(d.Address) + '</option>';
+    }).join("");
+  }
 }
 
 document.getElementById("buyerleads-import-btn").addEventListener("click", async function () {
@@ -963,19 +986,20 @@ document.getElementById("buyerleads-import-btn").addEventListener("click", async
   await loadBuyerLeadsAdmin();
 });
 
-document.getElementById("bulk-assign-btn").addEventListener("click", async function () {
-  const resultEl = document.getElementById("bulk-assign-result");
-  const username = document.getElementById("bulk-assign-rep-select").value;
-  const count = document.getElementById("bulk-assign-count").value;
-  if (!username || !count) { resultEl.textContent = "Pick a team member and a count."; return; }
-  const res = await api("adminAssignBuyerLeadsBulk", {
-    username: username, count: count,
-    city: document.getElementById("bulk-assign-city").value.trim(),
-    state: document.getElementById("bulk-assign-state").value.trim(),
-    zip: document.getElementById("bulk-assign-zip").value.trim()
+document.getElementById("bulk-give-btn").addEventListener("click", async function () {
+  const resultEl = document.getElementById("bulk-give-result");
+  const dealId = document.getElementById("bulk-give-deal-select").value;
+  const username = document.getElementById("bulk-give-rep-select").value;
+  const count = document.getElementById("bulk-give-count").value;
+  if (!dealId || !username || !count) { resultEl.textContent = "Pick a deal, a team member, and a count."; return; }
+  const res = await api("adminGiveBuyerLeadsBulk", {
+    dealId: dealId, username: username, count: count,
+    city: document.getElementById("bulk-give-city").value.trim(),
+    state: document.getElementById("bulk-give-state").value.trim(),
+    zip: document.getElementById("bulk-give-zip").value.trim()
   });
-  if (!res.ok) { resultEl.textContent = res.error || "Could not assign."; return; }
-  resultEl.textContent = "Assigned " + res.assignedCount + " lead(s). " + res.remainingInPool + " still unassigned matching that filter.";
+  if (!res.ok) { resultEl.textContent = res.error || "Could not give leads."; return; }
+  resultEl.textContent = "Gave " + res.givenCount + " lead(s) for this deal. " + res.remainingInPool + " still unpitched for it matching that filter.";
   await loadBuyerLeadsAdmin();
 });
 
@@ -1003,7 +1027,7 @@ document.getElementById("autofeed-run-btn").addEventListener("click", async func
   if (res.reason) { resultEl.textContent = res.reason; return; }
   resultEl.textContent = res.fed.length === 0
     ? "Nobody needed more leads right now."
-    : res.fed.map(function (f) { return f.name + ": +" + f.count; }).join(", ");
+    : res.fed.map(function (f) { return f.name + " (" + f.dealAddress + "): +" + f.count; }).join(", ");
   await loadBuyerLeadsAdmin();
 });
 
@@ -1022,34 +1046,24 @@ function renderBuyerLeadsAdmin() {
   const empty = document.getElementById("buyerleads-admin-empty");
   const filtered = adminBuyerLeads.filter(function (l) {
     if (!q) return true;
-    return [l.BuyerName, l.Phone, l.City, l.State, l.Zip, l.AssignedTo].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; });
+    return [l.BuyerName, l.Phone, l.City, l.State, l.Zip].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; });
   });
   empty.hidden = filtered.length > 0;
   tbody.innerHTML = filtered.map(function (l) {
+    const notesPreview = l.GeneralNotes ? (l.GeneralNotes.length > 60 ? l.GeneralNotes.slice(0, 60) + "…" : l.GeneralNotes) : "";
     return '<tr>' +
       '<td>' + esc(l.BuyerName) + '</td>' +
       '<td>' + esc(l.Phone) + '</td>' +
       '<td>' + esc(l.PhoneType || "") + '</td>' +
       '<td>' + [l.City, l.State, l.Zip].filter(Boolean).join(", ") + '</td>' +
-      '<td>' + (l.AssignedTo ? esc(l.AssignedTo) : "&mdash;") + '</td>' +
-      '<td><span class="status-pill ' + statusClass(l.status) + '">' + esc(l.status) + '</span></td>' +
-      '<td style="white-space:nowrap;">' +
-        '<button class="btn secondary small view-contacts-btn" data-lead-id="' + esc(l.BuyerLeadID) + '">History</button> ' +
-        (l.AssignedTo
-          ? '<button class="btn secondary small unassign-lead-btn" data-lead-id="' + esc(l.BuyerLeadID) + '">Unassign</button>'
-          : '') +
-      '</td>' +
+      '<td class="small-muted">' + esc(notesPreview) + '</td>' +
+      '<td>' + (l.openPitches.length || "&mdash;") + '</td>' +
+      '<td style="white-space:nowrap;"><button class="btn secondary small view-buyer-btn" data-lead-id="' + esc(l.BuyerLeadID) + '">View / Give</button></td>' +
       '</tr>';
   }).join("");
 
-  Array.from(tbody.querySelectorAll(".view-contacts-btn")).forEach(function (btn) {
+  Array.from(tbody.querySelectorAll(".view-buyer-btn")).forEach(function (btn) {
     btn.addEventListener("click", function () { openAdminBuyerLeadDetail(btn.getAttribute("data-lead-id")); });
-  });
-  Array.from(tbody.querySelectorAll(".unassign-lead-btn")).forEach(function (btn) {
-    btn.addEventListener("click", async function () {
-      await api("adminUnassignBuyerLead", { buyerLeadId: btn.getAttribute("data-lead-id") });
-      await loadBuyerLeadsAdmin();
-    });
   });
 }
 
@@ -1061,12 +1075,13 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
   const panel = document.getElementById("detail-panel");
   overlay.hidden = false;
 
-  const [contactsRes, repsRes] = await Promise.all([
-    api("adminGetBuyerLeadContacts", { buyerLeadId: buyerLeadId }),
-    api("adminGetReps", {})
-  ]);
-  const contacts = contactsRes.ok ? contactsRes.contacts : [];
-  const reps = repsRes.ok ? repsRes.reps.filter(function (r) { return r.active && !r.isAdmin; }) : [];
+  const pitchesRes = await api("adminGetPitchesForBuyerLead", { buyerLeadId: buyerLeadId });
+  const pitches = pitchesRes.ok ? pitchesRes.pitches : [];
+  if (buyerLeadsActiveReps.length === 0 || buyerLeadsActiveDeals.length === 0) await populateBulkGiveSelects();
+
+  const pitchedDealIds = {};
+  pitches.forEach(function (p) { pitchedDealIds[p.DealID] = true; });
+  const givableDeals = buyerLeadsActiveDeals.filter(function (d) { return !pitchedDealIds[d.DealID]; });
 
   panel.innerHTML =
     '<div style="display:flex; justify-content:space-between; align-items:flex-start;">' +
@@ -1075,27 +1090,95 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
       ([lead.City, lead.State, lead.Zip].filter(Boolean).length ? ' &middot; ' + [lead.City, lead.State, lead.Zip].filter(Boolean).join(", ") : "") + '</p></div>' +
       '<button class="link-btn" id="close-detail-btn">Close</button>' +
     '</div>' +
-    '<div class="banner info"><span class="status-pill ' + statusClass(lead.status) + '">' + esc(lead.status) + '</span>' +
-      '<div style="margin-top:8px;">Assigned to: ' + esc(lead.AssignedTo || "nobody yet") + '</div>' +
+
+    '<div class="section-title" style="margin-top:0;">General Buyer Notes</div>' +
+    '<p class="small-muted">Shared across every deal this buyer is ever pitched — ARV%, price range, areas of interest, cash vs. financed, etc.</p>' +
+    '<textarea id="admin-general-notes-input">' + esc(lead.GeneralNotes || "") + '</textarea>' +
+    '<div class="nav-row" style="justify-content:flex-end;">' +
+      '<button class="btn secondary" id="admin-general-notes-save-btn">Save Notes</button>' +
     '</div>' +
-    '<label class="field-label">Reassign to</label>' +
-    '<div style="display:flex; gap:8px;">' +
-      '<select id="reassign-select" style="flex:1;">' +
-        '<option value="">&mdash; unassigned &mdash;</option>' +
-        reps.map(function (r) { return '<option value="' + esc(r.username) + '"' + (r.username === lead.AssignedTo ? " selected" : "") + '>' + esc(r.name) + ' (' + esc(r.username) + ')</option>'; }).join("") +
-      '</select>' +
-      '<button class="btn secondary small" id="reassign-save-btn">Save</button>' +
-    '</div>' +
-    '<div class="section-title">Contact History</div>' +
-    '<div id="admin-contact-history">' + renderContactHistory(contacts) + '</div>';
+
+    '<div class="section-title">Give For a New Deal</div>' +
+    (givableDeals.length > 0
+      ? '<div class="row2">' +
+          '<div><select id="give-new-deal-select">' + givableDeals.map(function (d) { return '<option value="' + esc(d.DealID) + '">' + esc(d.Address) + '</option>'; }).join("") + '</select></div>' +
+          '<div><select id="give-new-rep-select">' + buyerLeadsActiveReps.map(function (r) { return '<option value="' + esc(r.username) + '">' + esc(r.name) + '</option>'; }).join("") + '</select></div>' +
+        '</div>' +
+        '<div class="nav-row" style="justify-content:flex-end;"><button class="btn primary small" id="give-new-pitch-btn">Give This Buyer Lead To</button></div>'
+      : '<p class="small-muted">This buyer already has an open pitch on every active deal, or there are no active deals yet.</p>') +
+
+    '<div class="section-title">Pitches</div>' +
+    '<div id="pitches-list">' + renderAdminPitchesList(pitches) + '</div>';
 
   document.getElementById("close-detail-btn").addEventListener("click", function () { overlay.hidden = true; loadBuyerLeadsAdmin(); });
 
-  document.getElementById("reassign-save-btn").addEventListener("click", async function () {
-    const username = document.getElementById("reassign-select").value;
-    if (username) await api("adminAssignBuyerLead", { buyerLeadId: buyerLeadId, username: username });
-    else await api("adminUnassignBuyerLead", { buyerLeadId: buyerLeadId });
-    openAdminBuyerLeadDetail(buyerLeadId);
+  document.getElementById("admin-general-notes-save-btn").addEventListener("click", async function () {
+    await api("updateBuyerLeadNotes", { buyerLeadId: buyerLeadId, notes: document.getElementById("admin-general-notes-input").value.trim() });
+    await loadBuyerLeadsAdmin();
+  });
+
+  const giveBtn = document.getElementById("give-new-pitch-btn");
+  if (giveBtn) {
+    giveBtn.addEventListener("click", async function () {
+      const dealId = document.getElementById("give-new-deal-select").value;
+      const username = document.getElementById("give-new-rep-select").value;
+      const res = await api("adminGiveBuyerLeadToRep", { buyerLeadId: buyerLeadId, dealId: dealId, username: username });
+      if (res.ok) openAdminBuyerLeadDetail(buyerLeadId);
+    });
+  }
+
+  wireAdminPitchActions(buyerLeadId);
+}
+
+function renderAdminPitchesList(pitches) {
+  if (pitches.length === 0) return '<p class="small-muted">No pitches given yet.</p>';
+  return pitches.slice().reverse().map(function (p) {
+    return '<div class="item-row">' +
+      '<span class="ts">' + formatDate(p.GivenAt) + ' &middot; given to ' + esc(p.Username) + '</span>' +
+      '<div style="margin-top:4px;"><strong>Re:</strong> ' + esc(p.dealAddress) + '</div>' +
+      '<div style="margin-top:6px;">' +
+        (p.dealStillActive
+          ? '<span class="status-pill ' + statusClass(p.status) + '">' + esc(p.status) + '</span>'
+          : '<span class="status-pill status-fully-worked">Deal ' + esc((p.dealStatus || "closed").toLowerCase()) + '</span>') +
+      '</div>' +
+      '<div style="display:flex; gap:8px; margin-top:8px;">' +
+        '<select class="pitch-reassign-select" data-pitch-id="' + esc(p.PitchID) + '" style="flex:1;">' +
+          buyerLeadsActiveReps.map(function (r) { return '<option value="' + esc(r.username) + '"' + (r.username === p.Username ? " selected" : "") + '>' + esc(r.name) + '</option>'; }).join("") +
+        '</select>' +
+        '<button class="btn secondary small pitch-reassign-btn" data-pitch-id="' + esc(p.PitchID) + '">Give to</button>' +
+        '<button class="btn secondary small pitch-withdraw-btn" data-pitch-id="' + esc(p.PitchID) + '">Withdraw</button>' +
+        '<button class="btn secondary small pitch-history-btn" data-pitch-id="' + esc(p.PitchID) + '">History</button>' +
+      '</div>' +
+      '<div class="pitch-history-container" data-pitch-id="' + esc(p.PitchID) + '" hidden></div>' +
+      '</div>';
+  }).join("");
+}
+
+function wireAdminPitchActions(buyerLeadId) {
+  const panel = document.getElementById("detail-panel");
+  Array.from(panel.querySelectorAll(".pitch-reassign-btn")).forEach(function (btn) {
+    btn.addEventListener("click", async function () {
+      const pitchId = btn.getAttribute("data-pitch-id");
+      const select = panel.querySelector('.pitch-reassign-select[data-pitch-id="' + pitchId + '"]');
+      await api("adminReassignPitch", { pitchId: pitchId, username: select.value });
+      openAdminBuyerLeadDetail(buyerLeadId);
+    });
+  });
+  Array.from(panel.querySelectorAll(".pitch-withdraw-btn")).forEach(function (btn) {
+    btn.addEventListener("click", async function () {
+      await api("adminWithdrawPitch", { pitchId: btn.getAttribute("data-pitch-id") });
+      openAdminBuyerLeadDetail(buyerLeadId);
+    });
+  });
+  Array.from(panel.querySelectorAll(".pitch-history-btn")).forEach(function (btn) {
+    btn.addEventListener("click", async function () {
+      const pitchId = btn.getAttribute("data-pitch-id");
+      const container = panel.querySelector('.pitch-history-container[data-pitch-id="' + pitchId + '"]');
+      if (!container.hidden) { container.hidden = true; return; }
+      const res = await api("adminGetPitchContacts", { pitchId: pitchId });
+      container.innerHTML = renderContactHistory(res.ok ? res.contacts : []);
+      container.hidden = false;
+    });
   });
 }
 

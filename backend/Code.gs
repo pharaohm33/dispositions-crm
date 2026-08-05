@@ -20,6 +20,17 @@
  * Until then getDeals/getDeal strip the Address field entirely rather than
  * relying on the front-end to hide it, since the value would otherwise sit
  * in the browser's network tab regardless of what's rendered.
+ *
+ * Buyer leads model: a buyer/LLC on the master calling list (BuyerLeads)
+ * only ever becomes a work item once it's paired with one specific active
+ * deal via a Pitch ("give this buyer lead to this rep for this deal") --
+ * see PITCH_COLUMNS. There is deliberately no bare "assign this buyer to a
+ * rep" without a deal attached, so nobody's queue can fill up with buyers
+ * there's nothing currently for sale to offer them. A buyer's cross-deal
+ * preferences (ARV%, price range, area, cash vs. financed) live in
+ * BuyerLeads.GeneralNotes and persist across every pitch that buyer ever
+ * gets, in any city, so a buyer who passed on one market can be correctly
+ * re-pitched when a matching deal shows up somewhere else later.
  */
 
 const REPS_SHEET = 'Reps';
@@ -29,6 +40,7 @@ const BUYERS_SHEET = 'InterestedBuyers';
 const FB_SHEET = 'FBPostRequests';
 const STATUS_SHEET = 'StatusOptions';
 const BUYER_LEADS_SHEET = 'BuyerLeads';
+const PITCHES_SHEET = 'Pitches';
 const BUYER_LEAD_CONTACTS_SHEET = 'BuyerLeadContacts';
 const SESSION_HOURS = 12;
 const DEFAULT_STATUSES = ['Active', 'Under Contract', 'Sold', 'Dead', 'On Hold'];
@@ -40,17 +52,35 @@ const ASSIGNMENT_COLUMNS = ['DealID', 'Username', 'AssignedAt'];
 const BUYER_COLUMNS = ['BuyerID', 'DealID', 'Username', 'BuyerName', 'BuyerContact', 'Notes', 'Status', 'AdminNote', 'CreatedAt', 'DecidedAt'];
 const FB_COLUMNS = ['RequestID', 'DealID', 'Username', 'PostText', 'TargetGroups', 'Status', 'AdminNote', 'CreatedAt', 'DecidedAt'];
 
-// One row per buyer/LLC on the master calling list. AssignedTo is blank
-// until an admin (or auto-feed) hands it to a specific rep -- there's no
-// concept of shared/pooled leads, by design, so two reps never call the
-// same buyer unless an admin deliberately reassigns it.
-const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'City', 'State', 'Zip', 'AssignedTo', 'AssignedAt', 'CreatedAt'];
+// One row per buyer/LLC on the master calling list. There is no direct
+// "assigned rep" here on purpose -- a buyer lead only becomes an actual work
+// item once a Pitch pairs it with a specific active deal (see PITCH_COLUMNS
+// below), so nobody's follow-up queue ever fills up with buyers there's
+// nothing current to sell them. GeneralNotes is a cross-deal profile (ARV%
+// they want, price range, areas of interest, cash vs. financed, etc.) that
+// persists no matter how many different deals/pitches this buyer goes
+// through over time -- it's what lets a buyer who passed on a Phoenix deal
+// get re-pitched correctly when a matching deal shows up in Dallas instead.
+const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'City', 'State', 'Zip', 'GeneralNotes', 'CreatedAt'];
 
-// One row per contact attempt against a BuyerLeadID -- this is both the
-// call/text touchpoint log that drives computeLeadStatus's 24/48-hour SOP,
-// and the running feedback history ("buyer said X about deal Y") that's the
-// whole point of building a most-active-buyers picture over time.
-const BUYER_LEAD_CONTACT_COLUMNS = ['ContactID', 'BuyerLeadID', 'Username', 'Method', 'ContactedAt', 'Responded', 'DealID', 'Notes'];
+// A Pitch is "give this buyer lead to this rep, to work against this one
+// specific deal." This is the only thing that creates an actionable item in
+// a rep's queue or blocks Auto-Feed -- a buyer lead with zero open pitches
+// just sits in the pool, generating no follow-up pressure for anyone.
+// Reassigning a pitch to a different rep (adminReassignPitch) keeps its
+// contact history intact; withdrawing one (adminWithdrawPitch) deletes the
+// pitch row itself but never touches BuyerLeadContacts, so the record of
+// what was said stays put even after the pitch is gone.
+const PITCH_COLUMNS = ['PitchID', 'BuyerLeadID', 'DealID', 'Username', 'GivenAt'];
+
+// One row per contact attempt against a specific Pitch -- this is both the
+// call/text touchpoint log that drives computeLeadStatus's 24/48-hour SOP
+// (scoped to that one buyer+deal pairing, not the buyer lead as a whole),
+// and the feedback history ("buyer said X about deal Y") that feeds the
+// buyer's GeneralNotes over time. BuyerLeadID/DealID are denormalized here
+// (copied from the Pitch at write time) so this history is still readable
+// even after the Pitch itself has been withdrawn.
+const BUYER_LEAD_CONTACT_COLUMNS = ['ContactID', 'PitchID', 'BuyerLeadID', 'DealID', 'Username', 'Method', 'ContactedAt', 'Responded', 'Notes'];
 
 function doGet(e) {
   const action = e.parameter.action;
@@ -89,12 +119,14 @@ function doPost(e) {
         return jsonOut(withSession(body, submitFbPostRequest));
       case 'getMyFbRequests':
         return jsonOut(withSession(body, getMyFbRequests));
-      case 'getMyBuyerLeads':
-        return jsonOut(withSession(body, getMyBuyerLeads));
-      case 'getBuyerLeadContacts':
-        return jsonOut(withSession(body, getBuyerLeadContacts));
-      case 'addBuyerLeadContact':
-        return jsonOut(withSession(body, addBuyerLeadContact));
+      case 'getMyPitches':
+        return jsonOut(withSession(body, getMyPitches));
+      case 'getPitchContacts':
+        return jsonOut(withSession(body, getPitchContacts));
+      case 'addPitchContact':
+        return jsonOut(withSession(body, addPitchContact));
+      case 'updateBuyerLeadNotes':
+        return jsonOut(withSession(body, updateBuyerLeadNotes));
 
       // ---- admin only ----
       case 'adminAddDeal':
@@ -129,14 +161,18 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminImportBuyerLeads));
       case 'adminGetBuyerLeads':
         return jsonOut(withAdminSession(body, adminGetBuyerLeads));
-      case 'adminAssignBuyerLead':
-        return jsonOut(withAdminSession(body, adminAssignBuyerLead));
-      case 'adminUnassignBuyerLead':
-        return jsonOut(withAdminSession(body, adminUnassignBuyerLead));
-      case 'adminAssignBuyerLeadsBulk':
-        return jsonOut(withAdminSession(body, adminAssignBuyerLeadsBulk));
-      case 'adminGetBuyerLeadContacts':
-        return jsonOut(withAdminSession(body, adminGetBuyerLeadContacts));
+      case 'adminGiveBuyerLeadToRep':
+        return jsonOut(withAdminSession(body, adminGiveBuyerLeadToRep));
+      case 'adminGiveBuyerLeadsBulk':
+        return jsonOut(withAdminSession(body, adminGiveBuyerLeadsBulk));
+      case 'adminReassignPitch':
+        return jsonOut(withAdminSession(body, adminReassignPitch));
+      case 'adminWithdrawPitch':
+        return jsonOut(withAdminSession(body, adminWithdrawPitch));
+      case 'adminGetPitchesForBuyerLead':
+        return jsonOut(withAdminSession(body, adminGetPitchesForBuyerLead));
+      case 'adminGetPitchContacts':
+        return jsonOut(withAdminSession(body, adminGetPitchContacts));
       case 'adminSetRepPreferredArea':
         return jsonOut(withAdminSession(body, adminSetRepPreferredArea));
       case 'adminGetAutoFeedSettings':
@@ -718,8 +754,9 @@ function adminDecideBuyer(body) {
 
 // ---------- Buyer leads (master calling list) ----------
 //
-// Status SOP, derived fresh on every read rather than stored, so it can
-// never drift from the actual contact log:
+// A buyer lead only generates follow-up pressure once it's paired with a
+// specific active deal via a Pitch (see PITCH_COLUMNS). Status SOP is
+// computed fresh from a pitch's contact log, never stored, so it can't drift:
 //   Not Contacted        - nothing logged yet
 //   Awaiting Response     - one contact logged, under 24 hours ago
 //   Follow-Up In Progress - past 24h, but the required second-touch method(s)
@@ -729,7 +766,8 @@ function adminDecideBuyer(body) {
 //   Fully Worked          - the phone-type-appropriate two-touch SOP is
 //                           complete (two calls for a landline; a call AND
 //                           a text for a mobile) with no response -- this
-//                           lead no longer blocks that rep from auto-feed
+//                           pitch no longer blocks that rep/deal from
+//                           Auto-Feed giving out more
 //
 // Landlines can only ever be called (never texted), so their SOP is two
 // calls; mobiles can be called or texted, and the required follow-up
@@ -752,8 +790,17 @@ function computeLeadStatus(phoneType, contacts) {
   return 'Follow-Up Due';
 }
 
-function leadNeedsAction(status) {
+// A pitch stops requiring action once its deal is no longer active (Sold or
+// Dead) -- there's nothing left to sell that buyer on it, so it shouldn't
+// keep generating follow-up pressure or block Auto-Feed from giving that rep
+// something that's actually still for sale.
+function leadNeedsAction(status, dealStillActive) {
+  if (!dealStillActive) return false;
   return status === 'Not Contacted' || status === 'Awaiting Response' || status === 'Follow-Up Due' || status === 'Follow-Up In Progress';
+}
+
+function dealIsActive(deal) {
+  return !!deal && deal['Status'] !== 'Sold' && deal['Status'] !== 'Dead';
 }
 
 // Parses pasted CSV/TSV/spreadsheet text: BuyerName, Phone, PhoneType,
@@ -804,7 +851,7 @@ function adminImportBuyerLeads(body) {
     existingPhones[normalizedPhone] = true;
     appendRowByHeaders(sheet, {
       'BuyerLeadID': Utilities.getUuid(), 'BuyerName': r.buyerName, 'Phone': r.phone, 'PhoneType': r.phoneType || '',
-      'City': r.city || '', 'State': r.state || '', 'Zip': r.zip || '', 'AssignedTo': '', 'AssignedAt': '', 'CreatedAt': now
+      'City': r.city || '', 'State': r.state || '', 'Zip': r.zip || '', 'GeneralNotes': '', 'CreatedAt': now
     });
     imported++;
   });
@@ -812,17 +859,24 @@ function adminImportBuyerLeads(body) {
   return { ok: true, imported: imported, skippedDuplicates: skippedDuplicates };
 }
 
-function buyerLeadsWithStatus(leadRows, allContacts) {
-  const contactsByLead = {};
+// Joins every pitch to its contacts and computes each one's live status,
+// tagging whether its deal is still active. dealsById must be a map of
+// DealID -> deal object (caller builds this once and reuses it).
+function pitchesWithStatus(pitchRows, allContacts, dealsById) {
+  const contactsByPitch = {};
   allContacts.forEach(function (c) {
-    if (!contactsByLead[c['BuyerLeadID']]) contactsByLead[c['BuyerLeadID']] = [];
-    contactsByLead[c['BuyerLeadID']].push(c);
+    if (!contactsByPitch[c['PitchID']]) contactsByPitch[c['PitchID']] = [];
+    contactsByPitch[c['PitchID']].push(c);
   });
-  return leadRows.map(function (l) {
-    const contacts = contactsByLead[l['BuyerLeadID']] || [];
-    const copy = Object.assign({}, l);
-    copy.status = computeLeadStatus(l['PhoneType'], contacts);
+  return pitchRows.map(function (p) {
+    const deal = dealsById[p['DealID']];
+    const contacts = contactsByPitch[p['PitchID']] || [];
+    const copy = Object.assign({}, p);
+    copy.status = computeLeadStatus(p._phoneType, contacts);
     copy.contactCount = contacts.length;
+    copy.dealAddress = deal ? deal['Address'] : '(deleted deal)';
+    copy.dealStatus = deal ? deal['Status'] : '';
+    copy.dealStillActive = dealIsActive(deal);
     return copy;
   });
 }
@@ -831,64 +885,154 @@ function adminGetBuyerLeads(body) {
   const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
   let leads = sheetToObjects(sheet);
   const f = body.filters || {};
-  if (f.assignedTo) leads = leads.filter(function (l) { return String(l['AssignedTo'] || '').toLowerCase() === String(f.assignedTo).toLowerCase(); });
-  if (f.unassignedOnly) leads = leads.filter(function (l) { return !l['AssignedTo']; });
   if (f.city) leads = leads.filter(function (l) { return String(l['City'] || '').toLowerCase() === String(f.city).toLowerCase(); });
   if (f.state) leads = leads.filter(function (l) { return String(l['State'] || '').toLowerCase() === String(f.state).toLowerCase(); });
   if (f.zip) leads = leads.filter(function (l) { return String(l['Zip'] || '') === String(f.zip); });
 
-  const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
-  const allContacts = sheetToObjects(contactsSheet);
-  return { ok: true, leads: buyerLeadsWithStatus(leads, allContacts) };
+  const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+  const allPitches = sheetToObjects(pitchesSheet);
+  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const dealsById = {};
+  sheetToObjects(dealsSheet).forEach(function (d) { dealsById[d['DealID']] = d; });
+
+  const openPitchesByLead = {};
+  allPitches.forEach(function (p) {
+    if (!openPitchesByLead[p['BuyerLeadID']]) openPitchesByLead[p['BuyerLeadID']] = [];
+    const deal = dealsById[p['DealID']];
+    openPitchesByLead[p['BuyerLeadID']].push({
+      pitchId: p['PitchID'], dealId: p['DealID'],
+      dealAddress: deal ? deal['Address'] : '(deleted deal)', username: p['Username']
+    });
+  });
+
+  const withPitches = leads.map(function (l) {
+    const copy = Object.assign({}, l);
+    copy.openPitches = openPitchesByLead[l['BuyerLeadID']] || [];
+    return copy;
+  });
+  return { ok: true, leads: withPitches };
 }
 
-function adminAssignBuyerLead(body) {
-  if (!body.buyerLeadId || !body.username) return { ok: false, error: 'Missing buyerLeadId or username.' };
-  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
-  const leads = sheetToObjects(sheet);
-  const match = leads.find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
-  if (!match) return { ok: false, error: 'Lead not found.' };
-  sheet.getRange(match._row, getColumnIndex(sheet, 'AssignedTo')).setValue(String(body.username).trim().toLowerCase());
-  sheet.getRange(match._row, getColumnIndex(sheet, 'AssignedAt')).setValue(new Date().toISOString());
-  return { ok: true };
-}
-
-function adminUnassignBuyerLead(body) {
+function updateBuyerLeadNotes(body, session) {
   if (!body.buyerLeadId) return { ok: false, error: 'Missing buyerLeadId.' };
   const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
   const leads = sheetToObjects(sheet);
   const match = leads.find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
   if (!match) return { ok: false, error: 'Lead not found.' };
-  sheet.getRange(match._row, getColumnIndex(sheet, 'AssignedTo')).setValue('');
-  sheet.getRange(match._row, getColumnIndex(sheet, 'AssignedAt')).setValue('');
+  if (!session.a) {
+    const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+    const ownsAPitch = sheetToObjects(pitchesSheet).some(function (p) {
+      return p['BuyerLeadID'] === body.buyerLeadId && String(p['Username'] || '').toLowerCase() === session.u;
+    });
+    if (!ownsAPitch) return { ok: false, error: 'You need an active pitch on this buyer to edit their notes.' };
+  }
+  sheet.getRange(match._row, getColumnIndex(sheet, 'GeneralNotes')).setValue(body.notes || '');
   return { ok: true };
 }
 
-// Hands the next N unassigned leads (optionally filtered by area) to one
-// rep in one shot -- e.g. "give Jordan the next 50 unassigned leads in
-// Phoenix, AZ." Oldest-imported leads go out first.
-function adminAssignBuyerLeadsBulk(body) {
-  if (!body.username || !body.count) return { ok: false, error: 'Missing username or count.' };
+// Gives one buyer lead to one rep for one specific deal -- creates a Pitch.
+// Two reps can each have their own pitch on the same buyer for two
+// different deals, but giving the SAME deal to two different reps for the
+// SAME buyer is blocked, since that's exactly the double-call scenario this
+// whole model exists to prevent.
+function adminGiveBuyerLeadToRep(body) {
+  if (!body.buyerLeadId || !body.dealId || !body.username) return { ok: false, error: 'Missing buyerLeadId, dealId, or username.' };
+  const sheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+  const existing = sheetToObjects(sheet);
+  const clash = existing.find(function (p) { return p['BuyerLeadID'] === body.buyerLeadId && p['DealID'] === body.dealId; });
+  if (clash) return { ok: false, error: 'This buyer already has an open pitch for this deal (given to ' + clash['Username'] + ').' };
+
+  const pitchId = Utilities.getUuid();
+  appendRowByHeaders(sheet, {
+    'PitchID': pitchId, 'BuyerLeadID': body.buyerLeadId, 'DealID': body.dealId,
+    'Username': String(body.username).trim().toLowerCase(), 'GivenAt': new Date().toISOString()
+  });
+  return { ok: true, pitchId: pitchId };
+}
+
+// Gives a batch of buyer leads -- matched to the deal's own City/State/Zip
+// unless overridden -- to one rep for that one deal, skipping any buyer
+// lead that already has an open pitch for this deal (to anyone).
+function adminGiveBuyerLeadsBulk(body) {
+  if (!body.dealId || !body.username || !body.count) return { ok: false, error: 'Missing dealId, username, or count.' };
   const username = String(body.username).trim().toLowerCase();
-  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
-  let pool = sheetToObjects(sheet).filter(function (l) { return !l['AssignedTo']; });
-  if (body.city) pool = pool.filter(function (l) { return String(l['City'] || '').toLowerCase() === String(body.city).toLowerCase(); });
-  if (body.state) pool = pool.filter(function (l) { return String(l['State'] || '').toLowerCase() === String(body.state).toLowerCase(); });
-  if (body.zip) pool = pool.filter(function (l) { return String(l['Zip'] || '') === String(body.zip); });
+
+  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === body.dealId; });
+  if (!deal) return { ok: false, error: 'Deal not found.' };
+
+  const city = body.city || deal['City'];
+  const state = body.state || deal['State'];
+  const zip = body.zip || deal['Zip'];
+
+  const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+  const existingPitches = sheetToObjects(pitchesSheet);
+  const alreadyPitchedForThisDeal = {};
+  existingPitches.forEach(function (p) { if (p['DealID'] === body.dealId) alreadyPitchedForThisDeal[p['BuyerLeadID']] = true; });
+
+  const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  let pool = sheetToObjects(leadsSheet).filter(function (l) { return !alreadyPitchedForThisDeal[l['BuyerLeadID']]; });
+  if (city) pool = pool.filter(function (l) { return String(l['City'] || '').toLowerCase() === String(city).toLowerCase(); });
+  if (state) pool = pool.filter(function (l) { return String(l['State'] || '').toLowerCase() === String(state).toLowerCase(); });
+  if (zip) pool = pool.filter(function (l) { return String(l['Zip'] || '') === String(zip); });
 
   const batch = pool.slice(0, Number(body.count));
   const now = new Date().toISOString();
   batch.forEach(function (l) {
-    sheet.getRange(l._row, getColumnIndex(sheet, 'AssignedTo')).setValue(username);
-    sheet.getRange(l._row, getColumnIndex(sheet, 'AssignedAt')).setValue(now);
+    appendRowByHeaders(pitchesSheet, {
+      'PitchID': Utilities.getUuid(), 'BuyerLeadID': l['BuyerLeadID'], 'DealID': body.dealId,
+      'Username': username, 'GivenAt': now
+    });
   });
-  return { ok: true, assignedCount: batch.length, remainingInPool: pool.length - batch.length };
+  return { ok: true, givenCount: batch.length, remainingInPool: pool.length - batch.length };
 }
 
-function adminGetBuyerLeadContacts(body) {
+function adminReassignPitch(body) {
+  if (!body.pitchId || !body.username) return { ok: false, error: 'Missing pitchId or username.' };
+  const sheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+  const pitches = sheetToObjects(sheet);
+  const match = pitches.find(function (p) { return p['PitchID'] === body.pitchId; });
+  if (!match) return { ok: false, error: 'Pitch not found.' };
+  sheet.getRange(match._row, getColumnIndex(sheet, 'Username')).setValue(String(body.username).trim().toLowerCase());
+  return { ok: true };
+}
+
+// Deletes the pitch row itself (so the buyer lead becomes available for a
+// fresh pitch on this deal again) but never touches BuyerLeadContacts --
+// the record of what was actually said to this buyer about this deal stays
+// permanently, even after the pitch that generated it is gone.
+function adminWithdrawPitch(body) {
+  if (!body.pitchId) return { ok: false, error: 'Missing pitchId.' };
+  const sheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+  const pitches = sheetToObjects(sheet);
+  const match = pitches.find(function (p) { return p['PitchID'] === body.pitchId; });
+  if (!match) return { ok: false, error: 'Pitch not found.' };
+  sheet.deleteRow(match._row);
+  return { ok: true };
+}
+
+function adminGetPitchesForBuyerLead(body) {
   if (!body.buyerLeadId) return { ok: false, error: 'Missing buyerLeadId.' };
+  const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+  const pitches = sheetToObjects(pitchesSheet).filter(function (p) { return p['BuyerLeadID'] === body.buyerLeadId; });
+
+  const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const lead = sheetToObjects(leadsSheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
+  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const dealsById = {};
+  sheetToObjects(dealsSheet).forEach(function (d) { dealsById[d['DealID']] = d; });
+  pitches.forEach(function (p) { p._phoneType = lead ? lead['PhoneType'] : ''; });
+
+  const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
+  const allContacts = sheetToObjects(contactsSheet).filter(function (c) { return c['BuyerLeadID'] === body.buyerLeadId; });
+
+  return { ok: true, pitches: pitchesWithStatus(pitches, allContacts, dealsById) };
+}
+
+function adminGetPitchContacts(body) {
+  if (!body.pitchId) return { ok: false, error: 'Missing pitchId.' };
   const sheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
-  const contacts = sheetToObjects(sheet).filter(function (c) { return c['BuyerLeadID'] === body.buyerLeadId; });
+  const contacts = sheetToObjects(sheet).filter(function (c) { return c['PitchID'] === body.pitchId; });
   return { ok: true, contacts: contacts };
 }
 
@@ -906,12 +1050,13 @@ function adminSetRepPreferredArea(body) {
 }
 
 // ---------- Auto-feed ----------
-// When enabled, tops up any active non-admin rep who has zero buyer leads
-// still needing action (see leadNeedsAction) with more unassigned leads,
-// matched to that rep's PreferredCity/State/Zip when set. A rep who's never
-// been assigned anything also qualifies (zero leads trivially need no
-// action), so turning this on for a brand-new rep with a preferred area set
-// will seed their very first batch too. Callable on demand via
+// When enabled, looks at every active deal (not Sold/Dead) and, for each rep
+// with access to it who has zero open pitches on that deal still needing
+// action, gives them more matching buyer leads for that deal automatically
+// (see adminGiveBuyerLeadsBulk's matching logic). A rep's PreferredCity/
+// State/Zip, if set, additionally restricts which of their deals qualify --
+// so a rep working Phoenix doesn't get auto-given a pitch for a deal in a
+// city they've never been assigned to work. Callable on demand via
 // adminRunAutoFeedNow, or on a schedule if you install a time-driven
 // trigger calling autoFeedCheck (see SETUP.md).
 function adminGetAutoFeedSettings(body) {
@@ -934,6 +1079,13 @@ function adminRunAutoFeedNow(body) {
   return autoFeedCheck();
 }
 
+function repMatchesArea(rep, deal) {
+  if (rep['PreferredCity'] && String(rep['PreferredCity']).toLowerCase() !== String(deal['City'] || '').toLowerCase()) return false;
+  if (rep['PreferredState'] && String(rep['PreferredState']).toLowerCase() !== String(deal['State'] || '').toLowerCase()) return false;
+  if (rep['PreferredZip'] && String(rep['PreferredZip']) !== String(deal['Zip'] || '')) return false;
+  return true;
+}
+
 function autoFeedCheck() {
   const props = PropertiesService.getScriptProperties();
   if (props.getProperty('AUTO_FEED_ENABLED') !== 'TRUE') return { ok: true, fed: [], reason: 'Auto-feed is turned off.' };
@@ -946,39 +1098,63 @@ function autoFeedCheck() {
     return active && !isAdmin;
   });
 
-  const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
-  const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
-  const allLeads = sheetToObjects(leadsSheet);
-  const allContacts = sheetToObjects(contactsSheet);
-  const contactsByLead = {};
-  allContacts.forEach(function (c) {
-    if (!contactsByLead[c['BuyerLeadID']]) contactsByLead[c['BuyerLeadID']] = [];
-    contactsByLead[c['BuyerLeadID']].push(c);
+  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const activeDeals = sheetToObjects(dealsSheet).filter(dealIsActive);
+
+  const assignmentsSheet = getSheet(ASSIGNMENTS_SHEET, ASSIGNMENT_COLUMNS);
+  const allAssignments = sheetToObjects(assignmentsSheet);
+  const assignedUsernamesByDeal = {};
+  allAssignments.forEach(function (a) {
+    if (!assignedUsernamesByDeal[a['DealID']]) assignedUsernamesByDeal[a['DealID']] = [];
+    assignedUsernamesByDeal[a['DealID']].push(String(a['Username'] || '').toLowerCase());
   });
 
+  const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+  const allPitches = sheetToObjects(pitchesSheet);
+  const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
+  const allContacts = sheetToObjects(contactsSheet);
+  const contactsByPitch = {};
+  allContacts.forEach(function (c) {
+    if (!contactsByPitch[c['PitchID']]) contactsByPitch[c['PitchID']] = [];
+    contactsByPitch[c['PitchID']].push(c);
+  });
+
+  const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const leadsById = {};
+  sheetToObjects(leadsSheet).forEach(function (l) { leadsById[l['BuyerLeadID']] = l; });
+
   const fed = [];
-  reps.forEach(function (rep) {
-    const username = rep['Username'];
-    const myLeads = allLeads.filter(function (l) { return String(l['AssignedTo'] || '').toLowerCase() === username; });
-    const stillNeedsAction = myLeads.some(function (l) {
-      return leadNeedsAction(computeLeadStatus(l['PhoneType'], contactsByLead[l['BuyerLeadID']] || []));
+  activeDeals.forEach(function (deal) {
+    const eligibleReps = reps.filter(function (rep) {
+      const hasAccess = rep['AllAccess'] === true || rep['AllAccess'] === 'TRUE' ||
+        (assignedUsernamesByDeal[deal['DealID']] || []).indexOf(rep['Username']) !== -1;
+      return hasAccess && repMatchesArea(rep, deal);
     });
-    if (stillNeedsAction) return;
 
-    let pool = allLeads.filter(function (l) { return !l['AssignedTo']; });
-    if (rep['PreferredCity']) pool = pool.filter(function (l) { return String(l['City'] || '').toLowerCase() === String(rep['PreferredCity']).toLowerCase(); });
-    if (rep['PreferredState']) pool = pool.filter(function (l) { return String(l['State'] || '').toLowerCase() === String(rep['PreferredState']).toLowerCase(); });
-    if (rep['PreferredZip']) pool = pool.filter(function (l) { return String(l['Zip'] || '') === String(rep['PreferredZip']); });
-    if (pool.length === 0) return;
+    eligibleReps.forEach(function (rep) {
+      const username = rep['Username'];
+      const myPitchesOnThisDeal = allPitches.filter(function (p) { return p['DealID'] === deal['DealID'] && p['Username'] === username; });
+      const stillNeedsAction = myPitchesOnThisDeal.some(function (p) {
+        const lead = leadsById[p['BuyerLeadID']];
+        return leadNeedsAction(computeLeadStatus(lead ? lead['PhoneType'] : '', contactsByPitch[p['PitchID']] || []), true);
+      });
+      if (stillNeedsAction) return;
 
-    const batch = pool.slice(0, batchSize);
-    const now = new Date().toISOString();
-    batch.forEach(function (l) {
-      leadsSheet.getRange(l._row, getColumnIndex(leadsSheet, 'AssignedTo')).setValue(username);
-      leadsSheet.getRange(l._row, getColumnIndex(leadsSheet, 'AssignedAt')).setValue(now);
-      l['AssignedTo'] = username; // keep in-memory allLeads consistent for subsequent reps in this same run
+      const alreadyPitchedForThisDeal = {};
+      allPitches.forEach(function (p) { if (p['DealID'] === deal['DealID']) alreadyPitchedForThisDeal[p['BuyerLeadID']] = true; });
+      let pool = sheetToObjects(leadsSheet).filter(function (l) { return !alreadyPitchedForThisDeal[l['BuyerLeadID']]; });
+      if (deal['City']) pool = pool.filter(function (l) { return String(l['City'] || '').toLowerCase() === String(deal['City']).toLowerCase(); });
+      if (deal['State']) pool = pool.filter(function (l) { return String(l['State'] || '').toLowerCase() === String(deal['State']).toLowerCase(); });
+      if (pool.length === 0) return;
+
+      const batch = pool.slice(0, batchSize);
+      const now = new Date().toISOString();
+      batch.forEach(function (l) {
+        appendRowByHeaders(pitchesSheet, { 'PitchID': Utilities.getUuid(), 'BuyerLeadID': l['BuyerLeadID'], 'DealID': deal['DealID'], 'Username': username, 'GivenAt': now });
+        alreadyPitchedForThisDeal[l['BuyerLeadID']] = true; // keep subsequent reps in this same run from double-claiming
+      });
+      fed.push({ username: username, name: rep['Name'], dealAddress: deal['Address'], count: batch.length });
     });
-    fed.push({ username: username, name: rep['Name'], count: batch.length });
   });
 
   return { ok: true, fed: fed };
@@ -993,48 +1169,73 @@ function installAutoFeedHourlyTrigger() {
   ScriptApp.newTrigger('autoFeedCheck').timeBased().everyHours(1).create();
 }
 
-// ---------- Rep-facing buyer leads ----------
+// ---------- Rep-facing pitches ----------
 
-function getMyBuyerLeads(body, session) {
-  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
-  const myLeads = sheetToObjects(sheet).filter(function (l) { return String(l['AssignedTo'] || '').toLowerCase() === session.u; });
+function getMyPitches(body, session) {
+  const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+  const myPitches = sheetToObjects(pitchesSheet).filter(function (p) { return String(p['Username'] || '').toLowerCase() === session.u; });
+
+  const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const leadsById = {};
+  sheetToObjects(leadsSheet).forEach(function (l) { leadsById[l['BuyerLeadID']] = l; });
+  myPitches.forEach(function (p) { p._phoneType = leadsById[p['BuyerLeadID']] ? leadsById[p['BuyerLeadID']]['PhoneType'] : ''; });
+
+  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const dealsById = {};
+  sheetToObjects(dealsSheet).forEach(function (d) { dealsById[d['DealID']] = d; });
+
   const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
   const allContacts = sheetToObjects(contactsSheet).filter(function (c) { return String(c['Username'] || '').toLowerCase() === session.u; });
-  return { ok: true, leads: buyerLeadsWithStatus(myLeads, allContacts) };
+
+  const withStatus = pitchesWithStatus(myPitches, allContacts, dealsById);
+  withStatus.forEach(function (p) {
+    const lead = leadsById[p['BuyerLeadID']];
+    p.buyerName = lead ? lead['BuyerName'] : '(deleted buyer)';
+    p.phone = lead ? lead['Phone'] : '';
+    p.phoneType = lead ? lead['PhoneType'] : '';
+    p.city = lead ? lead['City'] : '';
+    p.state = lead ? lead['State'] : '';
+    p.generalNotes = lead ? lead['GeneralNotes'] : '';
+  });
+  return { ok: true, pitches: withStatus };
 }
 
-function ownsLeadOrAdmin(session, lead) {
-  return session.a || String(lead['AssignedTo'] || '').toLowerCase() === session.u;
+function ownsPitchOrAdmin(session, pitch) {
+  return session.a || String(pitch['Username'] || '').toLowerCase() === session.u;
 }
 
-function getBuyerLeadContacts(body, session) {
-  if (!body.buyerLeadId) return { ok: false, error: 'Missing buyerLeadId.' };
-  const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
-  const lead = sheetToObjects(leadsSheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
-  if (!lead) return { ok: false, error: 'Lead not found.' };
-  if (!ownsLeadOrAdmin(session, lead)) return { ok: false, error: 'This lead is not assigned to you.' };
+function getPitchContacts(body, session) {
+  if (!body.pitchId) return { ok: false, error: 'Missing pitchId.' };
+  const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+  const pitch = sheetToObjects(pitchesSheet).find(function (p) { return p['PitchID'] === body.pitchId; });
+  if (!pitch) return { ok: false, error: 'Pitch not found.' };
+  if (!ownsPitchOrAdmin(session, pitch)) return { ok: false, error: 'This pitch is not yours.' };
   const sheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
-  const contacts = sheet ? sheetToObjects(sheet).filter(function (c) { return c['BuyerLeadID'] === body.buyerLeadId; }) : [];
+  const contacts = sheetToObjects(sheet).filter(function (c) { return c['PitchID'] === body.pitchId; });
   return { ok: true, contacts: contacts };
 }
 
-function addBuyerLeadContact(body, session) {
-  if (!body.buyerLeadId || !body.method) return { ok: false, error: 'Missing buyerLeadId or method.' };
+function addPitchContact(body, session) {
+  if (!body.pitchId || !body.method) return { ok: false, error: 'Missing pitchId or method.' };
   if (body.method !== 'Call' && body.method !== 'Text') return { ok: false, error: 'Method must be Call or Text.' };
 
+  const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+  const pitch = sheetToObjects(pitchesSheet).find(function (p) { return p['PitchID'] === body.pitchId; });
+  if (!pitch) return { ok: false, error: 'Pitch not found.' };
+  if (!ownsPitchOrAdmin(session, pitch)) return { ok: false, error: 'This pitch is not yours.' };
+
   const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
-  const lead = sheetToObjects(leadsSheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
-  if (!lead) return { ok: false, error: 'Lead not found.' };
-  if (!ownsLeadOrAdmin(session, lead)) return { ok: false, error: 'This lead is not assigned to you.' };
-  if (body.method === 'Text' && String(lead['PhoneType'] || '').trim().toLowerCase() === 'landline') {
+  const lead = sheetToObjects(leadsSheet).find(function (l) { return l['BuyerLeadID'] === pitch['BuyerLeadID']; });
+  if (body.method === 'Text' && lead && String(lead['PhoneType'] || '').trim().toLowerCase() === 'landline') {
     return { ok: false, error: 'This is a landline — it can only be called, not texted.' };
   }
 
   const sheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
   const contactId = Utilities.getUuid();
   appendRowByHeaders(sheet, {
-    'ContactID': contactId, 'BuyerLeadID': body.buyerLeadId, 'Username': session.u, 'Method': body.method,
-    'ContactedAt': new Date().toISOString(), 'Responded': !!body.responded, 'DealID': body.dealId || '', 'Notes': body.notes || ''
+    'ContactID': contactId, 'PitchID': body.pitchId, 'BuyerLeadID': pitch['BuyerLeadID'], 'DealID': pitch['DealID'],
+    'Username': session.u, 'Method': body.method, 'ContactedAt': new Date().toISOString(),
+    'Responded': !!body.responded, 'Notes': body.notes || ''
   });
   return { ok: true, contactId: contactId };
 }

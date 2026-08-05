@@ -227,17 +227,23 @@
   <div id="rep-tab-buyerleads" hidden>
     <div class="banner info">
       <strong>How to work a buyer lead:</strong>
+      <p class="small-muted" style="margin:6px 0 0;">Everything below was given to you specifically for a deal we currently
+        have to sell — you won't see buyers with nothing active to offer them.</p>
       <div style="margin-top:8px;">
-        <strong>Step 1.</strong> Reach out about a deal you think fits them — call a landline, call or text a mobile.
+        <strong>Step 1.</strong> Reach out about the deal shown on the card — call a landline, call or text a mobile.
       </div>
       <div style="margin-top:8px;">
         <strong>Step 2.</strong> No response within 24 hours? Call again, then follow up with a text asking for their
         feedback on the deal so we can match them better next time (landlines: just call again). That's the full SOP —
-        once both touches are logged, the lead is marked Fully Worked.
+        once both touches are logged, the pitch is marked Fully Worked.
+      </div>
+      <div style="margin-top:8px;">
+        Not the right fit? Update their <strong>General Notes</strong> (price range, ARV%, areas of interest) so we can
+        match them correctly the next time a deal comes up — even in a different city.
       </div>
     </div>
     <div id="buyerleads-list"></div>
-    <div id="buyerleads-empty" class="small-muted" style="padding:20px;" hidden>No buyer leads assigned to you yet.</div>
+    <div id="buyerleads-empty" class="small-muted" style="padding:20px;" hidden>No buyer leads given to you yet — check back once we have a deal that fits one.</div>
   </div>
 </div>
 
@@ -304,27 +310,33 @@
     </div>
 
     <div class="card">
-      <div class="section-title" style="margin-top:0;">Assign Leads to a Team Member</div>
+      <div class="section-title" style="margin-top:0;">Give Buyer Leads for a Deal</div>
+      <p class="small-muted">Gives a batch of buyer leads to one team member, paired specifically with the deal you pick below — that pairing (a "pitch") is what shows up in their queue. Leads already pitched for this same deal are skipped.</p>
       <div class="row2">
-        <div><label class="field-label">Team member</label><select id="bulk-assign-rep-select"></select></div>
-        <div><label class="field-label">How many</label><input type="number" id="bulk-assign-count" value="50" min="1"></div>
+        <div><label class="field-label">Deal</label><select id="bulk-give-deal-select"></select></div>
+        <div><label class="field-label">Give to</label><select id="bulk-give-rep-select"></select></div>
+      </div>
+      <div class="row2">
+        <div><label class="field-label">How many</label><input type="number" id="bulk-give-count" value="50" min="1"></div>
+        <div></div>
       </div>
       <div class="row3">
-        <div><label class="field-label">City (optional)</label><input type="text" id="bulk-assign-city"></div>
-        <div><label class="field-label">State (optional)</label><input type="text" id="bulk-assign-state"></div>
-        <div><label class="field-label">Zip (optional)</label><input type="text" id="bulk-assign-zip"></div>
+        <div><label class="field-label">City (optional override)</label><input type="text" id="bulk-give-city"></div>
+        <div><label class="field-label">State (optional override)</label><input type="text" id="bulk-give-state"></div>
+        <div><label class="field-label">Zip (optional override)</label><input type="text" id="bulk-give-zip"></div>
       </div>
+      <p class="small-muted">Leave city/state/zip blank to match the deal's own location automatically.</p>
       <div class="nav-row" style="justify-content:flex-end;">
-        <button class="btn primary" id="bulk-assign-btn">Assign From Unassigned Pool</button>
+        <button class="btn primary" id="bulk-give-btn">Give Buyer Leads</button>
       </div>
-      <div id="bulk-assign-result" class="small-muted"></div>
+      <div id="bulk-give-result" class="small-muted"></div>
     </div>
 
     <div class="card">
       <div class="section-title" style="margin-top:0;">Auto-Feed</div>
-      <p class="small-muted">When on, any active team member with zero buyer leads still needing action is automatically topped up from the unassigned pool (matching their Preferred Buyer-Lead Area if set, on the Team tab). Runs whenever you click below, or hourly if you've installed the optional trigger — see SETUP.md.</p>
+      <p class="small-muted">When on, checks every active deal (not Sold/Dead): any team member with access to it who's worked through everything they've been given for it is automatically given more matching buyer leads for that same deal. A team member's Preferred Buyer-Lead Area (Team tab), if set, limits which of their deals qualify. Runs whenever you click below, or hourly if you've installed the optional trigger — see SETUP.md.</p>
       <label class="checkbox-row"><input type="checkbox" id="autofeed-enabled-input"> Enable auto-feed</label>
-      <label class="field-label">Batch size per team member</label>
+      <label class="field-label">Batch size per team member per deal</label>
       <input type="number" id="autofeed-batchsize-input" value="50" min="1" style="max-width:160px;">
       <div class="nav-row" style="justify-content:flex-end;">
         <button class="btn secondary" id="autofeed-save-btn">Save Settings</button>
@@ -334,10 +346,10 @@
     </div>
 
     <div style="display:flex; justify-content:space-between; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
-      <input type="text" id="buyerleads-search" placeholder="Search by name, phone, city, state, zip, or assigned rep..." style="flex:1; min-width:240px;">
+      <input type="text" id="buyerleads-search" placeholder="Search by name, phone, city, state, or zip..." style="flex:1; min-width:240px;">
     </div>
     <table class="crm-table">
-      <thead><tr><th>Buyer / LLC</th><th>Phone</th><th>Type</th><th>Location</th><th>Assigned To</th><th>Status</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Buyer / LLC</th><th>Phone</th><th>Type</th><th>Location</th><th>General Notes</th><th>Open Pitches</th><th>Actions</th></tr></thead>
       <tbody id="buyerleads-tbody"></tbody>
     </table>
     <div id="buyerleads-admin-empty" class="small-muted" style="padding:20px;" hidden>No buyer leads imported yet.</div>
