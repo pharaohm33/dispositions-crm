@@ -90,12 +90,20 @@ const FB_COLUMNS = ['RequestID', 'DealID', 'Username', 'PostText', 'TargetGroups
 // persists no matter how many different deals/pitches this buyer goes
 // through over time -- it's what lets a buyer who passed on a Phoenix deal
 // get re-pitched correctly when a matching deal shows up in Dallas instead.
-// Email is optional (not every source list has one). DriveLink is a folder
-// URL for buyer-specific documents (proof of funds, signed agreements,
-// etc.) -- editable by admin only (adminUpdateBuyerLeadProfile), but any
-// rep with an open pitch on this buyer can see it, same visibility as
-// GeneralNotes.
-const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'Email', 'PhoneType', 'City', 'State', 'Zip', 'GeneralNotes', 'DriveLink', 'CreatedAt'];
+// Email is optional (not every source list has one). Phone2/Phone3 are
+// optional alternate numbers (each with its own PhoneType, since one might
+// be a mobile and another a landline) -- reps pick which one they're
+// calling/texting each time (see PhoneSlot on BuyerLeadContacts).
+// DoNotContact is a hard stop: once true, no rep can log a new contact
+// against this buyer on any phone number (addPitchContact rejects it), and
+// admin can no longer give this buyer a new pitch for any deal
+// (adminGiveBuyerLeadToRep/adminGiveBuyerLeadsBulk/autoFeedCheck all skip
+// it) -- existing pitches just stop being workable rather than being
+// deleted, so the history stays intact. DriveLink is a folder URL for
+// buyer-specific documents (proof of funds, signed agreements, etc.) --
+// editable by admin only (adminUpdateBuyerLeadProfile), but any rep with an
+// open pitch on this buyer can see it, same visibility as GeneralNotes.
+const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'CreatedAt'];
 
 // A Pitch is "give this buyer lead to this rep, to work against this one
 // specific deal." This is the only thing that creates an actionable item in
@@ -113,8 +121,11 @@ const PITCH_COLUMNS = ['PitchID', 'BuyerLeadID', 'DealID', 'Username', 'GivenAt'
 // and the feedback history ("buyer said X about deal Y") that feeds the
 // buyer's GeneralNotes over time. BuyerLeadID/DealID are denormalized here
 // (copied from the Pitch at write time) so this history is still readable
-// even after the Pitch itself has been withdrawn.
-const BUYER_LEAD_CONTACT_COLUMNS = ['ContactID', 'PitchID', 'BuyerLeadID', 'DealID', 'Username', 'Method', 'ContactedAt', 'Responded', 'Notes'];
+// even after the Pitch itself has been withdrawn. PhoneSlot ('Phone',
+// 'Phone2', or 'Phone3') records which of the buyer's numbers this specific
+// attempt was against; defaults to 'Phone' for rows written before this
+// existed.
+const BUYER_LEAD_CONTACT_COLUMNS = ['ContactID', 'PitchID', 'BuyerLeadID', 'DealID', 'Username', 'Method', 'PhoneSlot', 'ContactedAt', 'Responded', 'Notes'];
 
 // e is undefined if you click "Run" on doGet directly in the Apps Script
 // editor (it doesn't simulate a real request) -- guarded so that doesn't
@@ -169,6 +180,8 @@ function doPost(e) {
         return jsonOut(withSession(body, addPitchContact));
       case 'updateBuyerLeadNotes':
         return jsonOut(withSession(body, updateBuyerLeadNotes));
+      case 'updateBuyerLeadDoNotContact':
+        return jsonOut(withSession(body, updateBuyerLeadDoNotContact));
 
       // ---- admin only ----
       case 'adminAddDeal':
@@ -1036,8 +1049,10 @@ function adminImportBuyerLeads(body) {
     if (existingPhones[normalizedPhone]) { skippedDuplicates++; return; }
     existingPhones[normalizedPhone] = true;
     appendRowByHeaders(sheet, {
-      'BuyerLeadID': Utilities.getUuid(), 'BuyerName': r.buyerName, 'Phone': r.phone, 'Email': r.email || '', 'PhoneType': r.phoneType || '',
-      'City': r.city || '', 'State': r.state || '', 'Zip': r.zip || '', 'GeneralNotes': '', 'DriveLink': '', 'CreatedAt': now
+      'BuyerLeadID': Utilities.getUuid(), 'BuyerName': r.buyerName, 'Phone': r.phone, 'PhoneType': r.phoneType || '',
+      'Phone2': r.phone2 || '', 'Phone2Type': r.phone2Type || '', 'Phone3': r.phone3 || '', 'Phone3Type': r.phone3Type || '',
+      'Email': r.email || '', 'City': r.city || '', 'State': r.state || '', 'Zip': r.zip || '',
+      'GeneralNotes': '', 'DriveLink': '', 'DoNotContact': false, 'CreatedAt': now
     });
     imported++;
   });
@@ -1130,8 +1145,34 @@ function adminUpdateBuyerLeadProfile(body) {
   const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
   const match = sheetToObjects(sheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
   if (!match) return { ok: false, error: 'Lead not found.' };
-  if (body.email !== undefined) sheet.getRange(match._row, getColumnIndex(sheet, 'Email')).setValue(body.email || '');
-  if (body.driveLink !== undefined) sheet.getRange(match._row, getColumnIndex(sheet, 'DriveLink')).setValue(body.driveLink || '');
+  const fields = { email: 'Email', driveLink: 'DriveLink', phone: 'Phone', phoneType: 'PhoneType', phone2: 'Phone2', phone2Type: 'Phone2Type', phone3: 'Phone3', phone3Type: 'Phone3Type' };
+  Object.keys(fields).forEach(function (key) {
+    if (body[key] !== undefined) sheet.getRange(match._row, getColumnIndex(sheet, fields[key])).setValue(body[key] || '');
+  });
+  return { ok: true };
+}
+
+// Either admin, or a rep with an open pitch on this buyer, can flag Do Not
+// Contact -- most often it'll be whichever rep is on the phone when the
+// buyer says to stop calling. Once true: addPitchContact refuses to log any
+// new call/text against this buyer on any phone number/pitch, and
+// adminGiveBuyerLeadToRep/adminGiveBuyerLeadsBulk/autoFeedCheck all skip
+// this buyer entirely, so nobody can be newly pitched to them either.
+// Existing pitches and their history are left alone -- only new contact is
+// blocked.
+function updateBuyerLeadDoNotContact(body, session) {
+  if (!body.buyerLeadId) return { ok: false, error: 'Missing buyerLeadId.' };
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const match = sheetToObjects(sheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
+  if (!match) return { ok: false, error: 'Lead not found.' };
+  if (!session.a) {
+    const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+    const ownsAPitch = sheetToObjects(pitchesSheet).some(function (p) {
+      return p['BuyerLeadID'] === body.buyerLeadId && String(p['Username'] || '').toLowerCase() === session.u;
+    });
+    if (!ownsAPitch) return { ok: false, error: 'You need an active pitch on this buyer to change this.' };
+  }
+  sheet.getRange(match._row, getColumnIndex(sheet, 'DoNotContact')).setValue(!!body.doNotContact);
   return { ok: true };
 }
 
@@ -1142,6 +1183,11 @@ function adminUpdateBuyerLeadProfile(body) {
 // whole model exists to prevent.
 function adminGiveBuyerLeadToRep(body) {
   if (!body.buyerLeadId || !body.dealId || !body.username) return { ok: false, error: 'Missing buyerLeadId, dealId, or username.' };
+  const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const lead = sheetToObjects(leadsSheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
+  if (lead && (lead['DoNotContact'] === true || lead['DoNotContact'] === 'TRUE')) {
+    return { ok: false, error: 'This buyer is marked Do Not Contact and cannot be given a new pitch.' };
+  }
   const sheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
   const existing = sheetToObjects(sheet);
   const clash = existing.find(function (p) { return p['BuyerLeadID'] === body.buyerLeadId && p['DealID'] === body.dealId; });
@@ -1176,7 +1222,9 @@ function adminGiveBuyerLeadsBulk(body) {
   existingPitches.forEach(function (p) { if (p['DealID'] === body.dealId) alreadyPitchedForThisDeal[p['BuyerLeadID']] = true; });
 
   const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
-  let pool = sheetToObjects(leadsSheet).filter(function (l) { return !alreadyPitchedForThisDeal[l['BuyerLeadID']]; });
+  let pool = sheetToObjects(leadsSheet).filter(function (l) {
+    return !alreadyPitchedForThisDeal[l['BuyerLeadID']] && l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE';
+  });
   if (city) pool = pool.filter(function (l) { return String(l['City'] || '').toLowerCase() === String(city).toLowerCase(); });
   if (state) pool = pool.filter(function (l) { return String(l['State'] || '').toLowerCase() === String(state).toLowerCase(); });
   if (zip) pool = pool.filter(function (l) { return String(l['Zip'] || '') === String(zip); });
@@ -1347,7 +1395,9 @@ function autoFeedCheck() {
 
       const alreadyPitchedForThisDeal = {};
       allPitches.forEach(function (p) { if (p['DealID'] === deal['DealID']) alreadyPitchedForThisDeal[p['BuyerLeadID']] = true; });
-      let pool = sheetToObjects(leadsSheet).filter(function (l) { return !alreadyPitchedForThisDeal[l['BuyerLeadID']]; });
+      let pool = sheetToObjects(leadsSheet).filter(function (l) {
+        return !alreadyPitchedForThisDeal[l['BuyerLeadID']] && l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE';
+      });
       if (deal['City']) pool = pool.filter(function (l) { return String(l['City'] || '').toLowerCase() === String(deal['City']).toLowerCase(); });
       if (deal['State']) pool = pool.filter(function (l) { return String(l['State'] || '').toLowerCase() === String(deal['State']).toLowerCase(); });
       if (pool.length === 0) return;
@@ -1398,11 +1448,16 @@ function getMyPitches(body, session) {
     p.buyerName = lead ? lead['BuyerName'] : '(deleted buyer)';
     p.phone = lead ? lead['Phone'] : '';
     p.phoneType = lead ? lead['PhoneType'] : '';
+    p.phone2 = lead ? lead['Phone2'] : '';
+    p.phone2Type = lead ? lead['Phone2Type'] : '';
+    p.phone3 = lead ? lead['Phone3'] : '';
+    p.phone3Type = lead ? lead['Phone3Type'] : '';
     p.city = lead ? lead['City'] : '';
     p.state = lead ? lead['State'] : '';
     p.generalNotes = lead ? lead['GeneralNotes'] : '';
     p.email = lead ? lead['Email'] : '';
     p.driveLink = lead ? lead['DriveLink'] : '';
+    p.doNotContact = !!(lead && (lead['DoNotContact'] === true || lead['DoNotContact'] === 'TRUE'));
     p.hasResponded = allContacts.some(function (c) { return c['PitchID'] === p['PitchID'] && (c['Responded'] === true || c['Responded'] === 'TRUE'); });
     p.callingHours = lead ? callingHoursInfo(lead['State']) : null;
     delete p.dealAddress; // rep-facing -- never send the deal's Address, see file header comment
@@ -1425,6 +1480,14 @@ function getPitchContacts(body, session) {
   return { ok: true, contacts: contacts };
 }
 
+// Maps a phone slot ('Phone', 'Phone2', or 'Phone3') to its {number, type}
+// on a buyer lead row. Defaults to 'Phone' when body.phoneSlot is omitted,
+// so older callers/URLs that never knew about Phone2/Phone3 keep working.
+function phoneForSlot(lead, slot) {
+  const s = (slot === 'Phone2' || slot === 'Phone3') ? slot : 'Phone';
+  return { number: lead ? lead[s] : '', type: lead ? lead[s + 'Type'] : '', slot: s };
+}
+
 function addPitchContact(body, session) {
   if (!body.pitchId || !body.method) return { ok: false, error: 'Missing pitchId or method.' };
   if (body.method !== 'Call' && body.method !== 'Text') return { ok: false, error: 'Method must be Call or Text.' };
@@ -1437,8 +1500,15 @@ function addPitchContact(body, session) {
   const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
   const lead = sheetToObjects(leadsSheet).find(function (l) { return l['BuyerLeadID'] === pitch['BuyerLeadID']; });
 
+  if (lead && (lead['DoNotContact'] === true || lead['DoNotContact'] === 'TRUE')) {
+    return { ok: false, error: 'This buyer has asked not to be contacted again — no further calls or texts can be logged.' };
+  }
+
+  const phone = phoneForSlot(lead, body.phoneSlot);
+  if (!phone.number) return { ok: false, error: 'That phone number isn\'t on file for this buyer.' };
+
   if (body.method === 'Text') {
-    if (lead && String(lead['PhoneType'] || '').trim().toLowerCase() === 'landline') {
+    if (String(phone.type || '').trim().toLowerCase() === 'landline') {
       return { ok: false, error: 'This is a landline — it can only be called, not texted.' };
     }
     const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
@@ -1460,7 +1530,7 @@ function addPitchContact(body, session) {
   const contactId = Utilities.getUuid();
   appendRowByHeaders(sheet, {
     'ContactID': contactId, 'PitchID': body.pitchId, 'BuyerLeadID': pitch['BuyerLeadID'], 'DealID': pitch['DealID'],
-    'Username': session.u, 'Method': body.method, 'ContactedAt': new Date().toISOString(),
+    'Username': session.u, 'Method': body.method, 'PhoneSlot': phone.slot, 'ContactedAt': new Date().toISOString(),
     'Responded': !!body.responded, 'Notes': body.notes || ''
   });
   return { ok: true, contactId: contactId };

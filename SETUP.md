@@ -157,7 +157,16 @@ to the `Reps` sheet tab yourself, once, directly in Google Sheets:
   funds, signed agreements). `DriveLink` and `Email` are admin-editable only
   (from a buyer's detail panel in the **Buyer Leads** tab), though any rep
   with an open pitch on that buyer can see them; `GeneralNotes` stays
-  editable by any rep who's had a pitch on that buyer, same as before.
+  editable by any rep who's had a pitch on that buyer, same as before. Up to
+  two more numbers (`Phone2`/`Phone2Type`, `Phone3`/`Phone3Type`) can be set
+  the same way — each has its own type, since one might be a mobile and
+  another a landline, and a rep picks which number they're using each time
+  they log a contact. `DoNotContact` is a hard stop: once set (by admin, or
+  by any rep with an open pitch on that buyer — usually whoever's on the
+  phone when the buyer asks to stop being contacted), no new call/text can
+  be logged against that buyer on any number, and they can no longer be
+  given a new pitch for any deal, though existing pitch history is kept, not
+  deleted.
 - **Pitches** — "give this buyer lead to this rep, for this one specific
   deal." This is the only thing that puts a buyer in a rep's queue or blocks
   Auto-Feed — a buyer lead with no open pitch just sits in the pool,

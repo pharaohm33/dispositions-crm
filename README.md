@@ -37,19 +37,24 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   the admin automatically.
 - **Buyer Leads** — a separate "Buyer Leads" tab shows every buyer they've
   been given for a deal we currently have to sell (never a bare contact list
-  with nothing to offer them), each showing a phone-type hint (Landline =
-  call only, Mobile = call or text), which deal it's for, and a status (Not
-  Contacted, Awaiting Response, Follow-Up Due, Responded, Fully Worked). If a
-  deal closes before a buyer responds, that item just shows "deal closed —
-  no action needed" instead of piling up as overdue. Logging a contact
-  records the method, whether the buyer responded, and deal-specific
-  feedback notes; a separate **General Buyer Notes** field (ARV%, price
-  range, areas of interest, cash vs. financed) travels with the buyer across
-  every deal they're ever pitched, anywhere in the country — so a buyer who
-  passed on a deal in one city can be correctly re-pitched the moment a
-  matching deal shows up in a different one. If admin's added the buyer's
-  email or a Drive link to their documents (proof of funds, signed
-  agreements), those show up here too.
+  with nothing to offer them), with up to three phone numbers each showing
+  its own phone-type hint (Landline = call only, Mobile = call or text) — a
+  rep picks which number they're using each time they log a contact — plus
+  which deal it's for and a status (Not Contacted, Awaiting Response,
+  Follow-Up Due, Responded, Fully Worked). If a deal closes before a buyer
+  responds, that item just shows "deal closed — no action needed" instead of
+  piling up as overdue. Logging a contact records the method, which number
+  was used, whether the buyer responded, and deal-specific feedback notes; a
+  separate **General Buyer Notes** field (ARV%, price range, areas of
+  interest, cash vs. financed) travels with the buyer across every deal
+  they're ever pitched, anywhere in the country — so a buyer who passed on a
+  deal in one city can be correctly re-pitched the moment a matching deal
+  shows up in a different one. If admin's added the buyer's email or a Drive
+  link to their documents (proof of funds, signed agreements), those show up
+  here too. If a buyer asks not to be contacted again, a rep can mark **Do
+  Not Contact** right from this screen — that immediately stops any further
+  calls/texts from being logged for them, on any number, and stops them from
+  being given a new pitch.
 - Deals with a General Drive Link show an "Open Drive Folder" link right on
   the deal — marketing photos, comps, whatever admin's put there. A deal's
   Sensitive Drive Link (contracts, financials) never appears to reps at all.

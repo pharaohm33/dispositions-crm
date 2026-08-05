@@ -411,6 +411,25 @@ function renderMyPitches() {
   });
 }
 
+// Returns [{slot, number, type}] for every phone number a pitch's buyer
+// actually has on file (Phone is always first if present, then Phone2/3).
+function pitchPhoneSlots(pitch) {
+  const slots = [];
+  if (pitch.phone) slots.push({ slot: "Phone", number: pitch.phone, type: pitch.phoneType });
+  if (pitch.phone2) slots.push({ slot: "Phone2", number: pitch.phone2, type: pitch.phone2Type });
+  if (pitch.phone3) slots.push({ slot: "Phone3", number: pitch.phone3, type: pitch.phone3Type });
+  return slots;
+}
+
+function updateContactMethodOptions(slots) {
+  const slotSelect = document.getElementById("contact-phone-select");
+  const methodSelect = document.getElementById("contact-method-input");
+  if (!slotSelect || !methodSelect) return;
+  const chosen = slots.find(function (s) { return s.slot === slotSelect.value; }) || slots[0];
+  const canTextThisSlot = chosen && chosen.type !== "Landline" && window.__pitchHasResponded;
+  methodSelect.innerHTML = '<option value="Call">Call</option>' + (canTextThisSlot ? '<option value="Text">Text</option>' : '');
+}
+
 async function openPitchDetail(pitchId) {
   const pitch = myPitches.find(function (p) { return p.PitchID === pitchId; });
   if (!pitch) return;
@@ -421,8 +440,8 @@ async function openPitchDetail(pitchId) {
 
   const contactsRes = await api("getPitchContacts", { pitchId: pitchId });
   const contacts = contactsRes.ok ? contactsRes.contacts : [];
-  const isLandline = pitch.phoneType === "Landline";
-  const canText = !isLandline && pitch.hasResponded;
+  const slots = pitchPhoneSlots(pitch);
+  window.__pitchHasResponded = pitch.hasResponded;
   const hours = pitch.callingHours;
 
   let hoursBanner = "";
@@ -432,24 +451,27 @@ async function openPitchDetail(pitchId) {
       : '<div class="banner danger"><strong>Outside calling hours.</strong> It\'s currently ' + hours.hour + ':00 for this buyer &mdash; contact hours are 8am&ndash;7pm their time.</div>';
   }
 
+  const dncBanner = pitch.doNotContact
+    ? '<div class="banner danger"><strong>Do Not Contact.</strong> This buyer has asked not to be contacted again — no further calls or texts can be logged for them.</div>'
+    : "";
+
   panel.innerHTML =
     '<div style="display:flex; justify-content:space-between; align-items:flex-start;">' +
       '<div><h2 class="step-title">' + esc(pitch.buyerName) + '</h2>' +
-      '<p class="step-sub">' + esc(pitch.phone) + ' &middot; ' + esc(pitch.phoneType || "") +
+      '<p class="step-sub">' + slots.map(function (s) { return esc(s.number) + (s.type ? " (" + esc(s.type) + ")" : ""); }).join(" &middot; ") +
       (pitch.city ? ' &middot; ' + esc(pitch.city) + (pitch.state ? ", " + esc(pitch.state) : "") : "") + '</p></div>' +
       '<button class="link-btn" id="close-detail-btn">Close</button>' +
     '</div>' +
-    hoursBanner +
+    dncBanner +
+    (pitch.doNotContact ? "" : hoursBanner) +
     '<div class="banner info">' +
       (pitch.dealStillActive
         ? '<span class="status-pill ' + statusClass(pitch.status) + '">' + esc(pitch.status) + '</span>'
         : '<span class="status-pill status-fully-worked">Deal ' + esc((pitch.dealStatus || "closed").toLowerCase()) + '</span>') +
       '<div style="margin-top:8px;"><strong>Re:</strong> ' + esc(pitch.dealCode || "Deal") + '</div>' +
-      (isLandline
-        ? '<div style="margin-top:8px;">Landline &mdash; call only, texting isn\'t possible.</div>'
-        : (canText
-          ? '<div style="margin-top:8px;">Mobile &mdash; they\'ve responded, so you can call or text.</div>'
-          : '<div style="margin-top:8px;">Mobile &mdash; call first. Texting unlocks once they respond to a call (high-volume texting with no reply history gets numbers blocked from texting).</div>')) +
+      '<div style="margin-top:8px;">' + (pitch.hasResponded
+        ? 'They\'ve responded, so texting is available on any mobile number below.'
+        : 'Call first on every number — texting unlocks once they respond to a call (high-volume texting with no reply history gets numbers blocked from texting).') + '</div>' +
       (pitch.email ? '<div style="margin-top:8px;"><strong>Email:</strong> <a href="mailto:' + esc(pitch.email) + '">' + esc(pitch.email) + '</a></div>' : "") +
       (pitch.driveLink ? '<div style="margin-top:8px;"><strong>Documents:</strong> <a href="' + esc(pitch.driveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
     '</div>' +
@@ -461,21 +483,28 @@ async function openPitchDetail(pitchId) {
       '<button class="btn secondary" id="general-notes-save-btn">Save Notes</button>' +
     '</div>' +
 
+    (pitch.doNotContact ? "" :
     '<div class="section-title">Log a Contact</div>' +
-    '<label class="field-label">Method</label>' +
-    '<select id="contact-method-input">' +
-      '<option value="Call">Call</option>' +
-      (canText ? '<option value="Text">Text</option>' : '') +
+    '<label class="field-label">Which number?</label>' +
+    '<select id="contact-phone-select">' +
+      slots.map(function (s) { return '<option value="' + s.slot + '">' + esc(s.number) + (s.type ? " (" + esc(s.type) + ")" : "") + '</option>'; }).join("") +
     '</select>' +
+    '<label class="field-label">Method</label>' +
+    '<select id="contact-method-input"></select>' +
     '<label class="checkbox-row"><input type="checkbox" id="contact-responded-input"> Buyer responded during this contact</label>' +
     '<label class="field-label">Notes (buyer feedback on this deal specifically)</label>' +
     '<textarea id="contact-notes-input"></textarea>' +
     '<div class="error-text" id="contact-add-error"></div>' +
     '<div class="nav-row" style="justify-content:flex-end;">' +
       '<button class="btn primary" id="contact-add-submit">Log Contact</button>' +
-    '</div>' +
+    '</div>') +
+
     '<div class="section-title">Contact History</div>' +
-    '<div id="contact-history-list">' + renderContactHistory(contacts) + '</div>';
+    '<div id="contact-history-list">' + renderContactHistory(contacts) + '</div>' +
+
+    '<div class="section-title">Do Not Contact</div>' +
+    '<p class="small-muted">If this buyer has asked not to be contacted again, mark it here — it stops any further calls or texts from being logged for them, on any number, and admin won\'t be able to pitch them a new deal.</p>' +
+    '<button class="btn ' + (pitch.doNotContact ? "secondary" : "danger") + ' small" id="dnc-toggle-btn">' + (pitch.doNotContact ? "Allow Contact Again" : "Mark Do Not Contact") + '</button>';
 
   document.getElementById("close-detail-btn").addEventListener("click", function () { overlay.hidden = true; loadMyPitches(); });
 
@@ -483,23 +512,37 @@ async function openPitchDetail(pitchId) {
     await api("updateBuyerLeadNotes", { buyerLeadId: pitch.BuyerLeadID, notes: document.getElementById("general-notes-input").value.trim() });
   });
 
-  document.getElementById("contact-add-submit").addEventListener("click", async function () {
-    const method = document.getElementById("contact-method-input").value;
-    const responded = document.getElementById("contact-responded-input").checked;
-    const notes = document.getElementById("contact-notes-input").value.trim();
-    const errorEl = document.getElementById("contact-add-error");
-    errorEl.classList.remove("show");
-    const res = await api("addPitchContact", { pitchId: pitchId, method: method, responded: responded, notes: notes });
-    if (!res.ok) {
-      errorEl.textContent = res.error || "Could not log contact.";
-      errorEl.classList.add("show");
-      return;
-    }
-    document.getElementById("contact-notes-input").value = "";
-    document.getElementById("contact-responded-input").checked = false;
-    const fresh = await api("getPitchContacts", { pitchId: pitchId });
-    document.getElementById("contact-history-list").innerHTML = renderContactHistory(fresh.ok ? fresh.contacts : []);
+  document.getElementById("dnc-toggle-btn").addEventListener("click", async function () {
+    await api("updateBuyerLeadDoNotContact", { buyerLeadId: pitch.BuyerLeadID, doNotContact: !pitch.doNotContact });
+    await loadMyPitches();
+    openPitchDetail(pitchId);
   });
+
+  const phoneSelect = document.getElementById("contact-phone-select");
+  if (phoneSelect) {
+    updateContactMethodOptions(slots);
+    phoneSelect.addEventListener("change", function () { updateContactMethodOptions(slots); });
+
+    document.getElementById("contact-add-submit").addEventListener("click", async function () {
+      const phoneSlot = phoneSelect.value;
+      const method = document.getElementById("contact-method-input").value;
+      const responded = document.getElementById("contact-responded-input").checked;
+      const notes = document.getElementById("contact-notes-input").value.trim();
+      const errorEl = document.getElementById("contact-add-error");
+      errorEl.classList.remove("show");
+      const res = await api("addPitchContact", { pitchId: pitchId, phoneSlot: phoneSlot, method: method, responded: responded, notes: notes });
+      if (!res.ok) {
+        errorEl.textContent = res.error || "Could not log contact.";
+        errorEl.classList.add("show");
+        return;
+      }
+      document.getElementById("contact-notes-input").value = "";
+      document.getElementById("contact-responded-input").checked = false;
+      const fresh = await api("getPitchContacts", { pitchId: pitchId });
+      document.getElementById("contact-history-list").innerHTML = renderContactHistory(fresh.ok ? fresh.contacts : []);
+      if (responded) { await loadMyPitches(); openPitchDetail(pitchId); }
+    });
+  }
 }
 
 function renderContactHistory(contacts) {
@@ -507,6 +550,7 @@ function renderContactHistory(contacts) {
   return contacts.slice().reverse().map(function (c) {
     return '<div class="item-row">' +
       '<span class="ts">' + formatDate(c.ContactedAt) + ' &middot; ' + esc(c.Username) + ' &middot; ' + esc(c.Method) +
+      (c.PhoneSlot && c.PhoneSlot !== "Phone" ? ' (' + esc(c.PhoneSlot) + ')' : '') +
       (c.Responded === true || c.Responded === "TRUE" ? ' &middot; <strong>Responded</strong>' : '') + '</span>' +
       (c.Notes ? '<div style="margin-top:4px;">' + esc(c.Notes) + '</div>' : "") +
       '</div>';
@@ -1160,6 +1204,10 @@ const CSV_FIELD_OPTIONS = [
   { value: "buyerName", label: "Buyer / LLC Name" },
   { value: "phone", label: "Phone" },
   { value: "phoneType", label: "Phone Type (Mobile/Landline)" },
+  { value: "phone2", label: "Phone 2" },
+  { value: "phone2Type", label: "Phone 2 Type" },
+  { value: "phone3", label: "Phone 3" },
+  { value: "phone3Type", label: "Phone 3 Type" },
   { value: "city", label: "City" },
   { value: "state", label: "State" },
   { value: "zip", label: "Zip" },
@@ -1205,8 +1253,14 @@ function parseCsvText(text) {
 function guessCsvField(header) {
   const h = String(header || "").toLowerCase().trim();
   if (/e-?mail/.test(h)) return "email";
-  if (/phone.*type|line.*type|landline|mobile.*type/.test(h)) return "phoneType";
-  if (/phone|cell|mobile|tel(ephone)?|number/.test(h)) return "phone";
+  const isPhoneRelated = /phone|cell|mobile|tel(ephone)?|number|line/.test(h);
+  const isTypeRelated = /type/.test(h) || /^(mobile|landline)$/.test(h);
+  const isSecond = /\b2(nd)?\b|second|secondary|alt(ernate)?/.test(h);
+  const isThird = /\b3(rd)?\b|third/.test(h);
+  if (isPhoneRelated && isSecond) return isTypeRelated ? "phone2Type" : "phone2";
+  if (isPhoneRelated && isThird) return isTypeRelated ? "phone3Type" : "phone3";
+  if (isPhoneRelated && isTypeRelated) return "phoneType";
+  if (isPhoneRelated) return "phone";
   if (/zip|postal/.test(h)) return "zip";
   if (/^st$|state/.test(h)) return "state";
   if (/city|town/.test(h)) return "city";
@@ -1284,16 +1338,21 @@ function currentCsvMapping() {
   return mapping;
 }
 
+function normalizePhoneType(raw) {
+  const r = String(raw || "").toLowerCase();
+  return r === "mobile" ? "Mobile" : r === "landline" ? "Landline" : (raw || "");
+}
+
 function mappedCsvRows() {
   const mapping = currentCsvMapping();
   return csvRows
     .filter(function (row) { return row.some(function (cell) { return String(cell || "").trim() !== ""; }); })
     .map(function (row) {
       const get = function (field) { return mapping[field] !== undefined ? String(row[mapping[field]] || "").trim() : ""; };
-      const rawType = get("phoneType").toLowerCase();
-      const phoneType = rawType === "mobile" ? "Mobile" : rawType === "landline" ? "Landline" : get("phoneType");
       return {
-        buyerName: get("buyerName"), phone: get("phone"), phoneType: phoneType,
+        buyerName: get("buyerName"), phone: get("phone"), phoneType: normalizePhoneType(get("phoneType")),
+        phone2: get("phone2"), phone2Type: normalizePhoneType(get("phone2Type")),
+        phone3: get("phone3"), phone3Type: normalizePhoneType(get("phone3Type")),
         city: get("city"), state: get("state"), zip: get("zip"), email: get("email")
       };
     });
@@ -1305,6 +1364,8 @@ function renderCsvPreview() {
   tbody.innerHTML = rows.slice(0, 5).map(function (r) {
     return '<tr>' +
       '<td>' + esc(r.buyerName) + '</td>' + '<td>' + esc(r.phone) + '</td>' + '<td>' + esc(r.phoneType) + '</td>' +
+      '<td>' + esc(r.phone2) + (r.phone2 && r.phone2Type ? ' (' + esc(r.phone2Type) + ')' : '') + '</td>' +
+      '<td>' + esc(r.phone3) + (r.phone3 && r.phone3Type ? ' (' + esc(r.phone3Type) + ')' : '') + '</td>' +
       '<td>' + esc(r.city) + '</td>' + '<td>' + esc(r.state) + '</td>' + '<td>' + esc(r.zip) + '</td>' + '<td>' + esc(r.email) + '</td>' +
       '</tr>';
   }).join("");
@@ -1430,8 +1491,9 @@ function renderBuyerLeadsAdmin() {
   empty.hidden = filtered.length > 0;
   tbody.innerHTML = filtered.map(function (l) {
     const notesPreview = l.GeneralNotes ? (l.GeneralNotes.length > 60 ? l.GeneralNotes.slice(0, 60) + "…" : l.GeneralNotes) : "";
+    const isDnc = !!(l.DoNotContact === true || l.DoNotContact === "TRUE");
     return '<tr>' +
-      '<td>' + esc(l.BuyerName) + '</td>' +
+      '<td>' + esc(l.BuyerName) + (isDnc ? ' <span class="status-pill status-dead-match">DNC</span>' : "") + '</td>' +
       '<td>' + esc(l.Phone) + '</td>' +
       '<td>' + esc(l.Email || "") + '</td>' +
       '<td>' + esc(l.PhoneType || "") + '</td>' +
@@ -1463,6 +1525,8 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
   pitches.forEach(function (p) { pitchedDealIds[p.DealID] = true; });
   const givableDeals = buyerLeadsActiveDeals.filter(function (d) { return !pitchedDealIds[d.DealID]; });
 
+  const isDnc = !!(lead.DoNotContact === true || lead.DoNotContact === "TRUE");
+
   panel.innerHTML =
     '<div style="display:flex; justify-content:space-between; align-items:flex-start;">' +
       '<div><h2 class="step-title">' + esc(lead.BuyerName) + '</h2>' +
@@ -1471,12 +1535,27 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
       '<button class="link-btn" id="close-detail-btn">Close</button>' +
     '</div>' +
 
-    '<label class="field-label" style="margin-top:0;">Email</label>' +
+    (isDnc ? '<div class="banner danger"><strong>Do Not Contact.</strong> No rep can log a new call/text for this buyer, and they can\'t be given a new pitch.</div>' : "") +
+
+    '<div class="section-title" style="margin-top:0;">Phone Numbers</div>' +
+    '<div class="row2">' +
+      '<div><label class="field-label">Phone</label><input type="text" id="admin-buyer-phone-input" value="' + esc(lead.Phone || "") + '"></div>' +
+      '<div><label class="field-label">Type</label><select id="admin-buyer-phonetype-input"><option value="Mobile"' + (lead.PhoneType === "Mobile" ? " selected" : "") + '>Mobile</option><option value="Landline"' + (lead.PhoneType === "Landline" ? " selected" : "") + '>Landline</option></select></div>' +
+    '</div>' +
+    '<div class="row2">' +
+      '<div><label class="field-label">Phone 2</label><input type="text" id="admin-buyer-phone2-input" value="' + esc(lead.Phone2 || "") + '"></div>' +
+      '<div><label class="field-label">Type</label><select id="admin-buyer-phone2type-input"><option value="">&mdash;</option><option value="Mobile"' + (lead.Phone2Type === "Mobile" ? " selected" : "") + '>Mobile</option><option value="Landline"' + (lead.Phone2Type === "Landline" ? " selected" : "") + '>Landline</option></select></div>' +
+    '</div>' +
+    '<div class="row2">' +
+      '<div><label class="field-label">Phone 3</label><input type="text" id="admin-buyer-phone3-input" value="' + esc(lead.Phone3 || "") + '"></div>' +
+      '<div><label class="field-label">Type</label><select id="admin-buyer-phone3type-input"><option value="">&mdash;</option><option value="Mobile"' + (lead.Phone3Type === "Mobile" ? " selected" : "") + '>Mobile</option><option value="Landline"' + (lead.Phone3Type === "Landline" ? " selected" : "") + '>Landline</option></select></div>' +
+    '</div>' +
+    '<label class="field-label">Email</label>' +
     '<input type="text" id="admin-buyer-email-input" value="' + esc(lead.Email || "") + '" placeholder="buyer@example.com">' +
     '<label class="field-label">Buyer Documents Drive Link <span class="small-muted">(proof of funds, signed agreements, etc.)</span></label>' +
     '<input type="text" id="admin-buyer-drivelink-input" value="' + esc(lead.DriveLink || "") + '" placeholder="https://drive.google.com/...">' +
     '<div class="nav-row" style="justify-content:flex-end;">' +
-      '<button class="btn secondary" id="admin-buyer-profile-save-btn">Save Email / Drive Link</button>' +
+      '<button class="btn secondary" id="admin-buyer-profile-save-btn">Save Contact Info</button>' +
     '</div>' +
 
     '<div class="section-title">General Buyer Notes</div>' +
@@ -1486,6 +1565,7 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
       '<button class="btn secondary" id="admin-general-notes-save-btn">Save Notes</button>' +
     '</div>' +
 
+    (isDnc ? '' :
     '<div class="section-title">Give For a New Deal</div>' +
     (givableDeals.length > 0
       ? '<div class="row2">' +
@@ -1493,10 +1573,14 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
           '<div><select id="give-new-rep-select">' + buyerLeadsActiveReps.map(function (r) { return '<option value="' + esc(r.username) + '">' + esc(r.name) + '</option>'; }).join("") + '</select></div>' +
         '</div>' +
         '<div class="nav-row" style="justify-content:flex-end;"><button class="btn primary small" id="give-new-pitch-btn">Give This Buyer Lead To</button></div>'
-      : '<p class="small-muted">This buyer already has an open pitch on every active deal, or there are no active deals yet.</p>') +
+      : '<p class="small-muted">This buyer already has an open pitch on every active deal, or there are no active deals yet.</p>')) +
 
     '<div class="section-title">Pitches</div>' +
-    '<div id="pitches-list">' + renderAdminPitchesList(pitches) + '</div>';
+    '<div id="pitches-list">' + renderAdminPitchesList(pitches) + '</div>' +
+
+    '<div class="section-title">Do Not Contact</div>' +
+    '<p class="small-muted">Blocks any rep from logging a new call/text against this buyer and stops them from being given a new pitch. Existing pitch history is kept.</p>' +
+    '<button class="btn ' + (isDnc ? "secondary" : "danger") + ' small" id="admin-dnc-toggle-btn">' + (isDnc ? "Allow Contact Again" : "Mark Do Not Contact") + '</button>';
 
   document.getElementById("close-detail-btn").addEventListener("click", function () { overlay.hidden = true; loadBuyerLeadsAdmin(); });
 
@@ -1508,10 +1592,23 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
   document.getElementById("admin-buyer-profile-save-btn").addEventListener("click", async function () {
     await api("adminUpdateBuyerLeadProfile", {
       buyerLeadId: buyerLeadId,
+      phone: document.getElementById("admin-buyer-phone-input").value.trim(),
+      phoneType: document.getElementById("admin-buyer-phonetype-input").value,
+      phone2: document.getElementById("admin-buyer-phone2-input").value.trim(),
+      phone2Type: document.getElementById("admin-buyer-phone2type-input").value,
+      phone3: document.getElementById("admin-buyer-phone3-input").value.trim(),
+      phone3Type: document.getElementById("admin-buyer-phone3type-input").value,
       email: document.getElementById("admin-buyer-email-input").value.trim(),
       driveLink: document.getElementById("admin-buyer-drivelink-input").value.trim()
     });
     await loadBuyerLeadsAdmin();
+    openAdminBuyerLeadDetail(buyerLeadId);
+  });
+
+  document.getElementById("admin-dnc-toggle-btn").addEventListener("click", async function () {
+    await api("updateBuyerLeadDoNotContact", { buyerLeadId: buyerLeadId, doNotContact: !isDnc });
+    await loadBuyerLeadsAdmin();
+    openAdminBuyerLeadDetail(buyerLeadId);
   });
 
   const giveBtn = document.getElementById("give-new-pitch-btn");
