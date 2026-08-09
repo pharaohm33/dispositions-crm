@@ -217,6 +217,10 @@ async function openRepDealDetail(dealId) {
     '<input type="text" id="buyer-name-input">' +
     '<label class="field-label">Contact (optional)</label>' +
     '<input type="text" id="buyer-contact-input">' +
+    '<div class="row2">' +
+      '<div><label class="field-label">% of ARV interested at <span class="small-muted">(if known)</span></label><input type="text" id="buyer-arvpercent-input" placeholder="e.g. 70"></div>' +
+      '<div><label class="field-label">% of As-Is Value <span class="small-muted">(if known)</span></label><input type="text" id="buyer-asispercent-input" placeholder="e.g. 85"></div>' +
+    '</div>' +
     '<label class="field-label">Notes (optional)</label>' +
     '<textarea id="buyer-notes-input"></textarea>' +
     '<div class="error-text" id="buyer-add-error"></div>' +
@@ -254,6 +258,8 @@ async function openRepDealDetail(dealId) {
   document.getElementById("buyer-add-submit").addEventListener("click", async function () {
     const buyerName = document.getElementById("buyer-name-input").value.trim();
     const contact = document.getElementById("buyer-contact-input").value.trim();
+    const arvPercent = document.getElementById("buyer-arvpercent-input").value.trim();
+    const asIsPercent = document.getElementById("buyer-asispercent-input").value.trim();
     const notes = document.getElementById("buyer-notes-input").value.trim();
     const errorEl = document.getElementById("buyer-add-error");
     errorEl.classList.remove("show");
@@ -262,7 +268,7 @@ async function openRepDealDetail(dealId) {
       errorEl.classList.add("show");
       return;
     }
-    const res = await api("addInterestedBuyer", { dealId: dealId, buyerName: buyerName, buyerContact: contact, notes: notes });
+    const res = await api("addInterestedBuyer", { dealId: dealId, buyerName: buyerName, buyerContact: contact, arvPercent: arvPercent, asIsPercent: asIsPercent, notes: notes });
     if (!res.ok) {
       errorEl.textContent = res.error || "Could not add buyer.";
       errorEl.classList.add("show");
@@ -270,6 +276,8 @@ async function openRepDealDetail(dealId) {
     }
     document.getElementById("buyer-name-input").value = "";
     document.getElementById("buyer-contact-input").value = "";
+    document.getElementById("buyer-arvpercent-input").value = "";
+    document.getElementById("buyer-asispercent-input").value = "";
     document.getElementById("buyer-notes-input").value = "";
     await refreshBuyerMatchList(dealId);
   });
@@ -318,6 +326,11 @@ function renderBuyerMatchList(buyers) {
         '</select>' +
         '<button class="btn secondary small match-status-save-btn" data-buyer-id="' + esc(b.BuyerID) + '">Update</button>' +
       '</div>' +
+      '<div class="row2" style="margin-top:8px;">' +
+        '<div><label class="field-label">% of ARV</label><input type="text" class="match-arvpercent-input" data-buyer-id="' + esc(b.BuyerID) + '" value="' + esc(b.ARVPercent || "") + '" placeholder="e.g. 70"></div>' +
+        '<div><label class="field-label">% of As-Is Value</label><input type="text" class="match-asispercent-input" data-buyer-id="' + esc(b.BuyerID) + '" value="' + esc(b.AsIsPercent || "") + '" placeholder="e.g. 85"></div>' +
+      '</div>' +
+      '<p class="small-muted" style="margin:2px 0 0;">Saved along with Update above.</p>' +
       '<label class="field-label">Conversation Notes</label>' +
       '<textarea class="match-notes-input" data-buyer-id="' + esc(b.BuyerID) + '">' + esc(b.Notes || "") + '</textarea>' +
       '<div class="nav-row" style="justify-content:flex-end; margin-top:6px;">' +
@@ -341,8 +354,12 @@ function wireBuyerMatchListHandlers(container, onSaved) {
       const buyerId = btn.getAttribute("data-buyer-id");
       const select = container.querySelector('.match-status-select[data-buyer-id="' + buyerId + '"]');
       const adminNoteInput = container.querySelector('.match-adminnote-input[data-buyer-id="' + buyerId + '"]');
+      const arvInput = container.querySelector('.match-arvpercent-input[data-buyer-id="' + buyerId + '"]');
+      const asIsInput = container.querySelector('.match-asispercent-input[data-buyer-id="' + buyerId + '"]');
       const payload = { buyerId: buyerId, matchStatus: select.value };
       if (adminNoteInput) payload.adminNote = adminNoteInput.value.trim();
+      if (arvInput) payload.arvPercent = arvInput.value.trim();
+      if (asIsInput) payload.asIsPercent = asIsInput.value.trim();
       await api("updateInterestedBuyerMatchStatus", payload);
       await onSaved();
     });
@@ -492,6 +509,10 @@ async function openPitchDetail(pitchId) {
     '<label class="field-label">Method</label>' +
     '<select id="contact-method-input"></select>' +
     '<label class="checkbox-row"><input type="checkbox" id="contact-responded-input"> Buyer responded during this contact</label>' +
+    '<div class="row2">' +
+      '<div><label class="field-label">% of ARV interested at <span class="small-muted">(if mentioned)</span></label><input type="text" id="contact-arvpercent-input" placeholder="e.g. 70"></div>' +
+      '<div><label class="field-label">% of As-Is Value <span class="small-muted">(if mentioned)</span></label><input type="text" id="contact-asispercent-input" placeholder="e.g. 85"></div>' +
+    '</div>' +
     '<label class="field-label">Notes (buyer feedback on this deal specifically)</label>' +
     '<textarea id="contact-notes-input"></textarea>' +
     '<div class="error-text" id="contact-add-error"></div>' +
@@ -527,16 +548,20 @@ async function openPitchDetail(pitchId) {
       const phoneSlot = phoneSelect.value;
       const method = document.getElementById("contact-method-input").value;
       const responded = document.getElementById("contact-responded-input").checked;
+      const arvPercent = document.getElementById("contact-arvpercent-input").value.trim();
+      const asIsPercent = document.getElementById("contact-asispercent-input").value.trim();
       const notes = document.getElementById("contact-notes-input").value.trim();
       const errorEl = document.getElementById("contact-add-error");
       errorEl.classList.remove("show");
-      const res = await api("addPitchContact", { pitchId: pitchId, phoneSlot: phoneSlot, method: method, responded: responded, notes: notes });
+      const res = await api("addPitchContact", { pitchId: pitchId, phoneSlot: phoneSlot, method: method, responded: responded, arvPercent: arvPercent, asIsPercent: asIsPercent, notes: notes });
       if (!res.ok) {
         errorEl.textContent = res.error || "Could not log contact.";
         errorEl.classList.add("show");
         return;
       }
       document.getElementById("contact-notes-input").value = "";
+      document.getElementById("contact-arvpercent-input").value = "";
+      document.getElementById("contact-asispercent-input").value = "";
       document.getElementById("contact-responded-input").checked = false;
       const fresh = await api("getPitchContacts", { pitchId: pitchId });
       document.getElementById("contact-history-list").innerHTML = renderContactHistory(fresh.ok ? fresh.contacts : []);
@@ -552,6 +577,9 @@ function renderContactHistory(contacts) {
       '<span class="ts">' + formatDate(c.ContactedAt) + ' &middot; ' + esc(c.Username) + ' &middot; ' + esc(c.Method) +
       (c.PhoneSlot && c.PhoneSlot !== "Phone" ? ' (' + esc(c.PhoneSlot) + ')' : '') +
       (c.Responded === true || c.Responded === "TRUE" ? ' &middot; <strong>Responded</strong>' : '') + '</span>' +
+      (c.ARVPercent || c.AsIsPercent ? '<div class="small-muted" style="margin-top:4px;">' +
+        [c.ARVPercent ? esc(c.ARVPercent) + "% of ARV" : "", c.AsIsPercent ? esc(c.AsIsPercent) + "% of As-Is Value" : ""].filter(Boolean).join(" &middot; ") +
+        '</div>' : "") +
       (c.Notes ? '<div style="margin-top:4px;">' + esc(c.Notes) + '</div>' : "") +
       '</div>';
   }).join("");
@@ -1178,6 +1206,10 @@ async function loadBuyerRequests() {
         '</select>' +
         '<button class="btn secondary small match-status-save-btn" data-buyer-id="' + esc(b.BuyerID) + '">Update</button>' +
       '</div>' +
+      '<div class="row2" style="margin-top:8px;">' +
+        '<div><input type="text" class="match-arvpercent-input" data-buyer-id="' + esc(b.BuyerID) + '" value="' + esc(b.ARVPercent || "") + '" placeholder="% of ARV"></div>' +
+        '<div><input type="text" class="match-asispercent-input" data-buyer-id="' + esc(b.BuyerID) + '" value="' + esc(b.AsIsPercent || "") + '" placeholder="% of As-Is Value"></div>' +
+      '</div>' +
       (b.Notes ? '<div style="margin-top:8px;">' + esc(b.Notes) + '</div>' : "") +
       '<input type="text" class="match-adminnote-input" data-buyer-id="' + esc(b.BuyerID) + '" value="' + esc(b.AdminNote || "") + '" placeholder="Admin note" style="margin-top:8px;">' +
       '</div>';
@@ -1232,7 +1264,10 @@ const CSV_FIELD_OPTIONS = [
   { value: "zip", label: "Zip" },
   { value: "county", label: "County" },
   { value: "email", label: "Email" },
-  { value: "assetCategories", label: "Asset Categories (comma-separated)" }
+  { value: "assetCategories", label: "Asset Categories (comma-separated)" },
+  { value: "lastKnownPurchasePrice", label: "Last Known Purchase Price" },
+  { value: "priceRangeMin", label: "Price Range Min" },
+  { value: "priceRangeMax", label: "Price Range Max" }
 ];
 
 // Minimal RFC4180-ish CSV parser: handles quoted fields, commas and
@@ -1287,6 +1322,9 @@ function guessCsvField(header) {
   if (/^st$|state/.test(h)) return "state";
   if (/city|town/.test(h)) return "city";
   if (/category|categories|asset\s*type|property\s*type/.test(h)) return "assetCategories";
+  if (/(last|past|prior|known).*(purchase|bought|paid)|purchase.*price/.test(h)) return "lastKnownPurchasePrice";
+  if (/price.*(min|low)|(min|low).*price/.test(h)) return "priceRangeMin";
+  if (/price.*(max|high)|(max|high).*price/.test(h)) return "priceRangeMax";
   if (/name|buyer|llc|company|contact/.test(h)) return "buyerName";
   return "";
 }
@@ -1377,7 +1415,8 @@ function mappedCsvRows() {
         phone2: get("phone2"), phone2Type: normalizePhoneType(get("phone2Type")),
         phone3: get("phone3"), phone3Type: normalizePhoneType(get("phone3Type")),
         city: get("city"), state: get("state"), zip: get("zip"), county: get("county"), email: get("email"),
-        assetCategories: get("assetCategories")
+        assetCategories: get("assetCategories"), lastKnownPurchasePrice: get("lastKnownPurchasePrice"),
+        priceRangeMin: get("priceRangeMin"), priceRangeMax: get("priceRangeMax")
       };
     });
 }
@@ -1392,6 +1431,8 @@ function renderCsvPreview() {
       '<td>' + esc(r.phone3) + (r.phone3 && r.phone3Type ? ' (' + esc(r.phone3Type) + ')' : '') + '</td>' +
       '<td>' + esc(r.city) + '</td>' + '<td>' + esc(r.state) + '</td>' + '<td>' + esc(r.zip) + '</td>' +
       '<td>' + esc(r.county) + '</td>' + '<td>' + esc(r.email) + '</td>' + '<td>' + esc(r.assetCategories) + '</td>' +
+      '<td>' + esc(r.lastKnownPurchasePrice) + '</td>' +
+      '<td>' + [r.priceRangeMin, r.priceRangeMax].filter(Boolean).join(" – ") + '</td>' +
       '</tr>';
   }).join("");
   const missingBuyerNameOrPhone = rows.filter(function (r) { return !r.buyerName || !r.phone; }).length;
@@ -1666,6 +1707,13 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
     '</div>' +
     '<label class="field-label">Buyer Documents Drive Link <span class="small-muted">(proof of funds, signed agreements, etc.)</span></label>' +
     '<input type="text" id="admin-buyer-drivelink-input" value="' + esc(lead.DriveLink || "") + '" placeholder="https://drive.google.com/...">' +
+    '<label class="field-label">Last Known Purchase Price <span class="small-muted">(informational — an asset we found they bought, suggests a similar price range)</span></label>' +
+    '<input type="text" id="admin-buyer-lastpurchase-input" value="' + esc(lead.LastKnownPurchasePrice || "") + '" placeholder="e.g. $180,000 (Phoenix, 2023)">' +
+    '<label class="field-label">Price Range Buyer Has Told Us They Want <span class="small-muted">(if known — used for matching)</span></label>' +
+    '<div class="row2">' +
+      '<div><input type="text" id="admin-buyer-pricemin-input" value="' + esc(lead.PriceRangeMin || "") + '" placeholder="Min"></div>' +
+      '<div><input type="text" id="admin-buyer-pricemax-input" value="' + esc(lead.PriceRangeMax || "") + '" placeholder="Max"></div>' +
+    '</div>' +
     '<label class="field-label">Asset Categories <span class="small-muted">(what this buyer wants — used for matching; leave all unchecked to match any deal)</span></label>' +
     '<div class="chip-list">' +
       (function () {
@@ -1723,6 +1771,9 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
       email: document.getElementById("admin-buyer-email-input").value.trim(),
       driveLink: document.getElementById("admin-buyer-drivelink-input").value.trim(),
       county: document.getElementById("admin-buyer-county-input").value.trim(),
+      lastKnownPurchasePrice: document.getElementById("admin-buyer-lastpurchase-input").value.trim(),
+      priceRangeMin: document.getElementById("admin-buyer-pricemin-input").value.trim(),
+      priceRangeMax: document.getElementById("admin-buyer-pricemax-input").value.trim(),
       assetCategories: Array.from(document.querySelectorAll(".admin-buyer-category-checkbox:checked")).map(function (cb) { return cb.value; }).join(", ")
     });
     await loadBuyerLeadsAdmin();

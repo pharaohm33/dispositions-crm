@@ -92,18 +92,26 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   the guessed mapping so you can fix anything it got wrong, then imports — or
   just paste rows directly if that's easier for a short list. Each buyer's
   profile also holds an editable Email, County, up to three phone numbers,
-  Asset Categories (what they're looking for — Single Family, Fix and Flip,
-  etc.), and a Drive Link for their own documents (proof of funds, signed
-  agreements) — visible to any rep who's been given that buyer, editable by
-  admin only. The table filters by Asset Category and State, lets you select
-  everyone on the page or the first N matching your filter (e.g. "give me 50
-  Single Family buyers"), and give that whole selection to one rep for one
-  deal at once — and paginates at 50 rows so a list of 100+ never loads all
-  at once. Give a buyer to a rep individually, or give a whole batch at once
-  for one specific deal — matched automatically by State, by the deal's City
-  or any of its additional "match cities" in the same state (so "Phoenix" and
-  " phoenix " are treated the same, and you're not limited to one exact
-  city), and by Asset Category — every "give" pairs one buyer with one deal,
+  Asset Categories (what they're looking for — Single Family, Multifamily
+  4+ Units, Fix and Flip, etc. — customizable, see Asset Categories below),
+  a price range they've told us they want (if known), a note on the last
+  price we know they've actually paid for something similar, and a Drive
+  Link for their own documents (proof of funds, signed agreements) —
+  visible to any rep who's been given that buyer, editable by admin only.
+  Every contact a rep logs — and every "Interested Buyer" logged on a deal
+  page — can optionally record what % of ARV or as-is value that buyer
+  expressed interest at, building real data over time on what buyers
+  actually pay relative to value. The table filters by Asset Category and
+  State, lets you select everyone on the page or the first N matching your
+  filter (e.g. "give me 50 Single Family buyers"), and give that whole
+  selection to one rep for one deal at once — and paginates at 50 rows so a
+  list of 100+ never loads all at once. Give a buyer to a rep individually,
+  or give a whole batch at once for one specific deal — matched
+  automatically by State, by the deal's City or any of its additional
+  "match cities" in the same state (so "Phoenix" and " phoenix " are
+  treated the same, and you're not limited to one exact city), by Asset
+  Category, and by price range when both sides have one set — every "give"
+  pairs one buyer with one deal,
   so nobody's queue ever fills up with buyers there's nothing active to sell
   them. Set a rep's preferred working area on the Team tab, and turn on
   **Auto-Feed** to automatically give more matching buyer leads, per deal, to

@@ -57,7 +57,7 @@ const SESSION_HOURS = 12;
 const DEFAULT_STATUSES = ['Active', 'Under Contract', 'Sold', 'Dead', 'On Hold'];
 const FOLLOWUP_HOURS = 24;
 const MATCH_STATUSES = ['Active Match', 'Negotiating', 'Closing', 'Dead Match'];
-const DEFAULT_ASSET_CATEGORIES = ['Single Family', 'Multifamily (1-4 Units)', 'Multifamily (5+ Units)', 'Fix and Flip', 'Residential Vacant Land', 'Commercial'];
+const DEFAULT_ASSET_CATEGORIES = ['Single Family', 'Multifamily (1-4 Units)', 'Multifamily (4+ Units)', 'Fix and Flip', 'Residential Vacant Land', 'Commercial'];
 
 const REP_COLUMNS = ['Username', 'Name', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'PreferredCity', 'PreferredState', 'PreferredZip'];
 // DealCode (e.g. "A-1") plus City/State/Zip/County/Price is everything a
@@ -86,7 +86,11 @@ const ASSIGNMENT_COLUMNS = ['DealID', 'Username', 'AssignedAt'];
 // reps never see the address at all anymore. Notes is a running,
 // rep-updatable conversation log ("copy and paste important notes"), not a
 // one-time field; AdminNote is admin's own separate note on the match.
-const BUYER_COLUMNS = ['BuyerID', 'DealID', 'Username', 'BuyerName', 'BuyerContact', 'Notes', 'MatchStatus', 'AdminNote', 'CreatedAt', 'StatusUpdatedAt'];
+// ARVPercent/AsIsPercent capture what % of ARV or as-is value this buyer has
+// expressed interest at for this specific deal, if they've said -- neither
+// is required, but across every match they build a real picture of what
+// buyers actually pay relative to value.
+const BUYER_COLUMNS = ['BuyerID', 'DealID', 'Username', 'BuyerName', 'BuyerContact', 'Notes', 'MatchStatus', 'ARVPercent', 'AsIsPercent', 'AdminNote', 'CreatedAt', 'StatusUpdatedAt'];
 const FB_COLUMNS = ['RequestID', 'DealID', 'Username', 'PostText', 'TargetGroups', 'Status', 'AdminNote', 'CreatedAt', 'DecidedAt'];
 
 // One row per buyer/LLC on the master calling list. There is no direct
@@ -116,8 +120,13 @@ const FB_COLUMNS = ['RequestID', 'DealID', 'Username', 'PostText', 'TargetGroups
 // AssetCategories sheet ("Single Family, Fix and Flip") -- a buyer with no
 // categories set is treated as open to anything for matching purposes
 // (buyerMatchesDeal), so existing leads imported before this field existed
-// don't get silently excluded.
-const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'CreatedAt'];
+// don't get silently excluded. LastKnownPurchasePrice is a free-text note
+// ("$180k, Phoenix, 2023") on a deal this buyer is known to have actually
+// bought -- informational only, not used in matching. PriceRangeMin/Max are
+// what the buyer has told us they want to spend, if known; like
+// AssetCategories, a buyer with neither set is treated as open to any
+// price for matching purposes.
+const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'PriceRangeMin', 'PriceRangeMax', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'CreatedAt'];
 
 // A Pitch is "give this buyer lead to this rep, to work against this one
 // specific deal." This is the only thing that creates an actionable item in
@@ -138,8 +147,11 @@ const PITCH_COLUMNS = ['PitchID', 'BuyerLeadID', 'DealID', 'Username', 'GivenAt'
 // even after the Pitch itself has been withdrawn. PhoneSlot ('Phone',
 // 'Phone2', or 'Phone3') records which of the buyer's numbers this specific
 // attempt was against; defaults to 'Phone' for rows written before this
-// existed.
-const BUYER_LEAD_CONTACT_COLUMNS = ['ContactID', 'PitchID', 'BuyerLeadID', 'DealID', 'Username', 'Method', 'PhoneSlot', 'ContactedAt', 'Responded', 'Notes'];
+// existed. ARVPercent/AsIsPercent (both optional) capture what % of ARV or
+// as-is value the buyer expressed interest at during this specific
+// touchpoint, same purpose as on BUYER_COLUMNS but for the buyer-leads
+// calling-list side of the app.
+const BUYER_LEAD_CONTACT_COLUMNS = ['ContactID', 'PitchID', 'BuyerLeadID', 'DealID', 'Username', 'Method', 'PhoneSlot', 'ContactedAt', 'Responded', 'ARVPercent', 'AsIsPercent', 'Notes'];
 
 // e is undefined if you click "Run" on doGet directly in the Apps Script
 // editor (it doesn't simulate a real request) -- guarded so that doesn't
@@ -753,7 +765,8 @@ function addInterestedBuyer(body, session) {
   appendRowByHeaders(sheet, {
     'BuyerID': buyerId, 'DealID': body.dealId, 'Username': session.u,
     'BuyerName': body.buyerName, 'BuyerContact': body.buyerContact || '', 'Notes': body.notes || '',
-    'MatchStatus': 'Active Match', 'AdminNote': '', 'CreatedAt': now, 'StatusUpdatedAt': now
+    'MatchStatus': 'Active Match', 'ARVPercent': body.arvPercent || '', 'AsIsPercent': body.asIsPercent || '',
+    'AdminNote': '', 'CreatedAt': now, 'StatusUpdatedAt': now
   });
 
   const adminEmail = PropertiesService.getScriptProperties().getProperty('ADMIN_NOTIFY_EMAIL');
@@ -812,6 +825,8 @@ function updateInterestedBuyerMatchStatus(body, session) {
   if (!session.a && !canAccessDeal(session, found.match['DealID'])) return { ok: false, error: 'You do not have access to this deal.' };
   found.sheet.getRange(found.match._row, getColumnIndex(found.sheet, 'MatchStatus')).setValue(body.matchStatus);
   found.sheet.getRange(found.match._row, getColumnIndex(found.sheet, 'StatusUpdatedAt')).setValue(new Date().toISOString());
+  if (body.arvPercent !== undefined) found.sheet.getRange(found.match._row, getColumnIndex(found.sheet, 'ARVPercent')).setValue(body.arvPercent || '');
+  if (body.asIsPercent !== undefined) found.sheet.getRange(found.match._row, getColumnIndex(found.sheet, 'AsIsPercent')).setValue(body.asIsPercent || '');
   if (body.adminNote !== undefined && session.a) {
     found.sheet.getRange(found.match._row, getColumnIndex(found.sheet, 'AdminNote')).setValue(body.adminNote || '');
   }
@@ -1043,7 +1058,12 @@ function splitCommaList(s) {
 //   - AssetCategory: if the deal has one set, the buyer must either have no
 //     category preferences at all (treated as open to anything) or must
 //     explicitly include this deal's category among theirs.
-// Any dimension the deal hasn't set is simply not filtered on.
+//   - Price range: if the buyer has told us both a min and max they'll
+//     spend, and the deal's Price parses as a number, the deal's price must
+//     fall within that range. Either side missing/unparseable skips this
+//     dimension entirely rather than excluding the buyer.
+// Any dimension the deal (or buyer, for price) hasn't set is simply not
+// filtered on.
 function buyerMatchesDeal(lead, deal) {
   const dealState = normalizeText(deal['State']);
   if (dealState && normalizeText(lead['State']) !== dealState) return false;
@@ -1057,6 +1077,13 @@ function buyerMatchesDeal(lead, deal) {
   if (dealCategory) {
     const leadCategories = splitCommaList(lead['AssetCategories']).map(normalizeText);
     if (leadCategories.length > 0 && leadCategories.indexOf(dealCategory) === -1) return false;
+  }
+
+  const priceMin = parseMoney(lead['PriceRangeMin']);
+  const priceMax = parseMoney(lead['PriceRangeMax']);
+  if (priceMin !== null && priceMax !== null) {
+    const dealPrice = parseMoney(deal['Price']);
+    if (dealPrice !== null && (dealPrice < priceMin || dealPrice > priceMax)) return false;
   }
 
   return true;
@@ -1150,7 +1177,9 @@ function adminImportBuyerLeads(body) {
       'BuyerLeadID': Utilities.getUuid(), 'BuyerName': r.buyerName, 'Phone': r.phone, 'PhoneType': r.phoneType || '',
       'Phone2': r.phone2 || '', 'Phone2Type': r.phone2Type || '', 'Phone3': r.phone3 || '', 'Phone3Type': r.phone3Type || '',
       'Email': r.email || '', 'City': r.city || '', 'State': r.state || '', 'Zip': r.zip || '', 'County': r.county || '',
-      'AssetCategories': r.assetCategories || '', 'GeneralNotes': '', 'DriveLink': '', 'DoNotContact': false, 'CreatedAt': now
+      'AssetCategories': r.assetCategories || '', 'LastKnownPurchasePrice': r.lastKnownPurchasePrice || '',
+      'PriceRangeMin': r.priceRangeMin || '', 'PriceRangeMax': r.priceRangeMax || '',
+      'GeneralNotes': '', 'DriveLink': '', 'DoNotContact': false, 'CreatedAt': now
     });
     imported++;
   });
@@ -1249,7 +1278,8 @@ function adminUpdateBuyerLeadProfile(body) {
   if (!match) return { ok: false, error: 'Lead not found.' };
   const fields = {
     email: 'Email', driveLink: 'DriveLink', phone: 'Phone', phoneType: 'PhoneType', phone2: 'Phone2', phone2Type: 'Phone2Type',
-    phone3: 'Phone3', phone3Type: 'Phone3Type', county: 'County', assetCategories: 'AssetCategories'
+    phone3: 'Phone3', phone3Type: 'Phone3Type', county: 'County', assetCategories: 'AssetCategories',
+    lastKnownPurchasePrice: 'LastKnownPurchasePrice', priceRangeMin: 'PriceRangeMin', priceRangeMax: 'PriceRangeMax'
   };
   Object.keys(fields).forEach(function (key) {
     if (body[key] !== undefined) sheet.getRange(match._row, getColumnIndex(sheet, fields[key])).setValue(body[key] || '');
@@ -1674,7 +1704,7 @@ function addPitchContact(body, session) {
   appendRowByHeaders(sheet, {
     'ContactID': contactId, 'PitchID': body.pitchId, 'BuyerLeadID': pitch['BuyerLeadID'], 'DealID': pitch['DealID'],
     'Username': session.u, 'Method': body.method, 'PhoneSlot': phone.slot, 'ContactedAt': new Date().toISOString(),
-    'Responded': !!body.responded, 'Notes': body.notes || ''
+    'Responded': !!body.responded, 'ARVPercent': body.arvPercent || '', 'AsIsPercent': body.asIsPercent || '', 'Notes': body.notes || ''
   });
   return { ok: true, contactId: contactId };
 }

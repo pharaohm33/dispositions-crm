@@ -140,7 +140,8 @@ to the `Reps` sheet tab yourself, once, directly in Google Sheets:
   Negotiating / Closing / Dead Match) tracks the buyer<->deal relationship
   itself, editable by admin or any rep with access to that deal; `Notes` is a
   running conversation log either can keep updating over time ("copy and
-  paste important notes of the conversation"); `AdminNote` is your own
+  paste important notes of the conversation"); `ARVPercent`/`AsIsPercent`
+  work the same as on `BuyerLeadContacts` above; `AdminNote` is your own
   separate note on the match, admin-only.
 - **FBPostRequests** — a rep's Step 1 ask for approval before posting to
   Facebook, including which groups they intend to post to. Submitting one
@@ -178,20 +179,28 @@ to the `Reps` sheet tab yourself, once, directly in Google Sheets:
   be logged against that buyer on any number, and they can no longer be
   given a new pitch for any deal, though existing pitch history is kept, not
   deleted. `County` is imported only when your source data actually has it
-  — never required.
+  — never required. `LastKnownPurchasePrice` is a free-text, informational-
+  only note ("$180,000, Phoenix, 2023") on an asset this buyer is known to
+  have actually purchased — not used in matching, just a hint at their
+  typical range. `PriceRangeMin`/`PriceRangeMax` are what the buyer has told
+  us they want to spend, if known, and — unlike the purchase-price note —
+  *are* used in matching (see below); a buyer with neither set is treated as
+  open to any price.
 
   **Buyer↔deal matching** (`buyerMatchesDeal`, used by the bulk "Give Buyer
   Leads for a Deal" button when you leave city/state/zip blank, and by
   Auto-Feed): matches on State (exact), City (the deal's own City *or* any
-  of its `MatchCities`), and AssetCategory — all case/whitespace-insensitive,
-  so "Phoenix", " phoenix ", and "PHOENIX" are treated identically. Any
-  dimension the deal hasn't set isn't filtered on. There's no true
-  "within 50 miles" radius search — that needs a paid geocoding API — so
-  `MatchCities` (comma-separated extra cities in the same state) is the
-  practical stand-in: list every city you consider "close enough" for a
-  given deal. Typing an explicit city/state/zip into the bulk-give form's
-  override fields switches to a plain exact-match filter on just those,
-  instead of the auto-match logic.
+  of its `MatchCities`), AssetCategory, and price range (the deal's Price
+  must fall within the buyer's PriceRangeMin/Max, when both the buyer's
+  range and the deal's price are set and parseable) — all case/whitespace-
+  insensitive, so "Phoenix", " phoenix ", and "PHOENIX" are treated
+  identically. Any dimension the deal (or buyer, for price) hasn't set isn't
+  filtered on. There's no true "within 50 miles" radius search — that needs
+  a paid geocoding API — so `MatchCities` (comma-separated extra cities in
+  the same state) is the practical stand-in: list every city you consider
+  "close enough" for a given deal. Typing an explicit city/state/zip into
+  the bulk-give form's override fields switches to a plain exact-match
+  filter on just those, instead of the auto-match logic.
 - **Mass-selecting buyer leads by category**: the admin **Buyer Leads** tab
   filters by Asset Category and State, lets you select everyone on the
   current page or the first N matching your filter (e.g. 50), and give that
@@ -206,8 +215,14 @@ to the `Reps` sheet tab yourself, once, directly in Google Sheets:
   from the **Buyer Leads** admin tab, individually or in bulk per deal;
   reassign or withdraw them from a buyer's detail panel.
 - **BuyerLeadContacts** — every call/text a rep logs against one specific
-  Pitch, with free-text notes on the buyer's feedback about that deal. This
-  is both the 24-hour-response SOP tracker (scoped to that one buyer+deal
+  Pitch, with free-text notes on the buyer's feedback about that deal, plus
+  optional `ARVPercent`/`AsIsPercent` fields capturing what % of ARV or
+  as-is value the buyer said they'd want to pay, if they mentioned it.
+  Neither is required, but logged consistently across every contact (and on
+  `InterestedBuyers`, below, for the deal-page matching flow) it builds a
+  real picture over time of what buyers actually pay relative to value —
+  worth reviewing periodically even without a dedicated report built yet.
+  This is both the 24-hour-response SOP tracker (scoped to that one buyer+deal
   pairing) and the history that feeds `GeneralNotes` over time. Withdrawing
   a Pitch never deletes this history.
 - **Calling hours + call-first, enforced server-side** — a rep (not admin)
