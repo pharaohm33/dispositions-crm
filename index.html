@@ -408,6 +408,36 @@
       <div id="give-selected-result" class="small-muted"></div>
     </div>
 
+    <div class="card" id="buyerleads-mass-edit-card" hidden>
+      <div class="section-title" style="margin-top:0;">Mass Edit Selected Leads</div>
+      <p class="small-muted">Applies to every currently-selected lead (<span id="mass-edit-count">0</span> selected). Check a field to apply it — anything left unchecked is not touched, so you can backfill just one field across a batch without overwriting the rest.</p>
+
+      <label class="checkbox-row"><input type="checkbox" id="mass-edit-apply-categories"> Asset Categories</label>
+      <div class="chip-list" id="mass-edit-categories-list"></div>
+
+      <div class="row2">
+        <div>
+          <label class="checkbox-row"><input type="checkbox" id="mass-edit-apply-county"> County</label>
+          <input type="text" id="mass-edit-county-input">
+        </div>
+        <div>
+          <label class="checkbox-row"><input type="checkbox" id="mass-edit-apply-lastpurchase"> Last Known Purchase Price</label>
+          <input type="text" id="mass-edit-lastpurchase-input" placeholder="e.g. $180,000 (Phoenix, 2023)">
+        </div>
+      </div>
+
+      <label class="checkbox-row"><input type="checkbox" id="mass-edit-apply-pricerange"> Price Range Buyer Has Told Us They Want</label>
+      <div class="row2">
+        <div><input type="text" id="mass-edit-pricemin-input" placeholder="Min"></div>
+        <div><input type="text" id="mass-edit-pricemax-input" placeholder="Max"></div>
+      </div>
+
+      <div class="nav-row" style="justify-content:flex-end;">
+        <button class="btn primary small" id="mass-edit-apply-btn">Apply to Selected</button>
+      </div>
+      <div id="mass-edit-result" class="small-muted"></div>
+    </div>
+
     <table class="crm-table">
       <thead><tr><th></th><th>Buyer / LLC</th><th>Phone</th><th>Email</th><th>Type</th><th>Location</th><th>Asset Categories</th><th>General Notes</th><th>Open Pitches</th><th>Actions</th></tr></thead>
       <tbody id="buyerleads-tbody"></tbody>

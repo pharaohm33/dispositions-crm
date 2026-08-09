@@ -122,6 +122,9 @@ async function initRepView() {
   const statusRes = await api("getStatusOptions", {});
   if (statusRes.ok) statusOptionsCache = statusRes.statuses;
 
+  const catRes = await api("getAssetCategoryOptions", {});
+  if (catRes.ok) assetCategoryOptionsCache = catRes.categories;
+
   const res = await api("getDeals", {});
   if (!res.ok) {
     setSession(null);
@@ -493,6 +496,10 @@ async function openPitchDetail(pitchId) {
       (pitch.driveLink ? '<div style="margin-top:8px;"><strong>Documents:</strong> <a href="' + esc(pitch.driveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
     '</div>' +
 
+    '<div class="section-title">Buyer Info</div>' +
+    '<p class="small-muted">Fill in anything missing — asset types they buy, price range, last known purchase price, extra numbers — so this buyer is easier to match and pitch next time.</p>' +
+    (pitch.leadProfile ? renderBuyerProfileFields(pitch.leadProfile, "rep") : "") +
+
     '<div class="section-title">General Buyer Notes</div>' +
     '<p class="small-muted">Shared across every deal this buyer is ever pitched — ARV%, price range, areas of interest, cash vs. financed, etc.</p>' +
     '<textarea id="general-notes-input">' + esc(pitch.generalNotes || "") + '</textarea>' +
@@ -532,6 +539,13 @@ async function openPitchDetail(pitchId) {
   document.getElementById("general-notes-save-btn").addEventListener("click", async function () {
     await api("updateBuyerLeadNotes", { buyerLeadId: pitch.BuyerLeadID, notes: document.getElementById("general-notes-input").value.trim() });
   });
+
+  if (pitch.leadProfile) {
+    wireBuyerProfileFieldsHandlers("rep", pitch.BuyerLeadID, async function () {
+      await loadMyPitches();
+      openPitchDetail(pitchId);
+    });
+  }
 
   document.getElementById("dnc-toggle-btn").addEventListener("click", async function () {
     await api("updateBuyerLeadDoNotContact", { buyerLeadId: pitch.BuyerLeadID, doNotContact: !pitch.doNotContact });
@@ -1226,6 +1240,13 @@ let buyerLeadsActiveReps = [];
 
 async function initBuyerLeadsAdminTab() {
   await Promise.all([loadBuyerLeadsAdmin(), loadAutoFeedSettings(), populateBulkGiveSelects()]);
+  renderMassEditCategories();
+}
+
+function renderMassEditCategories() {
+  document.getElementById("mass-edit-categories-list").innerHTML = assetCategoryOptionsCache.map(function (c) {
+    return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="mass-edit-category-checkbox" value="' + esc(c) + '"> ' + esc(c) + '</label>';
+  }).join("");
 }
 
 async function populateBulkGiveSelects() {
@@ -1616,6 +1637,8 @@ function updateBuyerLeadsSelectionUI() {
   const count = buyerLeadsSelectedIds.size;
   document.getElementById("buyerleads-selection-count").textContent = count + " selected";
   document.getElementById("buyerleads-give-selected-row").hidden = count === 0;
+  document.getElementById("buyerleads-mass-edit-card").hidden = count === 0;
+  document.getElementById("mass-edit-count").textContent = count;
 }
 
 document.getElementById("buyerleads-prev-page-btn").addEventListener("click", function () {
@@ -1660,6 +1683,103 @@ document.getElementById("give-selected-btn").addEventListener("click", async fun
   await loadBuyerLeadsAdmin();
 });
 
+document.getElementById("mass-edit-apply-btn").addEventListener("click", async function () {
+  const resultEl = document.getElementById("mass-edit-result");
+  if (buyerLeadsSelectedIds.size === 0) { resultEl.textContent = "No leads selected."; return; }
+
+  const data = {};
+  if (document.getElementById("mass-edit-apply-categories").checked) {
+    data.assetCategories = Array.from(document.querySelectorAll(".mass-edit-category-checkbox:checked")).map(function (cb) { return cb.value; }).join(", ");
+  }
+  if (document.getElementById("mass-edit-apply-county").checked) {
+    data.county = document.getElementById("mass-edit-county-input").value.trim();
+  }
+  if (document.getElementById("mass-edit-apply-lastpurchase").checked) {
+    data.lastKnownPurchasePrice = document.getElementById("mass-edit-lastpurchase-input").value.trim();
+  }
+  if (document.getElementById("mass-edit-apply-pricerange").checked) {
+    data.priceRangeMin = document.getElementById("mass-edit-pricemin-input").value.trim();
+    data.priceRangeMax = document.getElementById("mass-edit-pricemax-input").value.trim();
+  }
+  if (Object.keys(data).length === 0) { resultEl.textContent = "Check at least one field to apply."; return; }
+
+  const res = await api("adminBulkUpdateBuyerLeads", { buyerLeadIds: Array.from(buyerLeadsSelectedIds), data: data });
+  if (!res.ok) { resultEl.textContent = res.error || "Could not apply changes."; return; }
+  resultEl.textContent = "Updated " + res.updatedCount + " lead(s).";
+  await loadBuyerLeadsAdmin();
+});
+
+// Shared by the admin buyer detail panel and the rep's pitch detail panel
+// -- both edit the exact same set of fields via updateBuyerLeadProfile,
+// which the backend now permits for either an admin or a rep with an open
+// pitch on this one buyer (one lead at a time; mass-editing many at once
+// is admin-only, see the Buyer Leads tab's Mass Edit section). `prefix`
+// keeps element ids distinct between the two contexts (e.g. "admin" vs
+// "rep") so both can exist in the DOM without colliding.
+function renderBuyerProfileFields(lead, prefix) {
+  const leadCats = (lead.AssetCategories || "").split(",").map(function (c) { return c.trim().toLowerCase(); });
+  return (
+    '<div class="section-title" style="margin-top:0;">Phone Numbers</div>' +
+    '<div class="row2">' +
+      '<div><label class="field-label">Phone</label><input type="text" id="' + prefix + '-buyer-phone-input" value="' + esc(lead.Phone || "") + '"></div>' +
+      '<div><label class="field-label">Type</label><select id="' + prefix + '-buyer-phonetype-input"><option value="Mobile"' + (lead.PhoneType === "Mobile" ? " selected" : "") + '>Mobile</option><option value="Landline"' + (lead.PhoneType === "Landline" ? " selected" : "") + '>Landline</option></select></div>' +
+    '</div>' +
+    '<div class="row2">' +
+      '<div><label class="field-label">Phone 2</label><input type="text" id="' + prefix + '-buyer-phone2-input" value="' + esc(lead.Phone2 || "") + '"></div>' +
+      '<div><label class="field-label">Type</label><select id="' + prefix + '-buyer-phone2type-input"><option value="">&mdash;</option><option value="Mobile"' + (lead.Phone2Type === "Mobile" ? " selected" : "") + '>Mobile</option><option value="Landline"' + (lead.Phone2Type === "Landline" ? " selected" : "") + '>Landline</option></select></div>' +
+    '</div>' +
+    '<div class="row2">' +
+      '<div><label class="field-label">Phone 3</label><input type="text" id="' + prefix + '-buyer-phone3-input" value="' + esc(lead.Phone3 || "") + '"></div>' +
+      '<div><label class="field-label">Type</label><select id="' + prefix + '-buyer-phone3type-input"><option value="">&mdash;</option><option value="Mobile"' + (lead.Phone3Type === "Mobile" ? " selected" : "") + '>Mobile</option><option value="Landline"' + (lead.Phone3Type === "Landline" ? " selected" : "") + '>Landline</option></select></div>' +
+    '</div>' +
+    '<div class="row2">' +
+      '<div><label class="field-label">Email</label><input type="text" id="' + prefix + '-buyer-email-input" value="' + esc(lead.Email || "") + '" placeholder="buyer@example.com"></div>' +
+      '<div><label class="field-label">County</label><input type="text" id="' + prefix + '-buyer-county-input" value="' + esc(lead.County || "") + '"></div>' +
+    '</div>' +
+    '<label class="field-label">Buyer Documents Drive Link <span class="small-muted">(proof of funds, signed agreements, etc.)</span></label>' +
+    '<input type="text" id="' + prefix + '-buyer-drivelink-input" value="' + esc(lead.DriveLink || "") + '" placeholder="https://drive.google.com/...">' +
+    '<label class="field-label">Last Known Purchase Price <span class="small-muted">(informational — an asset we found they bought, suggests a similar price range)</span></label>' +
+    '<input type="text" id="' + prefix + '-buyer-lastpurchase-input" value="' + esc(lead.LastKnownPurchasePrice || "") + '" placeholder="e.g. $180,000 (Phoenix, 2023)">' +
+    '<label class="field-label">Price Range Buyer Has Told Us They Want <span class="small-muted">(if known — used for matching)</span></label>' +
+    '<div class="row2">' +
+      '<div><input type="text" id="' + prefix + '-buyer-pricemin-input" value="' + esc(lead.PriceRangeMin || "") + '" placeholder="Min"></div>' +
+      '<div><input type="text" id="' + prefix + '-buyer-pricemax-input" value="' + esc(lead.PriceRangeMax || "") + '" placeholder="Max"></div>' +
+    '</div>' +
+    '<label class="field-label">Asset Categories <span class="small-muted">(what this buyer wants — used for matching; leave all unchecked to match any deal)</span></label>' +
+    '<div class="chip-list">' +
+      assetCategoryOptionsCache.map(function (c) {
+        const checked = leadCats.indexOf(c.toLowerCase()) !== -1 ? " checked" : "";
+        return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="' + prefix + '-buyer-category-checkbox" value="' + esc(c) + '"' + checked + '> ' + esc(c) + '</label>';
+      }).join("") +
+    '</div>' +
+    '<div class="nav-row" style="justify-content:flex-end;">' +
+      '<button class="btn secondary" id="' + prefix + '-buyer-profile-save-btn">Save Buyer Info</button>' +
+    '</div>'
+  );
+}
+
+function wireBuyerProfileFieldsHandlers(prefix, buyerLeadId, onSaved) {
+  document.getElementById(prefix + "-buyer-profile-save-btn").addEventListener("click", async function () {
+    await api("updateBuyerLeadProfile", {
+      buyerLeadId: buyerLeadId,
+      phone: document.getElementById(prefix + "-buyer-phone-input").value.trim(),
+      phoneType: document.getElementById(prefix + "-buyer-phonetype-input").value,
+      phone2: document.getElementById(prefix + "-buyer-phone2-input").value.trim(),
+      phone2Type: document.getElementById(prefix + "-buyer-phone2type-input").value,
+      phone3: document.getElementById(prefix + "-buyer-phone3-input").value.trim(),
+      phone3Type: document.getElementById(prefix + "-buyer-phone3type-input").value,
+      email: document.getElementById(prefix + "-buyer-email-input").value.trim(),
+      driveLink: document.getElementById(prefix + "-buyer-drivelink-input").value.trim(),
+      county: document.getElementById(prefix + "-buyer-county-input").value.trim(),
+      lastKnownPurchasePrice: document.getElementById(prefix + "-buyer-lastpurchase-input").value.trim(),
+      priceRangeMin: document.getElementById(prefix + "-buyer-pricemin-input").value.trim(),
+      priceRangeMax: document.getElementById(prefix + "-buyer-pricemax-input").value.trim(),
+      assetCategories: Array.from(document.querySelectorAll("." + prefix + "-buyer-category-checkbox:checked")).map(function (cb) { return cb.value; }).join(", ")
+    });
+    await onSaved();
+  });
+}
+
 async function openAdminBuyerLeadDetail(buyerLeadId) {
   const lead = adminBuyerLeads.find(function (l) { return l.BuyerLeadID === buyerLeadId; });
   if (!lead) return;
@@ -1688,45 +1808,7 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
 
     (isDnc ? '<div class="banner danger"><strong>Do Not Contact.</strong> No rep can log a new call/text for this buyer, and they can\'t be given a new pitch.</div>' : "") +
 
-    '<div class="section-title" style="margin-top:0;">Phone Numbers</div>' +
-    '<div class="row2">' +
-      '<div><label class="field-label">Phone</label><input type="text" id="admin-buyer-phone-input" value="' + esc(lead.Phone || "") + '"></div>' +
-      '<div><label class="field-label">Type</label><select id="admin-buyer-phonetype-input"><option value="Mobile"' + (lead.PhoneType === "Mobile" ? " selected" : "") + '>Mobile</option><option value="Landline"' + (lead.PhoneType === "Landline" ? " selected" : "") + '>Landline</option></select></div>' +
-    '</div>' +
-    '<div class="row2">' +
-      '<div><label class="field-label">Phone 2</label><input type="text" id="admin-buyer-phone2-input" value="' + esc(lead.Phone2 || "") + '"></div>' +
-      '<div><label class="field-label">Type</label><select id="admin-buyer-phone2type-input"><option value="">&mdash;</option><option value="Mobile"' + (lead.Phone2Type === "Mobile" ? " selected" : "") + '>Mobile</option><option value="Landline"' + (lead.Phone2Type === "Landline" ? " selected" : "") + '>Landline</option></select></div>' +
-    '</div>' +
-    '<div class="row2">' +
-      '<div><label class="field-label">Phone 3</label><input type="text" id="admin-buyer-phone3-input" value="' + esc(lead.Phone3 || "") + '"></div>' +
-      '<div><label class="field-label">Type</label><select id="admin-buyer-phone3type-input"><option value="">&mdash;</option><option value="Mobile"' + (lead.Phone3Type === "Mobile" ? " selected" : "") + '>Mobile</option><option value="Landline"' + (lead.Phone3Type === "Landline" ? " selected" : "") + '>Landline</option></select></div>' +
-    '</div>' +
-    '<div class="row2">' +
-      '<div><label class="field-label">Email</label><input type="text" id="admin-buyer-email-input" value="' + esc(lead.Email || "") + '" placeholder="buyer@example.com"></div>' +
-      '<div><label class="field-label">County</label><input type="text" id="admin-buyer-county-input" value="' + esc(lead.County || "") + '"></div>' +
-    '</div>' +
-    '<label class="field-label">Buyer Documents Drive Link <span class="small-muted">(proof of funds, signed agreements, etc.)</span></label>' +
-    '<input type="text" id="admin-buyer-drivelink-input" value="' + esc(lead.DriveLink || "") + '" placeholder="https://drive.google.com/...">' +
-    '<label class="field-label">Last Known Purchase Price <span class="small-muted">(informational — an asset we found they bought, suggests a similar price range)</span></label>' +
-    '<input type="text" id="admin-buyer-lastpurchase-input" value="' + esc(lead.LastKnownPurchasePrice || "") + '" placeholder="e.g. $180,000 (Phoenix, 2023)">' +
-    '<label class="field-label">Price Range Buyer Has Told Us They Want <span class="small-muted">(if known — used for matching)</span></label>' +
-    '<div class="row2">' +
-      '<div><input type="text" id="admin-buyer-pricemin-input" value="' + esc(lead.PriceRangeMin || "") + '" placeholder="Min"></div>' +
-      '<div><input type="text" id="admin-buyer-pricemax-input" value="' + esc(lead.PriceRangeMax || "") + '" placeholder="Max"></div>' +
-    '</div>' +
-    '<label class="field-label">Asset Categories <span class="small-muted">(what this buyer wants — used for matching; leave all unchecked to match any deal)</span></label>' +
-    '<div class="chip-list">' +
-      (function () {
-        const leadCats = (lead.AssetCategories || "").split(",").map(function (c) { return c.trim().toLowerCase(); });
-        return assetCategoryOptionsCache.map(function (c) {
-          const checked = leadCats.indexOf(c.toLowerCase()) !== -1 ? " checked" : "";
-          return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="admin-buyer-category-checkbox" value="' + esc(c) + '"' + checked + '> ' + esc(c) + '</label>';
-        }).join("");
-      })() +
-    '</div>' +
-    '<div class="nav-row" style="justify-content:flex-end;">' +
-      '<button class="btn secondary" id="admin-buyer-profile-save-btn">Save Contact Info</button>' +
-    '</div>' +
+    renderBuyerProfileFields(lead, "admin") +
 
     '<div class="section-title">General Buyer Notes</div>' +
     '<p class="small-muted">Shared across every deal this buyer is ever pitched — ARV%, price range, areas of interest, cash vs. financed, etc.</p>' +
@@ -1759,23 +1841,7 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
     await loadBuyerLeadsAdmin();
   });
 
-  document.getElementById("admin-buyer-profile-save-btn").addEventListener("click", async function () {
-    await api("adminUpdateBuyerLeadProfile", {
-      buyerLeadId: buyerLeadId,
-      phone: document.getElementById("admin-buyer-phone-input").value.trim(),
-      phoneType: document.getElementById("admin-buyer-phonetype-input").value,
-      phone2: document.getElementById("admin-buyer-phone2-input").value.trim(),
-      phone2Type: document.getElementById("admin-buyer-phone2type-input").value,
-      phone3: document.getElementById("admin-buyer-phone3-input").value.trim(),
-      phone3Type: document.getElementById("admin-buyer-phone3type-input").value,
-      email: document.getElementById("admin-buyer-email-input").value.trim(),
-      driveLink: document.getElementById("admin-buyer-drivelink-input").value.trim(),
-      county: document.getElementById("admin-buyer-county-input").value.trim(),
-      lastKnownPurchasePrice: document.getElementById("admin-buyer-lastpurchase-input").value.trim(),
-      priceRangeMin: document.getElementById("admin-buyer-pricemin-input").value.trim(),
-      priceRangeMax: document.getElementById("admin-buyer-pricemax-input").value.trim(),
-      assetCategories: Array.from(document.querySelectorAll(".admin-buyer-category-checkbox:checked")).map(function (cb) { return cb.value; }).join(", ")
-    });
+  wireBuyerProfileFieldsHandlers("admin", buyerLeadId, async function () {
     await loadBuyerLeadsAdmin();
     openAdminBuyerLeadDetail(buyerLeadId);
   });

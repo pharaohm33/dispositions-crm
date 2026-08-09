@@ -248,8 +248,10 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminImportBuyerLeads));
       case 'adminGetBuyerLeads':
         return jsonOut(withAdminSession(body, adminGetBuyerLeads));
-      case 'adminUpdateBuyerLeadProfile':
-        return jsonOut(withAdminSession(body, adminUpdateBuyerLeadProfile));
+      case 'updateBuyerLeadProfile':
+        return jsonOut(withSession(body, updateBuyerLeadProfile));
+      case 'adminBulkUpdateBuyerLeads':
+        return jsonOut(withAdminSession(body, adminBulkUpdateBuyerLeads));
       case 'adminGiveBuyerLeadToRep':
         return jsonOut(withAdminSession(body, adminGiveBuyerLeadToRep));
       case 'adminGiveBuyerLeadsBulk':
@@ -1267,24 +1269,56 @@ function updateBuyerLeadNotes(body, session) {
   return { ok: true };
 }
 
-// Admin-only, unlike updateBuyerLeadNotes -- Email and DriveLink (buyer-
-// specific documents: proof of funds, signed agreements, etc.) are set by
-// admin, though any rep with an open pitch on this buyer can still see them
-// once set (see getMyPitches).
-function adminUpdateBuyerLeadProfile(body) {
+// Same permission model as updateBuyerLeadNotes/updateBuyerLeadDoNotContact:
+// admin, or any rep with an open pitch on this one buyer, can edit -- one
+// lead at a time. (Mass-editing many leads at once is admin-only, see
+// adminBulkUpdateBuyerLeads below.)
+const BUYER_LEAD_PROFILE_FIELDS = {
+  email: 'Email', driveLink: 'DriveLink', phone: 'Phone', phoneType: 'PhoneType', phone2: 'Phone2', phone2Type: 'Phone2Type',
+  phone3: 'Phone3', phone3Type: 'Phone3Type', county: 'County', assetCategories: 'AssetCategories',
+  lastKnownPurchasePrice: 'LastKnownPurchasePrice', priceRangeMin: 'PriceRangeMin', priceRangeMax: 'PriceRangeMax'
+};
+
+function updateBuyerLeadProfile(body, session) {
   if (!body.buyerLeadId) return { ok: false, error: 'Missing buyerLeadId.' };
   const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
   const match = sheetToObjects(sheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
   if (!match) return { ok: false, error: 'Lead not found.' };
-  const fields = {
-    email: 'Email', driveLink: 'DriveLink', phone: 'Phone', phoneType: 'PhoneType', phone2: 'Phone2', phone2Type: 'Phone2Type',
-    phone3: 'Phone3', phone3Type: 'Phone3Type', county: 'County', assetCategories: 'AssetCategories',
-    lastKnownPurchasePrice: 'LastKnownPurchasePrice', priceRangeMin: 'PriceRangeMin', priceRangeMax: 'PriceRangeMax'
-  };
-  Object.keys(fields).forEach(function (key) {
-    if (body[key] !== undefined) sheet.getRange(match._row, getColumnIndex(sheet, fields[key])).setValue(body[key] || '');
+  if (!session.a) {
+    const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+    const ownsAPitch = sheetToObjects(pitchesSheet).some(function (p) {
+      return p['BuyerLeadID'] === body.buyerLeadId && String(p['Username'] || '').toLowerCase() === session.u;
+    });
+    if (!ownsAPitch) return { ok: false, error: 'You need an active pitch on this buyer to edit their info.' };
+  }
+  Object.keys(BUYER_LEAD_PROFILE_FIELDS).forEach(function (key) {
+    if (body[key] !== undefined) sheet.getRange(match._row, getColumnIndex(sheet, BUYER_LEAD_PROFILE_FIELDS[key])).setValue(body[key] || '');
   });
   return { ok: true };
+}
+
+// Admin-only. Applies the same value to every listed buyer lead for
+// whichever fields are present in body.data (fields the admin didn't check
+// an "apply" box for in the UI are simply absent from data, not touched
+// here at all) -- the backfill tool for "I know these 50 leads are all
+// Single Family but never got that set on import."
+function adminBulkUpdateBuyerLeads(body) {
+  if (!body.buyerLeadIds || body.buyerLeadIds.length === 0) return { ok: false, error: 'No leads selected.' };
+  const data = body.data || {};
+  const keys = Object.keys(data).filter(function (k) { return BUYER_LEAD_PROFILE_FIELDS[k]; });
+  if (keys.length === 0) return { ok: false, error: 'No fields selected to apply.' };
+
+  const wanted = {};
+  body.buyerLeadIds.forEach(function (id) { wanted[id] = true; });
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const rows = sheetToObjects(sheet).filter(function (l) { return wanted[l['BuyerLeadID']]; });
+
+  rows.forEach(function (l) {
+    keys.forEach(function (key) {
+      sheet.getRange(l._row, getColumnIndex(sheet, BUYER_LEAD_PROFILE_FIELDS[key])).setValue(data[key] || '');
+    });
+  });
+  return { ok: true, updatedCount: rows.length };
 }
 
 // Either admin, or a rep with an open pitch on this buyer, can flag Do Not
@@ -1633,6 +1667,15 @@ function getMyPitches(body, session) {
     p.doNotContact = !!(lead && (lead['DoNotContact'] === true || lead['DoNotContact'] === 'TRUE'));
     p.hasResponded = allContacts.some(function (c) { return c['PitchID'] === p['PitchID'] && (c['Responded'] === true || c['Responded'] === 'TRUE'); });
     p.callingHours = lead ? callingHoursInfo(lead['State']) : null;
+    // Everything editable via updateBuyerLeadProfile, in the same shape as a
+    // raw BuyerLeads row, so the frontend can reuse its shared profile-editing
+    // markup for reps (one lead at a time) exactly as it does for admin.
+    p.leadProfile = lead ? {
+      Phone: lead['Phone'], PhoneType: lead['PhoneType'], Phone2: lead['Phone2'], Phone2Type: lead['Phone2Type'],
+      Phone3: lead['Phone3'], Phone3Type: lead['Phone3Type'], Email: lead['Email'], County: lead['County'],
+      DriveLink: lead['DriveLink'], LastKnownPurchasePrice: lead['LastKnownPurchasePrice'],
+      PriceRangeMin: lead['PriceRangeMin'], PriceRangeMax: lead['PriceRangeMax'], AssetCategories: lead['AssetCategories']
+    } : null;
     delete p.dealAddress; // rep-facing -- never send the deal's Address, see file header comment
   });
   return { ok: true, pitches: withStatus };

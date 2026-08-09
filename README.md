@@ -35,6 +35,12 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
      of who's actually closing.
 - Every Facebook post submission and every interested-buyer submission emails
   the admin automatically.
+- On a buyer's pitch detail, a rep can edit that one buyer's own info right
+  there — phone numbers, email, county, Drive link, last known purchase
+  price, price range, and asset categories — so if you learn something new
+  about a buyer while working them, you can fill it in without needing admin
+  to touch the backend sheet. It's always one buyer at a time; only admin can
+  mass-edit many at once (see Buyer Leads below).
 - **Buyer Leads** — a separate "Buyer Leads" tab shows every buyer they've
   been given for a deal we currently have to sell (never a bare contact list
   with nothing to offer them), with up to three phone numbers each showing
@@ -119,7 +125,12 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   — so the calling queue never runs dry without you manually handing out
   more batches. A buyer's General Notes and full pitch/contact history stay
   visible from their profile even after a pitch is withdrawn or its deal
-  closes.
+  closes. Once you've selected a batch of leads, a **Mass Edit Selected
+  Leads** panel appears — check off just the fields you want to backfill
+  (Asset Categories, County, Last Known Purchase Price, Price Range) and it
+  applies only those to every selected lead at once, leaving everything else
+  untouched. Handy for "I never set Asset Type on these 50 imports and don't
+  want to open the spreadsheet."
 - **Status Categories** — add or remove the status options offered in the
   Deals dropdowns.
 - **Asset Categories** — add or remove the property-type categories buyers
