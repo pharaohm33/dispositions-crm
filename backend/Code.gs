@@ -52,10 +52,12 @@ const PITCHES_SHEET = 'Pitches';
 const BUYER_LEAD_CONTACTS_SHEET = 'BuyerLeadContacts';
 const ADDRESS_GRANTS_SHEET = 'AddressGrants';
 const ADDRESS_GRANT_COLUMNS = ['DealID', 'Username', 'GrantedAt'];
+const ASSET_CATEGORIES_SHEET = 'AssetCategories';
 const SESSION_HOURS = 12;
 const DEFAULT_STATUSES = ['Active', 'Under Contract', 'Sold', 'Dead', 'On Hold'];
 const FOLLOWUP_HOURS = 24;
 const MATCH_STATUSES = ['Active Match', 'Negotiating', 'Closing', 'Dead Match'];
+const DEFAULT_ASSET_CATEGORIES = ['Single Family', 'Multifamily (1-4 Units)', 'Multifamily (5+ Units)', 'Fix and Flip', 'Residential Vacant Land', 'Commercial'];
 
 const REP_COLUMNS = ['Username', 'Name', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'PreferredCity', 'PreferredState', 'PreferredZip'];
 // DealCode (e.g. "A-1") plus City/State/Zip/County/Price is everything a
@@ -69,7 +71,13 @@ const REP_COLUMNS = ['Username', 'Name', 'PasswordHash', 'Salt', 'AllAccess', 'I
 // (ARV - RehabEstimate - Price) is never stored; it's computed fresh on every
 // read by withComputedFields so it can't drift out of sync with the three
 // inputs it depends on.
-const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'AssetType', 'Price', 'ARV', 'RehabEstimate', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt'];
+// AssetCategory (one of AssetCategoriesSheet's list, or blank) and
+// MatchCities (comma-separated extra city names in the same State that
+// should also count as "in this deal's area") both exist purely to drive
+// buyer<->deal auto-matching -- see buyerMatchesDeal. AssetType stays a
+// free-text description field ("SFR - 3bd/2ba") separate from the
+// structured AssetCategory used for matching.
+const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt'];
 const ASSIGNMENT_COLUMNS = ['DealID', 'Username', 'AssignedAt'];
 // MatchStatus tracks the buyer<->deal relationship itself ('Active Match' by
 // default, through 'Negotiating'/'Closing', or 'Dead Match' once the buyer
@@ -103,7 +111,13 @@ const FB_COLUMNS = ['RequestID', 'DealID', 'Username', 'PostText', 'TargetGroups
 // buyer-specific documents (proof of funds, signed agreements, etc.) --
 // editable by admin only (adminUpdateBuyerLeadProfile), but any rep with an
 // open pitch on this buyer can see it, same visibility as GeneralNotes.
-const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'CreatedAt'];
+// County is imported only if the source data actually has it (never
+// required). AssetCategories is a comma-separated list drawn from the
+// AssetCategories sheet ("Single Family, Fix and Flip") -- a buyer with no
+// categories set is treated as open to anything for matching purposes
+// (buyerMatchesDeal), so existing leads imported before this field existed
+// don't get silently excluded.
+const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'CreatedAt'];
 
 // A Pitch is "give this buyer lead to this rep, to work against this one
 // specific deal." This is the only thing that creates an actionable item in
@@ -160,6 +174,8 @@ function doPost(e) {
         return jsonOut(withSession(body, getDeal));
       case 'getStatusOptions':
         return jsonOut(withSession(body, getStatusOptions));
+      case 'getAssetCategoryOptions':
+        return jsonOut(withSession(body, getAssetCategoryOptions));
       case 'addInterestedBuyer':
         return jsonOut(withSession(body, addInterestedBuyer));
       case 'getInterestedBuyers':
@@ -226,6 +242,12 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminGiveBuyerLeadToRep));
       case 'adminGiveBuyerLeadsBulk':
         return jsonOut(withAdminSession(body, adminGiveBuyerLeadsBulk));
+      case 'adminGiveSelectedBuyerLeads':
+        return jsonOut(withAdminSession(body, adminGiveSelectedBuyerLeads));
+      case 'adminAddAssetCategory':
+        return jsonOut(withAdminSession(body, adminAddAssetCategory));
+      case 'adminRemoveAssetCategory':
+        return jsonOut(withAdminSession(body, adminRemoveAssetCategory));
       case 'adminReassignPitch':
         return jsonOut(withAdminSession(body, adminReassignPitch));
       case 'adminWithdrawPitch':
@@ -519,7 +541,8 @@ function adminAddDeal(body) {
   const now = new Date().toISOString();
   appendRowByHeaders(sheet, {
     'DealID': dealId, 'DealCode': d.dealCode || '', 'Address': d.address, 'City': d.city || '', 'State': d.state || '', 'Zip': d.zip || '',
-    'County': d.county || '', 'AssetType': d.assetType || '', 'Price': d.price || '', 'ARV': d.arv || '', 'RehabEstimate': d.rehabEstimate || '',
+    'County': d.county || '', 'MatchCities': d.matchCities || '', 'AssetType': d.assetType || '', 'AssetCategory': d.assetCategory || '',
+    'Price': d.price || '', 'ARV': d.arv || '', 'RehabEstimate': d.rehabEstimate || '',
     'Status': d.status || DEFAULT_STATUSES[0],
     'Description': d.description || '', 'GeneralDriveLink': d.generalDriveLink || '', 'SensitiveDriveLink': d.sensitiveDriveLink || '',
     'AdminPrivateNotes': d.adminPrivateNotes || '', 'SourceLink': d.sourceLink || '',
@@ -535,7 +558,7 @@ function adminUpdateDeal(body) {
   const match = deals.find(function (d) { return d['DealID'] === body.dealId; });
   if (!match) return { ok: false, error: 'Deal not found.' };
   const d = body.data || {};
-  const editable = ['DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'AssetType', 'Price', 'ARV', 'RehabEstimate', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink'];
+  const editable = ['DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink'];
   editable.forEach(function (field) {
     if (d[field] === undefined) return;
     const col = getColumnIndex(sheet, field);
@@ -998,16 +1021,91 @@ function dealIsActive(deal) {
   return !!deal && deal['Status'] !== 'Sold' && deal['Status'] !== 'Dead';
 }
 
+// Case/whitespace-insensitive normalization for matching city/state/category
+// names -- "Phoenix", " phoenix ", "PHOENIX" and "Phoenix  " all collapse to
+// the same value, so imported data with inconsistent formatting still
+// matches correctly instead of silently filtering everything out.
+function normalizeText(s) {
+  return String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function splitCommaList(s) {
+  return String(s || '').split(',').map(function (v) { return v.trim(); }).filter(Boolean);
+}
+
+// Whether a buyer lead should be offered a given deal, for both manual
+// bulk-give (auto mode, no override) and Auto-Feed:
+//   - State must match exactly (normalized) if the deal has one set.
+//   - City must be either the deal's own City or one of its MatchCities
+//     (normalized) -- if the deal has neither set, city isn't filtered on
+//     at all. This is the multi-city-per-state matching area, since a real
+//     "within 50 miles" radius would need a paid geocoding API.
+//   - AssetCategory: if the deal has one set, the buyer must either have no
+//     category preferences at all (treated as open to anything) or must
+//     explicitly include this deal's category among theirs.
+// Any dimension the deal hasn't set is simply not filtered on.
+function buyerMatchesDeal(lead, deal) {
+  const dealState = normalizeText(deal['State']);
+  if (dealState && normalizeText(lead['State']) !== dealState) return false;
+
+  const matchCities = [deal['City']].concat(splitCommaList(deal['MatchCities'])).map(normalizeText).filter(Boolean);
+  if (matchCities.length > 0 && lead['City']) {
+    if (matchCities.indexOf(normalizeText(lead['City'])) === -1) return false;
+  }
+
+  const dealCategory = normalizeText(deal['AssetCategory']);
+  if (dealCategory) {
+    const leadCategories = splitCommaList(lead['AssetCategories']).map(normalizeText);
+    if (leadCategories.length > 0 && leadCategories.indexOf(dealCategory) === -1) return false;
+  }
+
+  return true;
+}
+
+// ---------- Asset categories ----------
+
+function getAssetCategoryOptions(body, session) {
+  const sheet = getSheet(ASSET_CATEGORIES_SHEET, ['Category']);
+  let rows = sheetToObjects(sheet);
+  if (rows.length === 0) {
+    DEFAULT_ASSET_CATEGORIES.forEach(function (c) { appendRowByHeaders(sheet, { 'Category': c }); });
+    rows = sheetToObjects(sheet);
+  }
+  return { ok: true, categories: rows.map(function (r) { return r['Category']; }) };
+}
+
+function adminAddAssetCategory(body) {
+  const category = String(body.category || '').trim();
+  if (!category) return { ok: false, error: 'Category name is required.' };
+  const sheet = getSheet(ASSET_CATEGORIES_SHEET, ['Category']);
+  const rows = sheetToObjects(sheet);
+  if (rows.some(function (r) { return normalizeText(r['Category']) === normalizeText(category); })) {
+    return { ok: false, error: 'That category already exists.' };
+  }
+  appendRowByHeaders(sheet, { 'Category': category });
+  return { ok: true };
+}
+
+function adminRemoveAssetCategory(body) {
+  const category = String(body.category || '').trim();
+  const sheet = getSheet(ASSET_CATEGORIES_SHEET, ['Category']);
+  const rows = sheetToObjects(sheet);
+  const match = rows.find(function (r) { return r['Category'] === category; });
+  if (!match) return { ok: false, error: 'Category not found.' };
+  sheet.deleteRow(match._row);
+  return { ok: true };
+}
+
 // Parses pasted CSV/TSV/spreadsheet text: BuyerName, Phone, PhoneType,
-// City, State, Zip, Email -- comma or tab separated, one buyer per line.
-// Email is last and optional specifically so it never shifts the position
-// of the other columns whether or not a given source list has it -- a
-// 6-cell row (no email) and a 7-cell row (with email) both parse the same
-// first six fields identically. Skips a header row if the first cell of
-// the first line isn't a phone-looking value. PhoneType is normalized to
-// exactly 'Mobile' or 'Landline'; any other value is kept as typed so an
-// admin notices and fixes it rather than having it silently
-// miscategorized as one or the other.
+// City, State, Zip, Email, County -- comma or tab separated, one buyer per
+// line. Email and County are last and optional specifically so they never
+// shift the position of the other columns whether or not a given source
+// list has them -- a 6-cell row (neither), 7-cell row (email only), and
+// 8-cell row (both) all parse the same first six fields identically. Skips
+// a header row if the first cell of the first line isn't a phone-looking
+// value. PhoneType is normalized to exactly 'Mobile' or 'Landline'; any
+// other value is kept as typed so an admin notices and fixes it rather
+// than having it silently miscategorized as one or the other.
 function parseBuyerLeadRows(text) {
   const lines = String(text || '').split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
   if (lines.length === 0) return [];
@@ -1025,7 +1123,7 @@ function parseBuyerLeadRows(text) {
     const phoneType = rawType === 'mobile' ? 'Mobile' : rawType === 'landline' ? 'Landline' : (cells[2] || '');
     rows.push({
       buyerName: cells[0] || '', phone: cells[1] || '', phoneType: phoneType,
-      city: cells[3] || '', state: cells[4] || '', zip: cells[5] || '', email: cells[6] || ''
+      city: cells[3] || '', state: cells[4] || '', zip: cells[5] || '', email: cells[6] || '', county: cells[7] || ''
     });
   }
   return rows;
@@ -1051,8 +1149,8 @@ function adminImportBuyerLeads(body) {
     appendRowByHeaders(sheet, {
       'BuyerLeadID': Utilities.getUuid(), 'BuyerName': r.buyerName, 'Phone': r.phone, 'PhoneType': r.phoneType || '',
       'Phone2': r.phone2 || '', 'Phone2Type': r.phone2Type || '', 'Phone3': r.phone3 || '', 'Phone3Type': r.phone3Type || '',
-      'Email': r.email || '', 'City': r.city || '', 'State': r.state || '', 'Zip': r.zip || '',
-      'GeneralNotes': '', 'DriveLink': '', 'DoNotContact': false, 'CreatedAt': now
+      'Email': r.email || '', 'City': r.city || '', 'State': r.state || '', 'Zip': r.zip || '', 'County': r.county || '',
+      'AssetCategories': r.assetCategories || '', 'GeneralNotes': '', 'DriveLink': '', 'DoNotContact': false, 'CreatedAt': now
     });
     imported++;
   });
@@ -1091,9 +1189,13 @@ function adminGetBuyerLeads(body) {
   const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
   let leads = sheetToObjects(sheet);
   const f = body.filters || {};
-  if (f.city) leads = leads.filter(function (l) { return String(l['City'] || '').toLowerCase() === String(f.city).toLowerCase(); });
-  if (f.state) leads = leads.filter(function (l) { return String(l['State'] || '').toLowerCase() === String(f.state).toLowerCase(); });
+  if (f.city) leads = leads.filter(function (l) { return normalizeText(l['City']) === normalizeText(f.city); });
+  if (f.state) leads = leads.filter(function (l) { return normalizeText(l['State']) === normalizeText(f.state); });
   if (f.zip) leads = leads.filter(function (l) { return String(l['Zip'] || '') === String(f.zip); });
+  if (f.assetCategory) {
+    leads = leads.filter(function (l) { return splitCommaList(l['AssetCategories']).map(normalizeText).indexOf(normalizeText(f.assetCategory)) !== -1; });
+  }
+  if (f.doNotContact === false) leads = leads.filter(function (l) { return l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE'; });
 
   const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
   const allPitches = sheetToObjects(pitchesSheet);
@@ -1145,7 +1247,10 @@ function adminUpdateBuyerLeadProfile(body) {
   const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
   const match = sheetToObjects(sheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
   if (!match) return { ok: false, error: 'Lead not found.' };
-  const fields = { email: 'Email', driveLink: 'DriveLink', phone: 'Phone', phoneType: 'PhoneType', phone2: 'Phone2', phone2Type: 'Phone2Type', phone3: 'Phone3', phone3Type: 'Phone3Type' };
+  const fields = {
+    email: 'Email', driveLink: 'DriveLink', phone: 'Phone', phoneType: 'PhoneType', phone2: 'Phone2', phone2Type: 'Phone2Type',
+    phone3: 'Phone3', phone3Type: 'Phone3Type', county: 'County', assetCategories: 'AssetCategories'
+  };
   Object.keys(fields).forEach(function (key) {
     if (body[key] !== undefined) sheet.getRange(match._row, getColumnIndex(sheet, fields[key])).setValue(body[key] || '');
   });
@@ -1201,9 +1306,14 @@ function adminGiveBuyerLeadToRep(body) {
   return { ok: true, pitchId: pitchId };
 }
 
-// Gives a batch of buyer leads -- matched to the deal's own City/State/Zip
-// unless overridden -- to one rep for that one deal, skipping any buyer
-// lead that already has an open pitch for this deal (to anyone).
+// Gives a batch of buyer leads to one rep for one deal, skipping any buyer
+// lead that already has an open pitch for this deal (to anyone) or is
+// marked Do Not Contact. With no city/state/zip override typed in, matching
+// is auto: same State, City equal to the deal's own City or one of its
+// MatchCities, and AssetCategory compatible -- all case/whitespace-
+// insensitive (see buyerMatchesDeal). Typing an explicit city/state/zip
+// override switches to a plain exact-match filter on just those fields
+// instead, for deliberate manual control.
 function adminGiveBuyerLeadsBulk(body) {
   if (!body.dealId || !body.username || !body.count) return { ok: false, error: 'Missing dealId, username, or count.' };
   const username = String(body.username).trim().toLowerCase();
@@ -1212,9 +1322,7 @@ function adminGiveBuyerLeadsBulk(body) {
   const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === body.dealId; });
   if (!deal) return { ok: false, error: 'Deal not found.' };
 
-  const city = body.city || deal['City'];
-  const state = body.state || deal['State'];
-  const zip = body.zip || deal['Zip'];
+  const hasOverride = body.city || body.state || body.zip;
 
   const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
   const existingPitches = sheetToObjects(pitchesSheet);
@@ -1225,9 +1333,13 @@ function adminGiveBuyerLeadsBulk(body) {
   let pool = sheetToObjects(leadsSheet).filter(function (l) {
     return !alreadyPitchedForThisDeal[l['BuyerLeadID']] && l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE';
   });
-  if (city) pool = pool.filter(function (l) { return String(l['City'] || '').toLowerCase() === String(city).toLowerCase(); });
-  if (state) pool = pool.filter(function (l) { return String(l['State'] || '').toLowerCase() === String(state).toLowerCase(); });
-  if (zip) pool = pool.filter(function (l) { return String(l['Zip'] || '') === String(zip); });
+  if (hasOverride) {
+    if (body.city) pool = pool.filter(function (l) { return normalizeText(l['City']) === normalizeText(body.city); });
+    if (body.state) pool = pool.filter(function (l) { return normalizeText(l['State']) === normalizeText(body.state); });
+    if (body.zip) pool = pool.filter(function (l) { return String(l['Zip'] || '') === String(body.zip); });
+  } else {
+    pool = pool.filter(function (l) { return buyerMatchesDeal(l, deal); });
+  }
 
   const batch = pool.slice(0, Number(body.count));
   const now = new Date().toISOString();
@@ -1238,6 +1350,39 @@ function adminGiveBuyerLeadsBulk(body) {
     });
   });
   return { ok: true, givenCount: batch.length, remainingInPool: pool.length - batch.length };
+}
+
+// Gives a specific, admin-picked set of buyer leads (e.g. from a mass
+// selection filtered by asset category) to one rep for one deal. Silently
+// skips any that are Do Not Contact or already pitched for this deal,
+// rather than failing the whole batch over a few.
+function adminGiveSelectedBuyerLeads(body) {
+  if (!body.dealId || !body.username || !body.buyerLeadIds || body.buyerLeadIds.length === 0) {
+    return { ok: false, error: 'Missing dealId, username, or buyerLeadIds.' };
+  }
+  const username = String(body.username).trim().toLowerCase();
+  const wanted = {};
+  body.buyerLeadIds.forEach(function (id) { wanted[id] = true; });
+
+  const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+  const existingPitches = sheetToObjects(pitchesSheet);
+  const alreadyPitchedForThisDeal = {};
+  existingPitches.forEach(function (p) { if (p['DealID'] === body.dealId) alreadyPitchedForThisDeal[p['BuyerLeadID']] = true; });
+
+  const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const candidates = sheetToObjects(leadsSheet).filter(function (l) {
+    return wanted[l['BuyerLeadID']] && !alreadyPitchedForThisDeal[l['BuyerLeadID']] &&
+      l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE';
+  });
+
+  const now = new Date().toISOString();
+  candidates.forEach(function (l) {
+    appendRowByHeaders(pitchesSheet, {
+      'PitchID': Utilities.getUuid(), 'BuyerLeadID': l['BuyerLeadID'], 'DealID': body.dealId,
+      'Username': username, 'GivenAt': now
+    });
+  });
+  return { ok: true, givenCount: candidates.length, skipped: body.buyerLeadIds.length - candidates.length };
 }
 
 function adminReassignPitch(body) {
@@ -1333,8 +1478,8 @@ function adminRunAutoFeedNow(body) {
 }
 
 function repMatchesArea(rep, deal) {
-  if (rep['PreferredCity'] && String(rep['PreferredCity']).toLowerCase() !== String(deal['City'] || '').toLowerCase()) return false;
-  if (rep['PreferredState'] && String(rep['PreferredState']).toLowerCase() !== String(deal['State'] || '').toLowerCase()) return false;
+  if (rep['PreferredCity'] && normalizeText(rep['PreferredCity']) !== normalizeText(deal['City'])) return false;
+  if (rep['PreferredState'] && normalizeText(rep['PreferredState']) !== normalizeText(deal['State'])) return false;
   if (rep['PreferredZip'] && String(rep['PreferredZip']) !== String(deal['Zip'] || '')) return false;
   return true;
 }
@@ -1396,10 +1541,8 @@ function autoFeedCheck() {
       const alreadyPitchedForThisDeal = {};
       allPitches.forEach(function (p) { if (p['DealID'] === deal['DealID']) alreadyPitchedForThisDeal[p['BuyerLeadID']] = true; });
       let pool = sheetToObjects(leadsSheet).filter(function (l) {
-        return !alreadyPitchedForThisDeal[l['BuyerLeadID']] && l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE';
+        return !alreadyPitchedForThisDeal[l['BuyerLeadID']] && l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE' && buyerMatchesDeal(l, deal);
       });
-      if (deal['City']) pool = pool.filter(function (l) { return String(l['City'] || '').toLowerCase() === String(deal['City']).toLowerCase(); });
-      if (deal['State']) pool = pool.filter(function (l) { return String(l['State'] || '').toLowerCase() === String(deal['State']).toLowerCase(); });
       if (pool.length === 0) return;
 
       const batch = pool.slice(0, batchSize);

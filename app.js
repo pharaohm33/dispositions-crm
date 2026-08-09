@@ -572,7 +572,7 @@ function switchAdminTab(tab) {
   Array.from(document.querySelectorAll("#admin-view .tabs .tab-btn")).forEach(function (btn) {
     btn.classList.toggle("active", btn.getAttribute("data-tab") === tab);
   });
-  ["deals", "team", "fb", "buyers", "buyerleads", "statuses"].forEach(function (t) {
+  ["deals", "team", "fb", "buyers", "buyerleads", "statuses", "assetcategories"].forEach(function (t) {
     document.getElementById("tab-" + t).hidden = t !== tab;
   });
   if (tab === "team") loadReps();
@@ -580,10 +580,12 @@ function switchAdminTab(tab) {
   if (tab === "buyers") loadBuyerRequests();
   if (tab === "buyerleads") initBuyerLeadsAdminTab();
   if (tab === "statuses") loadStatusOptions();
+  if (tab === "assetcategories") loadAssetCategoryOptions();
 }
 
 async function initAdminView() {
   await loadStatusOptions();
+  await loadAssetCategoryOptions();
   await loadAdminDeals();
 }
 
@@ -631,6 +633,7 @@ function openDealModal() {
   document.getElementById("deal-state-input").value = "";
   document.getElementById("deal-zip-input").value = "";
   document.getElementById("deal-county-input").value = "";
+  document.getElementById("deal-matchcities-input").value = "";
   document.getElementById("deal-assettype-input").value = "";
   document.getElementById("deal-price-input").value = "";
   document.getElementById("deal-arv-input").value = "";
@@ -642,6 +645,9 @@ function openDealModal() {
   document.getElementById("deal-source-link-input").value = "";
   const statusSelect = document.getElementById("deal-status-input");
   statusSelect.innerHTML = statusOptionsCache.map(function (s) { return '<option value="' + esc(s) + '">' + esc(s) + '</option>'; }).join("");
+  const categorySelect = document.getElementById("deal-assetcategory-input");
+  categorySelect.innerHTML = '<option value="">&mdash; none &mdash;</option>' +
+    assetCategoryOptionsCache.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join("");
   document.getElementById("deal-modal-error").classList.remove("show");
   document.getElementById("deal-modal").hidden = false;
 }
@@ -666,6 +672,8 @@ document.getElementById("deal-modal-save").addEventListener("click", async funct
     state: document.getElementById("deal-state-input").value.trim(),
     zip: document.getElementById("deal-zip-input").value.trim(),
     county: document.getElementById("deal-county-input").value.trim(),
+    matchCities: document.getElementById("deal-matchcities-input").value.trim(),
+    assetCategory: document.getElementById("deal-assetcategory-input").value,
     assetType: document.getElementById("deal-assettype-input").value.trim(),
     price: document.getElementById("deal-price-input").value.trim(),
     arv: document.getElementById("deal-arv-input").value.trim(),
@@ -741,10 +749,15 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     '<div class="row3">' +
       '<div><label class="field-label">Deal Code <span class="small-muted">(shown to reps instead of the address)</span></label><input type="text" id="deal-code-edit" value="' + esc(deal.DealCode || "") + '" placeholder="e.g. A-1"></div>' +
       '<div><label class="field-label">County</label><input type="text" id="deal-county-edit" value="' + esc(deal.County || "") + '"></div>' +
-      '<div></div>' +
+      '<div><label class="field-label">Asset Category <span class="small-muted">(for buyer matching)</span></label><select id="deal-assetcategory-edit">' +
+        '<option value="">&mdash; none &mdash;</option>' +
+        assetCategoryOptionsCache.map(function (c) { return '<option value="' + esc(c) + '"' + (c === deal.AssetCategory ? " selected" : "") + '>' + esc(c) + '</option>'; }).join("") +
+      '</select></div>' +
     '</div>' +
+    '<label class="field-label">Also Match These Cities <span class="small-muted">(same state, comma separated, in addition to ' + esc(deal.City || "the city above") + ')</span></label>' +
+    '<input type="text" id="deal-matchcities-edit" value="' + esc(deal.MatchCities || "") + '" placeholder="e.g. Tempe, Mesa, Scottsdale">' +
     '<div class="nav-row" style="justify-content:flex-end;">' +
-      '<button class="btn secondary small" id="save-code-btn">Save Deal Code / County</button>' +
+      '<button class="btn secondary small" id="save-code-btn">Save Deal Code / County / Matching</button>' +
     '</div>' +
 
     '<div class="section-title">Financials</div>' +
@@ -834,7 +847,9 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
       dealId: deal.DealID,
       data: {
         DealCode: document.getElementById("deal-code-edit").value.trim(),
-        County: document.getElementById("deal-county-edit").value.trim()
+        County: document.getElementById("deal-county-edit").value.trim(),
+        AssetCategory: document.getElementById("deal-assetcategory-edit").value,
+        MatchCities: document.getElementById("deal-matchcities-edit").value.trim()
       }
     });
     await loadAdminDeals();
@@ -1185,15 +1200,19 @@ async function populateBulkGiveSelects() {
   const [repsRes, dealsRes] = await Promise.all([api("adminGetReps", {}), api("getDeals", {})]);
   if (repsRes.ok) {
     buyerLeadsActiveReps = repsRes.reps.filter(function (r) { return r.active && !r.isAdmin; });
-    document.getElementById("bulk-give-rep-select").innerHTML = buyerLeadsActiveReps.map(function (r) {
+    const repOptions = buyerLeadsActiveReps.map(function (r) {
       return '<option value="' + esc(r.username) + '">' + esc(r.name) + ' (' + esc(r.username) + ')</option>';
     }).join("");
+    document.getElementById("bulk-give-rep-select").innerHTML = repOptions;
+    document.getElementById("give-selected-rep-select").innerHTML = repOptions;
   }
   if (dealsRes.ok) {
     buyerLeadsActiveDeals = dealsRes.deals.filter(function (d) { return d.Status !== "Sold" && d.Status !== "Dead"; });
-    document.getElementById("bulk-give-deal-select").innerHTML = buyerLeadsActiveDeals.map(function (d) {
-      return '<option value="' + esc(d.DealID) + '">' + esc(d.Address) + '</option>';
+    const dealOptions = buyerLeadsActiveDeals.map(function (d) {
+      return '<option value="' + esc(d.DealID) + '">' + esc(d.DealCode ? d.DealCode + " — " + d.Address : d.Address) + '</option>';
     }).join("");
+    document.getElementById("bulk-give-deal-select").innerHTML = dealOptions;
+    document.getElementById("give-selected-deal-select").innerHTML = dealOptions;
   }
 }
 
@@ -1211,7 +1230,9 @@ const CSV_FIELD_OPTIONS = [
   { value: "city", label: "City" },
   { value: "state", label: "State" },
   { value: "zip", label: "Zip" },
-  { value: "email", label: "Email" }
+  { value: "county", label: "County" },
+  { value: "email", label: "Email" },
+  { value: "assetCategories", label: "Asset Categories (comma-separated)" }
 ];
 
 // Minimal RFC4180-ish CSV parser: handles quoted fields, commas and
@@ -1262,8 +1283,10 @@ function guessCsvField(header) {
   if (isPhoneRelated && isTypeRelated) return "phoneType";
   if (isPhoneRelated) return "phone";
   if (/zip|postal/.test(h)) return "zip";
+  if (/county/.test(h)) return "county";
   if (/^st$|state/.test(h)) return "state";
   if (/city|town/.test(h)) return "city";
+  if (/category|categories|asset\s*type|property\s*type/.test(h)) return "assetCategories";
   if (/name|buyer|llc|company|contact/.test(h)) return "buyerName";
   return "";
 }
@@ -1353,7 +1376,8 @@ function mappedCsvRows() {
         buyerName: get("buyerName"), phone: get("phone"), phoneType: normalizePhoneType(get("phoneType")),
         phone2: get("phone2"), phone2Type: normalizePhoneType(get("phone2Type")),
         phone3: get("phone3"), phone3Type: normalizePhoneType(get("phone3Type")),
-        city: get("city"), state: get("state"), zip: get("zip"), email: get("email")
+        city: get("city"), state: get("state"), zip: get("zip"), county: get("county"), email: get("email"),
+        assetCategories: get("assetCategories")
       };
     });
 }
@@ -1366,7 +1390,8 @@ function renderCsvPreview() {
       '<td>' + esc(r.buyerName) + '</td>' + '<td>' + esc(r.phone) + '</td>' + '<td>' + esc(r.phoneType) + '</td>' +
       '<td>' + esc(r.phone2) + (r.phone2 && r.phone2Type ? ' (' + esc(r.phone2Type) + ')' : '') + '</td>' +
       '<td>' + esc(r.phone3) + (r.phone3 && r.phone3Type ? ' (' + esc(r.phone3Type) + ')' : '') + '</td>' +
-      '<td>' + esc(r.city) + '</td>' + '<td>' + esc(r.state) + '</td>' + '<td>' + esc(r.zip) + '</td>' + '<td>' + esc(r.email) + '</td>' +
+      '<td>' + esc(r.city) + '</td>' + '<td>' + esc(r.state) + '</td>' + '<td>' + esc(r.zip) + '</td>' +
+      '<td>' + esc(r.county) + '</td>' + '<td>' + esc(r.email) + '</td>' + '<td>' + esc(r.assetCategories) + '</td>' +
       '</tr>';
   }).join("");
   const missingBuyerNameOrPhone = rows.filter(function (r) { return !r.buyerName || !r.phone; }).length;
@@ -1471,7 +1496,9 @@ document.getElementById("autofeed-run-btn").addEventListener("click", async func
   await loadBuyerLeadsAdmin();
 });
 
-document.getElementById("buyerleads-search").addEventListener("input", renderBuyerLeadsAdmin);
+document.getElementById("buyerleads-search").addEventListener("input", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
+document.getElementById("buyerleads-filter-category").addEventListener("change", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
+document.getElementById("buyerleads-filter-state").addEventListener("input", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
 
 async function loadBuyerLeadsAdmin() {
   const res = await api("adminGetBuyerLeads", {});
@@ -1480,24 +1507,51 @@ async function loadBuyerLeadsAdmin() {
   renderBuyerLeadsAdmin();
 }
 
-function renderBuyerLeadsAdmin() {
+const BUYER_LEADS_PAGE_SIZE = 50;
+let buyerLeadsCurrentPage = 1;
+let buyerLeadsSelectedIds = new Set();
+
+function getFilteredBuyerLeads() {
   const q = document.getElementById("buyerleads-search").value.trim().toLowerCase();
+  const category = document.getElementById("buyerleads-filter-category").value;
+  const state = document.getElementById("buyerleads-filter-state").value.trim().toLowerCase();
+  return adminBuyerLeads.filter(function (l) {
+    if (q && ![l.BuyerName, l.Phone, l.Email, l.City, l.State, l.Zip, l.County].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; })) return false;
+    if (category && (l.AssetCategories || "").split(",").map(function (c) { return c.trim().toLowerCase(); }).indexOf(category.toLowerCase()) === -1) return false;
+    if (state && String(l.State || "").trim().toLowerCase() !== state) return false;
+    return true;
+  });
+}
+
+function renderBuyerLeadsAdmin() {
   const tbody = document.getElementById("buyerleads-tbody");
   const empty = document.getElementById("buyerleads-admin-empty");
-  const filtered = adminBuyerLeads.filter(function (l) {
-    if (!q) return true;
-    return [l.BuyerName, l.Phone, l.Email, l.City, l.State, l.Zip].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; });
-  });
+  const filtered = getFilteredBuyerLeads();
   empty.hidden = filtered.length > 0;
-  tbody.innerHTML = filtered.map(function (l) {
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / BUYER_LEADS_PAGE_SIZE));
+  if (buyerLeadsCurrentPage > totalPages) buyerLeadsCurrentPage = totalPages;
+  const pageStart = (buyerLeadsCurrentPage - 1) * BUYER_LEADS_PAGE_SIZE;
+  const pageItems = filtered.slice(pageStart, pageStart + BUYER_LEADS_PAGE_SIZE);
+
+  document.getElementById("buyerleads-page-indicator").textContent =
+    filtered.length === 0 ? "No results" :
+    "Page " + buyerLeadsCurrentPage + " of " + totalPages + " (" + filtered.length + " total)";
+  document.getElementById("buyerleads-prev-page-btn").disabled = buyerLeadsCurrentPage <= 1;
+  document.getElementById("buyerleads-next-page-btn").disabled = buyerLeadsCurrentPage >= totalPages;
+
+  tbody.innerHTML = pageItems.map(function (l) {
     const notesPreview = l.GeneralNotes ? (l.GeneralNotes.length > 60 ? l.GeneralNotes.slice(0, 60) + "…" : l.GeneralNotes) : "";
     const isDnc = !!(l.DoNotContact === true || l.DoNotContact === "TRUE");
+    const checked = buyerLeadsSelectedIds.has(l.BuyerLeadID) ? " checked" : "";
     return '<tr>' +
+      '<td><input type="checkbox" class="buyerlead-select-checkbox" data-lead-id="' + esc(l.BuyerLeadID) + '"' + checked + (isDnc ? " disabled" : "") + '></td>' +
       '<td>' + esc(l.BuyerName) + (isDnc ? ' <span class="status-pill status-dead-match">DNC</span>' : "") + '</td>' +
       '<td>' + esc(l.Phone) + '</td>' +
       '<td>' + esc(l.Email || "") + '</td>' +
       '<td>' + esc(l.PhoneType || "") + '</td>' +
-      '<td>' + [l.City, l.State, l.Zip].filter(Boolean).join(", ") + '</td>' +
+      '<td>' + [l.City, l.State, l.Zip, l.County ? l.County + " County" : ""].filter(Boolean).join(", ") + '</td>' +
+      '<td class="small-muted">' + esc(l.AssetCategories || "") + '</td>' +
       '<td class="small-muted">' + esc(notesPreview) + '</td>' +
       '<td>' + (l.openPitches.length || "&mdash;") + '</td>' +
       '<td style="white-space:nowrap;"><button class="btn secondary small view-buyer-btn" data-lead-id="' + esc(l.BuyerLeadID) + '">View / Give</button></td>' +
@@ -1507,7 +1561,63 @@ function renderBuyerLeadsAdmin() {
   Array.from(tbody.querySelectorAll(".view-buyer-btn")).forEach(function (btn) {
     btn.addEventListener("click", function () { openAdminBuyerLeadDetail(btn.getAttribute("data-lead-id")); });
   });
+  Array.from(tbody.querySelectorAll(".buyerlead-select-checkbox")).forEach(function (cb) {
+    cb.addEventListener("change", function () {
+      const id = cb.getAttribute("data-lead-id");
+      if (cb.checked) buyerLeadsSelectedIds.add(id); else buyerLeadsSelectedIds.delete(id);
+      updateBuyerLeadsSelectionUI();
+    });
+  });
+  updateBuyerLeadsSelectionUI();
 }
+
+function updateBuyerLeadsSelectionUI() {
+  const count = buyerLeadsSelectedIds.size;
+  document.getElementById("buyerleads-selection-count").textContent = count + " selected";
+  document.getElementById("buyerleads-give-selected-row").hidden = count === 0;
+}
+
+document.getElementById("buyerleads-prev-page-btn").addEventListener("click", function () {
+  if (buyerLeadsCurrentPage > 1) { buyerLeadsCurrentPage--; renderBuyerLeadsAdmin(); }
+});
+document.getElementById("buyerleads-next-page-btn").addEventListener("click", function () {
+  buyerLeadsCurrentPage++; renderBuyerLeadsAdmin();
+});
+
+document.getElementById("buyerleads-select-page-btn").addEventListener("click", function () {
+  Array.from(document.querySelectorAll(".buyerlead-select-checkbox:not(:disabled)")).forEach(function (cb) {
+    buyerLeadsSelectedIds.add(cb.getAttribute("data-lead-id"));
+  });
+  renderBuyerLeadsAdmin();
+});
+
+document.getElementById("buyerleads-select-first-n-btn").addEventListener("click", function () {
+  const n = Number(document.getElementById("buyerleads-select-n").value) || 0;
+  const filtered = getFilteredBuyerLeads().filter(function (l) { return !(l.DoNotContact === true || l.DoNotContact === "TRUE"); });
+  buyerLeadsSelectedIds = new Set(filtered.slice(0, n).map(function (l) { return l.BuyerLeadID; }));
+  buyerLeadsCurrentPage = 1;
+  renderBuyerLeadsAdmin();
+});
+
+document.getElementById("buyerleads-clear-selection-btn").addEventListener("click", function () {
+  buyerLeadsSelectedIds = new Set();
+  renderBuyerLeadsAdmin();
+});
+
+document.getElementById("give-selected-btn").addEventListener("click", async function () {
+  const resultEl = document.getElementById("give-selected-result");
+  const dealId = document.getElementById("give-selected-deal-select").value;
+  const username = document.getElementById("give-selected-rep-select").value;
+  if (!dealId || !username || buyerLeadsSelectedIds.size === 0) {
+    resultEl.textContent = "Pick a deal, a team member, and at least one buyer.";
+    return;
+  }
+  const res = await api("adminGiveSelectedBuyerLeads", { dealId: dealId, username: username, buyerLeadIds: Array.from(buyerLeadsSelectedIds) });
+  if (!res.ok) { resultEl.textContent = res.error || "Could not give leads."; return; }
+  resultEl.textContent = "Gave " + res.givenCount + " lead(s)." + (res.skipped ? " Skipped " + res.skipped + " (Do Not Contact or already pitched for this deal)." : "");
+  buyerLeadsSelectedIds = new Set();
+  await loadBuyerLeadsAdmin();
+});
 
 async function openAdminBuyerLeadDetail(buyerLeadId) {
   const lead = adminBuyerLeads.find(function (l) { return l.BuyerLeadID === buyerLeadId; });
@@ -1550,10 +1660,22 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
       '<div><label class="field-label">Phone 3</label><input type="text" id="admin-buyer-phone3-input" value="' + esc(lead.Phone3 || "") + '"></div>' +
       '<div><label class="field-label">Type</label><select id="admin-buyer-phone3type-input"><option value="">&mdash;</option><option value="Mobile"' + (lead.Phone3Type === "Mobile" ? " selected" : "") + '>Mobile</option><option value="Landline"' + (lead.Phone3Type === "Landline" ? " selected" : "") + '>Landline</option></select></div>' +
     '</div>' +
-    '<label class="field-label">Email</label>' +
-    '<input type="text" id="admin-buyer-email-input" value="' + esc(lead.Email || "") + '" placeholder="buyer@example.com">' +
+    '<div class="row2">' +
+      '<div><label class="field-label">Email</label><input type="text" id="admin-buyer-email-input" value="' + esc(lead.Email || "") + '" placeholder="buyer@example.com"></div>' +
+      '<div><label class="field-label">County</label><input type="text" id="admin-buyer-county-input" value="' + esc(lead.County || "") + '"></div>' +
+    '</div>' +
     '<label class="field-label">Buyer Documents Drive Link <span class="small-muted">(proof of funds, signed agreements, etc.)</span></label>' +
     '<input type="text" id="admin-buyer-drivelink-input" value="' + esc(lead.DriveLink || "") + '" placeholder="https://drive.google.com/...">' +
+    '<label class="field-label">Asset Categories <span class="small-muted">(what this buyer wants — used for matching; leave all unchecked to match any deal)</span></label>' +
+    '<div class="chip-list">' +
+      (function () {
+        const leadCats = (lead.AssetCategories || "").split(",").map(function (c) { return c.trim().toLowerCase(); });
+        return assetCategoryOptionsCache.map(function (c) {
+          const checked = leadCats.indexOf(c.toLowerCase()) !== -1 ? " checked" : "";
+          return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="admin-buyer-category-checkbox" value="' + esc(c) + '"' + checked + '> ' + esc(c) + '</label>';
+        }).join("");
+      })() +
+    '</div>' +
     '<div class="nav-row" style="justify-content:flex-end;">' +
       '<button class="btn secondary" id="admin-buyer-profile-save-btn">Save Contact Info</button>' +
     '</div>' +
@@ -1569,7 +1691,7 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
     '<div class="section-title">Give For a New Deal</div>' +
     (givableDeals.length > 0
       ? '<div class="row2">' +
-          '<div><select id="give-new-deal-select">' + givableDeals.map(function (d) { return '<option value="' + esc(d.DealID) + '">' + esc(d.Address) + '</option>'; }).join("") + '</select></div>' +
+          '<div><select id="give-new-deal-select">' + givableDeals.map(function (d) { return '<option value="' + esc(d.DealID) + '">' + esc(d.DealCode ? d.DealCode + " — " + d.Address : d.Address) + '</option>'; }).join("") + '</select></div>' +
           '<div><select id="give-new-rep-select">' + buyerLeadsActiveReps.map(function (r) { return '<option value="' + esc(r.username) + '">' + esc(r.name) + '</option>'; }).join("") + '</select></div>' +
         '</div>' +
         '<div class="nav-row" style="justify-content:flex-end;"><button class="btn primary small" id="give-new-pitch-btn">Give This Buyer Lead To</button></div>'
@@ -1599,7 +1721,9 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
       phone3: document.getElementById("admin-buyer-phone3-input").value.trim(),
       phone3Type: document.getElementById("admin-buyer-phone3type-input").value,
       email: document.getElementById("admin-buyer-email-input").value.trim(),
-      driveLink: document.getElementById("admin-buyer-drivelink-input").value.trim()
+      driveLink: document.getElementById("admin-buyer-drivelink-input").value.trim(),
+      county: document.getElementById("admin-buyer-county-input").value.trim(),
+      assetCategories: Array.from(document.querySelectorAll(".admin-buyer-category-checkbox:checked")).map(function (cb) { return cb.value; }).join(", ")
     });
     await loadBuyerLeadsAdmin();
     openAdminBuyerLeadDetail(buyerLeadId);
@@ -1703,5 +1827,46 @@ document.getElementById("add-status-btn").addEventListener("click", async functi
   if (res.ok) {
     input.value = "";
     loadStatusOptions();
+  }
+});
+
+let assetCategoryOptionsCache = [];
+
+async function loadAssetCategoryOptions() {
+  const res = await api("getAssetCategoryOptions", {});
+  if (!res.ok) return;
+  assetCategoryOptionsCache = res.categories;
+  const list = document.getElementById("assetcategory-chip-list");
+  if (list) {
+    list.innerHTML = assetCategoryOptionsCache.map(function (c) {
+      return '<span class="chip">' + esc(c) + '<button data-category="' + esc(c) + '" class="remove-assetcategory-btn">&times;</button></span>';
+    }).join("");
+    Array.from(list.querySelectorAll(".remove-assetcategory-btn")).forEach(function (btn) {
+      btn.addEventListener("click", async function () {
+        await api("adminRemoveAssetCategory", { category: btn.getAttribute("data-category") });
+        loadAssetCategoryOptions();
+      });
+    });
+  }
+  const dealSelect = document.getElementById("deal-assetcategory-input");
+  if (dealSelect) {
+    dealSelect.innerHTML = '<option value="">&mdash; none &mdash;</option>' +
+      assetCategoryOptionsCache.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join("");
+  }
+  const filterSelect = document.getElementById("buyerleads-filter-category");
+  if (filterSelect) {
+    filterSelect.innerHTML = '<option value="">All Asset Categories</option>' +
+      assetCategoryOptionsCache.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join("");
+  }
+}
+
+document.getElementById("add-assetcategory-btn").addEventListener("click", async function () {
+  const input = document.getElementById("new-assetcategory-input");
+  const category = input.value.trim();
+  if (!category) return;
+  const res = await api("adminAddAssetCategory", { category: category });
+  if (res.ok) {
+    input.value = "";
+    loadAssetCategoryOptions();
   }
 });

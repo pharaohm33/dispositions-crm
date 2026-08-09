@@ -109,7 +109,10 @@ to the `Reps` sheet tab yourself, once, directly in Google Sheets:
 - **Deals** — one row per property. `Status` is free text but the admin panel
   only offers whatever's currently listed in `StatusOptions`. `DealCode` (a
   short label like "A-1" you assign) plus City/State/Zip/County/Price is
-  everything a rep sees to identify a deal by default. `ARV` and
+  everything a rep sees to identify a deal by default. `AssetCategory` (one
+  of `AssetCategories`' list) and `MatchCities` (comma-separated extra city
+  names in the same State) exist purely to drive buyer↔deal auto-matching —
+  see `buyerMatchesDeal` below. `ARV` and
   `RehabEstimate` are visible to reps too (they use these to pitch buyers);
   `GrossMargin` (ARV − RehabEstimate − Price) is never stored — it's computed
   fresh on every read from those three fields, so it can't go stale, and
@@ -145,6 +148,14 @@ to the `Reps` sheet tab yourself, once, directly in Google Sheets:
 - **StatusOptions** — the list of deal-status categories offered in dropdowns
   (Active, Under Contract, Sold, Dead, On Hold by default). Editable from the
   **Status Categories** admin tab.
+- **AssetCategories** — the list of buyer-preference/deal categories used for
+  matching (Single Family, Multifamily (1-4 Units), Multifamily (5+ Units),
+  Fix and Flip, Residential Vacant Land, Commercial by default). Editable
+  from the **Asset Categories** admin tab. A buyer lead's `AssetCategories`
+  is a comma-separated list of these (a buyer can want more than one); a
+  deal's `AssetCategory` is a single value. A buyer with none set is treated
+  as open to any category, so leads imported before this field existed
+  aren't silently excluded from matching.
 - **BuyerLeads** — the master buyer/LLC calling list, imported by pasting
   CSV/spreadsheet text into the **Buyer Leads** admin tab (Name, Phone, Phone
   Type, City, State, Zip, and optionally Email — Email must come last in the
@@ -166,7 +177,27 @@ to the `Reps` sheet tab yourself, once, directly in Google Sheets:
   phone when the buyer asks to stop being contacted), no new call/text can
   be logged against that buyer on any number, and they can no longer be
   given a new pitch for any deal, though existing pitch history is kept, not
-  deleted.
+  deleted. `County` is imported only when your source data actually has it
+  — never required.
+
+  **Buyer↔deal matching** (`buyerMatchesDeal`, used by the bulk "Give Buyer
+  Leads for a Deal" button when you leave city/state/zip blank, and by
+  Auto-Feed): matches on State (exact), City (the deal's own City *or* any
+  of its `MatchCities`), and AssetCategory — all case/whitespace-insensitive,
+  so "Phoenix", " phoenix ", and "PHOENIX" are treated identically. Any
+  dimension the deal hasn't set isn't filtered on. There's no true
+  "within 50 miles" radius search — that needs a paid geocoding API — so
+  `MatchCities` (comma-separated extra cities in the same state) is the
+  practical stand-in: list every city you consider "close enough" for a
+  given deal. Typing an explicit city/state/zip into the bulk-give form's
+  override fields switches to a plain exact-match filter on just those,
+  instead of the auto-match logic.
+- **Mass-selecting buyer leads by category**: the admin **Buyer Leads** tab
+  filters by Asset Category and State, lets you select everyone on the
+  current page or the first N matching your filter (e.g. 50), and give that
+  whole selection to one rep for one deal in one action
+  (`adminGiveSelectedBuyerLeads`). The table itself paginates at 50 rows so
+  a list of 100+ buyers never renders all at once.
 - **Pitches** — "give this buyer lead to this rep, for this one specific
   deal." This is the only thing that puts a buyer in a rep's queue or blocks
   Auto-Feed — a buyer lead with no open pitch just sits in the pool,

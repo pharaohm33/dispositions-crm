@@ -64,7 +64,9 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
 - **Deals** — add deals, change a deal's status (Active, Sold, Dead, Under
   Contract, On Hold, or whatever categories you've defined), manage exactly
   which reps can see each deal, assign it a **Deal Code** and **County**
-  (what reps actually see instead of the address), and set two Google Drive
+  (what reps actually see instead of the address), an **Asset Category** and
+  any extra **cities to also match** in the same state (for buyer-matching —
+  see Buyer Leads below), and set two Google Drive
   links: a **General Drive Link** (visible to your team — photos, comps,
   marketing) and a **Sensitive Drive Link** (admin-only — contracts,
   financials, seller personal info). **Address Access** on each deal lets
@@ -85,15 +87,23 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   logged) to close the deal yourself, keeping the rep who brought the buyer
   updated as it moves.
 - **Buyer Leads** — upload a CSV file in any column order and it guesses
-  which column is which (Name, Phone, Phone Type, City, State, Zip, Email)
-  from your headers, shows you a preview and the guessed mapping so you can
-  fix anything it got wrong, then imports — or just paste rows directly if
-  that's easier for a short list. Each buyer's profile
-  also holds an editable Email and a Drive Link for their own documents
-  (proof of funds, signed agreements) — visible to any rep who's been given
-  that buyer, editable by admin only. Give one to a rep individually, or give a
-  whole batch at once for one specific deal (matched to that deal's own
-  city/state/zip automatically) — every "give" pairs one buyer with one deal,
+  which column is which (Name, Phone × 3, Phone Type × 3, City, State, Zip,
+  County, Email, Asset Categories) from your headers, shows you a preview and
+  the guessed mapping so you can fix anything it got wrong, then imports — or
+  just paste rows directly if that's easier for a short list. Each buyer's
+  profile also holds an editable Email, County, up to three phone numbers,
+  Asset Categories (what they're looking for — Single Family, Fix and Flip,
+  etc.), and a Drive Link for their own documents (proof of funds, signed
+  agreements) — visible to any rep who's been given that buyer, editable by
+  admin only. The table filters by Asset Category and State, lets you select
+  everyone on the page or the first N matching your filter (e.g. "give me 50
+  Single Family buyers"), and give that whole selection to one rep for one
+  deal at once — and paginates at 50 rows so a list of 100+ never loads all
+  at once. Give a buyer to a rep individually, or give a whole batch at once
+  for one specific deal — matched automatically by State, by the deal's City
+  or any of its additional "match cities" in the same state (so "Phoenix" and
+  " phoenix " are treated the same, and you're not limited to one exact
+  city), and by Asset Category — every "give" pairs one buyer with one deal,
   so nobody's queue ever fills up with buyers there's nothing active to sell
   them. Set a rep's preferred working area on the Team tab, and turn on
   **Auto-Feed** to automatically give more matching buyer leads, per deal, to
@@ -104,6 +114,8 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   closes.
 - **Status Categories** — add or remove the status options offered in the
   Deals dropdowns.
+- **Asset Categories** — add or remove the property-type categories buyers
+  and deals are matched by (Single Family, Multifamily, Fix and Flip, etc.).
 
 ## Files
 
