@@ -265,6 +265,7 @@
     <button class="tab-btn" data-tab="fb">Facebook Approvals</button>
     <button class="tab-btn" data-tab="buyers">Buyer Matches</button>
     <button class="tab-btn" data-tab="buyerleads">Buyer Leads</button>
+    <button class="tab-btn" data-tab="pitches">Pitches</button>
     <button class="tab-btn" data-tab="statuses">Status Categories</button>
     <button class="tab-btn" data-tab="assetcategories">Asset Categories</button>
   </div>
@@ -448,6 +449,33 @@
       <span class="small-muted" id="buyerleads-page-indicator"></span>
       <button class="btn secondary small" id="buyerleads-next-page-btn">Next &rarr;</button>
     </div>
+  </div>
+
+  <!-- Pitches tab: every open pitch across the whole team, in one place,
+       so a rep's leads can be found and pulled back without digging into
+       each buyer's detail panel individually. -->
+  <div id="tab-pitches" hidden>
+    <div class="card">
+      <div class="section-title" style="margin-top:0;">Filter</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <input type="text" id="pitches-search" placeholder="Search by buyer name, phone, or deal code/address..." style="flex:1; min-width:240px;">
+        <select id="pitches-filter-rep" style="flex:0 0 auto; min-width:180px;"><option value="">All Team Members</option></select>
+        <select id="pitches-filter-deal" style="flex:0 0 auto; min-width:180px;"><option value="">All Deals</option></select>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:12px;">
+        <button class="btn secondary small" id="pitches-select-all-btn">Select All (Filtered)</button>
+        <button class="btn secondary small" id="pitches-clear-selection-btn">Clear Selection</button>
+        <span class="small-muted" id="pitches-selection-count">0 selected</span>
+        <button class="btn danger small" id="pitches-withdraw-selected-btn">Withdraw Selected</button>
+      </div>
+      <div id="pitches-bulk-result" class="small-muted"></div>
+    </div>
+
+    <table class="crm-table">
+      <thead><tr><th></th><th>Buyer</th><th>Phone</th><th>Deal</th><th>Given To</th><th>Status</th><th>Given At</th><th>Actions</th></tr></thead>
+      <tbody id="pitches-tbody"></tbody>
+    </table>
+    <div id="pitches-empty" class="small-muted" style="padding:20px;" hidden>No pitches given yet.</div>
   </div>
 
   <!-- Status categories tab -->

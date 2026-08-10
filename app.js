@@ -614,13 +614,14 @@ function switchAdminTab(tab) {
   Array.from(document.querySelectorAll("#admin-view .tabs .tab-btn")).forEach(function (btn) {
     btn.classList.toggle("active", btn.getAttribute("data-tab") === tab);
   });
-  ["deals", "team", "fb", "buyers", "buyerleads", "statuses", "assetcategories"].forEach(function (t) {
+  ["deals", "team", "fb", "buyers", "buyerleads", "pitches", "statuses", "assetcategories"].forEach(function (t) {
     document.getElementById("tab-" + t).hidden = t !== tab;
   });
   if (tab === "team") loadReps();
   if (tab === "fb") loadFbRequests();
   if (tab === "buyers") loadBuyerRequests();
   if (tab === "buyerleads") initBuyerLeadsAdminTab();
+  if (tab === "pitches") initAdminPitchesTab();
   if (tab === "statuses") loadStatusOptions();
   if (tab === "assetcategories") loadAssetCategoryOptions();
 }
@@ -1514,17 +1515,21 @@ document.getElementById("buyerleads-import-btn").addEventListener("click", async
 });
 
 document.getElementById("bulk-give-btn").addEventListener("click", async function () {
+  const btn = this;
   const resultEl = document.getElementById("bulk-give-result");
   const dealId = document.getElementById("bulk-give-deal-select").value;
   const username = document.getElementById("bulk-give-rep-select").value;
   const count = document.getElementById("bulk-give-count").value;
   if (!dealId || !username || !count) { resultEl.textContent = "Pick a deal, a team member, and a count."; return; }
+  if (btn.disabled) return;
+  btn.disabled = true;
   const res = await api("adminGiveBuyerLeadsBulk", {
     dealId: dealId, username: username, count: count,
     city: document.getElementById("bulk-give-city").value.trim(),
     state: document.getElementById("bulk-give-state").value.trim(),
     zip: document.getElementById("bulk-give-zip").value.trim()
   });
+  btn.disabled = false;
   if (!res.ok) { resultEl.textContent = res.error || "Could not give leads."; return; }
   resultEl.textContent = "Gave " + res.givenCount + " lead(s) for this deal. " + res.remainingInPool + " still unpitched for it matching that filter.";
   await loadBuyerLeadsAdmin();
@@ -1669,6 +1674,7 @@ document.getElementById("buyerleads-clear-selection-btn").addEventListener("clic
 });
 
 document.getElementById("give-selected-btn").addEventListener("click", async function () {
+  const btn = this;
   const resultEl = document.getElementById("give-selected-result");
   const dealId = document.getElementById("give-selected-deal-select").value;
   const username = document.getElementById("give-selected-rep-select").value;
@@ -1676,7 +1682,10 @@ document.getElementById("give-selected-btn").addEventListener("click", async fun
     resultEl.textContent = "Pick a deal, a team member, and at least one buyer.";
     return;
   }
+  if (btn.disabled) return;
+  btn.disabled = true;
   const res = await api("adminGiveSelectedBuyerLeads", { dealId: dealId, username: username, buyerLeadIds: Array.from(buyerLeadsSelectedIds) });
+  btn.disabled = false;
   if (!res.ok) { resultEl.textContent = res.error || "Could not give leads."; return; }
   resultEl.textContent = "Gave " + res.givenCount + " lead(s)." + (res.skipped ? " Skipped " + res.skipped + " (Do Not Contact or already pitched for this deal)." : "");
   buyerLeadsSelectedIds = new Set();
@@ -1855,10 +1864,19 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
   const giveBtn = document.getElementById("give-new-pitch-btn");
   if (giveBtn) {
     giveBtn.addEventListener("click", async function () {
+      if (giveBtn.disabled) return;
+      giveBtn.disabled = true;
+      giveBtn.textContent = "Giving…";
       const dealId = document.getElementById("give-new-deal-select").value;
       const username = document.getElementById("give-new-rep-select").value;
       const res = await api("adminGiveBuyerLeadToRep", { buyerLeadId: buyerLeadId, dealId: dealId, username: username });
-      if (res.ok) openAdminBuyerLeadDetail(buyerLeadId);
+      if (!res.ok) {
+        giveBtn.disabled = false;
+        giveBtn.textContent = "Give This Buyer Lead To";
+        alert(res.error || "Could not give this buyer lead.");
+        return;
+      }
+      openAdminBuyerLeadDetail(buyerLeadId);
     });
   }
 
@@ -1916,6 +1934,140 @@ function wireAdminPitchActions(buyerLeadId) {
     });
   });
 }
+
+/* ---------- Pitches tab (whole-team view; find & pull back any rep's
+   leads without hunting through each buyer's detail panel first) ---------- */
+
+let adminAllPitches = [];
+let adminPitchesSelectedIds = new Set();
+let pitchesFilterRepsCache = [];
+let pitchesFilterDealsCache = [];
+
+async function initAdminPitchesTab() {
+  const [repsRes, dealsRes] = await Promise.all([api("adminGetReps", {}), api("getDeals", {})]);
+  if (repsRes.ok) pitchesFilterRepsCache = repsRes.reps.filter(function (r) { return !r.isAdmin; });
+  if (dealsRes.ok) pitchesFilterDealsCache = dealsRes.deals;
+
+  document.getElementById("pitches-filter-rep").innerHTML = '<option value="">All Team Members</option>' +
+    pitchesFilterRepsCache.map(function (r) { return '<option value="' + esc(r.username) + '">' + esc(r.name) + '</option>'; }).join("");
+  document.getElementById("pitches-filter-deal").innerHTML = '<option value="">All Deals</option>' +
+    pitchesFilterDealsCache.map(function (d) { return '<option value="' + esc(d.DealID) + '">' + esc(d.DealCode ? d.DealCode + " — " + d.Address : d.Address) + '</option>'; }).join("");
+
+  await loadAdminPitches();
+}
+
+async function loadAdminPitches() {
+  const res = await api("adminGetAllPitches", {});
+  if (!res.ok) return;
+  adminAllPitches = res.pitches;
+  renderAdminPitchesTable();
+}
+
+function getFilteredAdminPitches() {
+  const q = document.getElementById("pitches-search").value.trim().toLowerCase();
+  const rep = document.getElementById("pitches-filter-rep").value;
+  const dealId = document.getElementById("pitches-filter-deal").value;
+  return adminAllPitches.filter(function (p) {
+    if (rep && p.Username !== rep) return false;
+    if (dealId && p.DealID !== dealId) return false;
+    if (q && ![p.buyerName, p.buyerPhone, p.dealCode, p.dealAddress].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; })) return false;
+    return true;
+  });
+}
+
+function repNameFor(username) {
+  const rep = pitchesFilterRepsCache.find(function (r) { return r.username === username; });
+  return rep ? rep.name : username;
+}
+
+function renderAdminPitchesTable() {
+  const tbody = document.getElementById("pitches-tbody");
+  const empty = document.getElementById("pitches-empty");
+  const filtered = getFilteredAdminPitches();
+  empty.hidden = filtered.length > 0;
+
+  tbody.innerHTML = filtered.slice().reverse().map(function (p) {
+    const checked = adminPitchesSelectedIds.has(p.PitchID) ? " checked" : "";
+    return '<tr>' +
+      '<td><input type="checkbox" class="pitch-select-checkbox" data-pitch-id="' + esc(p.PitchID) + '"' + checked + '></td>' +
+      '<td>' + esc(p.buyerName) + '</td>' +
+      '<td>' + esc(p.buyerPhone || "") + '</td>' +
+      '<td>' + (p.dealCode ? esc(p.dealCode) + " — " : "") + esc(p.dealAddress) + '</td>' +
+      '<td>' + esc(repNameFor(p.Username)) + '</td>' +
+      '<td>' + (p.dealStillActive
+        ? '<span class="status-pill ' + statusClass(p.status) + '">' + esc(p.status) + '</span>'
+        : '<span class="status-pill status-fully-worked">Deal ' + esc((p.dealStatus || "closed").toLowerCase()) + '</span>') + '</td>' +
+      '<td class="small-muted">' + formatDate(p.GivenAt) + '</td>' +
+      '<td style="white-space:nowrap;">' +
+        '<select class="pitch-row-reassign-select" data-pitch-id="' + esc(p.PitchID) + '">' +
+          pitchesFilterRepsCache.map(function (r) { return '<option value="' + esc(r.username) + '"' + (r.username === p.Username ? " selected" : "") + '>' + esc(r.name) + '</option>'; }).join("") +
+        '</select> ' +
+        '<button class="btn secondary small pitch-row-reassign-btn" data-pitch-id="' + esc(p.PitchID) + '">Give to</button> ' +
+        '<button class="btn danger small pitch-row-withdraw-btn" data-pitch-id="' + esc(p.PitchID) + '">Withdraw</button>' +
+      '</td>' +
+      '</tr>';
+  }).join("");
+
+  Array.from(tbody.querySelectorAll(".pitch-select-checkbox")).forEach(function (cb) {
+    cb.addEventListener("change", function () {
+      const id = cb.getAttribute("data-pitch-id");
+      if (cb.checked) adminPitchesSelectedIds.add(id); else adminPitchesSelectedIds.delete(id);
+      updatePitchesSelectionUI();
+    });
+  });
+  Array.from(tbody.querySelectorAll(".pitch-row-reassign-btn")).forEach(function (btn) {
+    btn.addEventListener("click", async function () {
+      const pitchId = btn.getAttribute("data-pitch-id");
+      const select = tbody.querySelector('.pitch-row-reassign-select[data-pitch-id="' + pitchId + '"]');
+      btn.disabled = true;
+      const res = await api("adminReassignPitch", { pitchId: pitchId, username: select.value });
+      if (!res.ok) { btn.disabled = false; alert(res.error || "Could not reassign this pitch."); return; }
+      await loadAdminPitches();
+    });
+  });
+  Array.from(tbody.querySelectorAll(".pitch-row-withdraw-btn")).forEach(function (btn) {
+    btn.addEventListener("click", async function () {
+      const pitchId = btn.getAttribute("data-pitch-id");
+      btn.disabled = true;
+      const res = await api("adminWithdrawPitch", { pitchId: pitchId });
+      if (!res.ok) { btn.disabled = false; alert(res.error || "Could not withdraw this pitch."); return; }
+      adminPitchesSelectedIds.delete(pitchId);
+      await loadAdminPitches();
+    });
+  });
+
+  updatePitchesSelectionUI();
+}
+
+function updatePitchesSelectionUI() {
+  document.getElementById("pitches-selection-count").textContent = adminPitchesSelectedIds.size + " selected";
+}
+
+document.getElementById("pitches-search").addEventListener("input", renderAdminPitchesTable);
+document.getElementById("pitches-filter-rep").addEventListener("change", renderAdminPitchesTable);
+document.getElementById("pitches-filter-deal").addEventListener("change", renderAdminPitchesTable);
+
+document.getElementById("pitches-select-all-btn").addEventListener("click", function () {
+  getFilteredAdminPitches().forEach(function (p) { adminPitchesSelectedIds.add(p.PitchID); });
+  renderAdminPitchesTable();
+});
+document.getElementById("pitches-clear-selection-btn").addEventListener("click", function () {
+  adminPitchesSelectedIds = new Set();
+  renderAdminPitchesTable();
+});
+
+document.getElementById("pitches-withdraw-selected-btn").addEventListener("click", async function () {
+  const resultEl = document.getElementById("pitches-bulk-result");
+  if (adminPitchesSelectedIds.size === 0) { resultEl.textContent = "No pitches selected."; return; }
+  const btn = this;
+  btn.disabled = true;
+  const res = await api("adminBulkWithdrawPitches", { pitchIds: Array.from(adminPitchesSelectedIds) });
+  btn.disabled = false;
+  if (!res.ok) { resultEl.textContent = res.error || "Could not withdraw."; return; }
+  resultEl.textContent = "Withdrew " + res.withdrawnCount + " pitch(es).";
+  adminPitchesSelectedIds = new Set();
+  await loadAdminPitches();
+});
 
 /* ---------- Status categories tab ---------- */
 

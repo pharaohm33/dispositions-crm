@@ -131,6 +131,20 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   applies only those to every selected lead at once, leaving everything else
   untouched. Handy for "I never set Asset Type on these 50 imports and don't
   want to open the spreadsheet."
+- **Pitches** — every open pitch across the whole team in one table, instead
+  of having to open each buyer's detail panel one at a time. Search by buyer
+  or deal, filter by team member or deal, and reassign or **Withdraw** any
+  pitch right from the row — or select several (even across different reps
+  and deals) and **Withdraw Selected** to pull back a batch at once, e.g.
+  everything a rep has on a deal that just went dead so they're free to pick
+  up something new. Withdrawing only removes the pitch itself; that buyer's
+  full contact history stays intact. Giving a buyer a pitch is now
+  concurrency-safe on the backend (two near-simultaneous requests — a
+  double-click, or a manual give landing at the same moment as auto-feed —
+  can no longer both succeed and create a duplicate), and the single "Give"
+  button on a buyer's own detail panel now shows an error if it can't give
+  (previously it failed silently, which was easy to mistake for nothing
+  happening and re-click into a duplicate).
 - **Status Categories** — add or remove the status options offered in the
   Deals dropdowns.
 - **Asset Categories** — add or remove the property-type categories buyers

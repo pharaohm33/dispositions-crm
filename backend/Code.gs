@@ -270,6 +270,10 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminGetPitchesForBuyerLead));
       case 'adminGetPitchContacts':
         return jsonOut(withAdminSession(body, adminGetPitchContacts));
+      case 'adminGetAllPitches':
+        return jsonOut(withAdminSession(body, adminGetAllPitches));
+      case 'adminBulkWithdrawPitches':
+        return jsonOut(withAdminSession(body, adminBulkWithdrawPitches));
       case 'adminSetRepPreferredArea':
         return jsonOut(withAdminSession(body, adminSetRepPreferredArea));
       case 'adminGetAutoFeedSettings':
@@ -409,6 +413,23 @@ function withSession(body, fn) {
   const session = parseSessionToken(body.token);
   if (!session) return { ok: false, error: 'Session expired or invalid. Please log in again.' };
   return fn(body, session);
+}
+
+// Serializes read-check-then-write operations (like "give this buyer a
+// pitch if they don't already have one for this deal") across concurrent
+// Web App executions. Without this, two near-simultaneous requests (a
+// double-click, or a manual Give firing at the same moment auto-feed runs)
+// can both read "no existing pitch" before either has written its row,
+// producing duplicate Pitches for the same buyer+deal. 10s wait is well
+// above how long a single give operation actually takes.
+function withLock(fn) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    return fn();
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 function withAdminSession(body, fn) {
@@ -1352,22 +1373,24 @@ function updateBuyerLeadDoNotContact(body, session) {
 // whole model exists to prevent.
 function adminGiveBuyerLeadToRep(body) {
   if (!body.buyerLeadId || !body.dealId || !body.username) return { ok: false, error: 'Missing buyerLeadId, dealId, or username.' };
-  const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
-  const lead = sheetToObjects(leadsSheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
-  if (lead && (lead['DoNotContact'] === true || lead['DoNotContact'] === 'TRUE')) {
-    return { ok: false, error: 'This buyer is marked Do Not Contact and cannot be given a new pitch.' };
-  }
-  const sheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
-  const existing = sheetToObjects(sheet);
-  const clash = existing.find(function (p) { return p['BuyerLeadID'] === body.buyerLeadId && p['DealID'] === body.dealId; });
-  if (clash) return { ok: false, error: 'This buyer already has an open pitch for this deal (given to ' + clash['Username'] + ').' };
+  return withLock(function () {
+    const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+    const lead = sheetToObjects(leadsSheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
+    if (lead && (lead['DoNotContact'] === true || lead['DoNotContact'] === 'TRUE')) {
+      return { ok: false, error: 'This buyer is marked Do Not Contact and cannot be given a new pitch.' };
+    }
+    const sheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+    const existing = sheetToObjects(sheet);
+    const clash = existing.find(function (p) { return p['BuyerLeadID'] === body.buyerLeadId && p['DealID'] === body.dealId; });
+    if (clash) return { ok: false, error: 'This buyer already has an open pitch for this deal (given to ' + clash['Username'] + ').' };
 
-  const pitchId = Utilities.getUuid();
-  appendRowByHeaders(sheet, {
-    'PitchID': pitchId, 'BuyerLeadID': body.buyerLeadId, 'DealID': body.dealId,
-    'Username': String(body.username).trim().toLowerCase(), 'GivenAt': new Date().toISOString()
+    const pitchId = Utilities.getUuid();
+    appendRowByHeaders(sheet, {
+      'PitchID': pitchId, 'BuyerLeadID': body.buyerLeadId, 'DealID': body.dealId,
+      'Username': String(body.username).trim().toLowerCase(), 'GivenAt': new Date().toISOString()
+    });
+    return { ok: true, pitchId: pitchId };
   });
-  return { ok: true, pitchId: pitchId };
 }
 
 // Gives a batch of buyer leads to one rep for one deal, skipping any buyer
@@ -1382,38 +1405,40 @@ function adminGiveBuyerLeadsBulk(body) {
   if (!body.dealId || !body.username || !body.count) return { ok: false, error: 'Missing dealId, username, or count.' };
   const username = String(body.username).trim().toLowerCase();
 
-  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
-  const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === body.dealId; });
-  if (!deal) return { ok: false, error: 'Deal not found.' };
+  return withLock(function () {
+    const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+    const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === body.dealId; });
+    if (!deal) return { ok: false, error: 'Deal not found.' };
 
-  const hasOverride = body.city || body.state || body.zip;
+    const hasOverride = body.city || body.state || body.zip;
 
-  const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
-  const existingPitches = sheetToObjects(pitchesSheet);
-  const alreadyPitchedForThisDeal = {};
-  existingPitches.forEach(function (p) { if (p['DealID'] === body.dealId) alreadyPitchedForThisDeal[p['BuyerLeadID']] = true; });
+    const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+    const existingPitches = sheetToObjects(pitchesSheet);
+    const alreadyPitchedForThisDeal = {};
+    existingPitches.forEach(function (p) { if (p['DealID'] === body.dealId) alreadyPitchedForThisDeal[p['BuyerLeadID']] = true; });
 
-  const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
-  let pool = sheetToObjects(leadsSheet).filter(function (l) {
-    return !alreadyPitchedForThisDeal[l['BuyerLeadID']] && l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE';
-  });
-  if (hasOverride) {
-    if (body.city) pool = pool.filter(function (l) { return normalizeText(l['City']) === normalizeText(body.city); });
-    if (body.state) pool = pool.filter(function (l) { return normalizeText(l['State']) === normalizeText(body.state); });
-    if (body.zip) pool = pool.filter(function (l) { return String(l['Zip'] || '') === String(body.zip); });
-  } else {
-    pool = pool.filter(function (l) { return buyerMatchesDeal(l, deal); });
-  }
-
-  const batch = pool.slice(0, Number(body.count));
-  const now = new Date().toISOString();
-  batch.forEach(function (l) {
-    appendRowByHeaders(pitchesSheet, {
-      'PitchID': Utilities.getUuid(), 'BuyerLeadID': l['BuyerLeadID'], 'DealID': body.dealId,
-      'Username': username, 'GivenAt': now
+    const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+    let pool = sheetToObjects(leadsSheet).filter(function (l) {
+      return !alreadyPitchedForThisDeal[l['BuyerLeadID']] && l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE';
     });
+    if (hasOverride) {
+      if (body.city) pool = pool.filter(function (l) { return normalizeText(l['City']) === normalizeText(body.city); });
+      if (body.state) pool = pool.filter(function (l) { return normalizeText(l['State']) === normalizeText(body.state); });
+      if (body.zip) pool = pool.filter(function (l) { return String(l['Zip'] || '') === String(body.zip); });
+    } else {
+      pool = pool.filter(function (l) { return buyerMatchesDeal(l, deal); });
+    }
+
+    const batch = pool.slice(0, Number(body.count));
+    const now = new Date().toISOString();
+    batch.forEach(function (l) {
+      appendRowByHeaders(pitchesSheet, {
+        'PitchID': Utilities.getUuid(), 'BuyerLeadID': l['BuyerLeadID'], 'DealID': body.dealId,
+        'Username': username, 'GivenAt': now
+      });
+    });
+    return { ok: true, givenCount: batch.length, remainingInPool: pool.length - batch.length };
   });
-  return { ok: true, givenCount: batch.length, remainingInPool: pool.length - batch.length };
 }
 
 // Gives a specific, admin-picked set of buyer leads (e.g. from a mass
@@ -1428,25 +1453,27 @@ function adminGiveSelectedBuyerLeads(body) {
   const wanted = {};
   body.buyerLeadIds.forEach(function (id) { wanted[id] = true; });
 
-  const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
-  const existingPitches = sheetToObjects(pitchesSheet);
-  const alreadyPitchedForThisDeal = {};
-  existingPitches.forEach(function (p) { if (p['DealID'] === body.dealId) alreadyPitchedForThisDeal[p['BuyerLeadID']] = true; });
+  return withLock(function () {
+    const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+    const existingPitches = sheetToObjects(pitchesSheet);
+    const alreadyPitchedForThisDeal = {};
+    existingPitches.forEach(function (p) { if (p['DealID'] === body.dealId) alreadyPitchedForThisDeal[p['BuyerLeadID']] = true; });
 
-  const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
-  const candidates = sheetToObjects(leadsSheet).filter(function (l) {
-    return wanted[l['BuyerLeadID']] && !alreadyPitchedForThisDeal[l['BuyerLeadID']] &&
-      l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE';
-  });
-
-  const now = new Date().toISOString();
-  candidates.forEach(function (l) {
-    appendRowByHeaders(pitchesSheet, {
-      'PitchID': Utilities.getUuid(), 'BuyerLeadID': l['BuyerLeadID'], 'DealID': body.dealId,
-      'Username': username, 'GivenAt': now
+    const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+    const candidates = sheetToObjects(leadsSheet).filter(function (l) {
+      return wanted[l['BuyerLeadID']] && !alreadyPitchedForThisDeal[l['BuyerLeadID']] &&
+        l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE';
     });
+
+    const now = new Date().toISOString();
+    candidates.forEach(function (l) {
+      appendRowByHeaders(pitchesSheet, {
+        'PitchID': Utilities.getUuid(), 'BuyerLeadID': l['BuyerLeadID'], 'DealID': body.dealId,
+        'Username': username, 'GivenAt': now
+      });
+    });
+    return { ok: true, givenCount: candidates.length, skipped: body.buyerLeadIds.length - candidates.length };
   });
-  return { ok: true, givenCount: candidates.length, skipped: body.buyerLeadIds.length - candidates.length };
 }
 
 function adminReassignPitch(body) {
@@ -1489,6 +1516,53 @@ function adminGetPitchesForBuyerLead(body) {
   const allContacts = sheetToObjects(contactsSheet).filter(function (c) { return c['BuyerLeadID'] === body.buyerLeadId; });
 
   return { ok: true, pitches: pitchesWithStatus(pitches, allContacts, dealsById) };
+}
+
+// A single, whole-team view of every open pitch -- unlike
+// adminGetPitchesForBuyerLead (one buyer at a time, buried inside that
+// buyer's detail panel), this is the admin's one-stop place to see who has
+// what and pull work back from a rep (dead deal, overloaded queue, etc.)
+// without hunting through individual buyers first.
+function adminGetAllPitches(body) {
+  const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+  const pitches = sheetToObjects(pitchesSheet);
+
+  const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const leadsById = {};
+  sheetToObjects(leadsSheet).forEach(function (l) { leadsById[l['BuyerLeadID']] = l; });
+
+  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const dealsById = {};
+  sheetToObjects(dealsSheet).forEach(function (d) { dealsById[d['DealID']] = d; });
+
+  pitches.forEach(function (p) {
+    const lead = leadsById[p['BuyerLeadID']];
+    p._phoneType = lead ? lead['PhoneType'] : '';
+    p.buyerName = lead ? lead['BuyerName'] : '(deleted buyer)';
+    p.buyerPhone = lead ? lead['Phone'] : '';
+  });
+
+  const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
+  const allContacts = sheetToObjects(contactsSheet);
+
+  return { ok: true, pitches: pitchesWithStatus(pitches, allContacts, dealsById) };
+}
+
+// Withdraws many pitches at once (e.g. "pull everything this rep has on a
+// deal that just went dead"). Same effect as calling adminWithdrawPitch
+// repeatedly -- deletes the Pitches rows only, never touches
+// BuyerLeadContacts, so contact history survives.
+function adminBulkWithdrawPitches(body) {
+  if (!body.pitchIds || body.pitchIds.length === 0) return { ok: false, error: 'No pitches selected.' };
+  const wanted = {};
+  body.pitchIds.forEach(function (id) { wanted[id] = true; });
+
+  const sheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+  const rows = sheetToObjects(sheet).filter(function (p) { return wanted[p['PitchID']]; });
+  // Delete highest row first so earlier _row indexes stay valid as rows shift up.
+  rows.sort(function (a, b) { return b._row - a._row; }).forEach(function (p) { sheet.deleteRow(p._row); });
+
+  return { ok: true, withdrawnCount: rows.length };
 }
 
 function adminGetPitchContacts(body) {
@@ -1551,6 +1625,10 @@ function repMatchesArea(rep, deal) {
 function autoFeedCheck() {
   const props = PropertiesService.getScriptProperties();
   if (props.getProperty('AUTO_FEED_ENABLED') !== 'TRUE') return { ok: true, fed: [], reason: 'Auto-feed is turned off.' };
+  return withLock(function () { return autoFeedCheckLocked(props); });
+}
+
+function autoFeedCheckLocked(props) {
   const batchSize = Number(props.getProperty('AUTO_FEED_BATCH_SIZE') || '50');
 
   const repsSheet = getSheet(REPS_SHEET, REP_COLUMNS);
