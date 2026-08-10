@@ -34,6 +34,24 @@ function esc(s) {
   });
 }
 
+// A visible confirmation that a click actually registered -- separate from
+// (and in addition to) any inline result text, since a small line of text
+// under a button is easy to miss and is exactly what leads to a second,
+// duplicate click "just in case."
+function showToast(message, isError) {
+  const container = document.getElementById("toast-container");
+  if (!container) return;
+  const toast = document.createElement("div");
+  toast.className = "toast" + (isError ? " error" : "");
+  toast.innerHTML = '<span class="toast-icon">' + (isError ? "&#10005;" : "&#10003;") + '</span><span>' + esc(message) + '</span>';
+  container.appendChild(toast);
+  requestAnimationFrame(function () { toast.classList.add("show"); });
+  setTimeout(function () {
+    toast.classList.remove("show");
+    setTimeout(function () { toast.remove(); }, 200);
+  }, 2800);
+}
+
 // GrossMargin comes from the backend as a plain number (or null if ARV/
 // RehabEstimate/Price aren't all set yet) -- this just formats it for
 // display, with a distinct message for the "not enough info yet" case.
@@ -256,6 +274,7 @@ async function openRepDealDetail(dealId) {
     document.getElementById("fb-post-groups").value = "";
     const fresh = await api("getMyFbRequests", { dealId: dealId });
     document.getElementById("fb-post-list").innerHTML = renderFbRequestList(fresh.ok ? fresh.requests : [], false);
+    showToast("Post submitted for approval.");
   });
 
   document.getElementById("buyer-add-submit").addEventListener("click", async function () {
@@ -283,6 +302,7 @@ async function openRepDealDetail(dealId) {
     document.getElementById("buyer-asispercent-input").value = "";
     document.getElementById("buyer-notes-input").value = "";
     await refreshBuyerMatchList(dealId);
+    showToast("Buyer added.");
   });
 }
 
@@ -363,7 +383,9 @@ function wireBuyerMatchListHandlers(container, onSaved) {
       if (adminNoteInput) payload.adminNote = adminNoteInput.value.trim();
       if (arvInput) payload.arvPercent = arvInput.value.trim();
       if (asIsInput) payload.asIsPercent = asIsInput.value.trim();
+      btn.disabled = true;
       await api("updateInterestedBuyerMatchStatus", payload);
+      showToast("Match updated.");
       await onSaved();
     });
   });
@@ -371,7 +393,10 @@ function wireBuyerMatchListHandlers(container, onSaved) {
     btn.addEventListener("click", async function () {
       const buyerId = btn.getAttribute("data-buyer-id");
       const textarea = container.querySelector('.match-notes-input[data-buyer-id="' + buyerId + '"]');
+      btn.disabled = true;
       await api("updateInterestedBuyerNotes", { buyerId: buyerId, notes: textarea.value.trim() });
+      btn.disabled = false;
+      showToast("Notes saved.");
     });
   });
 }
@@ -537,7 +562,11 @@ async function openPitchDetail(pitchId) {
   document.getElementById("close-detail-btn").addEventListener("click", function () { overlay.hidden = true; loadMyPitches(); });
 
   document.getElementById("general-notes-save-btn").addEventListener("click", async function () {
+    const btn = this;
+    btn.disabled = true;
     await api("updateBuyerLeadNotes", { buyerLeadId: pitch.BuyerLeadID, notes: document.getElementById("general-notes-input").value.trim() });
+    btn.disabled = false;
+    showToast("Notes saved.");
   });
 
   if (pitch.leadProfile) {
@@ -548,9 +577,11 @@ async function openPitchDetail(pitchId) {
   }
 
   document.getElementById("dnc-toggle-btn").addEventListener("click", async function () {
-    await api("updateBuyerLeadDoNotContact", { buyerLeadId: pitch.BuyerLeadID, doNotContact: !pitch.doNotContact });
+    const willBeDnc = !pitch.doNotContact;
+    await api("updateBuyerLeadDoNotContact", { buyerLeadId: pitch.BuyerLeadID, doNotContact: willBeDnc });
     await loadMyPitches();
     openPitchDetail(pitchId);
+    showToast(willBeDnc ? "Marked Do Not Contact." : "Contact allowed again.");
   });
 
   const phoneSelect = document.getElementById("contact-phone-select");
@@ -571,6 +602,7 @@ async function openPitchDetail(pitchId) {
       if (!res.ok) {
         errorEl.textContent = res.error || "Could not log contact.";
         errorEl.classList.add("show");
+        showToast(res.error || "Could not log contact.", true);
         return;
       }
       document.getElementById("contact-notes-input").value = "";
@@ -579,6 +611,7 @@ async function openPitchDetail(pitchId) {
       document.getElementById("contact-responded-input").checked = false;
       const fresh = await api("getPitchContacts", { pitchId: pitchId });
       document.getElementById("contact-history-list").innerHTML = renderContactHistory(fresh.ok ? fresh.contacts : []);
+      showToast("Contact logged.");
       if (responded) { await loadMyPitches(); openPitchDetail(pitchId); }
     });
   }
@@ -700,6 +733,7 @@ document.getElementById("deal-modal-cancel").addEventListener("click", function 
 });
 
 document.getElementById("deal-modal-save").addEventListener("click", async function () {
+  const btn = this;
   const address = document.getElementById("deal-address-input").value.trim();
   const errorEl = document.getElementById("deal-modal-error");
   errorEl.classList.remove("show");
@@ -708,6 +742,8 @@ document.getElementById("deal-modal-save").addEventListener("click", async funct
     errorEl.classList.add("show");
     return;
   }
+  if (btn.disabled) return;
+  btn.disabled = true;
   const data = {
     dealCode: document.getElementById("deal-code-input").value.trim(),
     address: address,
@@ -729,13 +765,16 @@ document.getElementById("deal-modal-save").addEventListener("click", async funct
     sourceLink: document.getElementById("deal-source-link-input").value.trim()
   };
   const res = await api("adminAddDeal", { data: data });
+  btn.disabled = false;
   if (!res.ok) {
     errorEl.textContent = res.error || "Could not save deal.";
     errorEl.classList.add("show");
+    showToast(res.error || "Could not save deal.", true);
     return;
   }
   document.getElementById("deal-modal").hidden = true;
   await loadAdminDeals();
+  showToast("Deal added.");
 });
 
 async function openAdminDealDetail(dealId) {
@@ -886,6 +925,8 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
   });
 
   document.getElementById("save-code-btn").addEventListener("click", async function () {
+    const btn = this;
+    btn.disabled = true;
     await api("adminUpdateDeal", {
       dealId: deal.DealID,
       data: {
@@ -897,9 +938,12 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     });
     await loadAdminDeals();
     openAdminDealDetail(deal.DealID);
+    showToast("Deal code / matching info saved.");
   });
 
   document.getElementById("save-financials-btn").addEventListener("click", async function () {
+    const btn = this;
+    btn.disabled = true;
     await api("adminUpdateDeal", {
       dealId: deal.DealID,
       data: {
@@ -910,9 +954,12 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     });
     await loadAdminDeals();
     openAdminDealDetail(deal.DealID);
+    showToast("Financials saved.");
   });
 
   document.getElementById("save-admin-notes-btn").addEventListener("click", async function () {
+    const btn = this;
+    btn.disabled = true;
     await api("adminUpdateDeal", {
       dealId: deal.DealID,
       data: {
@@ -920,51 +967,70 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
         AdminPrivateNotes: document.getElementById("deal-admin-notes-edit").value.trim()
       }
     });
+    btn.disabled = false;
+    showToast("Private notes saved.");
   });
 
   document.getElementById("deal-status-select").addEventListener("change", async function (e) {
+    e.target.disabled = true;
     await api("adminUpdateDealStatus", { dealId: deal.DealID, status: e.target.value });
     deal.Status = e.target.value;
+    e.target.disabled = false;
+    showToast("Status updated to " + e.target.value + ".");
   });
 
   Array.from(panel.querySelectorAll(".unassign-btn")).forEach(function (btn) {
     btn.addEventListener("click", async function () {
+      btn.disabled = true;
       await api("adminUnassignRep", { dealId: deal.DealID, username: btn.getAttribute("data-username") });
       openAdminDealDetail(deal.DealID);
+      showToast("Access removed.");
     });
   });
 
   const assignBtn = document.getElementById("assign-rep-btn");
   if (assignBtn) {
     assignBtn.addEventListener("click", async function () {
+      assignBtn.disabled = true;
       const username = document.getElementById("assign-rep-select").value;
       await api("adminAssignRep", { dealId: deal.DealID, username: username });
       openAdminDealDetail(deal.DealID);
+      showToast("Access granted.");
     });
   }
 
   Array.from(panel.querySelectorAll(".revoke-address-btn")).forEach(function (btn) {
     btn.addEventListener("click", async function () {
+      btn.disabled = true;
       await api("adminRevokeAddressAccess", { dealId: deal.DealID, username: btn.getAttribute("data-username") });
       openAdminDealDetail(deal.DealID);
+      showToast("Address access revoked.");
     });
   });
 
   const grantAddressBtn = document.getElementById("grant-address-btn");
   if (grantAddressBtn) {
     grantAddressBtn.addEventListener("click", async function () {
+      grantAddressBtn.disabled = true;
       const username = document.getElementById("grant-address-select").value;
       await api("adminGrantAddressAccess", { dealId: deal.DealID, username: username });
       openAdminDealDetail(deal.DealID);
+      showToast("Address access granted.");
     });
   }
 
   document.getElementById("save-desc-btn").addEventListener("click", async function () {
+    const btn = this;
+    btn.disabled = true;
     await api("adminUpdateDeal", { dealId: deal.DealID, data: { Description: document.getElementById("deal-desc-edit").value.trim() } });
     await loadAdminDeals();
+    btn.disabled = false;
+    showToast("Notes saved.");
   });
 
   document.getElementById("save-drive-links-btn").addEventListener("click", async function () {
+    const btn = this;
+    btn.disabled = true;
     await api("adminUpdateDeal", {
       dealId: deal.DealID,
       data: {
@@ -973,6 +1039,8 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
       }
     });
     await loadAdminDeals();
+    btn.disabled = false;
+    showToast("Drive links saved.");
   });
 
   Array.from(panel.querySelectorAll(".fb-decide-btn")).forEach(function (btn) {
@@ -980,8 +1048,10 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
       const requestId = btn.getAttribute("data-request-id");
       const decision = btn.getAttribute("data-decision");
       const note = document.getElementById("fb-note-" + requestId).value.trim();
+      btn.disabled = true;
       await api("adminDecideFbRequest", { requestId: requestId, decision: decision, note: note });
       openAdminDealDetail(deal.DealID);
+      showToast("Post " + decision.toLowerCase() + ".");
     });
   });
 }
@@ -1038,9 +1108,12 @@ function renderReps() {
 
   Array.from(tbody.querySelectorAll(".rep-toggle")).forEach(function (cb) {
     cb.addEventListener("change", async function () {
+      cb.disabled = true;
       const payload = { username: cb.getAttribute("data-username") };
       payload[cb.getAttribute("data-field")] = cb.checked;
       await api("adminSetRepAccess", payload);
+      cb.disabled = false;
+      showToast("Updated.");
     });
   });
 
@@ -1070,15 +1143,20 @@ document.getElementById("area-modal-cancel").addEventListener("click", function 
 });
 
 document.getElementById("area-modal-save").addEventListener("click", async function () {
-  const username = this.getAttribute("data-username");
+  const btn = this;
+  if (btn.disabled) return;
+  btn.disabled = true;
+  const username = btn.getAttribute("data-username");
   await api("adminSetRepPreferredArea", {
     username: username,
     city: document.getElementById("area-city-input").value.trim(),
     state: document.getElementById("area-state-input").value.trim(),
     zip: document.getElementById("area-zip-input").value.trim()
   });
+  btn.disabled = false;
   document.getElementById("area-modal").hidden = true;
   await loadReps();
+  showToast("Preferred area saved.");
 });
 
 document.getElementById("add-rep-btn").addEventListener("click", function () {
@@ -1096,6 +1174,7 @@ document.getElementById("rep-modal-cancel").addEventListener("click", function (
 });
 
 document.getElementById("rep-modal-save").addEventListener("click", async function () {
+  const btn = this;
   const errorEl = document.getElementById("rep-modal-error");
   errorEl.classList.remove("show");
   const data = {
@@ -1110,14 +1189,19 @@ document.getElementById("rep-modal-save").addEventListener("click", async functi
     errorEl.classList.add("show");
     return;
   }
+  if (btn.disabled) return;
+  btn.disabled = true;
   const res = await api("adminAddRep", { data: data });
+  btn.disabled = false;
   if (!res.ok) {
     errorEl.textContent = res.error || "Could not add team member.";
     errorEl.classList.add("show");
+    showToast(res.error || "Could not add team member.", true);
     return;
   }
   document.getElementById("rep-modal").hidden = true;
   await loadReps();
+  showToast("Team member added.");
 });
 
 function openResetModal(username, name) {
@@ -1142,13 +1226,17 @@ document.getElementById("reset-modal-save").addEventListener("click", async func
     errorEl.classList.add("show");
     return;
   }
+  this.disabled = true;
   const res = await api("adminResetPassword", { username: username, newPassword: newPassword });
+  this.disabled = false;
   if (!res.ok) {
     errorEl.textContent = res.error || "Could not reset password.";
     errorEl.classList.add("show");
+    showToast(res.error || "Could not reset password.", true);
     return;
   }
   document.getElementById("reset-modal").hidden = true;
+  showToast("Password reset.");
 });
 
 /* ---------- Facebook Approvals tab ---------- */
@@ -1464,6 +1552,7 @@ function renderCsvPreview() {
 }
 
 document.getElementById("csv-import-btn").addEventListener("click", async function () {
+  const btn = this;
   const errorEl = document.getElementById("csv-import-error");
   const resultEl = document.getElementById("csv-import-result");
   errorEl.classList.remove("show");
@@ -1480,19 +1569,25 @@ document.getElementById("csv-import-btn").addEventListener("click", async functi
     errorEl.classList.add("show");
     return;
   }
+  if (btn.disabled) return;
+  btn.disabled = true;
   const res = await api("adminImportBuyerLeads", { rows: rows });
+  btn.disabled = false;
   if (!res.ok) {
     errorEl.textContent = res.error || "Import failed.";
     errorEl.classList.add("show");
+    showToast(res.error || "Import failed.", true);
     return;
   }
   resultEl.textContent = "Imported " + res.imported + " buyer(s)." + (res.skippedDuplicates ? " Skipped " + res.skippedDuplicates + " duplicate phone number(s)." : "");
   document.getElementById("csv-file-input").value = "";
   csvRows = []; csvHeaders = [];
   await loadBuyerLeadsAdmin();
+  showToast("Imported " + res.imported + " buyer(s).");
 });
 
 document.getElementById("buyerleads-import-btn").addEventListener("click", async function () {
+  const btn = this;
   const text = document.getElementById("buyerleads-import-text").value;
   const errorEl = document.getElementById("buyerleads-import-error");
   const resultEl = document.getElementById("buyerleads-import-result");
@@ -1503,15 +1598,20 @@ document.getElementById("buyerleads-import-btn").addEventListener("click", async
     errorEl.classList.add("show");
     return;
   }
+  if (btn.disabled) return;
+  btn.disabled = true;
   const res = await api("adminImportBuyerLeads", { pasteText: text });
+  btn.disabled = false;
   if (!res.ok) {
     errorEl.textContent = res.error || "Import failed.";
     errorEl.classList.add("show");
+    showToast(res.error || "Import failed.", true);
     return;
   }
   resultEl.textContent = "Imported " + res.imported + " buyer(s)." + (res.skippedDuplicates ? " Skipped " + res.skippedDuplicates + " duplicate phone number(s)." : "");
   document.getElementById("buyerleads-import-text").value = "";
   await loadBuyerLeadsAdmin();
+  showToast("Imported " + res.imported + " buyer(s).");
 });
 
 document.getElementById("bulk-give-btn").addEventListener("click", async function () {
@@ -1530,9 +1630,10 @@ document.getElementById("bulk-give-btn").addEventListener("click", async functio
     zip: document.getElementById("bulk-give-zip").value.trim()
   });
   btn.disabled = false;
-  if (!res.ok) { resultEl.textContent = res.error || "Could not give leads."; return; }
+  if (!res.ok) { resultEl.textContent = res.error || "Could not give leads."; showToast(res.error || "Could not give leads.", true); return; }
   resultEl.textContent = "Gave " + res.givenCount + " lead(s) for this deal. " + res.remainingInPool + " still unpitched for it matching that filter.";
   await loadBuyerLeadsAdmin();
+  showToast("Gave " + res.givenCount + " lead(s).");
 });
 
 async function loadAutoFeedSettings() {
@@ -1543,23 +1644,32 @@ async function loadAutoFeedSettings() {
 }
 
 document.getElementById("autofeed-save-btn").addEventListener("click", async function () {
+  const btn = this;
   const resultEl = document.getElementById("autofeed-result");
+  btn.disabled = true;
   await api("adminSetAutoFeed", {
     enabled: document.getElementById("autofeed-enabled-input").checked,
     batchSize: document.getElementById("autofeed-batchsize-input").value
   });
+  btn.disabled = false;
   resultEl.textContent = "Settings saved.";
+  showToast("Auto-feed settings saved.");
 });
 
 document.getElementById("autofeed-run-btn").addEventListener("click", async function () {
+  const btn = this;
   const resultEl = document.getElementById("autofeed-result");
+  if (btn.disabled) return;
+  btn.disabled = true;
   resultEl.textContent = "Running…";
   const res = await api("adminRunAutoFeedNow", {});
-  if (!res.ok) { resultEl.textContent = res.error || "Could not run auto-feed."; return; }
-  if (res.reason) { resultEl.textContent = res.reason; return; }
+  btn.disabled = false;
+  if (!res.ok) { resultEl.textContent = res.error || "Could not run auto-feed."; showToast(res.error || "Could not run auto-feed.", true); return; }
+  if (res.reason) { resultEl.textContent = res.reason; showToast(res.reason); return; }
   resultEl.textContent = res.fed.length === 0
     ? "Nobody needed more leads right now."
     : res.fed.map(function (f) { return f.name + " (" + f.dealAddress + "): +" + f.count; }).join(", ");
+  showToast(res.fed.length === 0 ? "Auto-feed ran — nobody needed more leads." : "Auto-feed ran.");
   await loadBuyerLeadsAdmin();
 });
 
@@ -1686,13 +1796,15 @@ document.getElementById("give-selected-btn").addEventListener("click", async fun
   btn.disabled = true;
   const res = await api("adminGiveSelectedBuyerLeads", { dealId: dealId, username: username, buyerLeadIds: Array.from(buyerLeadsSelectedIds) });
   btn.disabled = false;
-  if (!res.ok) { resultEl.textContent = res.error || "Could not give leads."; return; }
+  if (!res.ok) { resultEl.textContent = res.error || "Could not give leads."; showToast(res.error || "Could not give leads.", true); return; }
   resultEl.textContent = "Gave " + res.givenCount + " lead(s)." + (res.skipped ? " Skipped " + res.skipped + " (Do Not Contact or already pitched for this deal)." : "");
   buyerLeadsSelectedIds = new Set();
   await loadBuyerLeadsAdmin();
+  showToast("Gave " + res.givenCount + " lead(s).");
 });
 
 document.getElementById("mass-edit-apply-btn").addEventListener("click", async function () {
+  const btn = this;
   const resultEl = document.getElementById("mass-edit-result");
   if (buyerLeadsSelectedIds.size === 0) { resultEl.textContent = "No leads selected."; return; }
 
@@ -1712,10 +1824,14 @@ document.getElementById("mass-edit-apply-btn").addEventListener("click", async f
   }
   if (Object.keys(data).length === 0) { resultEl.textContent = "Check at least one field to apply."; return; }
 
+  if (btn.disabled) return;
+  btn.disabled = true;
   const res = await api("adminBulkUpdateBuyerLeads", { buyerLeadIds: Array.from(buyerLeadsSelectedIds), data: data });
-  if (!res.ok) { resultEl.textContent = res.error || "Could not apply changes."; return; }
+  btn.disabled = false;
+  if (!res.ok) { resultEl.textContent = res.error || "Could not apply changes."; showToast(res.error || "Could not apply changes.", true); return; }
   resultEl.textContent = "Updated " + res.updatedCount + " lead(s).";
   await loadBuyerLeadsAdmin();
+  showToast("Updated " + res.updatedCount + " lead(s).");
 });
 
 // Shared by the admin buyer detail panel and the rep's pitch detail panel
@@ -1768,8 +1884,11 @@ function renderBuyerProfileFields(lead, prefix) {
 }
 
 function wireBuyerProfileFieldsHandlers(prefix, buyerLeadId, onSaved) {
-  document.getElementById(prefix + "-buyer-profile-save-btn").addEventListener("click", async function () {
-    await api("updateBuyerLeadProfile", {
+  const btn = document.getElementById(prefix + "-buyer-profile-save-btn");
+  btn.addEventListener("click", async function () {
+    if (btn.disabled) return;
+    btn.disabled = true;
+    const res = await api("updateBuyerLeadProfile", {
       buyerLeadId: buyerLeadId,
       phone: document.getElementById(prefix + "-buyer-phone-input").value.trim(),
       phoneType: document.getElementById(prefix + "-buyer-phonetype-input").value,
@@ -1785,6 +1904,8 @@ function wireBuyerProfileFieldsHandlers(prefix, buyerLeadId, onSaved) {
       priceRangeMax: document.getElementById(prefix + "-buyer-pricemax-input").value.trim(),
       assetCategories: Array.from(document.querySelectorAll("." + prefix + "-buyer-category-checkbox:checked")).map(function (cb) { return cb.value; }).join(", ")
     });
+    if (!res.ok) { btn.disabled = false; showToast(res.error || "Could not save buyer info.", true); return; }
+    showToast("Buyer info saved.");
     await onSaved();
   });
 }
@@ -1846,8 +1967,12 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
   document.getElementById("close-detail-btn").addEventListener("click", function () { overlay.hidden = true; loadBuyerLeadsAdmin(); });
 
   document.getElementById("admin-general-notes-save-btn").addEventListener("click", async function () {
+    const btn = this;
+    if (btn.disabled) return;
+    btn.disabled = true;
     await api("updateBuyerLeadNotes", { buyerLeadId: buyerLeadId, notes: document.getElementById("admin-general-notes-input").value.trim() });
     await loadBuyerLeadsAdmin();
+    showToast("Notes saved.");
   });
 
   wireBuyerProfileFieldsHandlers("admin", buyerLeadId, async function () {
@@ -1856,9 +1981,14 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
   });
 
   document.getElementById("admin-dnc-toggle-btn").addEventListener("click", async function () {
-    await api("updateBuyerLeadDoNotContact", { buyerLeadId: buyerLeadId, doNotContact: !isDnc });
+    const btn = this;
+    if (btn.disabled) return;
+    btn.disabled = true;
+    const willBeDnc = !isDnc;
+    await api("updateBuyerLeadDoNotContact", { buyerLeadId: buyerLeadId, doNotContact: willBeDnc });
     await loadBuyerLeadsAdmin();
     openAdminBuyerLeadDetail(buyerLeadId);
+    showToast(willBeDnc ? "Marked Do Not Contact." : "Contact allowed again.");
   });
 
   const giveBtn = document.getElementById("give-new-pitch-btn");
@@ -1873,10 +2003,11 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
       if (!res.ok) {
         giveBtn.disabled = false;
         giveBtn.textContent = "Give This Buyer Lead To";
-        alert(res.error || "Could not give this buyer lead.");
+        showToast(res.error || "Could not give this buyer lead.", true);
         return;
       }
       openAdminBuyerLeadDetail(buyerLeadId);
+      showToast("Buyer given.");
     });
   }
 
@@ -1911,16 +2042,24 @@ function wireAdminPitchActions(buyerLeadId) {
   const panel = document.getElementById("detail-panel");
   Array.from(panel.querySelectorAll(".pitch-reassign-btn")).forEach(function (btn) {
     btn.addEventListener("click", async function () {
+      if (btn.disabled) return;
+      btn.disabled = true;
       const pitchId = btn.getAttribute("data-pitch-id");
       const select = panel.querySelector('.pitch-reassign-select[data-pitch-id="' + pitchId + '"]');
-      await api("adminReassignPitch", { pitchId: pitchId, username: select.value });
+      const res = await api("adminReassignPitch", { pitchId: pitchId, username: select.value });
+      if (!res.ok) { btn.disabled = false; showToast(res.error || "Could not reassign.", true); return; }
       openAdminBuyerLeadDetail(buyerLeadId);
+      showToast("Pitch reassigned.");
     });
   });
   Array.from(panel.querySelectorAll(".pitch-withdraw-btn")).forEach(function (btn) {
     btn.addEventListener("click", async function () {
-      await api("adminWithdrawPitch", { pitchId: btn.getAttribute("data-pitch-id") });
+      if (btn.disabled) return;
+      btn.disabled = true;
+      const res = await api("adminWithdrawPitch", { pitchId: btn.getAttribute("data-pitch-id") });
+      if (!res.ok) { btn.disabled = false; showToast(res.error || "Could not withdraw.", true); return; }
       openAdminBuyerLeadDetail(buyerLeadId);
+      showToast("Pitch withdrawn.");
     });
   });
   Array.from(panel.querySelectorAll(".pitch-history-btn")).forEach(function (btn) {
@@ -2021,8 +2160,9 @@ function renderAdminPitchesTable() {
       const select = tbody.querySelector('.pitch-row-reassign-select[data-pitch-id="' + pitchId + '"]');
       btn.disabled = true;
       const res = await api("adminReassignPitch", { pitchId: pitchId, username: select.value });
-      if (!res.ok) { btn.disabled = false; alert(res.error || "Could not reassign this pitch."); return; }
+      if (!res.ok) { btn.disabled = false; showToast(res.error || "Could not reassign this pitch.", true); return; }
       await loadAdminPitches();
+      showToast("Pitch reassigned.");
     });
   });
   Array.from(tbody.querySelectorAll(".pitch-row-withdraw-btn")).forEach(function (btn) {
@@ -2030,9 +2170,10 @@ function renderAdminPitchesTable() {
       const pitchId = btn.getAttribute("data-pitch-id");
       btn.disabled = true;
       const res = await api("adminWithdrawPitch", { pitchId: pitchId });
-      if (!res.ok) { btn.disabled = false; alert(res.error || "Could not withdraw this pitch."); return; }
+      if (!res.ok) { btn.disabled = false; showToast(res.error || "Could not withdraw this pitch.", true); return; }
       adminPitchesSelectedIds.delete(pitchId);
       await loadAdminPitches();
+      showToast("Pitch withdrawn.");
     });
   });
 
@@ -2063,10 +2204,11 @@ document.getElementById("pitches-withdraw-selected-btn").addEventListener("click
   btn.disabled = true;
   const res = await api("adminBulkWithdrawPitches", { pitchIds: Array.from(adminPitchesSelectedIds) });
   btn.disabled = false;
-  if (!res.ok) { resultEl.textContent = res.error || "Could not withdraw."; return; }
+  if (!res.ok) { resultEl.textContent = res.error || "Could not withdraw."; showToast(res.error || "Could not withdraw.", true); return; }
   resultEl.textContent = "Withdrew " + res.withdrawnCount + " pitch(es).";
   adminPitchesSelectedIds = new Set();
   await loadAdminPitches();
+  showToast("Withdrew " + res.withdrawnCount + " pitch(es).");
 });
 
 /* ---------- Status categories tab ---------- */
@@ -2082,20 +2224,29 @@ async function loadStatusOptions() {
   }).join("");
   Array.from(list.querySelectorAll(".remove-status-btn")).forEach(function (btn) {
     btn.addEventListener("click", async function () {
+      btn.disabled = true;
       await api("adminRemoveStatusOption", { status: btn.getAttribute("data-status") });
       loadStatusOptions();
+      showToast("Status removed.");
     });
   });
 }
 
 document.getElementById("add-status-btn").addEventListener("click", async function () {
+  const btn = this;
   const input = document.getElementById("new-status-input");
   const status = input.value.trim();
   if (!status) return;
+  if (btn.disabled) return;
+  btn.disabled = true;
   const res = await api("adminAddStatusOption", { status: status });
+  btn.disabled = false;
   if (res.ok) {
     input.value = "";
     loadStatusOptions();
+    showToast("Status added.");
+  } else {
+    showToast(res.error || "Could not add status.", true);
   }
 });
 
@@ -2112,8 +2263,10 @@ async function loadAssetCategoryOptions() {
     }).join("");
     Array.from(list.querySelectorAll(".remove-assetcategory-btn")).forEach(function (btn) {
       btn.addEventListener("click", async function () {
+        btn.disabled = true;
         await api("adminRemoveAssetCategory", { category: btn.getAttribute("data-category") });
         loadAssetCategoryOptions();
+        showToast("Category removed.");
       });
     });
   }
@@ -2130,12 +2283,19 @@ async function loadAssetCategoryOptions() {
 }
 
 document.getElementById("add-assetcategory-btn").addEventListener("click", async function () {
+  const btn = this;
   const input = document.getElementById("new-assetcategory-input");
   const category = input.value.trim();
   if (!category) return;
+  if (btn.disabled) return;
+  btn.disabled = true;
   const res = await api("adminAddAssetCategory", { category: category });
+  btn.disabled = false;
   if (res.ok) {
     input.value = "";
     loadAssetCategoryOptions();
+    showToast("Category added.");
+  } else {
+    showToast(res.error || "Could not add category.", true);
   }
 });
