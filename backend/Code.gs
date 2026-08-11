@@ -250,6 +250,10 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminImportBuyerLeads));
       case 'adminGetBuyerLeads':
         return jsonOut(withAdminSession(body, adminGetBuyerLeads));
+      case 'adminFindDuplicateBuyerLeads':
+        return jsonOut(withAdminSession(body, adminFindDuplicateBuyerLeads));
+      case 'adminMergeBuyerLeads':
+        return jsonOut(withAdminSession(body, adminMergeBuyerLeads));
       case 'updateBuyerLeadProfile':
         return jsonOut(withSession(body, updateBuyerLeadProfile));
       case 'adminBulkUpdateBuyerLeads':
@@ -1118,6 +1122,15 @@ function normalizeText(s) {
   return String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
 }
 
+// Digits only, with a leading US country code stripped -- "555-123-4567",
+// "(555) 123-4567", "+1 555 123 4567", and "15551234567" all normalize to
+// the same 10-digit key, so format differences alone don't let the same
+// buyer in twice.
+function normalizePhoneForDedup(phone) {
+  const digits = String(phone || '').replace(/\D/g, '');
+  return (digits.length === 11 && digits[0] === '1') ? digits.slice(1) : digits;
+}
+
 function splitCommaList(s) {
   return String(s || '').split(',').map(function (v) { return v.trim(); }).filter(Boolean);
 }
@@ -1230,6 +1243,137 @@ function parseBuyerLeadRows(text) {
   return rows;
 }
 
+// Groups existing BuyerLeads rows that share a normalized phone or a
+// normalized email into duplicate clusters (union-find, so if A matches B
+// on phone and B matches C on email, all three land in one group together
+// instead of two separate pairs). Only import-time dedup was in place
+// before, so leads already in the sheet from earlier imports, manual
+// paste, or direct spreadsheet edits could still collide -- this is the
+// cleanup pass for what's already there.
+function adminFindDuplicateBuyerLeads(body) {
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const leads = sheetToObjects(sheet);
+
+  const parent = {};
+  leads.forEach(function (l) { parent[l['BuyerLeadID']] = l['BuyerLeadID']; });
+  function find(x) { while (parent[x] !== x) { parent[x] = parent[parent[x]]; x = parent[x]; } return x; }
+  function union(a, b) { const ra = find(a), rb = find(b); if (ra !== rb) parent[ra] = rb; }
+
+  [
+    leads.reduce(function (groups, l) {
+      const key = normalizePhoneForDedup(l['Phone']);
+      if (key) { (groups[key] = groups[key] || []).push(l); }
+      return groups;
+    }, {}),
+    leads.reduce(function (groups, l) {
+      const key = normalizeText(l['Email']);
+      if (key) { (groups[key] = groups[key] || []).push(l); }
+      return groups;
+    }, {})
+  ].forEach(function (groups) {
+    Object.keys(groups).forEach(function (key) {
+      const group = groups[key];
+      for (let i = 1; i < group.length; i++) union(group[0]['BuyerLeadID'], group[i]['BuyerLeadID']);
+    });
+  });
+
+  const clusters = {};
+  leads.forEach(function (l) {
+    const root = find(l['BuyerLeadID']);
+    (clusters[root] = clusters[root] || []).push(l);
+  });
+
+  const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+  const pitchCountByLead = {};
+  sheetToObjects(pitchesSheet).forEach(function (p) { pitchCountByLead[p['BuyerLeadID']] = (pitchCountByLead[p['BuyerLeadID']] || 0) + 1; });
+
+  const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
+  const contactCountByLead = {};
+  sheetToObjects(contactsSheet).forEach(function (c) { contactCountByLead[c['BuyerLeadID']] = (contactCountByLead[c['BuyerLeadID']] || 0) + 1; });
+
+  const groups = Object.keys(clusters).map(function (root) { return clusters[root]; }).filter(function (g) { return g.length > 1; });
+
+  return {
+    ok: true,
+    groups: groups.map(function (g) {
+      return g.map(function (l) {
+        return {
+          buyerLeadId: l['BuyerLeadID'], buyerName: l['BuyerName'], phone: l['Phone'], email: l['Email'],
+          city: l['City'], state: l['State'], createdAt: l['CreatedAt'],
+          doNotContact: !!(l['DoNotContact'] === true || l['DoNotContact'] === 'TRUE'),
+          pitchCount: pitchCountByLead[l['BuyerLeadID']] || 0,
+          contactCount: contactCountByLead[l['BuyerLeadID']] || 0
+        };
+      });
+    })
+  };
+}
+
+// Folds one or more duplicate buyer leads into a single "keep" lead:
+// reassigns their pitches to the kept lead (dropping any that would
+// collide with a deal the kept lead already has a pitch on, rather than
+// creating an actual duplicate pitch), reassigns all contact history
+// unconditionally so nothing is lost, backfills any profile field the kept
+// lead is missing from whichever duplicate has it, carries over Do Not
+// Contact if any of them were flagged, and finally deletes the merged
+// rows. Never deletes contact history -- only ever repoints it.
+function adminMergeBuyerLeads(body) {
+  if (!body.keepId || !body.mergeIds || body.mergeIds.length === 0) return { ok: false, error: 'Missing keepId or mergeIds.' };
+  const mergeIds = body.mergeIds.filter(function (id) { return id !== body.keepId; });
+  if (mergeIds.length === 0) return { ok: false, error: 'Nothing to merge.' };
+  const mergeSet = {};
+  mergeIds.forEach(function (id) { mergeSet[id] = true; });
+
+  return withLock(function () {
+    const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+    const leads = sheetToObjects(leadsSheet);
+    const keepLead = leads.find(function (l) { return l['BuyerLeadID'] === body.keepId; });
+    if (!keepLead) return { ok: false, error: 'Lead to keep not found.' };
+    const mergeLeads = leads.filter(function (l) { return mergeSet[l['BuyerLeadID']]; });
+    if (mergeLeads.length === 0) return { ok: false, error: 'Leads to merge not found.' };
+
+    const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+    const allPitches = sheetToObjects(pitchesSheet);
+    const keepDealIds = {};
+    allPitches.forEach(function (p) { if (p['BuyerLeadID'] === body.keepId) keepDealIds[p['DealID']] = true; });
+
+    const pitchRowsToDelete = [];
+    allPitches.forEach(function (p) {
+      if (!mergeSet[p['BuyerLeadID']]) return;
+      if (keepDealIds[p['DealID']]) {
+        pitchRowsToDelete.push(p._row);
+      } else {
+        pitchesSheet.getRange(p._row, getColumnIndex(pitchesSheet, 'BuyerLeadID')).setValue(body.keepId);
+        keepDealIds[p['DealID']] = true;
+      }
+    });
+    pitchRowsToDelete.sort(function (a, b) { return b - a; }).forEach(function (row) { pitchesSheet.deleteRow(row); });
+
+    const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
+    sheetToObjects(contactsSheet).forEach(function (c) {
+      if (mergeSet[c['BuyerLeadID']]) {
+        contactsSheet.getRange(c._row, getColumnIndex(contactsSheet, 'BuyerLeadID')).setValue(body.keepId);
+      }
+    });
+
+    const fillableFields = ['Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'PriceRangeMin', 'PriceRangeMax', 'DriveLink', 'GeneralNotes'];
+    fillableFields.forEach(function (f) {
+      if (keepLead[f]) return;
+      const donor = mergeLeads.find(function (l) { return l[f]; });
+      if (donor) leadsSheet.getRange(keepLead._row, getColumnIndex(leadsSheet, f)).setValue(donor[f]);
+    });
+
+    const anyDnc = mergeLeads.some(function (l) { return l['DoNotContact'] === true || l['DoNotContact'] === 'TRUE'; });
+    if (anyDnc && !(keepLead['DoNotContact'] === true || keepLead['DoNotContact'] === 'TRUE')) {
+      leadsSheet.getRange(keepLead._row, getColumnIndex(leadsSheet, 'DoNotContact')).setValue(true);
+    }
+
+    mergeLeads.sort(function (a, b) { return b._row - a._row; }).forEach(function (l) { leadsSheet.deleteRow(l._row); });
+
+    return { ok: true, mergedCount: mergeLeads.length };
+  });
+}
+
 function adminImportBuyerLeads(body) {
   const rows = body.pasteText ? parseBuyerLeadRows(body.pasteText) : (body.rows || []);
   if (rows.length === 0) return { ok: false, error: 'No rows found to import.' };
@@ -1237,16 +1381,24 @@ function adminImportBuyerLeads(body) {
   const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
   const existing = sheetToObjects(sheet);
   const existingPhones = {};
-  existing.forEach(function (l) { existingPhones[String(l['Phone'] || '').replace(/\D/g, '')] = true; });
+  const existingEmails = {};
+  existing.forEach(function (l) {
+    const p = normalizePhoneForDedup(l['Phone']);
+    if (p) existingPhones[p] = true;
+    const e = normalizeText(l['Email']);
+    if (e) existingEmails[e] = true;
+  });
 
   let skippedDuplicates = 0;
   const now = new Date().toISOString();
   const newRows = [];
   rows.forEach(function (r) {
     if (!r.buyerName || !r.phone) return;
-    const normalizedPhone = String(r.phone).replace(/\D/g, '');
-    if (existingPhones[normalizedPhone]) { skippedDuplicates++; return; }
+    const normalizedPhone = normalizePhoneForDedup(r.phone);
+    const normalizedEmail = normalizeText(r.email);
+    if (existingPhones[normalizedPhone] || (normalizedEmail && existingEmails[normalizedEmail])) { skippedDuplicates++; return; }
     existingPhones[normalizedPhone] = true;
+    if (normalizedEmail) existingEmails[normalizedEmail] = true;
     newRows.push({
       'BuyerLeadID': Utilities.getUuid(), 'BuyerName': r.buyerName, 'Phone': r.phone, 'PhoneType': r.phoneType || '',
       'Phone2': r.phone2 || '', 'Phone2Type': r.phone2Type || '', 'Phone3': r.phone3 || '', 'Phone3Type': r.phone3Type || '',

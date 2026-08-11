@@ -479,6 +479,14 @@
       <div id="mass-edit-result" class="small-muted"></div>
     </div>
 
+    <div class="card">
+      <div class="section-title" style="margin-top:0;">Duplicate Buyers</div>
+      <p class="small-muted">Finds existing leads that share a phone number or email — not just at import time. Pick which one to keep in each group; the others get folded into it (pitches and contact history move over, nothing is lost) and removed.</p>
+      <button class="btn secondary small" id="find-duplicates-btn">Scan for Duplicates</button>
+      <div id="duplicates-result" class="small-muted" style="margin-top:8px;"></div>
+      <div id="duplicates-groups"></div>
+    </div>
+
     <table class="crm-table">
       <thead><tr><th></th><th>Buyer / LLC</th><th>Phone</th><th>Email</th><th>Type</th><th>Location</th><th>Asset Categories</th><th>General Notes</th><th>Open Pitches</th><th>Actions</th></tr></thead>
       <tbody id="buyerleads-tbody"></tbody>

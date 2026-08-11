@@ -1944,6 +1944,83 @@ document.getElementById("mass-edit-apply-btn").addEventListener("click", async f
   showToast("Updated " + res.updatedCount + " lead(s).");
 });
 
+/* ---------- Duplicate buyers (find + merge) ---------- */
+
+document.getElementById("find-duplicates-btn").addEventListener("click", async function () {
+  const btn = this;
+  const resultEl = document.getElementById("duplicates-result");
+  if (btn.disabled) return;
+  btn.disabled = true;
+  resultEl.textContent = "Scanning…";
+  const res = await api("adminFindDuplicateBuyerLeads", {});
+  btn.disabled = false;
+  if (!res.ok) { resultEl.textContent = res.error || "Could not scan for duplicates."; return; }
+  renderDuplicateGroups(res.groups);
+  resultEl.textContent = res.groups.length === 0
+    ? "No duplicates found — every lead has a unique phone and email."
+    : "Found " + res.groups.length + " group(s) sharing a phone or email.";
+});
+
+function renderDuplicateGroups(groups) {
+  const container = document.getElementById("duplicates-groups");
+  if (groups.length === 0) { container.innerHTML = ""; return; }
+
+  container.innerHTML = groups.map(function (group, groupIndex) {
+    // Default to keeping whichever lead has the most work already logged
+    // against it (pitches + contacts), tie-broken by whichever was created
+    // first -- the one most likely to be the "real" record worth keeping.
+    const defaultKeepId = group.slice().sort(function (a, b) {
+      const scoreDiff = (b.pitchCount + b.contactCount) - (a.pitchCount + a.contactCount);
+      if (scoreDiff !== 0) return scoreDiff;
+      return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+    })[0].buyerLeadId;
+
+    return '<div class="item-row" data-group-index="' + groupIndex + '" style="margin-top:12px;">' +
+      '<div style="margin-bottom:6px;"><strong>' + group.length + ' possible duplicates</strong> — pick which one to keep:</div>' +
+      group.map(function (l) {
+        return '<label class="checkbox-row" style="align-items:flex-start;">' +
+          '<input type="radio" name="dup-keep-' + groupIndex + '" value="' + esc(l.buyerLeadId) + '"' + (l.buyerLeadId === defaultKeepId ? " checked" : "") + '>' +
+          '<span>' +
+            '<strong>' + esc(l.buyerName || "(no name)") + '</strong>' +
+            (l.doNotContact ? ' <span class="status-pill status-dead-match">DNC</span>' : "") +
+            '<div class="small-muted">' +
+              [l.phone, l.email].filter(Boolean).join(" &middot; ") +
+              ([l.city, l.state].filter(Boolean).length ? ' &middot; ' + [l.city, l.state].filter(Boolean).join(", ") : "") +
+              ' &middot; ' + l.pitchCount + ' pitch(es), ' + l.contactCount + ' contact(s) logged' +
+              (l.createdAt ? ' &middot; added ' + formatDate(l.createdAt) : "") +
+            '</div>' +
+          '</span>' +
+        '</label>';
+      }).join("") +
+      '<div class="nav-row" style="justify-content:flex-end; margin-top:6px;">' +
+        '<button class="btn primary small dup-merge-btn" data-group-index="' + groupIndex + '">Merge This Group</button>' +
+      '</div>' +
+    '</div>';
+  }).join("");
+
+  window.__duplicateGroups = groups;
+
+  Array.from(container.querySelectorAll(".dup-merge-btn")).forEach(function (btn) {
+    btn.addEventListener("click", async function () {
+      const groupIndex = Number(btn.getAttribute("data-group-index"));
+      const group = window.__duplicateGroups[groupIndex];
+      const selected = container.querySelector('input[name="dup-keep-' + groupIndex + '"]:checked');
+      if (!selected) { showToast("Pick which lead to keep first.", true); return; }
+      const keepId = selected.value;
+      const mergeIds = group.map(function (l) { return l.buyerLeadId; }).filter(function (id) { return id !== keepId; });
+
+      if (btn.disabled) return;
+      btn.disabled = true;
+      const res = await api("adminMergeBuyerLeads", { keepId: keepId, mergeIds: mergeIds });
+      if (!res.ok) { btn.disabled = false; showToast(res.error || "Could not merge this group.", true); return; }
+      const groupEl = container.querySelector('.item-row[data-group-index="' + groupIndex + '"]');
+      if (groupEl) groupEl.remove();
+      await loadBuyerLeadsAdmin();
+      showToast("Merged " + res.mergedCount + " duplicate(s).");
+    });
+  });
+}
+
 // Shared by the admin buyer detail panel and the rep's pitch detail panel
 // -- both edit the exact same set of fields via updateBuyerLeadProfile,
 // which the backend now permits for either an admin or a rep with an open
