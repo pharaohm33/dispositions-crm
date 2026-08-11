@@ -129,6 +129,20 @@ async function doLogin() {
 
 showView(getSession());
 
+// Shown on the login page for anyone without an account yet -- loads
+// regardless of session state since it has to render before login.
+(async function loadJoinContact() {
+  const res = await api("getJoinContact", {});
+  if (!res.ok) return;
+  const parts = [];
+  if (res.name) parts.push(esc(res.name));
+  if (res.phone) parts.push(esc(res.phone));
+  if (res.email) parts.push('<a href="mailto:' + esc(res.email) + '">' + esc(res.email) + '</a>');
+  if (parts.length === 0) return;
+  document.getElementById("join-contact-text").innerHTML = '<strong>Want to join and get deals?</strong> Contact ' + parts.join(" &middot; ");
+  document.getElementById("join-contact-card").hidden = false;
+})();
+
 /* ============================================================
    REP VIEW
    ============================================================ */
@@ -1129,11 +1143,27 @@ function renderAdminFbList(requests) {
 /* ---------- Team tab ---------- */
 
 async function loadReps() {
-  const res = await api("adminGetReps", {});
-  if (!res.ok) return;
-  adminReps = res.reps;
-  renderReps();
+  const [repsRes, joinRes] = await Promise.all([api("adminGetReps", {}), api("getJoinContact", {})]);
+  if (repsRes.ok) { adminReps = repsRes.reps; renderReps(); }
+  if (joinRes.ok) {
+    document.getElementById("join-contact-name-input").value = joinRes.name || "";
+    document.getElementById("join-contact-phone-input").value = joinRes.phone || "";
+    document.getElementById("join-contact-email-input").value = joinRes.email || "";
+  }
 }
+
+document.getElementById("join-contact-save-btn").addEventListener("click", async function () {
+  const btn = this;
+  if (btn.disabled) return;
+  btn.disabled = true;
+  await api("adminSetJoinContact", {
+    name: document.getElementById("join-contact-name-input").value.trim(),
+    phone: document.getElementById("join-contact-phone-input").value.trim(),
+    email: document.getElementById("join-contact-email-input").value.trim()
+  });
+  btn.disabled = false;
+  showToast("Join contact saved.");
+});
 
 function renderReps() {
   const tbody = document.getElementById("reps-tbody");
@@ -1144,6 +1174,7 @@ function renderReps() {
       '<td>' + esc(r.name) + '</td>' +
       '<td>' + esc(r.username) + '</td>' +
       '<td>' + esc(r.phone || "") + '</td>' +
+      '<td>' + esc(r.email || "") + '</td>' +
       '<td><label class="toggle-row"><input type="checkbox" class="rep-toggle" data-username="' + esc(r.username) + '" data-field="allAccess"' + (r.allAccess ? " checked" : "") + '></label></td>' +
       '<td><label class="toggle-row"><input type="checkbox" class="rep-toggle" data-username="' + esc(r.username) + '" data-field="isAdmin"' + (r.isAdmin ? " checked" : "") + '></label></td>' +
       '<td><label class="toggle-row"><input type="checkbox" class="rep-toggle" data-username="' + esc(r.username) + '" data-field="active"' + (r.active ? " checked" : "") + '></label></td>' +
@@ -1152,7 +1183,7 @@ function renderReps() {
       '<td class="small-muted">' + [r.preferredCity, r.preferredState, r.preferredZip].filter(Boolean).join(", ") + '</td>' +
       '<td style="white-space:nowrap;">' +
         '<button class="btn secondary small reset-pw-btn" data-username="' + esc(r.username) + '" data-name="' + esc(r.name) + '">Reset Password</button> ' +
-        '<button class="btn secondary small area-btn" data-username="' + esc(r.username) + '" data-name="' + esc(r.name) + '" data-phone="' + esc(r.phone) + '" data-city="' + esc(r.preferredCity) + '" data-state="' + esc(r.preferredState) + '" data-zip="' + esc(r.preferredZip) + '">Edit Details</button>' +
+        '<button class="btn secondary small area-btn" data-username="' + esc(r.username) + '" data-name="' + esc(r.name) + '" data-phone="' + esc(r.phone) + '" data-email="' + esc(r.email) + '" data-city="' + esc(r.preferredCity) + '" data-state="' + esc(r.preferredState) + '" data-zip="' + esc(r.preferredZip) + '">Edit Details</button>' +
       '</td>' +
       '</tr>';
   }).join("");
@@ -1174,15 +1205,16 @@ function renderReps() {
 
   Array.from(tbody.querySelectorAll(".area-btn")).forEach(function (btn) {
     btn.addEventListener("click", function () {
-      openAreaModal(btn.getAttribute("data-username"), btn.getAttribute("data-name"), btn.getAttribute("data-phone"),
+      openAreaModal(btn.getAttribute("data-username"), btn.getAttribute("data-name"), btn.getAttribute("data-phone"), btn.getAttribute("data-email"),
         btn.getAttribute("data-city"), btn.getAttribute("data-state"), btn.getAttribute("data-zip"));
     });
   });
 }
 
-function openAreaModal(username, name, phone, city, state, zip) {
+function openAreaModal(username, name, phone, email, city, state, zip) {
   document.getElementById("area-modal-who").textContent = name + " (" + username + ")";
   document.getElementById("area-phone-input").value = phone || "";
+  document.getElementById("area-email-input").value = email || "";
   document.getElementById("area-city-input").value = city || "";
   document.getElementById("area-state-input").value = state || "";
   document.getElementById("area-zip-input").value = zip || "";
@@ -1202,6 +1234,7 @@ document.getElementById("area-modal-save").addEventListener("click", async funct
   await api("adminSetRepPreferredArea", {
     username: username,
     phone: document.getElementById("area-phone-input").value.trim(),
+    email: document.getElementById("area-email-input").value.trim(),
     city: document.getElementById("area-city-input").value.trim(),
     state: document.getElementById("area-state-input").value.trim(),
     zip: document.getElementById("area-zip-input").value.trim()
@@ -1215,6 +1248,7 @@ document.getElementById("area-modal-save").addEventListener("click", async funct
 document.getElementById("add-rep-btn").addEventListener("click", function () {
   document.getElementById("rep-name-input").value = "";
   document.getElementById("rep-phone-input").value = "";
+  document.getElementById("rep-email-input").value = "";
   document.getElementById("rep-username-input").value = "";
   document.getElementById("rep-password-input").value = "";
   document.getElementById("rep-allaccess-input").checked = false;
@@ -1234,6 +1268,7 @@ document.getElementById("rep-modal-save").addEventListener("click", async functi
   const data = {
     name: document.getElementById("rep-name-input").value.trim(),
     phone: document.getElementById("rep-phone-input").value.trim(),
+    email: document.getElementById("rep-email-input").value.trim(),
     username: document.getElementById("rep-username-input").value.trim(),
     password: document.getElementById("rep-password-input").value,
     allAccess: document.getElementById("rep-allaccess-input").checked,

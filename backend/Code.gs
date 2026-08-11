@@ -59,7 +59,7 @@ const FOLLOWUP_HOURS = 24;
 const MATCH_STATUSES = ['Active Match', 'Negotiating', 'Closing', 'Dead Match'];
 const DEFAULT_ASSET_CATEGORIES = ['Single Family', 'Multifamily (1-4 Units)', 'Multifamily (4+ Units)', 'Fix and Flip', 'Residential Vacant Land', 'Commercial'];
 
-const REP_COLUMNS = ['Username', 'Name', 'Phone', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'LastActive', 'PreferredCity', 'PreferredState', 'PreferredZip'];
+const REP_COLUMNS = ['Username', 'Name', 'Phone', 'Email', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'LastActive', 'PreferredCity', 'PreferredState', 'PreferredZip'];
 // DealCode (e.g. "A-1") plus City/State/Zip/County/Price is everything a
 // rep ever sees to identify a deal -- Address is admin-only, unconditionally
 // (see file header comment). GeneralDriveLink is visible to any rep with
@@ -178,6 +178,8 @@ function doPost(e) {
     switch (action) {
       case 'login':
         return jsonOut(login(body));
+      case 'getJoinContact':
+        return jsonOut(getJoinContact());
 
       // ---- authenticated, any rep ----
       case 'getDeals':
@@ -276,6 +278,8 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminBulkWithdrawPitches));
       case 'adminSetRepPreferredArea':
         return jsonOut(withAdminSession(body, adminSetRepPreferredArea));
+      case 'adminSetJoinContact':
+        return jsonOut(withAdminSession(body, adminSetJoinContact));
       case 'adminGetAutoFeedSettings':
         return jsonOut(withAdminSession(body, adminGetAutoFeedSettings));
       case 'adminSetAutoFeed':
@@ -703,7 +707,7 @@ function adminGetReps(body) {
     const allAccess = r['AllAccess'] === true || r['AllAccess'] === 'TRUE';
     const username = String(r['Username'] || '').trim().toLowerCase();
     return {
-      username: r['Username'], name: r['Name'], phone: r['Phone'] || '',
+      username: r['Username'], name: r['Name'], phone: r['Phone'] || '', email: r['Email'] || '',
       allAccess: allAccess,
       isAdmin: r['IsAdmin'] === true || r['IsAdmin'] === 'TRUE',
       active: !(r['Active'] === false || r['Active'] === 'FALSE'),
@@ -726,7 +730,7 @@ function adminAddRep(body) {
   }
   const salt = Utilities.getUuid();
   appendRowByHeaders(sheet, {
-    'Username': username, 'Name': d.name, 'Phone': d.phone || '', 'PasswordHash': hashPassword(d.password, salt), 'Salt': salt,
+    'Username': username, 'Name': d.name, 'Phone': d.phone || '', 'Email': d.email || '', 'PasswordHash': hashPassword(d.password, salt), 'Salt': salt,
     'AllAccess': !!d.allAccess, 'IsAdmin': !!d.isAdmin, 'Active': true, 'CreatedAt': new Date().toISOString(), 'LastActive': ''
   });
   return { ok: true };
@@ -1640,9 +1644,35 @@ function adminSetRepPreferredArea(body) {
   const match = reps.find(function (r) { return String(r['Username'] || '').trim().toLowerCase() === username; });
   if (!match) return { ok: false, error: 'Rep not found.' };
   if (body.phone !== undefined) sheet.getRange(match._row, getColumnIndex(sheet, 'Phone')).setValue(body.phone || '');
+  if (body.email !== undefined) sheet.getRange(match._row, getColumnIndex(sheet, 'Email')).setValue(body.email || '');
   sheet.getRange(match._row, getColumnIndex(sheet, 'PreferredCity')).setValue(body.city || '');
   sheet.getRange(match._row, getColumnIndex(sheet, 'PreferredState')).setValue(body.state || '');
   sheet.getRange(match._row, getColumnIndex(sheet, 'PreferredZip')).setValue(body.zip || '');
+  return { ok: true };
+}
+
+// ---------- "Want to join?" contact (shown on the login page) ----------
+// Deliberately just script properties rather than a Reps row -- this isn't
+// a real login, it's a contact card for anyone who doesn't have an account
+// yet and wants to ask about joining the dispositions team to get deals.
+// Admin can point it at themselves, someone else, or swap it any time
+// without touching the actual team roster. getJoinContact is public (no
+// session) since it has to render before anyone logs in.
+function getJoinContact() {
+  const props = PropertiesService.getScriptProperties();
+  return {
+    ok: true,
+    name: props.getProperty('JOIN_CONTACT_NAME') || '',
+    phone: props.getProperty('JOIN_CONTACT_PHONE') || '',
+    email: props.getProperty('JOIN_CONTACT_EMAIL') || ''
+  };
+}
+
+function adminSetJoinContact(body) {
+  const props = PropertiesService.getScriptProperties();
+  props.setProperty('JOIN_CONTACT_NAME', body.name || '');
+  props.setProperty('JOIN_CONTACT_PHONE', body.phone || '');
+  props.setProperty('JOIN_CONTACT_EMAIL', body.email || '');
   return { ok: true };
 }
 

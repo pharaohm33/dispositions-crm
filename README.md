@@ -85,16 +85,21 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   online listing link, track sourcing details, whatever you don't want any
   rep to ever see.
 - **Team** — add/remove team members, toggle "all-deal access" or admin
-  rights per person, reset anyone's password. No email or self-serve signup —
-  you create every login yourself. Each rep's row also shows their **phone
-  number**, **# of active deals** they can currently work (every active deal
-  for an all-access rep, otherwise however many they've been specifically
-  assigned), and **last active** (their most recent login) — a quick way to
-  spot who's overloaded or who's gone quiet. **Edit Details** on a rep lets
-  you set/update their phone plus their preferred buyer-lead area — city and
-  zip are still single values, but **states are now a comma-separated list**
-  (e.g. "AZ, NV, CA"), so a rep who works multiple states can be matched
-  across all of them instead of just one.
+  rights per person, reset anyone's password. No self-serve signup — you
+  create every login yourself. Each rep's row (including your own admin
+  account) shows their **phone number** and **email**, **# of active deals**
+  they can currently work (every active deal for an all-access rep,
+  otherwise however many they've been specifically assigned), and **last
+  active** (their most recent login) — a quick way to spot who's overloaded
+  or who's gone quiet. **Edit Details** on a rep lets you set/update their
+  phone, email, and preferred buyer-lead area — city and zip are still
+  single values, but **states are now a comma-separated list** (e.g. "AZ,
+  NV, CA"), so a rep who works multiple states can be matched across all of
+  them instead of just one. A separate **"Want to Join?" Contact** box at
+  the top of the Team tab sets the name/phone/email shown on the login
+  page for anyone without an account yet who's asking how to get set up
+  with deals — it isn't tied to any real login, so you can point it at
+  yourself, someone else, or swap it any time.
 - **Facebook Approvals** — every pending post request across all deals in one
   place, approve or reject with an optional note.
 - **Buyer Matches** — every interested-buyer match across all deals in one

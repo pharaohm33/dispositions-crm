@@ -221,6 +221,9 @@
       <button class="btn primary" id="login-btn">Log In</button>
     </div>
   </div>
+  <div class="card" id="join-contact-card" hidden>
+    <p class="small-muted" style="margin:0;" id="join-contact-text"></p>
+  </div>
 </div>
 
 <!-- ================= REP VIEW ================= -->
@@ -308,11 +311,24 @@
 
   <!-- Team tab -->
   <div id="tab-team" hidden>
+    <div class="card">
+      <div class="section-title" style="margin-top:0;">"Want to Join?" Contact</div>
+      <p class="small-muted">Shown on the login page, before anyone signs in — for buyers or prospective team members asking how to get set up with deals. Independent of any real login, so you can point it at yourself, someone else, or swap it any time.</p>
+      <div class="row3">
+        <div><label class="field-label">Name</label><input type="text" id="join-contact-name-input"></div>
+        <div><label class="field-label">Phone</label><input type="text" id="join-contact-phone-input"></div>
+        <div><label class="field-label">Email</label><input type="text" id="join-contact-email-input"></div>
+      </div>
+      <div class="nav-row" style="justify-content:flex-end;">
+        <button class="btn secondary small" id="join-contact-save-btn">Save</button>
+      </div>
+    </div>
+
     <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
       <button class="btn primary" id="add-rep-btn">+ Add Team Member</button>
     </div>
     <table class="crm-table">
-      <thead><tr><th>Name</th><th>Username</th><th>Phone</th><th>All-Deal Access</th><th>Admin</th><th>Active</th><th># Deals</th><th>Last Active</th><th>Preferred Buyer-Lead Area</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Name</th><th>Username</th><th>Phone</th><th>Email</th><th>All-Deal Access</th><th>Admin</th><th>Active</th><th># Deals</th><th>Last Active</th><th>Preferred Buyer-Lead Area</th><th>Actions</th></tr></thead>
       <tbody id="reps-tbody"></tbody>
     </table>
     <div id="reps-empty" class="small-muted" style="padding:20px;" hidden>No team members yet.</div>
@@ -582,6 +598,8 @@
     <input type="text" id="rep-name-input">
     <label class="field-label">Phone <span class="small-muted">(optional)</span></label>
     <input type="text" id="rep-phone-input">
+    <label class="field-label">Email <span class="small-muted">(optional)</span></label>
+    <input type="text" id="rep-email-input">
     <label class="field-label">Username</label>
     <input type="text" id="rep-username-input" autocomplete="off">
     <label class="field-label">Temporary Password</label>
@@ -618,6 +636,8 @@
     <p class="small-muted" id="area-modal-who"></p>
     <label class="field-label">Phone <span class="small-muted">(optional)</span></label>
     <input type="text" id="area-phone-input">
+    <label class="field-label">Email <span class="small-muted">(optional)</span></label>
+    <input type="text" id="area-email-input">
     <label class="field-label">City</label>
     <input type="text" id="area-city-input">
     <label class="field-label">States <span class="small-muted">(comma separated, e.g. AZ, NV, CA)</span></label>
