@@ -496,7 +496,7 @@ async function openPitchDetail(pitchId) {
   if (hours) {
     hoursBanner = hours.withinCallingHours
       ? '<div class="banner info">Within calling hours &mdash; it\'s currently ' + hours.hour + ':00 for this buyer.</div>'
-      : '<div class="banner danger"><strong>Outside calling hours.</strong> It\'s currently ' + hours.hour + ':00 for this buyer &mdash; contact hours are 8am&ndash;7pm their time.</div>';
+      : '<div class="banner warn"><strong>Outside typical calling hours</strong> &mdash; it\'s currently ' + hours.hour + ':00 for this buyer. Contact hours are usually 8am&ndash;7pm their time for a first outreach; go ahead if the buyer reached out to you, or if you\'re just working a little earlier or later.</div>';
   }
 
   const dncBanner = pitch.doNotContact

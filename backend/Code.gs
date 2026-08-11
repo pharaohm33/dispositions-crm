@@ -1888,12 +1888,13 @@ function addPitchContact(body, session) {
     }
   }
 
-  if (!session.a && lead) {
-    const hours = callingHoursInfo(lead['State']);
-    if (hours && !hours.withinCallingHours) {
-      return { ok: false, error: 'Outside calling hours for this buyer (it\'s currently ' + hours.hour + ':00 there). Contact hours are 8am-7pm in the buyer\'s time zone.' };
-    }
-  }
+  // Calling hours (8am-7pm in the buyer's time zone) are a heads-up, not a
+  // hard rule -- the pitch detail banner warns before a rep logs anything,
+  // but it's never enforced here. A blanket block would also stop a rep
+  // from logging a contact the BUYER initiated outside those hours (they
+  // called in late, or a rep is just working a little earlier/later than
+  // usual), which isn't the outbound-cold-contact behavior this was meant
+  // to discourage in the first place.
 
   const sheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
   const contactId = Utilities.getUuid();
