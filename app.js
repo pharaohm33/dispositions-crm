@@ -1786,6 +1786,7 @@ document.getElementById("autofeed-run-btn").addEventListener("click", async func
 document.getElementById("buyerleads-search").addEventListener("input", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
 document.getElementById("buyerleads-filter-category").addEventListener("change", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
 document.getElementById("buyerleads-filter-state").addEventListener("input", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
+document.getElementById("buyerleads-filter-cities").addEventListener("input", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
 
 async function loadBuyerLeadsAdmin() {
   const res = await api("adminGetBuyerLeads", {});
@@ -1802,10 +1803,17 @@ function getFilteredBuyerLeads() {
   const q = document.getElementById("buyerleads-search").value.trim().toLowerCase();
   const category = document.getElementById("buyerleads-filter-category").value;
   const state = document.getElementById("buyerleads-filter-state").value.trim().toLowerCase();
+  // Same comma-separated, case/whitespace-insensitive convention as a
+  // deal's "Also Match These Cities" -- lets admin mass-select buyers
+  // across several cities in one state at once (e.g. "Phoenix, Tempe,
+  // Mesa") instead of only ever being able to filter to one exact city.
+  const cities = document.getElementById("buyerleads-filter-cities").value
+    .split(",").map(function (c) { return c.trim().toLowerCase(); }).filter(Boolean);
   return adminBuyerLeads.filter(function (l) {
     if (q && ![l.BuyerName, l.Phone, l.Email, l.City, l.State, l.Zip, l.County].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; })) return false;
     if (category && (l.AssetCategories || "").split(",").map(function (c) { return c.trim().toLowerCase(); }).indexOf(category.toLowerCase()) === -1) return false;
     if (state && String(l.State || "").trim().toLowerCase() !== state) return false;
+    if (cities.length > 0 && cities.indexOf(String(l.City || "").trim().toLowerCase()) === -1) return false;
     return true;
   });
 }

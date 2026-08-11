@@ -130,9 +130,12 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   Every contact a rep logs — and every "Interested Buyer" logged on a deal
   page — can optionally record what % of ARV or as-is value that buyer
   expressed interest at, building real data over time on what buyers
-  actually pay relative to value. The table filters by Asset Category and
-  State, lets you select everyone on the page or the first N matching your
-  filter (e.g. "give me 50 Single Family buyers"), and give that whole
+  actually pay relative to value. The table filters by Asset Category,
+  State, and **Cities** (comma separated, e.g. "Phoenix, Tempe, Mesa" — same
+  convention as a deal's match cities) so a mass-select isn't limited to one
+  exact city within a state, lets you select everyone on the page or the
+  first N matching your filter (e.g. "give me 50 Single Family buyers in
+  Phoenix, Tempe, or Mesa"), and give that whole
   selection to one rep for one deal at once — and paginates at 50 rows so a
   list of 100+ never loads all at once. Give a buyer to a rep individually,
   or give a whole batch at once for one specific deal — matched
