@@ -1,5 +1,5 @@
 /**
- * Dispositions CRM — Apps Script backend.
+ * SendMyBuyer — Apps Script backend.
  *
  * Deploy this bound to a Google Sheet (see SETUP.md). It is the entire
  * "server": rep + admin login, deal management, per-deal access control,
@@ -160,7 +160,7 @@ const BUYER_LEAD_CONTACT_COLUMNS = ['ContactID', 'PitchID', 'BuyerLeadID', 'Deal
 function doGet(e) {
   const action = e && e.parameter && e.parameter.action;
   if (action === 'ping') {
-    return jsonOut({ ok: true, message: 'Dispositions CRM backend is alive.' });
+    return jsonOut({ ok: true, message: 'SendMyBuyer backend is alive.' });
   }
   return jsonOut({ ok: false, error: 'Use POST for this API.' });
 }
@@ -850,7 +850,7 @@ function addInterestedBuyer(body, session) {
     const dealLabel = deal ? (deal['DealCode'] || deal['Address']) : body.dealId;
     MailApp.sendEmail({
       to: adminEmail,
-      subject: 'Dispositions CRM — new interested buyer',
+      subject: 'SendMyBuyer — new interested buyer',
       body: session.n + ' (' + session.u + ') logged an interested buyer on ' + dealLabel + ':\n\n' +
         'Buyer name: ' + body.buyerName +
         (body.buyerContact ? '\nBuyer contact: ' + body.buyerContact : '') +
@@ -927,7 +927,7 @@ function submitFbPostRequest(body, session) {
     const address = deal ? deal['Address'] : body.dealId;
     MailApp.sendEmail({
       to: adminEmail,
-      subject: 'Dispositions CRM — new Facebook post pending approval',
+      subject: 'SendMyBuyer — new Facebook post pending approval',
       body: session.n + ' (' + session.u + ') wants to post about:\n\n' + address +
         '\n\nGroups: ' + (body.targetGroups || '(none specified)') +
         '\n\nPost text:\n' + body.postText +

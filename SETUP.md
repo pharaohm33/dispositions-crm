@@ -8,7 +8,7 @@ own. You only need to do this once.
 ## 1. Create the Sheet
 
 1. Go to [sheets.google.com](https://sheets.google.com) and create a new blank
-   spreadsheet. Name it something like **Dispositions CRM — Data**.
+   spreadsheet. Name it something like **SendMyBuyer — Data**.
 2. Leave it empty — the script creates its own tabs (`Reps`, `Deals`,
    `Assignments`, `InterestedBuyers`, `FBPostRequests`, `StatusOptions`,
    `BuyerLeads`, `Pitches`, `BuyerLeadContacts`) automatically the first time
@@ -58,7 +58,7 @@ live only inside this Apps Script project.
 
 To sanity-check the deployment on its own, paste the Web App URL into a
 browser tab with `?action=ping` on the end — you should see
-`{"ok":true,"message":"Dispositions CRM backend is alive."}`.
+`{"ok":true,"message":"SendMyBuyer backend is alive."}`.
 
 ## Optional: automatic auto-feed (time-driven trigger)
 

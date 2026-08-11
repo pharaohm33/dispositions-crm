@@ -1,4 +1,4 @@
-# Dispositions CRM
+# SendMyBuyer - Wholesale Deals For Sale & Disposition Team
 
 An internal tool for a dispositions team to work active deals: admin assigns
 deals to specific reps (or gives them access to everything), and each rep
