@@ -67,6 +67,14 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
 
 **Admin side** (behind the same login, when marked as admin):
 
+- A **Work as Rep** button in the header lets admin drop into these same
+  rep screens at any time — handy for working deals directly while the rep
+  side is still being built out or the team is still small. It's just a
+  display toggle (nothing about the login or its permissions changes), and
+  it resets back to the admin view on next login. Admin can also be picked
+  as a "give to" target anywhere a buyer lead gets handed to a rep, so
+  there's something to actually work once you switch over.
+
 - **Deals** — add deals, change a deal's status (Active, Sold, Dead, Under
   Contract, On Hold, or whatever categories you've defined), edit the
   **Address / City / State / Zip** at any time after creation (e.g. a typo,

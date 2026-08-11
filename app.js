@@ -74,9 +74,17 @@ function formatDate(iso) {
    ============================================================ */
 
 const els = {};
-["login-view", "rep-view", "admin-view", "who-label", "logout-btn"].forEach(function (id) {
+["login-view", "rep-view", "admin-view", "who-label", "logout-btn", "switch-view-btn"].forEach(function (id) {
   els[id] = document.getElementById(id);
 });
+
+// Lets an admin drop into the same screens a rep uses -- handy while the
+// rep side is still being built out / the team is still small, so admin
+// can work deals themselves without needing a second login. Purely a
+// display toggle: the session and its permissions never change, admin
+// just chooses which UI to look at. Resets to the admin view on logout /
+// next login rather than persisting, so it's always the default.
+let adminActingAsRep = false;
 
 function showView(session) {
   els["login-view"].hidden = !!session;
@@ -84,20 +92,29 @@ function showView(session) {
   els["admin-view"].hidden = true;
   els["who-label"].hidden = !session;
   els["logout-btn"].hidden = !session;
+  els["switch-view-btn"].hidden = !session || !session.isAdmin;
 
   if (!session) return;
   els["who-label"].textContent = session.name + (session.isAdmin ? " (Admin)" : "");
 
-  if (session.isAdmin) {
+  if (session.isAdmin && !adminActingAsRep) {
+    els["switch-view-btn"].textContent = "Work as Rep";
     els["admin-view"].hidden = false;
     initAdminView();
   } else {
+    els["switch-view-btn"].textContent = "Back to Admin";
     els["rep-view"].hidden = false;
     initRepView();
   }
 }
 
+document.getElementById("switch-view-btn").addEventListener("click", function () {
+  adminActingAsRep = !adminActingAsRep;
+  showView(getSession());
+});
+
 document.getElementById("logout-btn").addEventListener("click", function () {
+  adminActingAsRep = false;
   setSession(null);
   showView(null);
 });
@@ -1431,9 +1448,12 @@ function renderMassEditCategories() {
 async function populateBulkGiveSelects() {
   const [repsRes, dealsRes] = await Promise.all([api("adminGetReps", {}), api("getDeals", {})]);
   if (repsRes.ok) {
-    buyerLeadsActiveReps = repsRes.reps.filter(function (r) { return r.active && !r.isAdmin; });
+    // Admins can be given buyer leads too (not just reps) -- lets an admin
+    // hand themselves a lead and work it via "Work as Rep" while the rep
+    // side is still getting built out / the team is still small.
+    buyerLeadsActiveReps = repsRes.reps.filter(function (r) { return r.active; });
     const repOptions = buyerLeadsActiveReps.map(function (r) {
-      return '<option value="' + esc(r.username) + '">' + esc(r.name) + ' (' + esc(r.username) + ')</option>';
+      return '<option value="' + esc(r.username) + '">' + esc(r.name) + ' (' + esc(r.username) + ')' + (r.isAdmin ? " — Admin" : "") + '</option>';
     }).join("");
     document.getElementById("bulk-give-rep-select").innerHTML = repOptions;
     document.getElementById("give-selected-rep-select").innerHTML = repOptions;
@@ -2045,7 +2065,7 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
     (givableDeals.length > 0
       ? '<div class="row2">' +
           '<div><select id="give-new-deal-select">' + givableDeals.map(function (d) { return '<option value="' + esc(d.DealID) + '">' + esc(d.DealCode ? d.DealCode + " — " + d.Address : d.Address) + '</option>'; }).join("") + '</select></div>' +
-          '<div><select id="give-new-rep-select">' + buyerLeadsActiveReps.map(function (r) { return '<option value="' + esc(r.username) + '">' + esc(r.name) + '</option>'; }).join("") + '</select></div>' +
+          '<div><select id="give-new-rep-select">' + buyerLeadsActiveReps.map(function (r) { return '<option value="' + esc(r.username) + '">' + esc(r.name) + (r.isAdmin ? " — Admin" : "") + '</option>'; }).join("") + '</select></div>' +
         '</div>' +
         '<div class="nav-row" style="justify-content:flex-end;"><button class="btn primary small" id="give-new-pitch-btn">Give This Buyer Lead To</button></div>'
       : '<p class="small-muted">This buyer already has an open pitch on every active deal, or there are no active deals yet.</p>')) +
@@ -2120,7 +2140,7 @@ function renderAdminPitchesList(pitches) {
       '</div>' +
       '<div style="display:flex; gap:8px; margin-top:8px;">' +
         '<select class="pitch-reassign-select" data-pitch-id="' + esc(p.PitchID) + '" style="flex:1;">' +
-          buyerLeadsActiveReps.map(function (r) { return '<option value="' + esc(r.username) + '"' + (r.username === p.Username ? " selected" : "") + '>' + esc(r.name) + '</option>'; }).join("") +
+          buyerLeadsActiveReps.map(function (r) { return '<option value="' + esc(r.username) + '"' + (r.username === p.Username ? " selected" : "") + '>' + esc(r.name) + (r.isAdmin ? " — Admin" : "") + '</option>'; }).join("") +
         '</select>' +
         '<button class="btn secondary small pitch-reassign-btn" data-pitch-id="' + esc(p.PitchID) + '">Give to</button>' +
         '<button class="btn secondary small pitch-withdraw-btn" data-pitch-id="' + esc(p.PitchID) + '">Withdraw</button>' +
@@ -2177,11 +2197,11 @@ let pitchesFilterDealsCache = [];
 
 async function initAdminPitchesTab() {
   const [repsRes, dealsRes] = await Promise.all([api("adminGetReps", {}), api("getDeals", {})]);
-  if (repsRes.ok) pitchesFilterRepsCache = repsRes.reps.filter(function (r) { return !r.isAdmin; });
+  if (repsRes.ok) pitchesFilterRepsCache = repsRes.reps;
   if (dealsRes.ok) pitchesFilterDealsCache = dealsRes.deals;
 
   document.getElementById("pitches-filter-rep").innerHTML = '<option value="">All Team Members</option>' +
-    pitchesFilterRepsCache.map(function (r) { return '<option value="' + esc(r.username) + '">' + esc(r.name) + '</option>'; }).join("");
+    pitchesFilterRepsCache.map(function (r) { return '<option value="' + esc(r.username) + '">' + esc(r.name) + (r.isAdmin ? " — Admin" : "") + '</option>'; }).join("");
   document.getElementById("pitches-filter-deal").innerHTML = '<option value="">All Deals</option>' +
     pitchesFilterDealsCache.map(function (d) { return '<option value="' + esc(d.DealID) + '">' + esc(d.DealCode ? d.DealCode + " — " + d.Address : d.Address) + '</option>'; }).join("");
 
@@ -2232,7 +2252,7 @@ function renderAdminPitchesTable() {
       '<td class="small-muted">' + formatDate(p.GivenAt) + '</td>' +
       '<td style="white-space:nowrap;">' +
         '<select class="pitch-row-reassign-select" data-pitch-id="' + esc(p.PitchID) + '">' +
-          pitchesFilterRepsCache.map(function (r) { return '<option value="' + esc(r.username) + '"' + (r.username === p.Username ? " selected" : "") + '>' + esc(r.name) + '</option>'; }).join("") +
+          pitchesFilterRepsCache.map(function (r) { return '<option value="' + esc(r.username) + '"' + (r.username === p.Username ? " selected" : "") + '>' + esc(r.name) + (r.isAdmin ? " — Admin" : "") + '</option>'; }).join("") +
         '</select> ' +
         '<button class="btn secondary small pitch-row-reassign-btn" data-pitch-id="' + esc(p.PitchID) + '">Give to</button> ' +
         '<button class="btn danger small pitch-row-withdraw-btn" data-pitch-id="' + esc(p.PitchID) + '">Withdraw</button>' +
