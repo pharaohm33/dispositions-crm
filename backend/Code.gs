@@ -59,7 +59,7 @@ const FOLLOWUP_HOURS = 24;
 const MATCH_STATUSES = ['Active Match', 'Negotiating', 'Closing', 'Dead Match'];
 const DEFAULT_ASSET_CATEGORIES = ['Single Family', 'Multifamily (1-4 Units)', 'Multifamily (4+ Units)', 'Fix and Flip', 'Residential Vacant Land', 'Commercial'];
 
-const REP_COLUMNS = ['Username', 'Name', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'PreferredCity', 'PreferredState', 'PreferredZip'];
+const REP_COLUMNS = ['Username', 'Name', 'Phone', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'LastActive', 'PreferredCity', 'PreferredState', 'PreferredZip'];
 // DealCode (e.g. "A-1") plus City/State/Zip/County/Price is everything a
 // rep ever sees to identify a deal -- Address is admin-only, unconditionally
 // (see file header comment). GeneralDriveLink is visible to any rep with
@@ -472,6 +472,11 @@ function login(body) {
   const computed = hashPassword(password, rep['Salt']);
   if (computed !== rep['PasswordHash']) return { ok: false, error: 'Incorrect username or password.' };
 
+  // "Last active" is last successful login -- cheap to track (once per
+  // session, not per request) and close enough to what admin actually
+  // wants to know: is this person still logging in and working deals.
+  sheet.getRange(rep['_row'], getColumnIndex(sheet, 'LastActive')).setValue(new Date().toISOString());
+
   return {
     ok: true,
     token: makeSessionToken(rep),
@@ -672,15 +677,38 @@ function adminRemoveStatusOption(body) {
 
 // ---------- Reps (team) ----------
 
+// "# of deals" is active deals (not Sold/Dead) the rep can currently work
+// -- for an all-access rep that's every active deal; for anyone else it's
+// however many active deals they've specifically been assigned (a stale
+// assignment to a deal that's since sold/died doesn't count, so the
+// number always matches what they'd actually see in their own app).
 function adminGetReps(body) {
+  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const activeDealIds = {};
+  let activeDealsCount = 0;
+  sheetToObjects(dealsSheet).forEach(function (d) {
+    if (dealIsActive(d)) { activeDealIds[d['DealID']] = true; activeDealsCount++; }
+  });
+
+  const assignmentsSheet = getSheet(ASSIGNMENTS_SHEET, ASSIGNMENT_COLUMNS);
+  const assignedActiveCountByUsername = {};
+  sheetToObjects(assignmentsSheet).forEach(function (a) {
+    if (!activeDealIds[a['DealID']]) return;
+    const u = String(a['Username'] || '').trim().toLowerCase();
+    assignedActiveCountByUsername[u] = (assignedActiveCountByUsername[u] || 0) + 1;
+  });
+
   const sheet = getSheet(REPS_SHEET, REP_COLUMNS);
   const reps = sheetToObjects(sheet).map(function (r) {
+    const allAccess = r['AllAccess'] === true || r['AllAccess'] === 'TRUE';
+    const username = String(r['Username'] || '').trim().toLowerCase();
     return {
-      username: r['Username'], name: r['Name'],
-      allAccess: r['AllAccess'] === true || r['AllAccess'] === 'TRUE',
+      username: r['Username'], name: r['Name'], phone: r['Phone'] || '',
+      allAccess: allAccess,
       isAdmin: r['IsAdmin'] === true || r['IsAdmin'] === 'TRUE',
       active: !(r['Active'] === false || r['Active'] === 'FALSE'),
-      createdAt: r['CreatedAt'],
+      createdAt: r['CreatedAt'], lastActive: r['LastActive'] || '',
+      dealsAssignedCount: allAccess ? activeDealsCount : (assignedActiveCountByUsername[username] || 0),
       preferredCity: r['PreferredCity'] || '', preferredState: r['PreferredState'] || '', preferredZip: r['PreferredZip'] || ''
     };
   });
@@ -698,8 +726,8 @@ function adminAddRep(body) {
   }
   const salt = Utilities.getUuid();
   appendRowByHeaders(sheet, {
-    'Username': username, 'Name': d.name, 'PasswordHash': hashPassword(d.password, salt), 'Salt': salt,
-    'AllAccess': !!d.allAccess, 'IsAdmin': !!d.isAdmin, 'Active': true, 'CreatedAt': new Date().toISOString()
+    'Username': username, 'Name': d.name, 'Phone': d.phone || '', 'PasswordHash': hashPassword(d.password, salt), 'Salt': salt,
+    'AllAccess': !!d.allAccess, 'IsAdmin': !!d.isAdmin, 'Active': true, 'CreatedAt': new Date().toISOString(), 'LastActive': ''
   });
   return { ok: true };
 }
@@ -1600,6 +1628,10 @@ function adminGetPitchContacts(body) {
   return { ok: true, contacts: contacts };
 }
 
+// Also doubles as the general "edit a rep's details" save -- phone plus
+// their preferred working area (city/zip are still single values; state
+// is a comma-separated list so a rep can be matched against deals across
+// several states at once, same convention as a deal's MatchCities).
 function adminSetRepPreferredArea(body) {
   if (!body.username) return { ok: false, error: 'Missing username.' };
   const username = String(body.username).trim().toLowerCase();
@@ -1607,6 +1639,7 @@ function adminSetRepPreferredArea(body) {
   const reps = sheetToObjects(sheet);
   const match = reps.find(function (r) { return String(r['Username'] || '').trim().toLowerCase() === username; });
   if (!match) return { ok: false, error: 'Rep not found.' };
+  if (body.phone !== undefined) sheet.getRange(match._row, getColumnIndex(sheet, 'Phone')).setValue(body.phone || '');
   sheet.getRange(match._row, getColumnIndex(sheet, 'PreferredCity')).setValue(body.city || '');
   sheet.getRange(match._row, getColumnIndex(sheet, 'PreferredState')).setValue(body.state || '');
   sheet.getRange(match._row, getColumnIndex(sheet, 'PreferredZip')).setValue(body.zip || '');
@@ -1645,7 +1678,10 @@ function adminRunAutoFeedNow(body) {
 
 function repMatchesArea(rep, deal) {
   if (rep['PreferredCity'] && normalizeText(rep['PreferredCity']) !== normalizeText(deal['City'])) return false;
-  if (rep['PreferredState'] && normalizeText(rep['PreferredState']) !== normalizeText(deal['State'])) return false;
+  if (rep['PreferredState']) {
+    const states = splitCommaList(rep['PreferredState']).map(normalizeText);
+    if (states.length > 0 && states.indexOf(normalizeText(deal['State'])) === -1) return false;
+  }
   if (rep['PreferredZip'] && String(rep['PreferredZip']) !== String(deal['Zip'] || '')) return false;
   return true;
 }

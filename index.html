@@ -311,7 +311,7 @@
       <button class="btn primary" id="add-rep-btn">+ Add Team Member</button>
     </div>
     <table class="crm-table">
-      <thead><tr><th>Name</th><th>Username</th><th>All-Deal Access</th><th>Admin</th><th>Active</th><th>Preferred Buyer-Lead Area</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Name</th><th>Username</th><th>Phone</th><th>All-Deal Access</th><th>Admin</th><th>Active</th><th># Deals</th><th>Last Active</th><th>Preferred Buyer-Lead Area</th><th>Actions</th></tr></thead>
       <tbody id="reps-tbody"></tbody>
     </table>
     <div id="reps-empty" class="small-muted" style="padding:20px;" hidden>No team members yet.</div>
@@ -579,6 +579,8 @@
     <h3>Add Team Member</h3>
     <label class="field-label">Full Name</label>
     <input type="text" id="rep-name-input">
+    <label class="field-label">Phone <span class="small-muted">(optional)</span></label>
+    <input type="text" id="rep-phone-input">
     <label class="field-label">Username</label>
     <input type="text" id="rep-username-input" autocomplete="off">
     <label class="field-label">Temporary Password</label>
@@ -608,18 +610,20 @@
   </div>
 </div>
 
-<!-- Preferred buyer-lead area modal -->
+<!-- Rep details modal: phone + preferred buyer-lead area -->
 <div class="modal-backdrop" id="area-modal" hidden>
   <div class="modal-box" style="max-width:340px;">
-    <h3>Preferred Buyer-Lead Area</h3>
+    <h3>Edit Details</h3>
     <p class="small-muted" id="area-modal-who"></p>
+    <label class="field-label">Phone <span class="small-muted">(optional)</span></label>
+    <input type="text" id="area-phone-input">
     <label class="field-label">City</label>
     <input type="text" id="area-city-input">
-    <label class="field-label">State</label>
+    <label class="field-label">States <span class="small-muted">(comma separated, e.g. AZ, NV, CA)</span></label>
     <input type="text" id="area-state-input">
     <label class="field-label">Zip</label>
     <input type="text" id="area-zip-input">
-    <p class="small-muted">Leave any of these blank to not filter by it. Used by Auto-Feed to keep this person working the same area.</p>
+    <p class="small-muted">Leave City/States/Zip blank to not filter by it. Used by Auto-Feed to keep this person working the same area(s).</p>
     <div class="nav-row">
       <button class="btn secondary" id="area-modal-cancel">Cancel</button>
       <button class="btn primary" id="area-modal-save">Save</button>

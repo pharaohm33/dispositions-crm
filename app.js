@@ -1143,13 +1143,16 @@ function renderReps() {
     return '<tr>' +
       '<td>' + esc(r.name) + '</td>' +
       '<td>' + esc(r.username) + '</td>' +
+      '<td>' + esc(r.phone || "") + '</td>' +
       '<td><label class="toggle-row"><input type="checkbox" class="rep-toggle" data-username="' + esc(r.username) + '" data-field="allAccess"' + (r.allAccess ? " checked" : "") + '></label></td>' +
       '<td><label class="toggle-row"><input type="checkbox" class="rep-toggle" data-username="' + esc(r.username) + '" data-field="isAdmin"' + (r.isAdmin ? " checked" : "") + '></label></td>' +
       '<td><label class="toggle-row"><input type="checkbox" class="rep-toggle" data-username="' + esc(r.username) + '" data-field="active"' + (r.active ? " checked" : "") + '></label></td>' +
+      '<td>' + (r.dealsAssignedCount || 0) + (r.allAccess ? ' <span class="small-muted">(all)</span>' : "") + '</td>' +
+      '<td class="small-muted">' + (r.lastActive ? formatDate(r.lastActive) : "Never") + '</td>' +
       '<td class="small-muted">' + [r.preferredCity, r.preferredState, r.preferredZip].filter(Boolean).join(", ") + '</td>' +
       '<td style="white-space:nowrap;">' +
         '<button class="btn secondary small reset-pw-btn" data-username="' + esc(r.username) + '" data-name="' + esc(r.name) + '">Reset Password</button> ' +
-        '<button class="btn secondary small area-btn" data-username="' + esc(r.username) + '" data-name="' + esc(r.name) + '" data-city="' + esc(r.preferredCity) + '" data-state="' + esc(r.preferredState) + '" data-zip="' + esc(r.preferredZip) + '">Set Area</button>' +
+        '<button class="btn secondary small area-btn" data-username="' + esc(r.username) + '" data-name="' + esc(r.name) + '" data-phone="' + esc(r.phone) + '" data-city="' + esc(r.preferredCity) + '" data-state="' + esc(r.preferredState) + '" data-zip="' + esc(r.preferredZip) + '">Edit Details</button>' +
       '</td>' +
       '</tr>';
   }).join("");
@@ -1171,14 +1174,15 @@ function renderReps() {
 
   Array.from(tbody.querySelectorAll(".area-btn")).forEach(function (btn) {
     btn.addEventListener("click", function () {
-      openAreaModal(btn.getAttribute("data-username"), btn.getAttribute("data-name"),
+      openAreaModal(btn.getAttribute("data-username"), btn.getAttribute("data-name"), btn.getAttribute("data-phone"),
         btn.getAttribute("data-city"), btn.getAttribute("data-state"), btn.getAttribute("data-zip"));
     });
   });
 }
 
-function openAreaModal(username, name, city, state, zip) {
+function openAreaModal(username, name, phone, city, state, zip) {
   document.getElementById("area-modal-who").textContent = name + " (" + username + ")";
+  document.getElementById("area-phone-input").value = phone || "";
   document.getElementById("area-city-input").value = city || "";
   document.getElementById("area-state-input").value = state || "";
   document.getElementById("area-zip-input").value = zip || "";
@@ -1197,6 +1201,7 @@ document.getElementById("area-modal-save").addEventListener("click", async funct
   const username = btn.getAttribute("data-username");
   await api("adminSetRepPreferredArea", {
     username: username,
+    phone: document.getElementById("area-phone-input").value.trim(),
     city: document.getElementById("area-city-input").value.trim(),
     state: document.getElementById("area-state-input").value.trim(),
     zip: document.getElementById("area-zip-input").value.trim()
@@ -1204,11 +1209,12 @@ document.getElementById("area-modal-save").addEventListener("click", async funct
   btn.disabled = false;
   document.getElementById("area-modal").hidden = true;
   await loadReps();
-  showToast("Preferred area saved.");
+  showToast("Details saved.");
 });
 
 document.getElementById("add-rep-btn").addEventListener("click", function () {
   document.getElementById("rep-name-input").value = "";
+  document.getElementById("rep-phone-input").value = "";
   document.getElementById("rep-username-input").value = "";
   document.getElementById("rep-password-input").value = "";
   document.getElementById("rep-allaccess-input").checked = false;
@@ -1227,6 +1233,7 @@ document.getElementById("rep-modal-save").addEventListener("click", async functi
   errorEl.classList.remove("show");
   const data = {
     name: document.getElementById("rep-name-input").value.trim(),
+    phone: document.getElementById("rep-phone-input").value.trim(),
     username: document.getElementById("rep-username-input").value.trim(),
     password: document.getElementById("rep-password-input").value,
     allAccess: document.getElementById("rep-allaccess-input").checked,
