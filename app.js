@@ -199,11 +199,19 @@ function renderRepDeals() {
   });
   empty.hidden = filtered.length > 0;
   container.innerHTML = filtered.map(function (d) {
+    // Deal Code stays visible here no matter what -- it's the one label
+    // that also shows on this buyer's Buyer Leads / Pitches tab (which
+    // never shows the address, disclosed or not), so it's what actually
+    // lets a rep match "this pitch" to "this deal" at a glance. Without
+    // it, a rep with address access sees only the street address here but
+    // only "Re: AZ-3 Land" over on Buyer Leads, with nothing tying them
+    // together.
+    const codeTag = d.DealCode ? '<span class="status-pill status-default" style="margin-right:6px;">' + esc(d.DealCode) + '</span>' : "";
     const heading = d.Address
       ? esc(d.Address) + (d.City ? ", " + esc(d.City) : "")
-      : esc(d.DealCode || "Deal") + (d.City ? " &middot; " + esc(d.City) + (d.State ? ", " + esc(d.State) : "") : "");
+      : (d.City ? esc(d.City) + (d.State ? ", " + esc(d.State) : "") : "Deal");
     return '<div class="deal-card" data-deal-id="' + esc(d.DealID) + '">' +
-      '<div class="addr">' + heading + '</div>' +
+      '<div class="addr">' + codeTag + heading + '</div>' +
       '<div class="meta">' + esc(d.AssetType || "") + (d.Price ? " &middot; " + esc(d.Price) : "") +
       ' <span class="status-pill ' + statusClass(d.Status) + '">' + esc(d.Status || "") + '</span>' +
       (d.addressGranted ? ' <span class="status-pill status-active-match">Address disclosed</span>' : "") + '</div>' +
@@ -235,10 +243,15 @@ async function openRepDealDetail(dealId) {
       ' risks losing us this deal and getting paid on it, and will get you removed as a dispositions team member.</div>'
     : "";
 
+  // Same reasoning as the deal card: keep the Deal Code visible here
+  // (in the subtitle, not fighting the address for the big heading) no
+  // matter whether the address is shown, since it's the only thing that
+  // also appears on this rep's Buyer Leads / Pitches tab to match against.
+  const codeTag = deal.DealCode ? '<span class="status-pill status-default" style="margin-right:6px;">' + esc(deal.DealCode) + '</span>' : "";
   panel.innerHTML =
     '<div style="display:flex; justify-content:space-between; align-items:flex-start;">' +
-      '<div><h2 class="step-title">' + (deal.Address ? esc(deal.Address) : esc(deal.DealCode || "Deal")) + '</h2>' +
-      '<p class="step-sub">' + [deal.City, deal.State].filter(Boolean).join(", ") + (deal.Zip ? " " + esc(deal.Zip) : "") +
+      '<div><h2 class="step-title">' + (deal.Address ? esc(deal.Address) : (deal.City ? esc(deal.City) : "Deal")) + '</h2>' +
+      '<p class="step-sub">' + codeTag + [deal.City, deal.State].filter(Boolean).join(", ") + (deal.Zip ? " " + esc(deal.Zip) : "") +
       (deal.County ? " &middot; " + esc(deal.County) + " County" : "") + '</p></div>' +
       '<button class="link-btn" id="close-detail-btn">Close</button>' +
     '</div>' +

@@ -20,9 +20,14 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   hidden by default, with one deliberate exception: admin can disclose it to
   a specific team member for a specific deal (once they've proven they work
   it correctly), and revoke that access just as easily — see **Address
-  Access** in the admin section below. Each deal also shows **ARV**,
-  **Rehab Estimate**, and a computed **Gross Margin** (ARV − Rehab Estimate
-  − Price) so reps have what they need to pitch buyers.
+  Access** in the admin section below. The Deal Code always stays visible
+  even once the address is disclosed (shown as a small tag alongside it)
+  since it's the same label used over on Buyer Leads / Pitches, which never
+  shows the address — keeping the code visible in both places is what lets
+  a rep actually match a buyer's pitch back to the right deal at a glance.
+  Each deal also shows **ARV**, **Rehab Estimate**, and a computed **Gross
+  Margin** (ARV − Rehab Estimate − Price) so reps have what they need to
+  pitch buyers.
 - Each deal shows the standing SOP:
   1. Contact buyers from the lead list, or submit a Facebook post here for
      admin approval before posting — including which groups you intend to
