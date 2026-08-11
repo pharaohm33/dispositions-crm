@@ -340,6 +340,25 @@ function appendRowByHeaders(sheet, dataObj) {
   sheet.appendRow(row);
 }
 
+// Batch version of appendRowByHeaders -- reads the header row once and
+// writes every new row in a single setValues() call instead of one
+// getRange()+appendRow() round trip per row. Each individual Sheets
+// service call is the dominant cost in Apps Script (tens to low hundreds
+// of ms), so importing/giving N rows one at a time is O(N) remote calls;
+// this is 2 total, regardless of N. No-op on an empty list.
+function appendRowsByHeaders(sheet, dataObjs) {
+  if (dataObjs.length === 0) return;
+  const lastCol = sheet.getLastColumn();
+  const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  const rows = dataObjs.map(function (dataObj) {
+    return headers.map(function (h) {
+      const v = dataObj[h];
+      return (v === undefined || v === null) ? '' : v;
+    });
+  });
+  sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, headers.length).setValues(rows);
+}
+
 function sheetToObjects(sheet) {
   const values = sheet.getDataRange().getValues();
   if (values.length < 2) return [];
@@ -1188,15 +1207,15 @@ function adminImportBuyerLeads(body) {
   const existingPhones = {};
   existing.forEach(function (l) { existingPhones[String(l['Phone'] || '').replace(/\D/g, '')] = true; });
 
-  let imported = 0;
   let skippedDuplicates = 0;
   const now = new Date().toISOString();
+  const newRows = [];
   rows.forEach(function (r) {
     if (!r.buyerName || !r.phone) return;
     const normalizedPhone = String(r.phone).replace(/\D/g, '');
     if (existingPhones[normalizedPhone]) { skippedDuplicates++; return; }
     existingPhones[normalizedPhone] = true;
-    appendRowByHeaders(sheet, {
+    newRows.push({
       'BuyerLeadID': Utilities.getUuid(), 'BuyerName': r.buyerName, 'Phone': r.phone, 'PhoneType': r.phoneType || '',
       'Phone2': r.phone2 || '', 'Phone2Type': r.phone2Type || '', 'Phone3': r.phone3 || '', 'Phone3Type': r.phone3Type || '',
       'Email': r.email || '', 'City': r.city || '', 'State': r.state || '', 'Zip': r.zip || '', 'County': r.county || '',
@@ -1204,10 +1223,10 @@ function adminImportBuyerLeads(body) {
       'PriceRangeMin': r.priceRangeMin || '', 'PriceRangeMax': r.priceRangeMax || '',
       'GeneralNotes': '', 'DriveLink': '', 'DoNotContact': false, 'CreatedAt': now
     });
-    imported++;
   });
+  appendRowsByHeaders(sheet, newRows);
 
-  return { ok: true, imported: imported, skippedDuplicates: skippedDuplicates };
+  return { ok: true, imported: newRows.length, skippedDuplicates: skippedDuplicates };
 }
 
 // Joins every pitch to its contacts and computes each one's live status,
@@ -1323,6 +1342,11 @@ function updateBuyerLeadProfile(body, session) {
 // an "apply" box for in the UI are simply absent from data, not touched
 // here at all) -- the backfill tool for "I know these 50 leads are all
 // Single Family but never got that set on import."
+// Reads the whole sheet once and writes it back once, instead of one
+// getRange()+setValue() round trip per field per row (which for, say, 50
+// leads x 2 fields was 200 separate Sheets service calls). Editing the
+// in-memory grid and writing it back in a single setValues() is 2 calls
+// total no matter how many rows or fields are involved.
 function adminBulkUpdateBuyerLeads(body) {
   if (!body.buyerLeadIds || body.buyerLeadIds.length === 0) return { ok: false, error: 'No leads selected.' };
   const data = body.data || {};
@@ -1331,15 +1355,25 @@ function adminBulkUpdateBuyerLeads(body) {
 
   const wanted = {};
   body.buyerLeadIds.forEach(function (id) { wanted[id] = true; });
-  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
-  const rows = sheetToObjects(sheet).filter(function (l) { return wanted[l['BuyerLeadID']]; });
 
-  rows.forEach(function (l) {
-    keys.forEach(function (key) {
-      sheet.getRange(l._row, getColumnIndex(sheet, BUYER_LEAD_PROFILE_FIELDS[key])).setValue(data[key] || '');
-    });
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const values = sheet.getDataRange().getValues();
+  const headers = values[0];
+  const idCol = headers.indexOf('BuyerLeadID');
+  const fieldCols = keys.map(function (key) {
+    return { col: headers.indexOf(BUYER_LEAD_PROFILE_FIELDS[key]), value: data[key] || '' };
   });
-  return { ok: true, updatedCount: rows.length };
+
+  let updatedCount = 0;
+  for (let i = 1; i < values.length; i++) {
+    if (!wanted[values[i][idCol]]) continue;
+    fieldCols.forEach(function (f) { values[i][f.col] = f.value; });
+    updatedCount++;
+  }
+  if (updatedCount > 0) {
+    sheet.getRange(1, 1, values.length, headers.length).setValues(values);
+  }
+  return { ok: true, updatedCount: updatedCount };
 }
 
 // Either admin, or a rep with an open pitch on this buyer, can flag Do Not
@@ -1431,12 +1465,9 @@ function adminGiveBuyerLeadsBulk(body) {
 
     const batch = pool.slice(0, Number(body.count));
     const now = new Date().toISOString();
-    batch.forEach(function (l) {
-      appendRowByHeaders(pitchesSheet, {
-        'PitchID': Utilities.getUuid(), 'BuyerLeadID': l['BuyerLeadID'], 'DealID': body.dealId,
-        'Username': username, 'GivenAt': now
-      });
-    });
+    appendRowsByHeaders(pitchesSheet, batch.map(function (l) {
+      return { 'PitchID': Utilities.getUuid(), 'BuyerLeadID': l['BuyerLeadID'], 'DealID': body.dealId, 'Username': username, 'GivenAt': now };
+    }));
     return { ok: true, givenCount: batch.length, remainingInPool: pool.length - batch.length };
   });
 }
@@ -1466,12 +1497,9 @@ function adminGiveSelectedBuyerLeads(body) {
     });
 
     const now = new Date().toISOString();
-    candidates.forEach(function (l) {
-      appendRowByHeaders(pitchesSheet, {
-        'PitchID': Utilities.getUuid(), 'BuyerLeadID': l['BuyerLeadID'], 'DealID': body.dealId,
-        'Username': username, 'GivenAt': now
-      });
-    });
+    appendRowsByHeaders(pitchesSheet, candidates.map(function (l) {
+      return { 'PitchID': Utilities.getUuid(), 'BuyerLeadID': l['BuyerLeadID'], 'DealID': body.dealId, 'Username': username, 'GivenAt': now };
+    }));
     return { ok: true, givenCount: candidates.length, skipped: body.buyerLeadIds.length - candidates.length };
   });
 }
@@ -1660,16 +1688,27 @@ function autoFeedCheckLocked(props) {
   });
 
   const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const allLeads = sheetToObjects(leadsSheet);
   const leadsById = {};
-  sheetToObjects(leadsSheet).forEach(function (l) { leadsById[l['BuyerLeadID']] = l; });
+  allLeads.forEach(function (l) { leadsById[l['BuyerLeadID']] = l; });
 
   const fed = [];
+  const newPitchRows = [];
   activeDeals.forEach(function (deal) {
     const eligibleReps = reps.filter(function (rep) {
       const hasAccess = rep['AllAccess'] === true || rep['AllAccess'] === 'TRUE' ||
         (assignedUsernamesByDeal[deal['DealID']] || []).indexOf(rep['Username']) !== -1;
       return hasAccess && repMatchesArea(rep, deal);
     });
+    if (eligibleReps.length === 0) return;
+
+    // Shared across every rep considered for this deal (not rebuilt per
+    // rep) so a buyer lead handed to one rep here can't also be handed to
+    // a second rep later in this same run -- allPitches is a snapshot from
+    // before this run started, so without this it wouldn't know about
+    // leads already claimed earlier in the loop.
+    const alreadyPitchedForThisDeal = {};
+    allPitches.forEach(function (p) { if (p['DealID'] === deal['DealID']) alreadyPitchedForThisDeal[p['BuyerLeadID']] = true; });
 
     eligibleReps.forEach(function (rep) {
       const username = rep['Username'];
@@ -1680,9 +1719,7 @@ function autoFeedCheckLocked(props) {
       });
       if (stillNeedsAction) return;
 
-      const alreadyPitchedForThisDeal = {};
-      allPitches.forEach(function (p) { if (p['DealID'] === deal['DealID']) alreadyPitchedForThisDeal[p['BuyerLeadID']] = true; });
-      let pool = sheetToObjects(leadsSheet).filter(function (l) {
+      const pool = allLeads.filter(function (l) {
         return !alreadyPitchedForThisDeal[l['BuyerLeadID']] && l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE' && buyerMatchesDeal(l, deal);
       });
       if (pool.length === 0) return;
@@ -1690,12 +1727,14 @@ function autoFeedCheckLocked(props) {
       const batch = pool.slice(0, batchSize);
       const now = new Date().toISOString();
       batch.forEach(function (l) {
-        appendRowByHeaders(pitchesSheet, { 'PitchID': Utilities.getUuid(), 'BuyerLeadID': l['BuyerLeadID'], 'DealID': deal['DealID'], 'Username': username, 'GivenAt': now });
-        alreadyPitchedForThisDeal[l['BuyerLeadID']] = true; // keep subsequent reps in this same run from double-claiming
+        newPitchRows.push({ 'PitchID': Utilities.getUuid(), 'BuyerLeadID': l['BuyerLeadID'], 'DealID': deal['DealID'], 'Username': username, 'GivenAt': now });
+        alreadyPitchedForThisDeal[l['BuyerLeadID']] = true;
       });
       fed.push({ username: username, name: rep['Name'], dealAddress: deal['Address'], count: batch.length });
     });
   });
+
+  appendRowsByHeaders(pitchesSheet, newPitchRows);
 
   return { ok: true, fed: fed };
 }

@@ -137,13 +137,16 @@ let repDeals = [];
 let statusOptionsCache = [];
 
 async function initRepView() {
-  const statusRes = await api("getStatusOptions", {});
+  // These three are independent -- fire them together instead of waiting
+  // on each round trip in turn, since each Apps Script call is its own
+  // (fairly slow) network hop.
+  const [statusRes, catRes, res] = await Promise.all([
+    api("getStatusOptions", {}),
+    api("getAssetCategoryOptions", {}),
+    api("getDeals", {})
+  ]);
   if (statusRes.ok) statusOptionsCache = statusRes.statuses;
-
-  const catRes = await api("getAssetCategoryOptions", {});
   if (catRes.ok) assetCategoryOptionsCache = catRes.categories;
-
-  const res = await api("getDeals", {});
   if (!res.ok) {
     setSession(null);
     showView(null);
@@ -660,9 +663,8 @@ function switchAdminTab(tab) {
 }
 
 async function initAdminView() {
-  await loadStatusOptions();
-  await loadAssetCategoryOptions();
-  await loadAdminDeals();
+  // Independent reads -- run together rather than one after another.
+  await Promise.all([loadStatusOptions(), loadAssetCategoryOptions(), loadAdminDeals()]);
 }
 
 /* ---------- Deals tab ---------- */
@@ -1918,9 +1920,12 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
   const panel = document.getElementById("detail-panel");
   overlay.hidden = false;
 
-  const pitchesRes = await api("adminGetPitchesForBuyerLead", { buyerLeadId: buyerLeadId });
+  const needsSelects = buyerLeadsActiveReps.length === 0 || buyerLeadsActiveDeals.length === 0;
+  const [pitchesRes] = await Promise.all([
+    api("adminGetPitchesForBuyerLead", { buyerLeadId: buyerLeadId }),
+    needsSelects ? populateBulkGiveSelects() : Promise.resolve()
+  ]);
   const pitches = pitchesRes.ok ? pitchesRes.pitches : [];
-  if (buyerLeadsActiveReps.length === 0 || buyerLeadsActiveDeals.length === 0) await populateBulkGiveSelects();
 
   const pitchedDealIds = {};
   pitches.forEach(function (p) { pitchedDealIds[p.DealID] = true; });
