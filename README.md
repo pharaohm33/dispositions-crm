@@ -68,8 +68,10 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
 **Admin side** (behind the same login, when marked as admin):
 
 - **Deals** — add deals, change a deal's status (Active, Sold, Dead, Under
-  Contract, On Hold, or whatever categories you've defined), manage exactly
-  which reps can see each deal, assign it a **Deal Code** and **County**
+  Contract, On Hold, or whatever categories you've defined), edit the
+  **Address / City / State / Zip** at any time after creation (e.g. a typo,
+  or details that firm up after the deal's already been added), manage
+  exactly which reps can see each deal, assign it a **Deal Code** and **County**
   (what reps actually see instead of the address), an **Asset Category** and
   any extra **cities to also match** in the same state (for buyer-matching —
   see Buyer Leads below), and set two Google Drive

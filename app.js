@@ -830,6 +830,19 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
       statusOptionsCache.map(function (s) { return '<option value="' + esc(s) + '"' + (s === deal.Status ? " selected" : "") + '>' + esc(s) + '</option>'; }).join("") +
     '</select>' +
 
+    '<div class="section-title">Location</div>' +
+    '<label class="field-label">Address</label>' +
+    '<input type="text" id="deal-address-edit" value="' + esc(deal.Address || "") + '">' +
+    '<div class="row3">' +
+      '<div><label class="field-label">City</label><input type="text" id="deal-city-edit" value="' + esc(deal.City || "") + '"></div>' +
+      '<div><label class="field-label">State</label><input type="text" id="deal-state-edit" value="' + esc(deal.State || "") + '"></div>' +
+      '<div><label class="field-label">Zip</label><input type="text" id="deal-zip-edit" value="' + esc(deal.Zip || "") + '"></div>' +
+    '</div>' +
+    '<div class="error-text" id="deal-location-error"></div>' +
+    '<div class="nav-row" style="justify-content:flex-end;">' +
+      '<button class="btn secondary small" id="save-location-btn">Save Location</button>' +
+    '</div>' +
+
     '<div class="row3">' +
       '<div><label class="field-label">Deal Code <span class="small-muted">(shown to reps instead of the address)</span></label><input type="text" id="deal-code-edit" value="' + esc(deal.DealCode || "") + '" placeholder="e.g. A-1"></div>' +
       '<div><label class="field-label">County</label><input type="text" id="deal-county-edit" value="' + esc(deal.County || "") + '"></div>' +
@@ -924,6 +937,39 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
 
   wireBuyerMatchListHandlers(document.getElementById("admin-buyer-list"), function () {
     return refreshBuyerMatchList(deal.DealID, "admin-buyer-list");
+  });
+
+  document.getElementById("save-location-btn").addEventListener("click", async function () {
+    const btn = this;
+    const errorEl = document.getElementById("deal-location-error");
+    errorEl.classList.remove("show");
+    const address = document.getElementById("deal-address-edit").value.trim();
+    if (!address) {
+      errorEl.textContent = "Address is required.";
+      errorEl.classList.add("show");
+      return;
+    }
+    if (btn.disabled) return;
+    btn.disabled = true;
+    const res = await api("adminUpdateDeal", {
+      dealId: deal.DealID,
+      data: {
+        Address: address,
+        City: document.getElementById("deal-city-edit").value.trim(),
+        State: document.getElementById("deal-state-edit").value.trim(),
+        Zip: document.getElementById("deal-zip-edit").value.trim()
+      }
+    });
+    if (!res.ok) {
+      btn.disabled = false;
+      errorEl.textContent = res.error || "Could not save location.";
+      errorEl.classList.add("show");
+      showToast(res.error || "Could not save location.", true);
+      return;
+    }
+    await loadAdminDeals();
+    openAdminDealDetail(deal.DealID);
+    showToast("Location saved.");
   });
 
   document.getElementById("save-code-btn").addEventListener("click", async function () {
