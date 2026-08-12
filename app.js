@@ -468,40 +468,112 @@ function switchRepTab(tab) {
 }
 
 const LEAD_STATUS_PRIORITY = ["Follow-Up Due", "Follow-Up In Progress", "Awaiting Response", "Not Contacted", "Responded", "Fully Worked"];
+const MY_PITCHES_PAGE_SIZE = 50;
+let myPitchesCurrentPage = 1;
 
 async function loadMyPitches() {
   const res = await api("getMyPitches", {});
   if (!res.ok) return;
   myPitches = res.pitches;
+  populateMyPitchesDealFilter();
   renderMyPitches();
 }
 
-function renderMyPitches() {
-  const container = document.getElementById("buyerleads-list");
-  const empty = document.getElementById("buyerleads-empty");
-  empty.hidden = myPitches.length > 0;
-  const sorted = myPitches.slice().sort(function (a, b) {
-    if (a.dealStillActive !== b.dealStillActive) return a.dealStillActive ? -1 : 1;
-    return LEAD_STATUS_PRIORITY.indexOf(a.status) - LEAD_STATUS_PRIORITY.indexOf(b.status);
+// Rebuilds the Deal filter's options from whatever deals this rep actually
+// has pitches on right now -- lets them scroll straight to just the buyer
+// leads matched for one specific deal instead of the whole list. Preserves
+// the current selection across a reload as long as that deal still exists.
+function populateMyPitchesDealFilter() {
+  const select = document.getElementById("mypitches-filter-deal");
+  const prevValue = select.value;
+  const seen = {};
+  const deals = [];
+  myPitches.forEach(function (p) {
+    if (seen[p.DealID]) return;
+    seen[p.DealID] = true;
+    deals.push({ id: p.DealID, label: p.dealCode || "Deal" });
   });
-  container.innerHTML = sorted.map(function (p) {
-    const typeHint = p.phoneType === "Landline" ? "Landline &middot; Call Only" : p.phoneType === "Mobile" ? "Mobile &middot; Call or Text" : (p.phoneType || "");
-    return '<div class="deal-card" data-pitch-id="' + esc(p.PitchID) + '">' +
-      '<div class="addr">' + esc(p.buyerName) + '</div>' +
-      '<div class="meta">Re: ' + esc(p.dealCode || "Deal") + '</div>' +
-      '<div class="meta">' + esc(p.phone) + (typeHint ? " &middot; " + typeHint : "") +
-      (p.city ? " &middot; " + esc(p.city) + (p.state ? ", " + esc(p.state) : "") : "") + '</div>' +
-      '<div style="margin-top:6px;">' +
-      (p.dealStillActive
-        ? '<span class="status-pill ' + statusClass(p.status) + '">' + esc(p.status) + '</span>'
-        : '<span class="status-pill status-fully-worked">Deal ' + esc((p.dealStatus || "closed").toLowerCase()) + ' &mdash; no action needed</span>') +
-      '</div>' +
-      '</div>';
+  deals.sort(function (a, b) { return a.label.localeCompare(b.label); });
+  select.innerHTML = '<option value="">All Deals</option>' +
+    deals.map(function (d) { return '<option value="' + esc(d.id) + '">' + esc(d.label) + '</option>'; }).join("");
+  if (deals.some(function (d) { return d.id === prevValue; })) select.value = prevValue;
+}
+
+function getFilteredSortedMyPitches() {
+  const q = document.getElementById("mypitches-search").value.trim().toLowerCase();
+  const dealId = document.getElementById("mypitches-filter-deal").value;
+  const status = document.getElementById("mypitches-filter-status").value;
+  const sortMode = document.getElementById("mypitches-sort").value;
+
+  const filtered = myPitches.filter(function (p) {
+    if (q && ![p.buyerName, p.phone, p.city, p.state, p.dealCode].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; })) return false;
+    if (dealId && p.DealID !== dealId) return false;
+    if (status && p.status !== status) return false;
+    return true;
+  });
+
+  const sorted = filtered.slice();
+  if (sortMode === "deal") {
+    sorted.sort(function (a, b) { return String(a.dealCode || "").localeCompare(String(b.dealCode || "")); });
+  } else if (sortMode === "newest") {
+    sorted.sort(function (a, b) { return new Date(b.GivenAt || 0) - new Date(a.GivenAt || 0); });
+  } else if (sortMode === "oldest") {
+    sorted.sort(function (a, b) { return new Date(a.GivenAt || 0) - new Date(b.GivenAt || 0); });
+  } else {
+    sorted.sort(function (a, b) {
+      if (a.dealStillActive !== b.dealStillActive) return a.dealStillActive ? -1 : 1;
+      return LEAD_STATUS_PRIORITY.indexOf(a.status) - LEAD_STATUS_PRIORITY.indexOf(b.status);
+    });
+  }
+  return sorted;
+}
+
+function renderMyPitches() {
+  const tbody = document.getElementById("mypitches-tbody");
+  const empty = document.getElementById("buyerleads-empty");
+  const filtered = getFilteredSortedMyPitches();
+  empty.hidden = filtered.length > 0;
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / MY_PITCHES_PAGE_SIZE));
+  if (myPitchesCurrentPage > totalPages) myPitchesCurrentPage = totalPages;
+  const pageStart = (myPitchesCurrentPage - 1) * MY_PITCHES_PAGE_SIZE;
+  const pageItems = filtered.slice(pageStart, pageStart + MY_PITCHES_PAGE_SIZE);
+
+  document.getElementById("mypitches-page-indicator").textContent =
+    filtered.length === 0 ? "No results" :
+    "Page " + myPitchesCurrentPage + " of " + totalPages + " (" + filtered.length + " total)";
+  document.getElementById("mypitches-prev-page-btn").disabled = myPitchesCurrentPage <= 1;
+  document.getElementById("mypitches-next-page-btn").disabled = myPitchesCurrentPage >= totalPages;
+
+  tbody.innerHTML = pageItems.map(function (p) {
+    const typeHint = p.phoneType === "Landline" ? "Landline" : p.phoneType === "Mobile" ? "Mobile" : (p.phoneType || "");
+    const statusCell = p.dealStillActive
+      ? '<span class="status-pill ' + statusClass(p.status) + '">' + esc(p.status) + '</span>'
+      : '<span class="status-pill status-fully-worked">Deal ' + esc((p.dealStatus || "closed").toLowerCase()) + '</span>';
+    return '<tr class="clickable" data-pitch-id="' + esc(p.PitchID) + '">' +
+      '<td>' + esc(p.buyerName) + '</td>' +
+      '<td>' + esc(p.phone) + (typeHint ? '<div class="small-muted">' + esc(typeHint) + '</div>' : "") + '</td>' +
+      '<td>' + esc(p.dealCode || "Deal") + '</td>' +
+      '<td>' + [p.city, p.state].filter(Boolean).join(", ") + '</td>' +
+      '<td>' + statusCell + '</td>' +
+      '<td class="small-muted">' + (p.GivenAt ? formatDate(p.GivenAt) : "") + '</td>' +
+      '</tr>';
   }).join("");
-  Array.from(container.querySelectorAll(".deal-card")).forEach(function (card) {
-    card.addEventListener("click", function () { openPitchDetail(card.getAttribute("data-pitch-id")); });
+  Array.from(tbody.querySelectorAll("tr")).forEach(function (row) {
+    row.addEventListener("click", function () { openPitchDetail(row.getAttribute("data-pitch-id")); });
   });
 }
+
+document.getElementById("mypitches-search").addEventListener("input", function () { myPitchesCurrentPage = 1; renderMyPitches(); });
+document.getElementById("mypitches-filter-deal").addEventListener("change", function () { myPitchesCurrentPage = 1; renderMyPitches(); });
+document.getElementById("mypitches-filter-status").addEventListener("change", function () { myPitchesCurrentPage = 1; renderMyPitches(); });
+document.getElementById("mypitches-sort").addEventListener("change", function () { myPitchesCurrentPage = 1; renderMyPitches(); });
+document.getElementById("mypitches-prev-page-btn").addEventListener("click", function () {
+  if (myPitchesCurrentPage > 1) { myPitchesCurrentPage--; renderMyPitches(); }
+});
+document.getElementById("mypitches-next-page-btn").addEventListener("click", function () {
+  myPitchesCurrentPage++; renderMyPitches();
+});
 
 // Returns [{slot, number, type}] for every phone number a pitch's buyer
 // actually has on file (Phone is always first if present, then Phone2/3).

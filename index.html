@@ -279,8 +279,38 @@
         match them correctly the next time a deal comes up — even in a different city.
       </div>
     </div>
-    <div id="buyerleads-list"></div>
+    <div class="card">
+      <div style="display:flex; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
+        <input type="text" id="mypitches-search" placeholder="Search by buyer name, phone, or city..." style="flex:1; min-width:220px;">
+        <select id="mypitches-filter-deal" style="flex:0 0 auto; min-width:170px;"><option value="">All Deals</option></select>
+        <select id="mypitches-filter-status" style="flex:0 0 auto; min-width:170px;">
+          <option value="">All Statuses</option>
+          <option value="Follow-Up Due">Follow-Up Due</option>
+          <option value="Follow-Up In Progress">Follow-Up In Progress</option>
+          <option value="Awaiting Response">Awaiting Response</option>
+          <option value="Not Contacted">Not Contacted</option>
+          <option value="Responded">Responded</option>
+          <option value="Fully Worked">Fully Worked</option>
+        </select>
+        <select id="mypitches-sort" style="flex:0 0 auto; min-width:190px;">
+          <option value="priority">Sort: Needs Attention First</option>
+          <option value="deal">Sort: By Deal</option>
+          <option value="newest">Sort: Newest Given First</option>
+          <option value="oldest">Sort: Oldest Given First</option>
+        </select>
+      </div>
+    </div>
+
+    <table class="crm-table">
+      <thead><tr><th>Buyer</th><th>Phone</th><th>Deal</th><th>Location</th><th>Status</th><th>Given</th></tr></thead>
+      <tbody id="mypitches-tbody"></tbody>
+    </table>
     <div id="buyerleads-empty" class="small-muted" style="padding:20px;" hidden>No buyer leads given to you yet — check back once we have a deal that fits one.</div>
+    <div class="nav-row" style="justify-content:center; gap:16px; margin-top:12px;">
+      <button class="btn secondary small" id="mypitches-prev-page-btn">&larr; Previous</button>
+      <span class="small-muted" id="mypitches-page-indicator"></span>
+      <button class="btn secondary small" id="mypitches-next-page-btn">Next &rarr;</button>
+    </div>
   </div>
 </div>
 
@@ -674,7 +704,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=7"></script>
-<script src="app.js?v=7"></script>
+<script src="config.js?v=8"></script>
+<script src="app.js?v=8"></script>
 </body>
 </html>

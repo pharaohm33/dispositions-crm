@@ -48,13 +48,19 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   mass-edit many at once (see Buyer Leads below).
 - **Buyer Leads** — a separate "Buyer Leads" tab shows every buyer they've
   been given for a deal we currently have to sell (never a bare contact list
-  with nothing to offer them), with up to three phone numbers each showing
-  its own phone-type hint (Landline = call only, Mobile = call or text) — a
-  rep picks which number they're using each time they log a contact — plus
-  which deal it's for and a status (Not Contacted, Awaiting Response,
-  Follow-Up Due, Responded, Fully Worked). If a deal closes before a buyer
-  responds, that item just shows "deal closed — no action needed" instead of
-  piling up as overdue. Logging a contact records the method, which number
+  with nothing to offer them), laid out as a scrollable table — paginated at
+  50 rows so a long list never loads all at once — with up to three phone
+  numbers each showing its own phone-type hint (Landline = call only, Mobile
+  = call or text) — a rep picks which number they're using each time they
+  log a contact — plus which deal it's for and a status (Not Contacted,
+  Awaiting Response, Follow-Up Due, Follow-Up In Progress, Responded, Fully
+  Worked). Search by buyer/phone/city, filter down to one specific deal or
+  one specific status (e.g. just Not Contacted, or everything already
+  contacted), and sort by what needs attention first (the default),
+  alphabetically by deal, or by when it was given — newest or oldest first.
+  If a deal closes before a buyer responds, that item just shows "deal
+  closed — no action needed" instead of piling up as overdue. Logging a
+  contact records the method, which number
   was used, whether the buyer responded, and deal-specific feedback notes; a
   separate **General Buyer Notes** field (ARV%, price range, areas of
   interest, cash vs. financed) travels with the buyer across every deal
