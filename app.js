@@ -207,11 +207,21 @@ function renderRepDeals() {
     // only "Re: AZ-3 Land" over on Buyer Leads, with nothing tying them
     // together.
     const codeTag = d.DealCode ? '<span class="status-pill status-default" style="margin-right:6px;">' + esc(d.DealCode) + '</span>' : "";
+    // Full address (street, city, state, zip) once disclosed, not just
+    // street+city -- with several similar deals in the same asset class on
+    // screen at once, a rep scrolling this list needs enough here to tell
+    // them apart and go straight into calls without opening each one just
+    // to check which is which.
     const heading = d.Address
-      ? esc(d.Address) + (d.City ? ", " + esc(d.City) : "")
+      ? esc(d.Address) + (d.City ? ", " + esc(d.City) : "") + (d.State ? ", " + esc(d.State) : "") + (d.Zip ? " " + esc(d.Zip) : "")
       : (d.City ? esc(d.City) + (d.State ? ", " + esc(d.State) : "") : "Deal");
+    // County is visible to reps whether or not the address itself has been
+    // disclosed (only the exact street address is ever gated) -- shown here
+    // too so it's not something only the detail panel reveals.
+    const countyLine = d.County ? '<div class="small-muted">' + esc(d.County) + ' County</div>' : "";
     return '<div class="deal-card" data-deal-id="' + esc(d.DealID) + '">' +
       '<div class="addr">' + codeTag + heading + '</div>' +
+      countyLine +
       '<div class="meta">' + esc(d.AssetType || "") + (d.Price ? " &middot; " + esc(d.Price) : "") +
       ' <span class="status-pill ' + statusClass(d.Status) + '">' + esc(d.Status || "") + '</span>' +
       (d.addressGranted ? ' <span class="status-pill status-active-match">Address disclosed</span>' : "") + '</div>' +

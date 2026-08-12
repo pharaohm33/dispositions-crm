@@ -25,9 +25,14 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   since it's the same label used over on Buyer Leads / Pitches, which never
   shows the address — keeping the code visible in both places is what lets
   a rep actually match a buyer's pitch back to the right deal at a glance.
-  Each deal also shows **ARV**, **Rehab Estimate**, and a computed **Gross
-  Margin** (ARV − Rehab Estimate − Price) so reps have what they need to
-  pitch buyers.
+  Once disclosed, the deal list shows the **full address** (street, city,
+  state, zip) right on the card, not just a partial one — and the **County**
+  underneath it, which is visible whether or not the address itself has been
+  disclosed — so a rep scrolling a list with several similar deals in the same asset
+  class can tell them apart and go straight into calls without opening each
+  one first to check which is which. Each deal also shows **ARV**, **Rehab
+  Estimate**, and a computed **Gross Margin** (ARV − Rehab Estimate − Price)
+  so reps have what they need to pitch buyers.
 - Each deal shows the standing SOP:
   1. Contact buyers from the lead list, or submit a Facebook post here for
      admin approval before posting — including which groups you intend to
