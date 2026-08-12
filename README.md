@@ -179,10 +179,21 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   of having to open each buyer's detail panel one at a time. Search by buyer
   or deal, filter by team member or deal, and reassign or **Withdraw** any
   pitch right from the row — or select several (even across different reps
-  and deals) and **Withdraw Selected** to pull back a batch at once, e.g.
-  everything a rep has on a deal that just went dead so they're free to pick
-  up something new. Withdrawing only removes the pitch itself; that buyer's
-  full contact history stays intact. Giving a buyer a pitch is now
+  and deals) and either **Withdraw Selected** to pull back a batch at once
+  (e.g. everything a rep has on a deal that just went dead so they're free
+  to pick up something new), or pick a team member and **Reassign Selected
+  To** to mass-move a batch of pitches onto someone else in one action.
+  Reassigning is a move, not a copy — if a selected pitch's buyer+deal
+  already belongs to the person you're reassigning to, that one's dropped
+  rather than duplicated. **More than one person can now be given the same
+  buyer for the same deal** — handy when two reps cover the same market and
+  you want a backup in case one isn't active — the only thing still blocked
+  is the exact same person getting the exact same buyer+deal twice. "Give
+  For a Deal" on a buyer's own detail panel works the same way: it now
+  lists every active deal, even ones this buyer's already been given for,
+  since giving it to a second person is a completely normal thing to do.
+  Withdrawing only removes the pitch itself; that buyer's full contact
+  history stays intact. Giving a buyer a pitch is now
   concurrency-safe on the backend (two near-simultaneous requests — a
   double-click, or a manual give landing at the same moment as auto-feed —
   can no longer both succeed and create a duplicate), and the single "Give"

@@ -516,8 +516,13 @@
         <button class="btn secondary small" id="pitches-select-all-btn">Select All (Filtered)</button>
         <button class="btn secondary small" id="pitches-clear-selection-btn">Clear Selection</button>
         <span class="small-muted" id="pitches-selection-count">0 selected</span>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:10px;">
+        <select id="pitches-reassign-selected-select" style="flex:0 0 auto; min-width:200px;"></select>
+        <button class="btn secondary small" id="pitches-reassign-selected-btn">Reassign Selected To</button>
         <button class="btn danger small" id="pitches-withdraw-selected-btn">Withdraw Selected</button>
       </div>
+      <p class="small-muted" style="margin:6px 0 0;">Reassigning is a move, not a copy — if a selected pitch's buyer+deal already belongs to the team member you're reassigning to, that duplicate is dropped rather than reassigned. To have <em>both</em> people on the same buyer+deal, use "Give For a Deal" from that buyer's own page instead.</p>
       <div id="pitches-bulk-result" class="small-muted"></div>
     </div>
 
@@ -669,7 +674,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=6"></script>
-<script src="app.js?v=6"></script>
+<script src="config.js?v=7"></script>
+<script src="app.js?v=7"></script>
 </body>
 </html>

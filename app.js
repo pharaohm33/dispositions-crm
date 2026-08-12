@@ -2141,9 +2141,12 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
   ]);
   const pitches = pitchesRes.ok ? pitchesRes.pitches : [];
 
-  const pitchedDealIds = {};
-  pitches.forEach(function (p) { pitchedDealIds[p.DealID] = true; });
-  const givableDeals = buyerLeadsActiveDeals.filter(function (d) { return !pitchedDealIds[d.DealID]; });
+  // Every active deal is givable, even ones this buyer already has a pitch
+  // on -- multiple reps can share a buyer+deal (e.g. two people covering
+  // the same market), so the only real restriction is giving the exact
+  // same rep the exact same buyer+deal twice, which the backend rejects
+  // with a clear error rather than this list needing to guess it in advance.
+  const givableDeals = buyerLeadsActiveDeals;
 
   const isDnc = !!(lead.DoNotContact === true || lead.DoNotContact === "TRUE");
 
@@ -2167,14 +2170,15 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
     '</div>' +
 
     (isDnc ? '' :
-    '<div class="section-title">Give For a New Deal</div>' +
+    '<div class="section-title">Give For a Deal</div>' +
+    '<p class="small-muted">Works even for a deal this buyer\'s already been given for — picks a different team member, not a different lead, so more than one person can cover the same deal.</p>' +
     (givableDeals.length > 0
       ? '<div class="row2">' +
           '<div><select id="give-new-deal-select">' + givableDeals.map(function (d) { return '<option value="' + esc(d.DealID) + '">' + esc(d.DealCode ? d.DealCode + " — " + d.Address : d.Address) + '</option>'; }).join("") + '</select></div>' +
           '<div><select id="give-new-rep-select">' + buyerLeadsActiveReps.map(function (r) { return '<option value="' + esc(r.username) + '">' + esc(r.name) + (r.isAdmin ? " — Admin" : "") + '</option>'; }).join("") + '</select></div>' +
         '</div>' +
         '<div class="nav-row" style="justify-content:flex-end;"><button class="btn primary small" id="give-new-pitch-btn">Give This Buyer Lead To</button></div>'
-      : '<p class="small-muted">This buyer already has an open pitch on every active deal, or there are no active deals yet.</p>')) +
+      : '<p class="small-muted">No active deals yet.</p>')) +
 
     '<div class="section-title">Pitches</div>' +
     '<div id="pitches-list">' + renderAdminPitchesList(pitches) + '</div>' +
@@ -2310,6 +2314,8 @@ async function initAdminPitchesTab() {
     pitchesFilterRepsCache.map(function (r) { return '<option value="' + esc(r.username) + '">' + esc(r.name) + (r.isAdmin ? " — Admin" : "") + '</option>'; }).join("");
   document.getElementById("pitches-filter-deal").innerHTML = '<option value="">All Deals</option>' +
     pitchesFilterDealsCache.map(function (d) { return '<option value="' + esc(d.DealID) + '">' + esc(d.DealCode ? d.DealCode + " — " + d.Address : d.Address) + '</option>'; }).join("");
+  document.getElementById("pitches-reassign-selected-select").innerHTML =
+    pitchesFilterRepsCache.map(function (r) { return '<option value="' + esc(r.username) + '">' + esc(r.name) + (r.isAdmin ? " — Admin" : "") + '</option>'; }).join("");
 
   await loadAdminPitches();
 }
@@ -2428,6 +2434,23 @@ document.getElementById("pitches-withdraw-selected-btn").addEventListener("click
   adminPitchesSelectedIds = new Set();
   await loadAdminPitches();
   showToast("Withdrew " + res.withdrawnCount + " pitch(es).");
+});
+
+document.getElementById("pitches-reassign-selected-btn").addEventListener("click", async function () {
+  const resultEl = document.getElementById("pitches-bulk-result");
+  if (adminPitchesSelectedIds.size === 0) { resultEl.textContent = "No pitches selected."; return; }
+  const username = document.getElementById("pitches-reassign-selected-select").value;
+  if (!username) { resultEl.textContent = "Pick who to reassign to."; return; }
+  const btn = this;
+  if (btn.disabled) return;
+  btn.disabled = true;
+  const res = await api("adminBulkReassignPitches", { pitchIds: Array.from(adminPitchesSelectedIds), username: username });
+  btn.disabled = false;
+  if (!res.ok) { resultEl.textContent = res.error || "Could not reassign."; showToast(res.error || "Could not reassign.", true); return; }
+  resultEl.textContent = "Reassigned " + res.reassignedCount + " pitch(es)." + (res.droppedCount ? " Dropped " + res.droppedCount + " duplicate(s) that team member already had." : "");
+  adminPitchesSelectedIds = new Set();
+  await loadAdminPitches();
+  showToast("Reassigned " + res.reassignedCount + " pitch(es).");
 });
 
 /* ---------- Status categories tab ---------- */

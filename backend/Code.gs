@@ -270,6 +270,8 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminRemoveAssetCategory));
       case 'adminReassignPitch':
         return jsonOut(withAdminSession(body, adminReassignPitch));
+      case 'adminBulkReassignPitches':
+        return jsonOut(withAdminSession(body, adminBulkReassignPitches));
       case 'adminWithdrawPitch':
         return jsonOut(withAdminSession(body, adminWithdrawPitch));
       case 'adminGetPitchesForBuyerLead':
@@ -1591,6 +1593,7 @@ function updateBuyerLeadDoNotContact(body, session) {
 // whole model exists to prevent.
 function adminGiveBuyerLeadToRep(body) {
   if (!body.buyerLeadId || !body.dealId || !body.username) return { ok: false, error: 'Missing buyerLeadId, dealId, or username.' };
+  const username = String(body.username).trim().toLowerCase();
   return withLock(function () {
     const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
     const lead = sheetToObjects(leadsSheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
@@ -1599,23 +1602,28 @@ function adminGiveBuyerLeadToRep(body) {
     }
     const sheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
     const existing = sheetToObjects(sheet);
-    const clash = existing.find(function (p) { return p['BuyerLeadID'] === body.buyerLeadId && p['DealID'] === body.dealId; });
-    if (clash) return { ok: false, error: 'This buyer already has an open pitch for this deal (given to ' + clash['Username'] + ').' };
+    // Multiple reps CAN share the same buyer+deal now (e.g. two people
+    // working the same market as backup for each other) -- only block a
+    // literal duplicate: this same rep getting this same buyer for this
+    // same deal twice.
+    const clash = existing.find(function (p) { return p['BuyerLeadID'] === body.buyerLeadId && p['DealID'] === body.dealId && String(p['Username'] || '').toLowerCase() === username; });
+    if (clash) return { ok: false, error: 'This buyer already has an open pitch for this deal with this team member.' };
 
     const pitchId = Utilities.getUuid();
     appendRowByHeaders(sheet, {
       'PitchID': pitchId, 'BuyerLeadID': body.buyerLeadId, 'DealID': body.dealId,
-      'Username': String(body.username).trim().toLowerCase(), 'GivenAt': new Date().toISOString()
+      'Username': username, 'GivenAt': new Date().toISOString()
     });
     return { ok: true, pitchId: pitchId };
   });
 }
 
 // Gives a batch of buyer leads to one rep for one deal, skipping any buyer
-// lead that already has an open pitch for this deal (to anyone) or is
-// marked Do Not Contact. With no city/state/zip override typed in, matching
-// is auto: same State, City equal to the deal's own City or one of its
-// MatchCities, and AssetCategory compatible -- all case/whitespace-
+// lead THIS REP already has an open pitch on for this deal (a different rep
+// already having it is fine -- e.g. two people covering the same market) or
+// is marked Do Not Contact. With no city/state/zip override typed in,
+// matching is auto: same State, City equal to the deal's own City or one of
+// its MatchCities, and AssetCategory compatible -- all case/whitespace-
 // insensitive (see buyerMatchesDeal). Typing an explicit city/state/zip
 // override switches to a plain exact-match filter on just those fields
 // instead, for deliberate manual control.
@@ -1632,12 +1640,14 @@ function adminGiveBuyerLeadsBulk(body) {
 
     const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
     const existingPitches = sheetToObjects(pitchesSheet);
-    const alreadyPitchedForThisDeal = {};
-    existingPitches.forEach(function (p) { if (p['DealID'] === body.dealId) alreadyPitchedForThisDeal[p['BuyerLeadID']] = true; });
+    const alreadyPitchedByThisRepForThisDeal = {};
+    existingPitches.forEach(function (p) {
+      if (p['DealID'] === body.dealId && String(p['Username'] || '').toLowerCase() === username) alreadyPitchedByThisRepForThisDeal[p['BuyerLeadID']] = true;
+    });
 
     const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
     let pool = sheetToObjects(leadsSheet).filter(function (l) {
-      return !alreadyPitchedForThisDeal[l['BuyerLeadID']] && l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE';
+      return !alreadyPitchedByThisRepForThisDeal[l['BuyerLeadID']] && l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE';
     });
     if (hasOverride) {
       if (body.city) pool = pool.filter(function (l) { return normalizeText(l['City']) === normalizeText(body.city); });
@@ -1658,8 +1668,8 @@ function adminGiveBuyerLeadsBulk(body) {
 
 // Gives a specific, admin-picked set of buyer leads (e.g. from a mass
 // selection filtered by asset category) to one rep for one deal. Silently
-// skips any that are Do Not Contact or already pitched for this deal,
-// rather than failing the whole batch over a few.
+// skips any THIS REP already has an open pitch on for this deal, or that
+// are Do Not Contact, rather than failing the whole batch over a few.
 function adminGiveSelectedBuyerLeads(body) {
   if (!body.dealId || !body.username || !body.buyerLeadIds || body.buyerLeadIds.length === 0) {
     return { ok: false, error: 'Missing dealId, username, or buyerLeadIds.' };
@@ -1671,12 +1681,14 @@ function adminGiveSelectedBuyerLeads(body) {
   return withLock(function () {
     const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
     const existingPitches = sheetToObjects(pitchesSheet);
-    const alreadyPitchedForThisDeal = {};
-    existingPitches.forEach(function (p) { if (p['DealID'] === body.dealId) alreadyPitchedForThisDeal[p['BuyerLeadID']] = true; });
+    const alreadyPitchedByThisRepForThisDeal = {};
+    existingPitches.forEach(function (p) {
+      if (p['DealID'] === body.dealId && String(p['Username'] || '').toLowerCase() === username) alreadyPitchedByThisRepForThisDeal[p['BuyerLeadID']] = true;
+    });
 
     const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
     const candidates = sheetToObjects(leadsSheet).filter(function (l) {
-      return wanted[l['BuyerLeadID']] && !alreadyPitchedForThisDeal[l['BuyerLeadID']] &&
+      return wanted[l['BuyerLeadID']] && !alreadyPitchedByThisRepForThisDeal[l['BuyerLeadID']] &&
         l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE';
     });
 
@@ -1690,12 +1702,72 @@ function adminGiveSelectedBuyerLeads(body) {
 
 function adminReassignPitch(body) {
   if (!body.pitchId || !body.username) return { ok: false, error: 'Missing pitchId or username.' };
+  const username = String(body.username).trim().toLowerCase();
   const sheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
   const pitches = sheetToObjects(sheet);
   const match = pitches.find(function (p) { return p['PitchID'] === body.pitchId; });
   if (!match) return { ok: false, error: 'Pitch not found.' };
-  sheet.getRange(match._row, getColumnIndex(sheet, 'Username')).setValue(String(body.username).trim().toLowerCase());
+  // Multiple reps can share a buyer+deal, but the same rep can't have it
+  // twice -- block only if the target rep already has a *different* open
+  // pitch on this exact buyer+deal.
+  const clash = pitches.find(function (p) {
+    return p['PitchID'] !== body.pitchId && p['BuyerLeadID'] === match['BuyerLeadID'] && p['DealID'] === match['DealID'] && String(p['Username'] || '').toLowerCase() === username;
+  });
+  if (clash) return { ok: false, error: 'That team member already has an open pitch for this exact buyer on this deal.' };
+  sheet.getRange(match._row, getColumnIndex(sheet, 'Username')).setValue(username);
   return { ok: true };
+}
+
+// Reassigns many pitches to one rep at once. If two selected pitches (or a
+// selected pitch and one the target rep already holds, outside the
+// selection) share the same buyer+deal, reassigning all of them onto the
+// same rep would create a literal duplicate -- those extras are dropped
+// (deleted) rather than reassigned, so the target rep ends up with at most
+// one pitch per buyer+deal, same rule as everywhere else.
+function adminBulkReassignPitches(body) {
+  if (!body.pitchIds || body.pitchIds.length === 0) return { ok: false, error: 'No pitches selected.' };
+  if (!body.username) return { ok: false, error: 'Missing username.' };
+  const username = String(body.username).trim().toLowerCase();
+  const wanted = {};
+  body.pitchIds.forEach(function (id) { wanted[id] = true; });
+
+  return withLock(function () {
+    const sheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+    const values = sheet.getDataRange().getValues();
+    const headers = values[0];
+    const idCol = headers.indexOf('PitchID');
+    const buyerCol = headers.indexOf('BuyerLeadID');
+    const dealCol = headers.indexOf('DealID');
+    const userCol = headers.indexOf('Username');
+
+    const targetAlreadyHasCombo = {};
+    for (let i = 1; i < values.length; i++) {
+      if (wanted[values[i][idCol]]) continue;
+      if (String(values[i][userCol] || '').toLowerCase() === username) {
+        targetAlreadyHasCombo[values[i][buyerCol] + '|' + values[i][dealCol]] = true;
+      }
+    }
+
+    let reassignedCount = 0;
+    const rowsToDrop = [];
+    const claimedCombosInBatch = {};
+    for (let i = 1; i < values.length; i++) {
+      if (!wanted[values[i][idCol]]) continue;
+      const comboKey = values[i][buyerCol] + '|' + values[i][dealCol];
+      if (targetAlreadyHasCombo[comboKey] || claimedCombosInBatch[comboKey]) {
+        rowsToDrop.push(i + 1);
+        continue;
+      }
+      values[i][userCol] = username;
+      claimedCombosInBatch[comboKey] = true;
+      reassignedCount++;
+    }
+
+    sheet.getRange(1, 1, values.length, headers.length).setValues(values);
+    rowsToDrop.sort(function (a, b) { return b - a; }).forEach(function (row) { sheet.deleteRow(row); });
+
+    return { ok: true, reassignedCount: reassignedCount, droppedCount: rowsToDrop.length };
+  });
 }
 
 // Deletes the pitch row itself (so the buyer lead becomes available for a
