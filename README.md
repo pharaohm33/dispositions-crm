@@ -32,7 +32,11 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   class can tell them apart and go straight into calls without opening each
   one first to check which is which. Each deal also shows **ARV**, **Rehab
   Estimate**, and a computed **Gross Margin** (ARV − Rehab Estimate − Price)
-  so reps have what they need to pitch buyers.
+  so reps have what they need to pitch buyers — plus, when set, an **As-Is
+  Value** and computed **As-Is Equity** (As-Is Value − Price) for a deal
+  whose selling point is being undervalued as-is rather than a rehab
+  spread, so it doesn't need ARV/Rehab filled in at all to still show reps
+  the number that actually sells it.
 - Each deal shows the standing SOP:
   1. Contact buyers from the lead list, or submit a Facebook post here for
      admin approval before posting — including which groups you intend to

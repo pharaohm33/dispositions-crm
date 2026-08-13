@@ -77,7 +77,7 @@ const REP_COLUMNS = ['Username', 'Name', 'Phone', 'Email', 'PasswordHash', 'Salt
 // buyer<->deal auto-matching -- see buyerMatchesDeal. AssetType stays a
 // free-text description field ("SFR - 3bd/2ba") separate from the
 // structured AssetCategory used for matching.
-const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt'];
+const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt'];
 const ASSIGNMENT_COLUMNS = ['DealID', 'Username', 'AssignedAt'];
 // MatchStatus tracks the buyer<->deal relationship itself ('Active Match' by
 // default, through 'Negotiating'/'Closing', or 'Dead Match' once the buyer
@@ -584,6 +584,7 @@ function getDeal(body, session) {
 function withComputedFields(deal) {
   const copy = Object.assign({}, deal);
   copy.GrossMargin = computeGrossMargin(deal);
+  copy.AsIsEquity = computeAsIsEquity(deal);
   return copy;
 }
 
@@ -593,6 +594,17 @@ function computeGrossMargin(deal) {
   const price = parseMoney(deal['Price']);
   if (arv === null || rehab === null || price === null) return null;
   return arv - rehab - price;
+}
+
+// For a deal whose selling point is being undervalued as-is rather than a
+// rehab spread -- e.g. no repairs needed, so ARV/RehabEstimate may not
+// even be filled in. As-Is Value is optional and separate from ARV (which
+// implies "after repairs").
+function computeAsIsEquity(deal) {
+  const asIsValue = parseMoney(deal['AsIsValue']);
+  const price = parseMoney(deal['Price']);
+  if (asIsValue === null || price === null) return null;
+  return asIsValue - price;
 }
 
 // Strips $ signs, commas, and other formatting so "$250,000" and "250000"
@@ -643,7 +655,7 @@ function adminAddDeal(body) {
   appendRowByHeaders(sheet, {
     'DealID': dealId, 'DealCode': d.dealCode || '', 'Address': d.address, 'City': d.city || '', 'State': d.state || '', 'Zip': d.zip || '',
     'County': d.county || '', 'MatchCities': d.matchCities || '', 'AssetType': d.assetType || '', 'AssetCategory': d.assetCategory || '',
-    'Price': d.price || '', 'ARV': d.arv || '', 'RehabEstimate': d.rehabEstimate || '',
+    'Price': d.price || '', 'ARV': d.arv || '', 'RehabEstimate': d.rehabEstimate || '', 'AsIsValue': d.asIsValue || '',
     'Status': d.status || DEFAULT_STATUSES[0],
     'Description': d.description || '', 'GeneralDriveLink': d.generalDriveLink || '', 'SensitiveDriveLink': d.sensitiveDriveLink || '',
     'AdminPrivateNotes': d.adminPrivateNotes || '', 'SourceLink': d.sourceLink || '',
@@ -659,7 +671,7 @@ function adminUpdateDeal(body) {
   const match = deals.find(function (d) { return d['DealID'] === body.dealId; });
   if (!match) return { ok: false, error: 'Deal not found.' };
   const d = body.data || {};
-  const editable = ['DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink'];
+  const editable = ['DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink'];
   editable.forEach(function (field) {
     if (d[field] === undefined) return;
     const col = getColumnIndex(sheet, field);

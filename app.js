@@ -52,13 +52,20 @@ function showToast(message, isError) {
   }, 2800);
 }
 
-// GrossMargin comes from the backend as a plain number (or null if ARV/
-// RehabEstimate/Price aren't all set yet) -- this just formats it for
-// display, with a distinct message for the "not enough info yet" case.
-function formatGrossMargin(value) {
-  if (value === null || value === undefined) return "&mdash; (needs ARV, Rehab Estimate, and Price)";
+// GrossMargin/AsIsEquity come from the backend as plain numbers (or null
+// if the fields behind them aren't all set yet) -- this just formats
+// either for display, with a distinct message for the "not enough info
+// yet" case.
+function formatComputedMargin(value, missingHint) {
+  if (value === null || value === undefined) return "&mdash; (needs " + missingHint + ")";
   const rounded = Math.round(value);
   return (rounded < 0 ? "-$" + Math.abs(rounded).toLocaleString() : "$" + rounded.toLocaleString());
+}
+function formatGrossMargin(value) {
+  return formatComputedMargin(value, "ARV, Rehab Estimate, and Price");
+}
+function formatAsIsEquity(value) {
+  return formatComputedMargin(value, "As-Is Value and Price");
 }
 
 function formatDate(iso) {
@@ -273,6 +280,8 @@ async function openRepDealDetail(dealId) {
       (deal.ARV ? '<div><strong>ARV:</strong> ' + esc(deal.ARV) + '</div>' : "") +
       (deal.RehabEstimate ? '<div><strong>Rehab Estimate:</strong> ' + esc(deal.RehabEstimate) + '</div>' : "") +
       (deal.ARV || deal.RehabEstimate ? '<div><strong>Gross Margin:</strong> ' + formatGrossMargin(deal.GrossMargin) + '</div>' : "") +
+      (deal.AsIsValue ? '<div><strong>As-Is Value:</strong> ' + esc(deal.AsIsValue) + '</div>' : "") +
+      (deal.AsIsValue ? '<div><strong>As-Is Equity:</strong> ' + formatAsIsEquity(deal.AsIsEquity) + '</div>' : "") +
       (deal.Description ? '<div style="margin-top:8px;">' + esc(deal.Description) + '</div>' : "") +
       (deal.GeneralDriveLink ? '<div style="margin-top:8px;"><a href="' + esc(deal.GeneralDriveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
     '</div>' +
@@ -843,6 +852,7 @@ function openDealModal() {
   document.getElementById("deal-price-input").value = "";
   document.getElementById("deal-arv-input").value = "";
   document.getElementById("deal-rehab-input").value = "";
+  document.getElementById("deal-asisvalue-input").value = "";
   document.getElementById("deal-description-input").value = "";
   document.getElementById("deal-general-drive-input").value = "";
   document.getElementById("deal-sensitive-drive-input").value = "";
@@ -886,6 +896,7 @@ document.getElementById("deal-modal-save").addEventListener("click", async funct
     price: document.getElementById("deal-price-input").value.trim(),
     arv: document.getElementById("deal-arv-input").value.trim(),
     rehabEstimate: document.getElementById("deal-rehab-input").value.trim(),
+    asIsValue: document.getElementById("deal-asisvalue-input").value.trim(),
     status: document.getElementById("deal-status-input").value,
     description: document.getElementById("deal-description-input").value.trim(),
     generalDriveLink: document.getElementById("deal-general-drive-input").value.trim(),
@@ -990,7 +1001,10 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
       '<div><label class="field-label">Rehab Estimate</label><input type="text" id="deal-rehab-edit" value="' + esc(deal.RehabEstimate || "") + '"></div>' +
       '<div><label class="field-label">Price</label><input type="text" id="deal-price-edit" value="' + esc(deal.Price || "") + '"></div>' +
     '</div>' +
+    '<label class="field-label">As-Is Value <span class="small-muted">(optional — current value with no repairs done; the selling point for a deal that\'s undervalued as-is rather than a rehab spread)</span></label>' +
+    '<input type="text" id="deal-asisvalue-edit" value="' + esc(deal.AsIsValue || "") + '">' +
     '<p class="small-muted">Gross Margin (ARV &minus; Rehab Estimate &minus; Price): <strong>' + formatGrossMargin(deal.GrossMargin) + '</strong></p>' +
+    '<p class="small-muted">As-Is Equity (As-Is Value &minus; Price): <strong>' + formatAsIsEquity(deal.AsIsEquity) + '</strong></p>' +
     '<div class="nav-row" style="justify-content:flex-end;">' +
       '<button class="btn secondary small" id="save-financials-btn">Save Financials</button>' +
     '</div>' +
@@ -1124,7 +1138,8 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
       data: {
         ARV: document.getElementById("deal-arv-edit").value.trim(),
         RehabEstimate: document.getElementById("deal-rehab-edit").value.trim(),
-        Price: document.getElementById("deal-price-edit").value.trim()
+        Price: document.getElementById("deal-price-edit").value.trim(),
+        AsIsValue: document.getElementById("deal-asisvalue-edit").value.trim()
       }
     });
     await loadAdminDeals();
