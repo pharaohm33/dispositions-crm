@@ -139,16 +139,31 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   updated as it moves.
 - **Buyer Leads** — upload a CSV file in any column order and it guesses
   which column is which (Name, Phone × 3, Phone Type × 3, City, State, Zip,
-  County, Email, Asset Categories) from your headers, shows you a preview and
-  the guessed mapping so you can fix anything it got wrong, then imports — or
-  just paste rows directly if that's easier for a short list. Each buyer's
-  profile also holds an editable Email, County, up to three phone numbers,
-  Asset Categories (what they're looking for — Single Family, Multifamily
-  4+ Units, Fix and Flip, etc. — customizable, see Asset Categories below),
-  a price range they've told us they want (if known), a note on the last
-  price we know they've actually paid for something similar, and a Drive
-  Link for their own documents (proof of funds, signed agreements) —
-  visible to any rep who's been given that buyer, editable by admin only.
+  County, Email, Asset Categories, Last Known Purchase Price, Portfolio
+  Value) from your headers, shows you a preview and the guessed mapping so
+  you can fix anything it got wrong, then imports — or just paste rows
+  directly if that's easier for a short list. Built to handle skip-trace
+  exports (Propwire and similar) out of the box: a raw decimal like
+  "21200000.000000000" becomes "$21,200,000"; if the amount and date of a
+  last sale/purchase are in two separate columns, mapping both folds them
+  into one "$X (date)" value instead of losing the date; a Property Type
+  column like "Multi-Family 5+ Units" is translated to this app's own Asset
+  Category wording ("Multifamily (4+ Units)") so buyer-matching against a
+  deal's Asset Category still works instead of silently never matching (an
+  unrecognized category name just passes through as-is rather than being
+  dropped); and listing-agent/lender/mailing-address columns are never
+  auto-guessed as the buyer's own name/phone/email/location, since those
+  belong to a third party, not the owner. Each buyer's profile also holds
+  an editable Email, County, up to three phone numbers, Asset Categories
+  (what they're looking for — Single Family, Condominium / Townhouse,
+  Multifamily 4+ Units, Fix and Flip, etc. — customizable, see Asset
+  Categories below), a price range they've told us they want (if known), a
+  note on the last price we know they've actually paid for something
+  similar, a **Portfolio / Estimated Value** (informational — total value
+  of real estate we know they own, a signal of how well-capitalized they
+  are), and a Drive Link for their own documents (proof of funds, signed
+  agreements) — visible to any rep who's been given that buyer, editable by
+  admin only.
   Every contact a rep logs — and every "Interested Buyer" logged on a deal
   page — can optionally record what % of ARV or as-is value that buyer
   expressed interest at, building real data over time on what buyers

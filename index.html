@@ -396,7 +396,7 @@
 
         <div class="section-title">Preview</div>
         <div style="overflow-x:auto;">
-          <table class="crm-table" id="csv-preview-table"><thead><tr><th>Buyer / LLC</th><th>Phone</th><th>Type</th><th>Phone 2</th><th>Phone 3</th><th>City</th><th>State</th><th>Zip</th><th>County</th><th>Email</th><th>Asset Categories</th><th>Last Purchase Price</th><th>Price Range</th></tr></thead><tbody></tbody></table>
+          <table class="crm-table" id="csv-preview-table"><thead><tr><th>Buyer / LLC</th><th>Phone</th><th>Type</th><th>Phone 2</th><th>Phone 3</th><th>City</th><th>State</th><th>Zip</th><th>County</th><th>Email</th><th>Asset Categories</th><th>Last Purchase Price</th><th>Portfolio Value</th><th>Price Range</th></tr></thead><tbody></tbody></table>
         </div>
         <p class="small-muted" id="csv-preview-note"></p>
 
@@ -498,6 +498,9 @@
           <input type="text" id="mass-edit-lastpurchase-input" placeholder="e.g. $180,000 (Phoenix, 2023)">
         </div>
       </div>
+
+      <label class="checkbox-row"><input type="checkbox" id="mass-edit-apply-portfolio"> Portfolio / Estimated Value</label>
+      <input type="text" id="mass-edit-portfolio-input" placeholder="e.g. $2,400,000 across 6 properties">
 
       <label class="checkbox-row"><input type="checkbox" id="mass-edit-apply-pricerange"> Price Range Buyer Has Told Us They Want</label>
       <div class="row2">
@@ -704,7 +707,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=10"></script>
-<script src="app.js?v=10"></script>
+<script src="config.js?v=11"></script>
+<script src="app.js?v=11"></script>
 </body>
 </html>

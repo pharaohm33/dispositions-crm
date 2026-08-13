@@ -1582,6 +1582,8 @@ const CSV_FIELD_OPTIONS = [
   { value: "email", label: "Email" },
   { value: "assetCategories", label: "Asset Categories (comma-separated)" },
   { value: "lastKnownPurchasePrice", label: "Last Known Purchase Price" },
+  { value: "lastPurchaseDateHint", label: "Last Purchase/Sale Date (folded into Last Known Purchase Price)" },
+  { value: "portfolioValue", label: "Portfolio / Estimated Value" },
   { value: "priceRangeMin", label: "Price Range Min" },
   { value: "priceRangeMax", label: "Price Range Max" }
 ];
@@ -1624,6 +1626,17 @@ function parseCsvText(text) {
 // -- admin picks manually for anything we can't confidently guess.
 function guessCsvField(header) {
   const h = String(header || "").toLowerCase().trim();
+  // Skip-trace exports (Propwire and similar) bundle third-party columns
+  // alongside the actual owner/buyer info -- a listing agent's or lender's
+  // name/phone/email would otherwise pattern-match right along with the
+  // owner's own, and silently win the mapping since later columns
+  // overwrite earlier guesses for the same field. Never guess these.
+  if (/listing\s*agent|listing\s*brokerage|\blender\b|\bmls\b/.test(h)) return "";
+  // Same idea for "Owner Mailing" address -- often an out-of-state LLC
+  // registered-agent address, not where the owner actually invests. The
+  // property's own City/State/Zip/County (unprefixed, checked below) is
+  // the signal that actually belongs in buyer-matching.
+  if (/mailing/.test(h)) return "";
   if (/e-?mail/.test(h)) return "email";
   const isPhoneRelated = /phone|cell|mobile|tel(ephone)?|number|line/.test(h);
   const isTypeRelated = /type/.test(h) || /^(mobile|landline)$/.test(h);
@@ -1637,8 +1650,15 @@ function guessCsvField(header) {
   if (/county/.test(h)) return "county";
   if (/^st$|state/.test(h)) return "state";
   if (/city|town/.test(h)) return "city";
-  if (/category|categories|asset\s*type|property\s*type/.test(h)) return "assetCategories";
-  if (/(last|past|prior|known).*(purchase|bought|paid)|purchase.*price/.test(h)) return "lastKnownPurchasePrice";
+  if (/category|categories|asset\s*type|property\s*type|land\s*use/.test(h)) return "assetCategories";
+  // "Last Sale Date" / "Purchase Date" etc -- checked before the price rule
+  // below so a *_date column doesn't get mistaken for the price itself
+  // (skip-trace exports like Propwire split "Last Sale Amount" and "Last
+  // Sale Date" into two separate columns; this lets the date get folded
+  // back into the price text on import instead of just being dropped).
+  if (/(purchase|sale|sold).*date|date.*(purchase|sale|sold)/.test(h)) return "lastPurchaseDateHint";
+  if (/(last|past|prior|known).*(purchase|bought|paid|sale\s*(amount|price))|purchase.*price/.test(h)) return "lastKnownPurchasePrice";
+  if (/portfolio|estimated\s*value|market\s*value/.test(h)) return "portfolioValue";
   if (/price.*(min|low)|(min|low).*price/.test(h)) return "priceRangeMin";
   if (/price.*(max|high)|(max|high).*price/.test(h)) return "priceRangeMax";
   if (/name|buyer|llc|company|contact/.test(h)) return "buyerName";
@@ -1720,18 +1740,64 @@ function normalizePhoneType(raw) {
   return r === "mobile" ? "Mobile" : r === "landline" ? "Landline" : (raw || "");
 }
 
+// Skip-trace exports (Propwire and similar) tend to dump dollar figures as
+// raw decimals like "21200000.000000000" -- turns that into "$21,200,000"
+// for anything that's purely numeric, and leaves anything already
+// formatted (or not a number at all) alone.
+function formatMoneyish(raw) {
+  const trimmed = String(raw || "").trim();
+  if (!trimmed) return "";
+  if (!/^-?\d+(\.\d+)?$/.test(trimmed)) return trimmed;
+  return "$" + Math.round(Number(trimmed)).toLocaleString();
+}
+
+// A skip-trace/MLS "Property Type" column ("Multi-Family 5+ Units",
+// "Single Family Residence") won't literally match this app's own Asset
+// Category vocabulary ("Multifamily (4+ Units)", "Single Family") --
+// buyer-matching against a deal's Asset Category is exact-after-
+// normalizing-case/whitespace, not fuzzy, so an unmapped value would just
+// silently never match anything. Translates the common phrasings; anything
+// not recognized (including a genuinely new category name) passes through
+// unchanged rather than being dropped, so it's still visible for admin to
+// fix or add as its own category.
+const ASSET_CATEGORY_ALIASES = [
+  { pattern: /single\s*family/i, value: "Single Family" },
+  { pattern: /condo|townhouse|town\s*home/i, value: "Condominium / Townhouse" },
+  { pattern: /multi.?family.*(5\+|five|5\s*or\s*more)|5\+.*unit/i, value: "Multifamily (4+ Units)" },
+  { pattern: /multi.?family.*(2-4|two.*four)|duplex|triplex|fourplex/i, value: "Multifamily (1-4 Units)" },
+  { pattern: /vacant\s*land|^land$/i, value: "Residential Vacant Land" },
+  { pattern: /commercial/i, value: "Commercial" }
+];
+function normalizeAssetCategoryValue(raw) {
+  const trimmed = String(raw || "").trim();
+  if (!trimmed) return "";
+  return trimmed.split(",").map(function (part) {
+    const p = part.trim();
+    const alias = ASSET_CATEGORY_ALIASES.find(function (a) { return a.pattern.test(p); });
+    return alias ? alias.value : p;
+  }).join(", ");
+}
+
 function mappedCsvRows() {
   const mapping = currentCsvMapping();
   return csvRows
     .filter(function (row) { return row.some(function (cell) { return String(cell || "").trim() !== ""; }); })
     .map(function (row) {
       const get = function (field) { return mapping[field] !== undefined ? String(row[mapping[field]] || "").trim() : ""; };
+      // "Last Known Purchase Price" is one free-text field, but a
+      // skip-trace export often splits the amount and the date into two
+      // columns -- fold the date back in as "$X (date)" (same shape as the
+      // field's own placeholder example) instead of losing it.
+      const purchasePrice = formatMoneyish(get("lastKnownPurchasePrice"));
+      const purchaseDateHint = get("lastPurchaseDateHint");
+      const lastKnownPurchasePrice = purchasePrice && purchaseDateHint ? purchasePrice + " (" + purchaseDateHint + ")" : (purchasePrice || purchaseDateHint);
       return {
         buyerName: get("buyerName"), phone: get("phone"), phoneType: normalizePhoneType(get("phoneType")),
         phone2: get("phone2"), phone2Type: normalizePhoneType(get("phone2Type")),
         phone3: get("phone3"), phone3Type: normalizePhoneType(get("phone3Type")),
         city: get("city"), state: get("state"), zip: get("zip"), county: get("county"), email: get("email"),
-        assetCategories: get("assetCategories"), lastKnownPurchasePrice: get("lastKnownPurchasePrice"),
+        assetCategories: normalizeAssetCategoryValue(get("assetCategories")), lastKnownPurchasePrice: lastKnownPurchasePrice,
+        portfolioValue: formatMoneyish(get("portfolioValue")),
         priceRangeMin: get("priceRangeMin"), priceRangeMax: get("priceRangeMax")
       };
     });
@@ -1748,6 +1814,7 @@ function renderCsvPreview() {
       '<td>' + esc(r.city) + '</td>' + '<td>' + esc(r.state) + '</td>' + '<td>' + esc(r.zip) + '</td>' +
       '<td>' + esc(r.county) + '</td>' + '<td>' + esc(r.email) + '</td>' + '<td>' + esc(r.assetCategories) + '</td>' +
       '<td>' + esc(r.lastKnownPurchasePrice) + '</td>' +
+      '<td>' + esc(r.portfolioValue) + '</td>' +
       '<td>' + [r.priceRangeMin, r.priceRangeMax].filter(Boolean).join(" – ") + '</td>' +
       '</tr>';
   }).join("");
@@ -2040,6 +2107,9 @@ document.getElementById("mass-edit-apply-btn").addEventListener("click", async f
   if (document.getElementById("mass-edit-apply-lastpurchase").checked) {
     data.lastKnownPurchasePrice = document.getElementById("mass-edit-lastpurchase-input").value.trim();
   }
+  if (document.getElementById("mass-edit-apply-portfolio").checked) {
+    data.portfolioValue = document.getElementById("mass-edit-portfolio-input").value.trim();
+  }
   if (document.getElementById("mass-edit-apply-pricerange").checked) {
     data.priceRangeMin = document.getElementById("mass-edit-pricemin-input").value.trim();
     data.priceRangeMax = document.getElementById("mass-edit-pricemax-input").value.trim();
@@ -2164,6 +2234,8 @@ function renderBuyerProfileFields(lead, prefix) {
     '<input type="text" id="' + prefix + '-buyer-drivelink-input" value="' + esc(lead.DriveLink || "") + '" placeholder="https://drive.google.com/...">' +
     '<label class="field-label">Last Known Purchase Price <span class="small-muted">(informational — an asset we found they bought, suggests a similar price range)</span></label>' +
     '<input type="text" id="' + prefix + '-buyer-lastpurchase-input" value="' + esc(lead.LastKnownPurchasePrice || "") + '" placeholder="e.g. $180,000 (Phoenix, 2023)">' +
+    '<label class="field-label">Portfolio / Estimated Value <span class="small-muted">(informational — total value of real estate we know they own, a signal of how well-capitalized they are)</span></label>' +
+    '<input type="text" id="' + prefix + '-buyer-portfolio-input" value="' + esc(lead.PortfolioValue || "") + '" placeholder="e.g. $2,400,000 across 6 properties">' +
     '<label class="field-label">Price Range Buyer Has Told Us They Want <span class="small-muted">(if known — used for matching)</span></label>' +
     '<div class="row2">' +
       '<div><input type="text" id="' + prefix + '-buyer-pricemin-input" value="' + esc(lead.PriceRangeMin || "") + '" placeholder="Min"></div>' +
@@ -2199,6 +2271,7 @@ function wireBuyerProfileFieldsHandlers(prefix, buyerLeadId, onSaved) {
       driveLink: document.getElementById(prefix + "-buyer-drivelink-input").value.trim(),
       county: document.getElementById(prefix + "-buyer-county-input").value.trim(),
       lastKnownPurchasePrice: document.getElementById(prefix + "-buyer-lastpurchase-input").value.trim(),
+      portfolioValue: document.getElementById(prefix + "-buyer-portfolio-input").value.trim(),
       priceRangeMin: document.getElementById(prefix + "-buyer-pricemin-input").value.trim(),
       priceRangeMax: document.getElementById(prefix + "-buyer-pricemax-input").value.trim(),
       assetCategories: Array.from(document.querySelectorAll("." + prefix + "-buyer-category-checkbox:checked")).map(function (cb) { return cb.value; }).join(", ")
