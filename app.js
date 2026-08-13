@@ -1001,6 +1001,11 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
       '<div><label class="field-label">Rehab Estimate</label><input type="text" id="deal-rehab-edit" value="' + esc(deal.RehabEstimate || "") + '"></div>' +
       '<div><label class="field-label">Price</label><input type="text" id="deal-price-edit" value="' + esc(deal.Price || "") + '"></div>' +
     '</div>' +
+    '<div class="banner warn">' +
+      '<strong>Pricing guidance:</strong> for best results, aim for around 70% of the price posted online for an ' +
+      'accepted offer. Only use our highest MAO as a last resort, and round down to the nearest $5,000. The tighter ' +
+      'the deal, the less likely it is to sell.' +
+    '</div>' +
     '<label class="field-label">As-Is Value <span class="small-muted">(optional — current value with no repairs done; the selling point for a deal that\'s undervalued as-is rather than a rehab spread)</span></label>' +
     '<input type="text" id="deal-asisvalue-edit" value="' + esc(deal.AsIsValue || "") + '">' +
     '<p class="small-muted">Gross Margin (ARV &minus; Rehab Estimate &minus; Price): <strong>' + formatGrossMargin(deal.GrossMargin) + '</strong></p>' +
