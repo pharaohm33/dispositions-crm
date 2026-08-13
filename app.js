@@ -820,6 +820,7 @@ function renderAdminDeals() {
       '<td>' + esc(d.AssetType || "") + '</td>' +
       '<td>' + esc(d.Price || "") + '</td>' +
       '<td><span class="status-pill ' + statusClass(d.Status) + '">' + esc(d.Status || "") + '</span></td>' +
+      '<td>' + (d.repsWithAccessCount === 0 ? '<span class="status-pill status-dead">0 reps</span>' : (d.repsWithAccessCount === undefined ? "&mdash;" : d.repsWithAccessCount)) + '</td>' +
       '<td class="small-muted">Manage &rarr;</td>' +
       '</tr>';
   }).join("");

@@ -91,11 +91,17 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   as a "give to" target anywhere a buyer lead gets handed to a rep, so
   there's something to actually work once you switch over.
 
-- **Deals** — add deals, change a deal's status (Active, Sold, Dead, Under
-  Contract, On Hold, or whatever categories you've defined), edit the
-  **Address / City / State / Zip** at any time after creation (e.g. a typo,
-  or details that firm up after the deal's already been added), manage
-  exactly which reps can see each deal, assign it a **Deal Code** and **County**
+- **Deals** — the table shows a **# Reps** column for each deal — how many
+  active team members can currently work it (an all-access rep counts
+  toward every deal, everyone else only for deals they're specifically
+  assigned to — same math as the Team tab's per-rep "# Deals," just
+  inverted). A deal with 0 is flagged in red so it's obvious at a glance
+  which ones need to be pushed to another rep. Add deals, change a deal's
+  status (Active, Sold, Dead, Under Contract, On Hold, or whatever
+  categories you've defined), edit the **Address / City / State / Zip** at
+  any time after creation (e.g. a typo, or details that firm up after the
+  deal's already been added), manage exactly which reps can see each deal,
+  assign it a **Deal Code** and **County**
   (what reps actually see instead of the address), an **Asset Category** and
   any extra **cities to also match** in the same state (for buyer-matching —
   see Buyer Leads below), and set two Google Drive

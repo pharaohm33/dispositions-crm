@@ -531,6 +531,38 @@ function getDeals(body, session) {
   if (!session.a) {
     const grants = loadAddressGrantsSet();
     deals = deals.map(function (d) { return applyAddressSecrecy(d, session, grants); });
+  } else {
+    // Admin-only: how many active, non-admin team members can currently
+    // work each deal -- an all-access rep counts toward every deal,
+    // everyone else only counts for deals they're specifically assigned
+    // to (same math as the Team tab's per-rep "# Deals", just inverted to
+    // per-deal). Lets admin spot at a glance which deals are thin on
+    // coverage and could use another rep pushed onto them.
+    const repsSheet = getSheet(REPS_SHEET, REP_COLUMNS);
+    const activeReps = sheetToObjects(repsSheet).filter(function (r) {
+      const active = !(r['Active'] === false || r['Active'] === 'FALSE');
+      const isAdmin = r['IsAdmin'] === true || r['IsAdmin'] === 'TRUE';
+      return active && !isAdmin;
+    });
+    const allAccessCount = activeReps.filter(function (r) { return r['AllAccess'] === true || r['AllAccess'] === 'TRUE'; }).length;
+    const specificallyAssignableUsernames = {};
+    activeReps.forEach(function (r) {
+      if (!(r['AllAccess'] === true || r['AllAccess'] === 'TRUE')) specificallyAssignableUsernames[String(r['Username'] || '').trim().toLowerCase()] = true;
+    });
+
+    const assignmentsSheet = getSheet(ASSIGNMENTS_SHEET, ASSIGNMENT_COLUMNS);
+    const specificCountByDeal = {};
+    sheetToObjects(assignmentsSheet).forEach(function (a) {
+      const u = String(a['Username'] || '').trim().toLowerCase();
+      if (!specificallyAssignableUsernames[u]) return; // inactive, admin, or already counted via all-access
+      specificCountByDeal[a['DealID']] = (specificCountByDeal[a['DealID']] || 0) + 1;
+    });
+
+    deals = deals.map(function (d) {
+      const copy = Object.assign({}, d);
+      copy.repsWithAccessCount = allAccessCount + (specificCountByDeal[d['DealID']] || 0);
+      return copy;
+    });
   }
   return { ok: true, deals: deals };
 }
