@@ -181,7 +181,18 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   or the first N matching your filter (e.g. "give me 50 Single Family
   buyers in Phoenix, Tempe, or Mesa"), and give that whole
   selection to one rep for one deal at once — and paginates at 50 rows so a
-  list of 100+ never loads all at once. Give a buyer to a rep individually,
+  list of 100+ never loads all at once. Right after importing a batch, a
+  **"Show only leads from the last upload"** checkbox appears automatically
+  so the fresh batch doesn't get lost among everything already in the
+  sheet — select all of them and go straight to giving them out. When
+  giving a selection to a deal, picking a team member is now optional —
+  leave it on **"tag for this deal only"** to just earmark the selected
+  leads for that deal without deciding who works it yet (nothing shows up
+  in anyone's queue), then filter by **Pending Deal Tag** later to find
+  them again and hand them to someone once you're ready — or pick a rep
+  right away like before to give a real pitch immediately. A lead's tag
+  clears itself automatically once it's actually given to a rep for that
+  same deal. Give a buyer to a rep individually,
   or give a whole batch at once for one specific deal — matched
   automatically by State, by the deal's City or any of its additional
   "match cities" in the same state (so "Phoenix" and " phoenix " are

@@ -1567,7 +1567,10 @@ async function populateBulkGiveSelects() {
       return '<option value="' + esc(r.username) + '">' + esc(r.name) + ' (' + esc(r.username) + ')' + (r.isAdmin ? " — Admin" : "") + '</option>';
     }).join("");
     document.getElementById("bulk-give-rep-select").innerHTML = repOptions;
-    document.getElementById("give-selected-rep-select").innerHTML = repOptions;
+    // "give-selected" keeps an extra leading option (see index.html) so
+    // admin can tag a batch for a deal without picking anyone yet.
+    document.getElementById("give-selected-rep-select").innerHTML =
+      '<option value="">— Tag for this deal only, pick a rep later —</option>' + repOptions;
   }
   if (dealsRes.ok) {
     buyerLeadsActiveDeals = dealsRes.deals.filter(function (d) { return d.Status !== "Sold" && d.Status !== "Dead"; });
@@ -1839,6 +1842,24 @@ function renderCsvPreview() {
     (missingBuyerNameOrPhone > 0 ? " " + missingBuyerNameOrPhone + " row(s) are missing a Buyer Name or Phone and will be skipped — make sure those are mapped correctly above." : "");
 }
 
+// Tracks whichever buyer leads came from the most recent import (CSV or
+// paste) so the Filter & Mass-Select bar can offer a "just show what I
+// uploaded" view -- otherwise a fresh batch gets lost in however many
+// leads were already in the sheet, making it tedious to select just the
+// new ones for a deal.
+let lastImportedBuyerLeadIds = null;
+
+function markLastImportedBuyerLeads(ids, count) {
+  lastImportedBuyerLeadIds = new Set(ids || []);
+  const row = document.getElementById("buyerleads-lastupload-row");
+  const label = document.getElementById("buyerleads-lastupload-label");
+  const checkbox = document.getElementById("buyerleads-filter-lastupload");
+  if (lastImportedBuyerLeadIds.size === 0) { row.hidden = true; return; }
+  label.textContent = "Show only the " + count + " lead(s) from the last upload";
+  row.hidden = false;
+  checkbox.checked = true;
+}
+
 document.getElementById("csv-import-btn").addEventListener("click", async function () {
   const btn = this;
   const errorEl = document.getElementById("csv-import-error");
@@ -1870,6 +1891,7 @@ document.getElementById("csv-import-btn").addEventListener("click", async functi
   resultEl.textContent = "Imported " + res.imported + " buyer(s)." + (res.skippedDuplicates ? " Skipped " + res.skippedDuplicates + " duplicate phone number(s)." : "");
   document.getElementById("csv-file-input").value = "";
   csvRows = []; csvHeaders = [];
+  markLastImportedBuyerLeads(res.importedIds, res.imported);
   await loadBuyerLeadsAdmin();
   showToast("Imported " + res.imported + " buyer(s).");
 });
@@ -1898,6 +1920,7 @@ document.getElementById("buyerleads-import-btn").addEventListener("click", async
   }
   resultEl.textContent = "Imported " + res.imported + " buyer(s)." + (res.skippedDuplicates ? " Skipped " + res.skippedDuplicates + " duplicate phone number(s)." : "");
   document.getElementById("buyerleads-import-text").value = "";
+  markLastImportedBuyerLeads(res.importedIds, res.imported);
   await loadBuyerLeadsAdmin();
   showToast("Imported " + res.imported + " buyer(s).");
 });
@@ -1966,12 +1989,37 @@ document.getElementById("buyerleads-filter-category").addEventListener("change",
 document.getElementById("buyerleads-filter-state").addEventListener("input", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
 document.getElementById("buyerleads-filter-cities").addEventListener("input", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
 document.getElementById("buyerleads-filter-exclude-cities").addEventListener("input", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
+document.getElementById("buyerleads-filter-lastupload").addEventListener("change", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
+document.getElementById("buyerleads-filter-pendingdeal").addEventListener("change", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
 
 async function loadBuyerLeadsAdmin() {
   const res = await api("adminGetBuyerLeads", {});
   if (!res.ok) return;
   adminBuyerLeads = res.leads;
+  populatePendingDealFilter();
   renderBuyerLeadsAdmin();
+}
+
+// adminDeals (loaded once at admin login, see initAdminView) covers every
+// deal regardless of status, so a lead tagged for a deal that's since sold
+// or gone dead still shows a real label here instead of just its raw ID.
+function dealLabelFor(dealId) {
+  const deal = adminDeals.find(function (d) { return d.DealID === dealId; });
+  if (!deal) return dealId;
+  return deal.DealCode ? deal.DealCode + " — " + deal.Address : deal.Address;
+}
+
+function populatePendingDealFilter() {
+  const select = document.getElementById("buyerleads-filter-pendingdeal");
+  const prevValue = select.value;
+  const seen = {};
+  const dealIds = [];
+  adminBuyerLeads.forEach(function (l) {
+    if (l.PendingDealID && !seen[l.PendingDealID]) { seen[l.PendingDealID] = true; dealIds.push(l.PendingDealID); }
+  });
+  select.innerHTML = '<option value="">Any Pending Deal Tag</option>' +
+    dealIds.map(function (id) { return '<option value="' + esc(id) + '">' + esc(dealLabelFor(id)) + '</option>'; }).join("");
+  if (dealIds.indexOf(prevValue) !== -1) select.value = prevValue;
 }
 
 const BUYER_LEADS_PAGE_SIZE = 50;
@@ -1994,12 +2042,17 @@ function getFilteredBuyerLeads() {
   // state-wide mass-select.
   const excludeCities = document.getElementById("buyerleads-filter-exclude-cities").value
     .split(",").map(function (c) { return c.trim().toLowerCase(); }).filter(Boolean);
+  const lastUploadOnly = !document.getElementById("buyerleads-lastupload-row").hidden &&
+    document.getElementById("buyerleads-filter-lastupload").checked;
+  const pendingDeal = document.getElementById("buyerleads-filter-pendingdeal").value;
   return adminBuyerLeads.filter(function (l) {
     if (q && ![l.BuyerName, l.Phone, l.Email, l.City, l.State, l.Zip, l.County].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; })) return false;
     if (category && (l.AssetCategories || "").split(",").map(function (c) { return c.trim().toLowerCase(); }).indexOf(category.toLowerCase()) === -1) return false;
     if (state && String(l.State || "").trim().toLowerCase() !== state) return false;
     if (cities.length > 0 && cities.indexOf(String(l.City || "").trim().toLowerCase()) === -1) return false;
     if (excludeCities.length > 0 && excludeCities.indexOf(String(l.City || "").trim().toLowerCase()) !== -1) return false;
+    if (lastUploadOnly && !(lastImportedBuyerLeadIds && lastImportedBuyerLeadIds.has(l.BuyerLeadID))) return false;
+    if (pendingDeal && l.PendingDealID !== pendingDeal) return false;
     return true;
   });
 }
@@ -2034,6 +2087,7 @@ function renderBuyerLeadsAdmin() {
       '<td>' + [l.City, l.State, l.Zip, l.County ? l.County + " County" : ""].filter(Boolean).join(", ") + '</td>' +
       '<td class="small-muted">' + esc(l.AssetCategories || "") + '</td>' +
       '<td class="small-muted">' + esc(notesPreview) + '</td>' +
+      '<td class="small-muted">' + (l.PendingDealID ? esc(dealLabelFor(l.PendingDealID)) : "&mdash;") + '</td>' +
       '<td>' + (l.openPitches.length || "&mdash;") + '</td>' +
       '<td style="white-space:nowrap;"><button class="btn secondary small view-buyer-btn" data-lead-id="' + esc(l.BuyerLeadID) + '">View / Give</button></td>' +
       '</tr>';
@@ -2092,12 +2146,28 @@ document.getElementById("give-selected-btn").addEventListener("click", async fun
   const resultEl = document.getElementById("give-selected-result");
   const dealId = document.getElementById("give-selected-deal-select").value;
   const username = document.getElementById("give-selected-rep-select").value;
-  if (!dealId || !username || buyerLeadsSelectedIds.size === 0) {
-    resultEl.textContent = "Pick a deal, a team member, and at least one buyer.";
+  if (!dealId || buyerLeadsSelectedIds.size === 0) {
+    resultEl.textContent = "Pick a deal and at least one buyer.";
     return;
   }
   if (btn.disabled) return;
   btn.disabled = true;
+
+  // Leaving the rep dropdown on "tag only" just earmarks the selection for
+  // this deal (adminTagBuyerLeadsForDeal) -- no pitch, nobody's queue
+  // changes. Picking an actual team member gives them a real pitch right
+  // away, same as before.
+  if (!username) {
+    const res = await api("adminTagBuyerLeadsForDeal", { dealId: dealId, buyerLeadIds: Array.from(buyerLeadsSelectedIds) });
+    btn.disabled = false;
+    if (!res.ok) { resultEl.textContent = res.error || "Could not tag leads."; showToast(res.error || "Could not tag leads.", true); return; }
+    resultEl.textContent = "Tagged " + res.taggedCount + " lead(s) for " + dealLabelFor(dealId) + ".";
+    buyerLeadsSelectedIds = new Set();
+    await loadBuyerLeadsAdmin();
+    showToast("Tagged " + res.taggedCount + " lead(s).");
+    return;
+  }
+
   const res = await api("adminGiveSelectedBuyerLeads", { dealId: dealId, username: username, buyerLeadIds: Array.from(buyerLeadsSelectedIds) });
   btn.disabled = false;
   if (!res.ok) { resultEl.textContent = res.error || "Could not give leads."; showToast(res.error || "Could not give leads.", true); return; }

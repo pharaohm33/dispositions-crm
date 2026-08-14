@@ -126,7 +126,7 @@ const FB_COLUMNS = ['RequestID', 'DealID', 'Username', 'PostText', 'TargetGroups
 // what the buyer has told us they want to spend, if known; like
 // AssetCategories, a buyer with neither set is treated as open to any
 // price for matching purposes.
-const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'PortfolioValue', 'PriceRangeMin', 'PriceRangeMax', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'CreatedAt'];
+const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'PortfolioValue', 'PriceRangeMin', 'PriceRangeMax', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'PendingDealID', 'CreatedAt'];
 
 // A Pitch is "give this buyer lead to this rep, to work against this one
 // specific deal." This is the only thing that creates an actionable item in
@@ -264,6 +264,8 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminGiveBuyerLeadsBulk));
       case 'adminGiveSelectedBuyerLeads':
         return jsonOut(withAdminSession(body, adminGiveSelectedBuyerLeads));
+      case 'adminTagBuyerLeadsForDeal':
+        return jsonOut(withAdminSession(body, adminTagBuyerLeadsForDeal));
       case 'adminAddAssetCategory':
         return jsonOut(withAdminSession(body, adminAddAssetCategory));
       case 'adminRemoveAssetCategory':
@@ -1451,12 +1453,15 @@ function adminImportBuyerLeads(body) {
       'Email': r.email || '', 'City': r.city || '', 'State': r.state || '', 'Zip': r.zip || '', 'County': r.county || '',
       'AssetCategories': r.assetCategories || '', 'LastKnownPurchasePrice': r.lastKnownPurchasePrice || '', 'PortfolioValue': r.portfolioValue || '',
       'PriceRangeMin': r.priceRangeMin || '', 'PriceRangeMax': r.priceRangeMax || '',
-      'GeneralNotes': '', 'DriveLink': '', 'DoNotContact': false, 'CreatedAt': now
+      'GeneralNotes': '', 'DriveLink': '', 'DoNotContact': false, 'PendingDealID': '', 'CreatedAt': now
     });
   });
   appendRowsByHeaders(sheet, newRows);
 
-  return { ok: true, imported: newRows.length, skippedDuplicates: skippedDuplicates };
+  // Lets the frontend offer a "just show what I uploaded" view right after
+  // an import, instead of the new batch getting lost in however many leads
+  // were already in the sheet.
+  return { ok: true, imported: newRows.length, skippedDuplicates: skippedDuplicates, importedIds: newRows.map(function (r) { return r['BuyerLeadID']; }) };
 }
 
 // Joins every pitch to its contacts and computes each one's live status,
@@ -1740,7 +1745,58 @@ function adminGiveSelectedBuyerLeads(body) {
     appendRowsByHeaders(pitchesSheet, candidates.map(function (l) {
       return { 'PitchID': Utilities.getUuid(), 'BuyerLeadID': l['BuyerLeadID'], 'DealID': body.dealId, 'Username': username, 'GivenAt': now };
     }));
+
+    // A lead tagged "pending" for this exact deal just became a real pitch
+    // for it, so the pending tag has served its purpose -- clear it (one
+    // batched read+write, not a per-row call). Leaves alone any lead
+    // pending for a *different* deal, in case it's deliberately being
+    // tracked for both.
+    const clearIds = {};
+    candidates.forEach(function (l) { if (l['PendingDealID'] === body.dealId) clearIds[l['BuyerLeadID']] = true; });
+    if (Object.keys(clearIds).length > 0) {
+      const values = leadsSheet.getDataRange().getValues();
+      const headers = values[0];
+      const idCol = headers.indexOf('BuyerLeadID');
+      const pendingCol = headers.indexOf('PendingDealID');
+      for (let i = 1; i < values.length; i++) {
+        if (clearIds[values[i][idCol]]) values[i][pendingCol] = '';
+      }
+      leadsSheet.getRange(1, 1, values.length, headers.length).setValues(values);
+    }
+
     return { ok: true, givenCount: candidates.length, skipped: body.buyerLeadIds.length - candidates.length };
+  });
+}
+
+// Earmarks a batch of buyer leads for a deal WITHOUT creating any pitches
+// (no rep involved) -- purely an admin-side organizational tag so leads
+// can be sorted by "which deal are these for" before deciding who actually
+// works them. Never appears in any rep's queue; only adminGetBuyerLeads
+// surfaces it. Passing an empty dealId clears the tag instead of setting
+// one, so the same action doubles as "un-tag."
+function adminTagBuyerLeadsForDeal(body) {
+  if (!body.buyerLeadIds || body.buyerLeadIds.length === 0) return { ok: false, error: 'No leads selected.' };
+  const dealId = body.dealId || '';
+  const wanted = {};
+  body.buyerLeadIds.forEach(function (id) { wanted[id] = true; });
+
+  return withLock(function () {
+    const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+    const values = sheet.getDataRange().getValues();
+    const headers = values[0];
+    const idCol = headers.indexOf('BuyerLeadID');
+    const pendingCol = headers.indexOf('PendingDealID');
+
+    let taggedCount = 0;
+    for (let i = 1; i < values.length; i++) {
+      if (!wanted[values[i][idCol]]) continue;
+      values[i][pendingCol] = dealId;
+      taggedCount++;
+    }
+    if (taggedCount > 0) {
+      sheet.getRange(1, 1, values.length, headers.length).setValues(values);
+    }
+    return { ok: true, taggedCount: taggedCount };
   });
 }
 
