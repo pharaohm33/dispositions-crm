@@ -1849,13 +1849,17 @@ function renderCsvPreview() {
 // new ones for a deal.
 let lastImportedBuyerLeadIds = null;
 
-function markLastImportedBuyerLeads(ids, count) {
+function markLastImportedBuyerLeads(ids, count, importedAt) {
   lastImportedBuyerLeadIds = new Set(ids || []);
   const row = document.getElementById("buyerleads-lastupload-row");
   const label = document.getElementById("buyerleads-lastupload-label");
   const checkbox = document.getElementById("buyerleads-filter-lastupload");
   if (lastImportedBuyerLeadIds.size === 0) { row.hidden = true; return; }
-  label.textContent = "Show only the " + count + " lead(s) from the last upload";
+  // Exact timestamp (not just "the last one"), since it's the same value
+  // stored as each lead's own CreatedAt -- with the Uploaded column and the
+  // newest/oldest sort, this is what actually lets a dead deal's timeframe
+  // get matched back to whichever upload batch the buyers for it came from.
+  label.textContent = "Show only the " + count + " lead(s) uploaded " + (importedAt ? formatDate(importedAt) : "just now");
   row.hidden = false;
   checkbox.checked = true;
 }
@@ -1891,7 +1895,7 @@ document.getElementById("csv-import-btn").addEventListener("click", async functi
   resultEl.textContent = "Imported " + res.imported + " buyer(s)." + (res.skippedDuplicates ? " Skipped " + res.skippedDuplicates + " duplicate phone number(s)." : "");
   document.getElementById("csv-file-input").value = "";
   csvRows = []; csvHeaders = [];
-  markLastImportedBuyerLeads(res.importedIds, res.imported);
+  markLastImportedBuyerLeads(res.importedIds, res.imported, res.importedAt);
   await loadBuyerLeadsAdmin();
   showToast("Imported " + res.imported + " buyer(s).");
 });
@@ -1920,7 +1924,7 @@ document.getElementById("buyerleads-import-btn").addEventListener("click", async
   }
   resultEl.textContent = "Imported " + res.imported + " buyer(s)." + (res.skippedDuplicates ? " Skipped " + res.skippedDuplicates + " duplicate phone number(s)." : "");
   document.getElementById("buyerleads-import-text").value = "";
-  markLastImportedBuyerLeads(res.importedIds, res.imported);
+  markLastImportedBuyerLeads(res.importedIds, res.imported, res.importedAt);
   await loadBuyerLeadsAdmin();
   showToast("Imported " + res.imported + " buyer(s).");
 });
@@ -1991,6 +1995,7 @@ document.getElementById("buyerleads-filter-cities").addEventListener("input", fu
 document.getElementById("buyerleads-filter-exclude-cities").addEventListener("input", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
 document.getElementById("buyerleads-filter-lastupload").addEventListener("change", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
 document.getElementById("buyerleads-filter-pendingdeal").addEventListener("change", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
+document.getElementById("buyerleads-sort").addEventListener("change", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
 
 async function loadBuyerLeadsAdmin() {
   const res = await api("adminGetBuyerLeads", {});
@@ -2045,7 +2050,8 @@ function getFilteredBuyerLeads() {
   const lastUploadOnly = !document.getElementById("buyerleads-lastupload-row").hidden &&
     document.getElementById("buyerleads-filter-lastupload").checked;
   const pendingDeal = document.getElementById("buyerleads-filter-pendingdeal").value;
-  return adminBuyerLeads.filter(function (l) {
+  const sortMode = document.getElementById("buyerleads-sort").value;
+  const filtered = adminBuyerLeads.filter(function (l) {
     if (q && ![l.BuyerName, l.Phone, l.Email, l.City, l.State, l.Zip, l.County].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; })) return false;
     if (category && (l.AssetCategories || "").split(",").map(function (c) { return c.trim().toLowerCase(); }).indexOf(category.toLowerCase()) === -1) return false;
     if (state && String(l.State || "").trim().toLowerCase() !== state) return false;
@@ -2055,6 +2061,16 @@ function getFilteredBuyerLeads() {
     if (pendingDeal && l.PendingDealID !== pendingDeal) return false;
     return true;
   });
+  // Lets admin browse chronologically by upload batch -- e.g. line up when
+  // a deal went dead against which round of leads came in around then,
+  // without needing to hunt across paginated default (sheet-insertion)
+  // order for a specific date.
+  if (sortMode === "newest") {
+    filtered.sort(function (a, b) { return new Date(b.CreatedAt || 0) - new Date(a.CreatedAt || 0); });
+  } else if (sortMode === "oldest") {
+    filtered.sort(function (a, b) { return new Date(a.CreatedAt || 0) - new Date(b.CreatedAt || 0); });
+  }
+  return filtered;
 }
 
 function renderBuyerLeadsAdmin() {
@@ -2088,6 +2104,7 @@ function renderBuyerLeadsAdmin() {
       '<td class="small-muted">' + esc(l.AssetCategories || "") + '</td>' +
       '<td class="small-muted">' + esc(notesPreview) + '</td>' +
       '<td class="small-muted">' + (l.PendingDealID ? esc(dealLabelFor(l.PendingDealID)) : "&mdash;") + '</td>' +
+      '<td class="small-muted">' + (l.CreatedAt ? formatDate(l.CreatedAt) : "&mdash;") + '</td>' +
       '<td>' + (l.openPitches.length || "&mdash;") + '</td>' +
       '<td style="white-space:nowrap;"><button class="btn secondary small view-buyer-btn" data-lead-id="' + esc(l.BuyerLeadID) + '">View / Give</button></td>' +
       '</tr>';

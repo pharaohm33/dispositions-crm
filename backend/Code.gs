@@ -1461,7 +1461,7 @@ function adminImportBuyerLeads(body) {
   // Lets the frontend offer a "just show what I uploaded" view right after
   // an import, instead of the new batch getting lost in however many leads
   // were already in the sheet.
-  return { ok: true, imported: newRows.length, skippedDuplicates: skippedDuplicates, importedIds: newRows.map(function (r) { return r['BuyerLeadID']; }) };
+  return { ok: true, imported: newRows.length, skippedDuplicates: skippedDuplicates, importedIds: newRows.map(function (r) { return r['BuyerLeadID']; }), importedAt: now };
 }
 
 // Joins every pitch to its contacts and computes each one's live status,

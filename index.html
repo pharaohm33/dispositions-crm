@@ -468,6 +468,11 @@
         <input type="text" id="buyerleads-filter-cities" placeholder="Cities (comma separated)" style="flex:0 0 auto; min-width:220px;">
         <input type="text" id="buyerleads-filter-exclude-cities" placeholder="Exclude cities (comma separated)" style="flex:0 0 auto; min-width:220px;">
         <select id="buyerleads-filter-pendingdeal" style="flex:0 0 auto; min-width:200px;"><option value="">Any Pending Deal Tag</option></select>
+        <select id="buyerleads-sort" style="flex:0 0 auto; min-width:190px;">
+          <option value="">Sort: Default</option>
+          <option value="newest">Sort: Newest Uploaded First</option>
+          <option value="oldest">Sort: Oldest Uploaded First</option>
+        </select>
       </div>
       <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
         <button class="btn secondary small" id="buyerleads-select-page-btn">Select All On This Page</button>
@@ -529,7 +534,7 @@
     </div>
 
     <table class="crm-table">
-      <thead><tr><th></th><th>Buyer / LLC</th><th>Phone</th><th>Email</th><th>Type</th><th>Location</th><th>Asset Categories</th><th>General Notes</th><th>Pending Deal</th><th>Open Pitches</th><th>Actions</th></tr></thead>
+      <thead><tr><th></th><th>Buyer / LLC</th><th>Phone</th><th>Email</th><th>Type</th><th>Location</th><th>Asset Categories</th><th>General Notes</th><th>Pending Deal</th><th>Uploaded</th><th>Open Pitches</th><th>Actions</th></tr></thead>
       <tbody id="buyerleads-tbody"></tbody>
     </table>
     <div id="buyerleads-admin-empty" class="small-muted" style="padding:20px;" hidden>No buyer leads imported yet.</div>
@@ -715,7 +720,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=15"></script>
-<script src="app.js?v=15"></script>
+<script src="config.js?v=16"></script>
+<script src="app.js?v=16"></script>
 </body>
 </html>
