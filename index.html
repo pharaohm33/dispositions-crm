@@ -394,6 +394,13 @@
           <table class="crm-table" id="csv-mapping-table"><thead><tr><th>Your Column</th><th>Sample Value</th><th>Maps To</th></tr></thead><tbody></tbody></table>
         </div>
 
+        <div class="section-title">Portfolio Value For This Batch <span class="small-muted">(optional)</span></div>
+        <p class="small-muted">Propwire lets you filter a search by portfolio/estimated value, but doesn't include that value in the export itself. If you built this list that way, enter the range (or just a minimum) here and it'll be applied to every buyer in this upload who doesn't already have a Portfolio Value from a mapped column above.</p>
+        <div class="row2">
+          <div><label class="field-label">Min</label><input type="text" id="csv-portfolio-min-input" placeholder="e.g. 500000"></div>
+          <div><label class="field-label">Max <span class="small-muted">(leave blank if you only have a minimum)</span></label><input type="text" id="csv-portfolio-max-input" placeholder="e.g. 1000000"></div>
+        </div>
+
         <div class="section-title">Preview</div>
         <div style="overflow-x:auto;">
           <table class="crm-table" id="csv-preview-table"><thead><tr><th>Buyer / LLC</th><th>Phone</th><th>Type</th><th>Phone 2</th><th>Phone 3</th><th>City</th><th>State</th><th>Zip</th><th>County</th><th>Email</th><th>Asset Categories</th><th>Last Purchase Price</th><th>Portfolio Value</th><th>Price Range</th></tr></thead><tbody></tbody></table>
@@ -720,7 +727,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=17"></script>
-<script src="app.js?v=17"></script>
+<script src="config.js?v=18"></script>
+<script src="app.js?v=18"></script>
 </body>
 </html>

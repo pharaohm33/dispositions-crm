@@ -1701,6 +1701,10 @@ document.getElementById("csv-file-input").addEventListener("change", function (e
   errorEl.classList.remove("show");
   document.getElementById("csv-import-result").textContent = "";
   document.getElementById("csv-import-error").classList.remove("show");
+  // A new file means a new batch -- don't silently carry over a portfolio
+  // value range typed in for a previous, unrelated upload.
+  document.getElementById("csv-portfolio-min-input").value = "";
+  document.getElementById("csv-portfolio-max-input").value = "";
   if (!file) return;
   const reader = new FileReader();
   reader.onload = function () {
@@ -1725,6 +1729,12 @@ document.getElementById("csv-file-input").addEventListener("change", function (e
     errorEl.classList.add("show");
   };
   reader.readAsText(file);
+});
+
+["csv-portfolio-min-input", "csv-portfolio-max-input"].forEach(function (id) {
+  document.getElementById(id).addEventListener("input", function () {
+    if (!document.getElementById("csv-mapping-section").hidden) renderCsvPreview();
+  });
 });
 
 document.getElementById("csv-has-header").addEventListener("change", function () {
@@ -1787,6 +1797,33 @@ function formatPercentish(raw) {
   return Math.round(Number(trimmed.replace("%", ""))) + "%";
 }
 
+// Same idea as formatMoneyish, but also strips "$" and "," first since this
+// one reads an admin's own typed-in number (e.g. "500,000" or "$500000"),
+// not a raw skip-trace decimal.
+function formatAdminMoney(raw) {
+  const trimmed = String(raw || "").trim();
+  if (!trimmed) return "";
+  const cleaned = trimmed.replace(/[$,]/g, "");
+  if (!/^\d+(\.\d+)?$/.test(cleaned)) return trimmed;
+  return "$" + Math.round(Number(cleaned)).toLocaleString();
+}
+
+// Propwire (and similar) let you filter a search by portfolio/estimated
+// value, but don't export that value in the CSV -- so there's no per-row
+// column to map. This reads the admin's own manually-entered range for the
+// whole batch, to use as a fallback wherever a row doesn't already have a
+// real per-row Portfolio Value.
+function csvPortfolioOverrideValue() {
+  const minEl = document.getElementById("csv-portfolio-min-input");
+  const maxEl = document.getElementById("csv-portfolio-max-input");
+  const min = formatAdminMoney(minEl ? minEl.value : "");
+  const max = formatAdminMoney(maxEl ? maxEl.value : "");
+  if (min && max) return min + " – " + max;
+  if (min) return min + "+";
+  if (max) return "Up to " + max;
+  return "";
+}
+
 // A skip-trace/MLS "Property Type" column ("Multi-Family 5+ Units",
 // "Single Family Residence") won't literally match this app's own Asset
 // Category vocabulary ("Multifamily (4+ Units)", "Single Family") --
@@ -1839,7 +1876,7 @@ function mappedCsvRows() {
       // separate field.
       const portfolioBase = formatMoneyish(get("portfolioValue"));
       const equityHint = formatPercentish(get("equityHint"));
-      const portfolioValue = portfolioBase && equityHint ? portfolioBase + " (" + equityHint + " equity)" : (portfolioBase || (equityHint ? equityHint + " equity" : ""));
+      const portfolioValue = (portfolioBase && equityHint ? portfolioBase + " (" + equityHint + " equity)" : (portfolioBase || (equityHint ? equityHint + " equity" : ""))) || csvPortfolioOverrideValue();
       return {
         buyerName: get("buyerName"), phone: get("phone"), phoneType: normalizePhoneType(get("phoneType")),
         phone2: get("phone2"), phone2Type: normalizePhoneType(get("phone2Type")),

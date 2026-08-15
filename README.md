@@ -156,7 +156,12 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   an Estimated Equity Percent column folds into Portfolio Value as "$X (Y%
   equity)" since 100% equity is a stronger "how liquid is this buyer" signal
   than the raw value alone, e.g. a good sign they could pay cash and close
-  fast; a Property Type
+  fast. Propwire lets you filter a search by portfolio/estimated value but
+  doesn't export that value in the CSV, so there's a **Portfolio Value For
+  This Batch** min/max box right on the import screen — enter it once (a
+  range, or just a minimum) and it's applied to every buyer in that upload
+  who doesn't already have a real per-row Portfolio Value from a mapped
+  column, e.g. "$500,000 – $1,000,000" or "$500,000+"; a Property Type
   column like "Multi-Family 5+ Units" is translated to this app's own Asset
   Category wording ("Multifamily (4+ Units)") so buyer-matching against a
   deal's Asset Category still works instead of silently never matching (an
