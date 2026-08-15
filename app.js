@@ -1603,6 +1603,8 @@ const CSV_FIELD_OPTIONS = [
   { value: "lastPurchaseDateHint", label: "Last Purchase/Sale Date (folded into Last Known Purchase Price)" },
   { value: "estimatedPropertyValue", label: "Estimated Value (this one property, not their whole portfolio)" },
   { value: "equityHint", label: "Estimated Equity % (folded into Estimated Value)" },
+  { value: "ownershipLengthMonths", label: "Ownership Length (in months)" },
+  { value: "propertyUrl", label: "Property Listing URL" },
   { value: "priceRangeMin", label: "Price Range Min" },
   { value: "priceRangeMax", label: "Price Range Max" }
 ];
@@ -1693,6 +1695,13 @@ function guessCsvField(header) {
   // once for the whole batch instead (see the Portfolio Value For This
   // Batch box on the import screen).
   if (/estimated\s*value|market\s*value/.test(h)) return "estimatedPropertyValue";
+  // How long the owner has held this one property -- a long hold on vacant
+  // land often signals an inherited or otherwise low-priority parcel,
+  // useful for dispositions outreach. Checked before the generic "county"
+  // rule can't apply here anyway, but kept in this general area alongside
+  // the other single-property signals above.
+  if (/ownership.*length|length.*ownership|months?\s*owned|owned.*months?/.test(h)) return "ownershipLengthMonths";
+  if (/property\s*url|listing\s*url/.test(h)) return "propertyUrl";
   if (/price.*(min|low)|(min|low).*price/.test(h)) return "priceRangeMin";
   if (/price.*(max|high)|(max|high).*price/.test(h)) return "priceRangeMax";
   if (/name|buyer|llc|company|contact/.test(h)) return "buyerName";
@@ -1804,6 +1813,18 @@ function formatPercentish(raw) {
   return Math.round(Number(trimmed.replace("%", ""))) + "%";
 }
 
+// Same idea as formatMoneyish/formatPercentish but with no unit -- rounds a
+// raw decimal like "237.000000000" down to a clean integer string "237",
+// leaving anything non-numeric untouched. Used for Ownership Length
+// (months), stored as a plain number so it stays filterable rather than
+// baked into a formatted sentence.
+function formatWholeNumber(raw) {
+  const trimmed = String(raw || "").trim();
+  if (!trimmed) return "";
+  if (!/^-?\d+(\.\d+)?$/.test(trimmed)) return trimmed;
+  return String(Math.round(Number(trimmed)));
+}
+
 // Same idea as formatMoneyish, but also strips "$" and "," first since this
 // one reads an admin's own typed-in number (e.g. "500,000" or "$500000"),
 // not a raw skip-trace decimal.
@@ -1897,9 +1918,21 @@ function mappedCsvRows() {
         assetCategories: normalizeAssetCategoryValue(get("assetCategories")), lastKnownPurchasePrice: lastKnownPurchasePrice,
         estimatedPropertyValue: estimatedPropertyValue,
         portfolioValue: portfolioValue,
+        ownershipLengthMonths: formatWholeNumber(get("ownershipLengthMonths")),
+        propertyUrl: get("propertyUrl"),
         priceRangeMin: get("priceRangeMin"), priceRangeMax: get("priceRangeMax")
       };
     });
+}
+
+// Display-only: "237" months -> "19 yrs". Kept separate from the stored
+// raw number (formatWholeNumber above) so the sheet/filter always works off
+// the exact figure and this rounding is only ever cosmetic.
+function formatOwnershipLengthLabel(monthsRaw) {
+  const months = Number(monthsRaw);
+  if (!monthsRaw || isNaN(months)) return "";
+  const years = Math.floor(months / 12);
+  return years >= 1 ? years + (years === 1 ? " yr" : " yrs") : Math.round(months) + " mo";
 }
 
 function renderCsvPreview() {
@@ -1915,13 +1948,16 @@ function renderCsvPreview() {
       '<td>' + esc(r.lastKnownPurchasePrice) + '</td>' +
       '<td>' + esc(r.estimatedPropertyValue) + '</td>' +
       '<td>' + esc(r.portfolioValue) + '</td>' +
+      '<td>' + esc(formatOwnershipLengthLabel(r.ownershipLengthMonths)) + '</td>' +
       '<td>' + [r.priceRangeMin, r.priceRangeMax].filter(Boolean).join(" – ") + '</td>' +
       '</tr>';
   }).join("");
   const missingBuyerNameOrPhone = rows.filter(function (r) { return !r.buyerName || !r.phone; }).length;
+  const withPropertyUrl = rows.filter(function (r) { return r.propertyUrl; }).length;
   document.getElementById("csv-preview-note").textContent =
     "Showing " + Math.min(5, rows.length) + " of " + rows.length + " row(s)." +
-    (missingBuyerNameOrPhone > 0 ? " " + missingBuyerNameOrPhone + " row(s) are missing a Buyer Name or Phone and will be skipped — make sure those are mapped correctly above." : "");
+    (missingBuyerNameOrPhone > 0 ? " " + missingBuyerNameOrPhone + " row(s) are missing a Buyer Name or Phone and will be skipped — make sure those are mapped correctly above." : "") +
+    (withPropertyUrl > 0 ? " " + withPropertyUrl + " row(s) include a source Property URL that will be saved (not shown in this preview)." : "");
 }
 
 // Tracks whichever buyer leads came from the most recent import (CSV or
@@ -2078,6 +2114,9 @@ document.getElementById("buyerleads-filter-exclude-cities").addEventListener("in
 document.getElementById("buyerleads-filter-lastupload").addEventListener("change", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
 document.getElementById("buyerleads-filter-pendingdeal").addEventListener("change", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
 document.getElementById("buyerleads-sort").addEventListener("change", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
+document.getElementById("buyerleads-filter-ownertype").addEventListener("change", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
+document.getElementById("buyerleads-filter-minequity").addEventListener("input", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
+document.getElementById("buyerleads-filter-minheldyears").addEventListener("input", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
 
 async function loadBuyerLeadsAdmin() {
   const res = await api("adminGetBuyerLeads", {});
@@ -2113,6 +2152,24 @@ const BUYER_LEADS_PAGE_SIZE = 50;
 let buyerLeadsCurrentPage = 1;
 let buyerLeadsSelectedIds = new Set();
 
+// A skip-trace/company-owned property is often held by a more active,
+// sophisticated investor than an individual owner -- useful to filter on
+// for dispositions outreach. Derived on the fly from BuyerName rather than
+// stored as its own field, since the name itself is already the source of
+// truth (an LLC name doesn't stop being an LLC name).
+function isCompanyBuyerName(name) {
+  return /\b(llc|inc|incorporated|corp|corporation|trust|lp|llp|ltd|company|co\.?|holdings|group|partners|properties|investments|capital)\b/i.test(String(name || ""));
+}
+
+// Estimated Value folds equity in as a "(NN% equity)" suffix (see
+// mappedCsvRows) -- pulled back out here for filtering rather than stored
+// as a separate number, so there's one source of truth for the figure
+// instead of two copies that could drift apart.
+function extractEquityPercent(estimatedPropertyValue) {
+  const m = /\((\d+)%\s*equity\)/i.exec(String(estimatedPropertyValue || ""));
+  return m ? Number(m[1]) : null;
+}
+
 function getFilteredBuyerLeads() {
   const q = document.getElementById("buyerleads-search").value.trim().toLowerCase();
   const category = document.getElementById("buyerleads-filter-category").value;
@@ -2133,6 +2190,11 @@ function getFilteredBuyerLeads() {
     document.getElementById("buyerleads-filter-lastupload").checked;
   const pendingDeal = document.getElementById("buyerleads-filter-pendingdeal").value;
   const sortMode = document.getElementById("buyerleads-sort").value;
+  const ownerType = document.getElementById("buyerleads-filter-ownertype").value;
+  const minEquityRaw = document.getElementById("buyerleads-filter-minequity").value.trim();
+  const minEquity = minEquityRaw === "" ? null : Number(minEquityRaw);
+  const minHeldYearsRaw = document.getElementById("buyerleads-filter-minheldyears").value.trim();
+  const minHeldMonths = minHeldYearsRaw === "" ? null : Number(minHeldYearsRaw) * 12;
   const filtered = adminBuyerLeads.filter(function (l) {
     if (q && ![l.BuyerName, l.Phone, l.Email, l.City, l.State, l.Zip, l.County].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; })) return false;
     if (category && (l.AssetCategories || "").split(",").map(function (c) { return c.trim().toLowerCase(); }).indexOf(category.toLowerCase()) === -1) return false;
@@ -2141,6 +2203,16 @@ function getFilteredBuyerLeads() {
     if (excludeCities.length > 0 && excludeCities.indexOf(String(l.City || "").trim().toLowerCase()) !== -1) return false;
     if (lastUploadOnly && !(lastImportedBuyerLeadIds && lastImportedBuyerLeadIds.has(l.BuyerLeadID))) return false;
     if (pendingDeal && l.PendingDealID !== pendingDeal) return false;
+    if (ownerType === "company" && !isCompanyBuyerName(l.BuyerName)) return false;
+    if (ownerType === "individual" && isCompanyBuyerName(l.BuyerName)) return false;
+    if (minEquity !== null) {
+      const equity = extractEquityPercent(l.EstimatedPropertyValue);
+      if (equity === null || equity < minEquity) return false;
+    }
+    if (minHeldMonths !== null) {
+      const months = Number(l.OwnershipLengthMonths);
+      if (!l.OwnershipLengthMonths || isNaN(months) || months < minHeldMonths) return false;
+    }
     return true;
   });
   // Lets admin browse chronologically by upload batch -- e.g. line up when
@@ -2178,7 +2250,7 @@ function renderBuyerLeadsAdmin() {
     const checked = buyerLeadsSelectedIds.has(l.BuyerLeadID) ? " checked" : "";
     return '<tr>' +
       '<td><input type="checkbox" class="buyerlead-select-checkbox" data-lead-id="' + esc(l.BuyerLeadID) + '"' + checked + (isDnc ? " disabled" : "") + '></td>' +
-      '<td>' + esc(l.BuyerName) + (isDnc ? ' <span class="status-pill status-dead-match">DNC</span>' : "") + '</td>' +
+      '<td>' + esc(l.BuyerName) + (isCompanyBuyerName(l.BuyerName) ? ' <span class="status-pill status-fully-worked">Co</span>' : "") + (isDnc ? ' <span class="status-pill status-dead-match">DNC</span>' : "") + '</td>' +
       '<td>' + esc(l.Phone) + '</td>' +
       '<td>' + esc(l.Email || "") + '</td>' +
       '<td>' + esc(l.PhoneType || "") + '</td>' +
@@ -2425,6 +2497,10 @@ function renderBuyerProfileFields(lead, prefix) {
     '<input type="text" id="' + prefix + '-buyer-estimatedvalue-input" value="' + esc(lead.EstimatedPropertyValue || "") + '" placeholder="e.g. $180,000 (100% equity)">' +
     '<label class="field-label">Portfolio Value <span class="small-muted">(informational — total value of real estate we believe they own across their whole portfolio, a signal of how well-capitalized they are)</span></label>' +
     '<input type="text" id="' + prefix + '-buyer-portfolio-input" value="' + esc(lead.PortfolioValue || "") + '" placeholder="e.g. $500,000 – $1,000,000">' +
+    '<div class="row2">' +
+      '<div><label class="field-label">Ownership Length <span class="small-muted">(months, on the one property above — a long hold on vacant land can signal an inherited or low-priority parcel)</span></label><input type="text" id="' + prefix + '-buyer-ownershiplength-input" value="' + esc(lead.OwnershipLengthMonths || "") + '" placeholder="e.g. 237"></div>' +
+      '<div><label class="field-label">Source Listing URL</label><input type="text" id="' + prefix + '-buyer-propertyurl-input" value="' + esc(lead.PropertyURL || "") + '" placeholder="https://propwire.com/..."></div>' +
+    '</div>' +
     '<label class="field-label">Price Range Buyer Has Told Us They Want <span class="small-muted">(if known — used for matching)</span></label>' +
     '<div class="row2">' +
       '<div><input type="text" id="' + prefix + '-buyer-pricemin-input" value="' + esc(lead.PriceRangeMin || "") + '" placeholder="Min"></div>' +
@@ -2462,6 +2538,8 @@ function wireBuyerProfileFieldsHandlers(prefix, buyerLeadId, onSaved) {
       lastKnownPurchasePrice: document.getElementById(prefix + "-buyer-lastpurchase-input").value.trim(),
       estimatedPropertyValue: document.getElementById(prefix + "-buyer-estimatedvalue-input").value.trim(),
       portfolioValue: document.getElementById(prefix + "-buyer-portfolio-input").value.trim(),
+      ownershipLengthMonths: document.getElementById(prefix + "-buyer-ownershiplength-input").value.trim(),
+      propertyUrl: document.getElementById(prefix + "-buyer-propertyurl-input").value.trim(),
       priceRangeMin: document.getElementById(prefix + "-buyer-pricemin-input").value.trim(),
       priceRangeMax: document.getElementById(prefix + "-buyer-pricemax-input").value.trim(),
       assetCategories: Array.from(document.querySelectorAll("." + prefix + "-buyer-category-checkbox:checked")).map(function (cb) { return cb.value; }).join(", ")

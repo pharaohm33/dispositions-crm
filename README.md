@@ -163,7 +163,11 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   itself, so **Portfolio Value** always comes from the **Portfolio Value
   For This Batch** min/max box on the import screen instead — enter the
   range you filtered on (or just a minimum) once and it's applied to every
-  buyer in that upload, e.g. "$500,000 – $1,000,000" or "$500,000+"; a Property Type
+  buyer in that upload, e.g. "$500,000 – $1,000,000" or "$500,000+". Also
+  picks up an "Ownership Length (Months)" column (stored as a plain number
+  so it stays filterable, shown as "19 yrs" wherever it's displayed) and a
+  "Property URL" column (saved as-is, not shown in the preview table since
+  it's long, but carried through to the buyer's profile); a Property Type
   column like "Multi-Family 5+ Units" is translated to this app's own Asset
   Category wording ("Multifamily (4+ Units)") so buyer-matching against a
   deal's Asset Category still works instead of silently never matching (an
@@ -180,7 +184,11 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   of one specific property we found they own, separate from their
   portfolio), a **Portfolio Value** (informational — total value of real
   estate we believe they own across their whole portfolio, a signal of how
-  well-capitalized they are), and a Drive Link for their own documents
+  well-capitalized they are), an **Ownership Length** in months on that one
+  property (informational — a long hold on vacant land often signals an
+  inherited or otherwise low-priority parcel, worth flagging for
+  dispositions outreach), a **Source Listing URL** back to the original
+  Propwire (or similar) record, and a Drive Link for their own documents
   (proof of funds, signed agreements) — visible to and editable by any rep
   who's been given that buyer, or by admin.
   Every contact a rep logs — and every "Interested Buyer" logged on a deal
@@ -189,12 +197,19 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   actually pay relative to value. The table filters by Asset Category,
   State, **Cities** (comma separated, e.g. "Phoenix, Tempe, Mesa" — same
   convention as a deal's match cities) so a mass-select isn't limited to one
-  exact city within a state, and **Exclude Cities** to carve specific
+  exact city within a state, **Exclude Cities** to carve specific
   cities back out on top of everything else (e.g. State = AZ, Exclude
   Cities = "Phoenix" gets every Arizona buyer except Phoenix ones — handy
-  when one city's already saturated), lets you select everyone on the page
-  or the first N matching your filter (e.g. "give me 50 Single Family
-  buyers in Phoenix, Tempe, or Mesa"), and give that whole
+  when one city's already saturated), **Owner Type** (Companies Only —
+  LLC/Inc/Trust/etc. in the name, tends to mean a more active investor —
+  or Individuals Only), **Min Equity %** (pulls the equity number back out
+  of Estimated Value to filter on, e.g. 100+ for cash-ready buyers who can
+  close fast with no financing contingency), and **Held N+ Years** (using
+  Ownership Length, to surface long-held/potentially-motivated owners) —
+  every LLC/Inc/Trust-named buyer also gets a small "Co" tag right in the
+  table for an at-a-glance read without opening the filter. Lets you select
+  everyone on the page or the first N matching your filter (e.g. "give me
+  50 Single Family buyers in Phoenix, Tempe, or Mesa"), and give that whole
   selection to one rep for one deal at once — and paginates at 50 rows so a
   list of 100+ never loads all at once. Every lead's row shows an
   **Uploaded** timestamp, and a **Sort** control (newest/oldest uploaded
