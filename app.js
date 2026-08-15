@@ -1601,8 +1601,8 @@ const CSV_FIELD_OPTIONS = [
   { value: "assetCategories", label: "Asset Categories (comma-separated)" },
   { value: "lastKnownPurchasePrice", label: "Last Known Purchase Price" },
   { value: "lastPurchaseDateHint", label: "Last Purchase/Sale Date (folded into Last Known Purchase Price)" },
-  { value: "portfolioValue", label: "Portfolio / Estimated Value" },
-  { value: "equityHint", label: "Estimated Equity % (folded into Portfolio Value)" },
+  { value: "estimatedPropertyValue", label: "Estimated Value (this one property, not their whole portfolio)" },
+  { value: "equityHint", label: "Estimated Equity % (folded into Estimated Value)" },
   { value: "priceRangeMin", label: "Price Range Min" },
   { value: "priceRangeMax", label: "Price Range Max" }
 ];
@@ -1680,12 +1680,19 @@ function guessCsvField(header) {
   // Equity is a sharper "how well-capitalized / how liquid is this buyer"
   // signal than raw estimated value alone (100% equity means free and
   // clear -- a stronger cash-buyer signal than a high value with a big
-  // mortgage against it), so fold it in as a suffix on Portfolio Value
+  // mortgage against it), so fold it in as a suffix on Estimated Value
   // rather than just discarding it. Checked before the plain "estimated
   // value" rule below so "Estimated Equity Percent" doesn't get claimed by
   // it instead (both contain "estimated").
   if (/equity.*percent|percent.*equity/.test(h)) return "equityHint";
-  if (/portfolio|estimated\s*value|market\s*value/.test(h)) return "portfolioValue";
+  // NOTE: this is the value of the *one property* in this row, not the
+  // buyer's whole portfolio -- skip-trace exports like Propwire only ever
+  // report on a single property even though the underlying owner may hold
+  // several. There's deliberately no per-row mapping for the buyer's actual
+  // Portfolio Value; Propwire doesn't export that at all, so it's entered
+  // once for the whole batch instead (see the Portfolio Value For This
+  // Batch box on the import screen).
+  if (/estimated\s*value|market\s*value/.test(h)) return "estimatedPropertyValue";
   if (/price.*(min|low)|(min|low).*price/.test(h)) return "priceRangeMin";
   if (/price.*(max|high)|(max|high).*price/.test(h)) return "priceRangeMax";
   if (/name|buyer|llc|company|contact/.test(h)) return "buyerName";
@@ -1873,16 +1880,22 @@ function mappedCsvRows() {
       // Same fold-in pattern as the purchase price/date above -- equity is
       // a stronger "how liquid is this buyer" signal than raw value alone,
       // so it rides along as "$X (Y% equity)" instead of needing its own
-      // separate field.
-      const portfolioBase = formatMoneyish(get("portfolioValue"));
+      // separate field. This is the value of the one property in this row
+      // (see the CSV_FIELD_OPTIONS note), not the buyer's whole portfolio.
+      const estimatedBase = formatMoneyish(get("estimatedPropertyValue"));
       const equityHint = formatPercentish(get("equityHint"));
-      const portfolioValue = (portfolioBase && equityHint ? portfolioBase + " (" + equityHint + " equity)" : (portfolioBase || (equityHint ? equityHint + " equity" : ""))) || csvPortfolioOverrideValue();
+      const estimatedPropertyValue = estimatedBase && equityHint ? estimatedBase + " (" + equityHint + " equity)" : (estimatedBase || (equityHint ? equityHint + " equity" : ""));
+      // Portfolio Value has no per-row CSV source at all -- Propwire and
+      // similar tools let you filter a search by it but never export it, so
+      // this is always the admin's own manually-entered batch-wide range.
+      const portfolioValue = csvPortfolioOverrideValue();
       return {
         buyerName: get("buyerName"), phone: get("phone"), phoneType: normalizePhoneType(get("phoneType")),
         phone2: get("phone2"), phone2Type: normalizePhoneType(get("phone2Type")),
         phone3: get("phone3"), phone3Type: normalizePhoneType(get("phone3Type")),
         city: get("city"), state: get("state"), zip: get("zip"), county: get("county"), email: get("email"),
         assetCategories: normalizeAssetCategoryValue(get("assetCategories")), lastKnownPurchasePrice: lastKnownPurchasePrice,
+        estimatedPropertyValue: estimatedPropertyValue,
         portfolioValue: portfolioValue,
         priceRangeMin: get("priceRangeMin"), priceRangeMax: get("priceRangeMax")
       };
@@ -1900,6 +1913,7 @@ function renderCsvPreview() {
       '<td>' + esc(r.city) + '</td>' + '<td>' + esc(r.state) + '</td>' + '<td>' + esc(r.zip) + '</td>' +
       '<td>' + esc(r.county) + '</td>' + '<td>' + esc(r.email) + '</td>' + '<td>' + esc(r.assetCategories) + '</td>' +
       '<td>' + esc(r.lastKnownPurchasePrice) + '</td>' +
+      '<td>' + esc(r.estimatedPropertyValue) + '</td>' +
       '<td>' + esc(r.portfolioValue) + '</td>' +
       '<td>' + [r.priceRangeMin, r.priceRangeMax].filter(Boolean).join(" – ") + '</td>' +
       '</tr>';
@@ -2277,6 +2291,9 @@ document.getElementById("mass-edit-apply-btn").addEventListener("click", async f
   if (document.getElementById("mass-edit-apply-lastpurchase").checked) {
     data.lastKnownPurchasePrice = document.getElementById("mass-edit-lastpurchase-input").value.trim();
   }
+  if (document.getElementById("mass-edit-apply-estimatedvalue").checked) {
+    data.estimatedPropertyValue = document.getElementById("mass-edit-estimatedvalue-input").value.trim();
+  }
   if (document.getElementById("mass-edit-apply-portfolio").checked) {
     data.portfolioValue = document.getElementById("mass-edit-portfolio-input").value.trim();
   }
@@ -2404,8 +2421,10 @@ function renderBuyerProfileFields(lead, prefix) {
     '<input type="text" id="' + prefix + '-buyer-drivelink-input" value="' + esc(lead.DriveLink || "") + '" placeholder="https://drive.google.com/...">' +
     '<label class="field-label">Last Known Purchase Price <span class="small-muted">(informational — an asset we found they bought, suggests a similar price range)</span></label>' +
     '<input type="text" id="' + prefix + '-buyer-lastpurchase-input" value="' + esc(lead.LastKnownPurchasePrice || "") + '" placeholder="e.g. $180,000 (Phoenix, 2023)">' +
-    '<label class="field-label">Portfolio / Estimated Value <span class="small-muted">(informational — total value of real estate we know they own, a signal of how well-capitalized they are)</span></label>' +
-    '<input type="text" id="' + prefix + '-buyer-portfolio-input" value="' + esc(lead.PortfolioValue || "") + '" placeholder="e.g. $2,400,000 across 6 properties">' +
+    '<label class="field-label">Estimated Value <span class="small-muted">(informational — current estimated value of one specific property we found they own)</span></label>' +
+    '<input type="text" id="' + prefix + '-buyer-estimatedvalue-input" value="' + esc(lead.EstimatedPropertyValue || "") + '" placeholder="e.g. $180,000 (100% equity)">' +
+    '<label class="field-label">Portfolio Value <span class="small-muted">(informational — total value of real estate we believe they own across their whole portfolio, a signal of how well-capitalized they are)</span></label>' +
+    '<input type="text" id="' + prefix + '-buyer-portfolio-input" value="' + esc(lead.PortfolioValue || "") + '" placeholder="e.g. $500,000 – $1,000,000">' +
     '<label class="field-label">Price Range Buyer Has Told Us They Want <span class="small-muted">(if known — used for matching)</span></label>' +
     '<div class="row2">' +
       '<div><input type="text" id="' + prefix + '-buyer-pricemin-input" value="' + esc(lead.PriceRangeMin || "") + '" placeholder="Min"></div>' +
@@ -2441,6 +2460,7 @@ function wireBuyerProfileFieldsHandlers(prefix, buyerLeadId, onSaved) {
       driveLink: document.getElementById(prefix + "-buyer-drivelink-input").value.trim(),
       county: document.getElementById(prefix + "-buyer-county-input").value.trim(),
       lastKnownPurchasePrice: document.getElementById(prefix + "-buyer-lastpurchase-input").value.trim(),
+      estimatedPropertyValue: document.getElementById(prefix + "-buyer-estimatedvalue-input").value.trim(),
       portfolioValue: document.getElementById(prefix + "-buyer-portfolio-input").value.trim(),
       priceRangeMin: document.getElementById(prefix + "-buyer-pricemin-input").value.trim(),
       priceRangeMax: document.getElementById(prefix + "-buyer-pricemax-input").value.trim(),

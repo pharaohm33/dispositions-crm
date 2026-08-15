@@ -126,7 +126,7 @@ const FB_COLUMNS = ['RequestID', 'DealID', 'Username', 'PostText', 'TargetGroups
 // what the buyer has told us they want to spend, if known; like
 // AssetCategories, a buyer with neither set is treated as open to any
 // price for matching purposes.
-const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'PortfolioValue', 'PriceRangeMin', 'PriceRangeMax', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'PendingDealID', 'CreatedAt'];
+const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'PriceRangeMin', 'PriceRangeMax', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'PendingDealID', 'CreatedAt'];
 
 // A Pitch is "give this buyer lead to this rep, to work against this one
 // specific deal." This is the only thing that creates an actionable item in
@@ -1404,7 +1404,7 @@ function adminMergeBuyerLeads(body) {
       }
     });
 
-    const fillableFields = ['Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'PriceRangeMin', 'PriceRangeMax', 'DriveLink', 'GeneralNotes'];
+    const fillableFields = ['Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'PriceRangeMin', 'PriceRangeMax', 'DriveLink', 'GeneralNotes'];
     fillableFields.forEach(function (f) {
       if (keepLead[f]) return;
       const donor = mergeLeads.find(function (l) { return l[f]; });
@@ -1451,7 +1451,8 @@ function adminImportBuyerLeads(body) {
       'BuyerLeadID': Utilities.getUuid(), 'BuyerName': r.buyerName, 'Phone': r.phone, 'PhoneType': r.phoneType || '',
       'Phone2': r.phone2 || '', 'Phone2Type': r.phone2Type || '', 'Phone3': r.phone3 || '', 'Phone3Type': r.phone3Type || '',
       'Email': r.email || '', 'City': r.city || '', 'State': r.state || '', 'Zip': r.zip || '', 'County': r.county || '',
-      'AssetCategories': r.assetCategories || '', 'LastKnownPurchasePrice': r.lastKnownPurchasePrice || '', 'PortfolioValue': r.portfolioValue || '',
+      'AssetCategories': r.assetCategories || '', 'LastKnownPurchasePrice': r.lastKnownPurchasePrice || '',
+      'EstimatedPropertyValue': r.estimatedPropertyValue || '', 'PortfolioValue': r.portfolioValue || '',
       'PriceRangeMin': r.priceRangeMin || '', 'PriceRangeMax': r.priceRangeMax || '',
       'GeneralNotes': '', 'DriveLink': '', 'DoNotContact': false, 'PendingDealID': '', 'CreatedAt': now
     });
@@ -1551,7 +1552,8 @@ function updateBuyerLeadNotes(body, session) {
 const BUYER_LEAD_PROFILE_FIELDS = {
   email: 'Email', driveLink: 'DriveLink', phone: 'Phone', phoneType: 'PhoneType', phone2: 'Phone2', phone2Type: 'Phone2Type',
   phone3: 'Phone3', phone3Type: 'Phone3Type', county: 'County', assetCategories: 'AssetCategories',
-  lastKnownPurchasePrice: 'LastKnownPurchasePrice', portfolioValue: 'PortfolioValue', priceRangeMin: 'PriceRangeMin', priceRangeMax: 'PriceRangeMax'
+  lastKnownPurchasePrice: 'LastKnownPurchasePrice', estimatedPropertyValue: 'EstimatedPropertyValue', portfolioValue: 'PortfolioValue',
+  priceRangeMin: 'PriceRangeMin', priceRangeMax: 'PriceRangeMax'
 };
 
 function updateBuyerLeadProfile(body, session) {
@@ -2181,7 +2183,7 @@ function getMyPitches(body, session) {
       Phone: lead['Phone'], PhoneType: lead['PhoneType'], Phone2: lead['Phone2'], Phone2Type: lead['Phone2Type'],
       Phone3: lead['Phone3'], Phone3Type: lead['Phone3Type'], Email: lead['Email'], County: lead['County'],
       DriveLink: lead['DriveLink'], LastKnownPurchasePrice: lead['LastKnownPurchasePrice'],
-      PortfolioValue: lead['PortfolioValue'],
+      EstimatedPropertyValue: lead['EstimatedPropertyValue'], PortfolioValue: lead['PortfolioValue'],
       PriceRangeMin: lead['PriceRangeMin'], PriceRangeMax: lead['PriceRangeMax'], AssetCategories: lead['AssetCategories']
     } : null;
     delete p.dealAddress; // rep-facing -- never send the deal's Address, see file header comment

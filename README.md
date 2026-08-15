@@ -143,7 +143,7 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   updated as it moves.
 - **Buyer Leads** — upload a CSV file in any column order and it guesses
   which column is which (Name, Phone × 3, Phone Type × 3, City, State, Zip,
-  County, Email, Asset Categories, Last Known Purchase Price, Portfolio
+  County, Email, Asset Categories, Last Known Purchase Price, Estimated
   Value) from your headers, shows you a preview and the guessed mapping so
   you can fix anything it got wrong, then imports — or just paste rows
   directly if that's easier for a short list. Built to handle skip-trace
@@ -152,16 +152,18 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   last sale/purchase are in two separate columns, mapping both folds them
   into one "$X (date)" value instead of losing the date (and if the export
   only has a sale date with no amount — common on vacant-land records — it
-  shows "Unknown price (sold date)" instead of a bare, easily-misread date);
-  an Estimated Equity Percent column folds into Portfolio Value as "$X (Y%
-  equity)" since 100% equity is a stronger "how liquid is this buyer" signal
-  than the raw value alone, e.g. a good sign they could pay cash and close
-  fast. Propwire lets you filter a search by portfolio/estimated value but
-  doesn't export that value in the CSV, so there's a **Portfolio Value For
-  This Batch** min/max box right on the import screen — enter it once (a
-  range, or just a minimum) and it's applied to every buyer in that upload
-  who doesn't already have a real per-row Portfolio Value from a mapped
-  column, e.g. "$500,000 – $1,000,000" or "$500,000+"; a Property Type
+  shows "Unknown price (sold date)" instead of a bare, easily-misread date).
+  Propwire's own "Estimated Value" and "Estimated Equity" columns describe
+  only the **one property in that row**, not the buyer's whole portfolio —
+  Estimated Equity Percent folds into Estimated Value as "$X (Y% equity)"
+  since 100% equity is a stronger "how liquid is this buyer" signal than
+  the raw value alone (e.g. a good sign they could pay cash and close
+  fast), but it never gets treated as portfolio-wide data. Propwire lets
+  you *filter* a search by portfolio value but never exports the value
+  itself, so **Portfolio Value** always comes from the **Portfolio Value
+  For This Batch** min/max box on the import screen instead — enter the
+  range you filtered on (or just a minimum) once and it's applied to every
+  buyer in that upload, e.g. "$500,000 – $1,000,000" or "$500,000+"; a Property Type
   column like "Multi-Family 5+ Units" is translated to this app's own Asset
   Category wording ("Multifamily (4+ Units)") so buyer-matching against a
   deal's Asset Category still works instead of silently never matching (an
@@ -174,11 +176,13 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   Multifamily 4+ Units, Fix and Flip, etc. — customizable, see Asset
   Categories below), a price range they've told us they want (if known), a
   note on the last price we know they've actually paid for something
-  similar, a **Portfolio / Estimated Value** (informational — total value
-  of real estate we know they own, a signal of how well-capitalized they
-  are), and a Drive Link for their own documents (proof of funds, signed
-  agreements) — visible to any rep who's been given that buyer, editable by
-  admin only.
+  similar, an **Estimated Value** (informational — current estimated value
+  of one specific property we found they own, separate from their
+  portfolio), a **Portfolio Value** (informational — total value of real
+  estate we believe they own across their whole portfolio, a signal of how
+  well-capitalized they are), and a Drive Link for their own documents
+  (proof of funds, signed agreements) — visible to and editable by any rep
+  who's been given that buyer, or by admin.
   Every contact a rep logs — and every "Interested Buyer" logged on a deal
   page — can optionally record what % of ARV or as-is value that buyer
   expressed interest at, building real data over time on what buyers
