@@ -1558,6 +1558,10 @@ const BUYER_LEAD_PROFILE_FIELDS = {
   priceRangeMin: 'PriceRangeMin', priceRangeMax: 'PriceRangeMax'
 };
 
+// The Propwire (or similar) source listing URL is admin-only -- not shown
+// to or editable by reps. Checked against BUYER_LEAD_PROFILE_FIELDS keys.
+const ADMIN_ONLY_PROFILE_FIELDS = ['propertyUrl'];
+
 function updateBuyerLeadProfile(body, session) {
   if (!body.buyerLeadId) return { ok: false, error: 'Missing buyerLeadId.' };
   const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
@@ -1571,6 +1575,7 @@ function updateBuyerLeadProfile(body, session) {
     if (!ownsAPitch) return { ok: false, error: 'You need an active pitch on this buyer to edit their info.' };
   }
   Object.keys(BUYER_LEAD_PROFILE_FIELDS).forEach(function (key) {
+    if (ADMIN_ONLY_PROFILE_FIELDS.indexOf(key) !== -1 && !session.a) return;
     if (body[key] !== undefined) sheet.getRange(match._row, getColumnIndex(sheet, BUYER_LEAD_PROFILE_FIELDS[key])).setValue(body[key] || '');
   });
   return { ok: true };
@@ -2186,7 +2191,9 @@ function getMyPitches(body, session) {
       Phone3: lead['Phone3'], Phone3Type: lead['Phone3Type'], Email: lead['Email'], County: lead['County'],
       DriveLink: lead['DriveLink'], LastKnownPurchasePrice: lead['LastKnownPurchasePrice'],
       EstimatedPropertyValue: lead['EstimatedPropertyValue'], PortfolioValue: lead['PortfolioValue'],
-      OwnershipLengthMonths: lead['OwnershipLengthMonths'], PropertyURL: lead['PropertyURL'],
+      OwnershipLengthMonths: lead['OwnershipLengthMonths'],
+      // PropertyURL (the Propwire/source listing link) is admin-only, see
+      // ADMIN_ONLY_PROFILE_FIELDS -- deliberately left out of what reps get.
       PriceRangeMin: lead['PriceRangeMin'], PriceRangeMax: lead['PriceRangeMax'], AssetCategories: lead['AssetCategories']
     } : null;
     delete p.dealAddress; // rep-facing -- never send the deal's Address, see file header comment

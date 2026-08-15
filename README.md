@@ -187,10 +187,13 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   well-capitalized they are), an **Ownership Length** in months on that one
   property (informational — a long hold on vacant land often signals an
   inherited or otherwise low-priority parcel, worth flagging for
-  dispositions outreach), a **Source Listing URL** back to the original
-  Propwire (or similar) record, and a Drive Link for their own documents
-  (proof of funds, signed agreements) — visible to and editable by any rep
-  who's been given that buyer, or by admin.
+  dispositions outreach), and a Drive Link for their own documents (proof
+  of funds, signed agreements) — visible to and editable by any rep who's
+  been given that buyer, or by admin. A **Source Listing URL** back to the
+  original Propwire (or similar) record is also kept on the lead, but it's
+  admin-only — never sent to or editable by reps, enforced both in what the
+  UI shows and on the backend itself (a rep can't write it even by calling
+  the API directly).
   Every contact a rep logs — and every "Interested Buyer" logged on a deal
   page — can optionally record what % of ARV or as-is value that buyer
   expressed interest at, building real data over time on what buyers

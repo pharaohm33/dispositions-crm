@@ -2499,7 +2499,10 @@ function renderBuyerProfileFields(lead, prefix) {
     '<input type="text" id="' + prefix + '-buyer-portfolio-input" value="' + esc(lead.PortfolioValue || "") + '" placeholder="e.g. $500,000 – $1,000,000">' +
     '<div class="row2">' +
       '<div><label class="field-label">Ownership Length <span class="small-muted">(months, on the one property above — a long hold on vacant land can signal an inherited or low-priority parcel)</span></label><input type="text" id="' + prefix + '-buyer-ownershiplength-input" value="' + esc(lead.OwnershipLengthMonths || "") + '" placeholder="e.g. 237"></div>' +
-      '<div><label class="field-label">Source Listing URL</label><input type="text" id="' + prefix + '-buyer-propertyurl-input" value="' + esc(lead.PropertyURL || "") + '" placeholder="https://propwire.com/..."></div>' +
+      // Source Listing URL is admin-only -- not shown to reps. See
+      // ADMIN_ONLY_PROFILE_FIELDS in Code.gs, which backs this up
+      // server-side too (a rep can't write it even via a direct API call).
+      (prefix === "admin" ? '<div><label class="field-label">Source Listing URL</label><input type="text" id="' + prefix + '-buyer-propertyurl-input" value="' + esc(lead.PropertyURL || "") + '" placeholder="https://propwire.com/..."></div>' : '<div></div>') +
     '</div>' +
     '<label class="field-label">Price Range Buyer Has Told Us They Want <span class="small-muted">(if known — used for matching)</span></label>' +
     '<div class="row2">' +
@@ -2524,7 +2527,7 @@ function wireBuyerProfileFieldsHandlers(prefix, buyerLeadId, onSaved) {
   btn.addEventListener("click", async function () {
     if (btn.disabled) return;
     btn.disabled = true;
-    const res = await api("updateBuyerLeadProfile", {
+    const payload = {
       buyerLeadId: buyerLeadId,
       phone: document.getElementById(prefix + "-buyer-phone-input").value.trim(),
       phoneType: document.getElementById(prefix + "-buyer-phonetype-input").value,
@@ -2539,11 +2542,15 @@ function wireBuyerProfileFieldsHandlers(prefix, buyerLeadId, onSaved) {
       estimatedPropertyValue: document.getElementById(prefix + "-buyer-estimatedvalue-input").value.trim(),
       portfolioValue: document.getElementById(prefix + "-buyer-portfolio-input").value.trim(),
       ownershipLengthMonths: document.getElementById(prefix + "-buyer-ownershiplength-input").value.trim(),
-      propertyUrl: document.getElementById(prefix + "-buyer-propertyurl-input").value.trim(),
       priceRangeMin: document.getElementById(prefix + "-buyer-pricemin-input").value.trim(),
       priceRangeMax: document.getElementById(prefix + "-buyer-pricemax-input").value.trim(),
       assetCategories: Array.from(document.querySelectorAll("." + prefix + "-buyer-category-checkbox:checked")).map(function (cb) { return cb.value; }).join(", ")
-    });
+    };
+    // Source Listing URL field only exists in the DOM for admin -- see the
+    // matching prefix === "admin" gate in renderBuyerProfileFields.
+    const propertyUrlInput = document.getElementById(prefix + "-buyer-propertyurl-input");
+    if (propertyUrlInput) payload.propertyUrl = propertyUrlInput.value.trim();
+    const res = await api("updateBuyerLeadProfile", payload);
     if (!res.ok) { btn.disabled = false; showToast(res.error || "Could not save buyer info.", true); return; }
     showToast("Buyer info saved.");
     await onSaved();
