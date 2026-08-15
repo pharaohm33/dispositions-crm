@@ -2181,6 +2181,7 @@ function getMyPitches(body, session) {
       Phone: lead['Phone'], PhoneType: lead['PhoneType'], Phone2: lead['Phone2'], Phone2Type: lead['Phone2Type'],
       Phone3: lead['Phone3'], Phone3Type: lead['Phone3Type'], Email: lead['Email'], County: lead['County'],
       DriveLink: lead['DriveLink'], LastKnownPurchasePrice: lead['LastKnownPurchasePrice'],
+      PortfolioValue: lead['PortfolioValue'],
       PriceRangeMin: lead['PriceRangeMin'], PriceRangeMax: lead['PriceRangeMax'], AssetCategories: lead['AssetCategories']
     } : null;
     delete p.dealAddress; // rep-facing -- never send the deal's Address, see file header comment
