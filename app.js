@@ -1602,6 +1602,7 @@ const CSV_FIELD_OPTIONS = [
   { value: "lastKnownPurchasePrice", label: "Last Known Purchase Price" },
   { value: "lastPurchaseDateHint", label: "Last Purchase/Sale Date (folded into Last Known Purchase Price)" },
   { value: "portfolioValue", label: "Portfolio / Estimated Value" },
+  { value: "equityHint", label: "Estimated Equity % (folded into Portfolio Value)" },
   { value: "priceRangeMin", label: "Price Range Min" },
   { value: "priceRangeMax", label: "Price Range Max" }
 ];
@@ -1676,6 +1677,14 @@ function guessCsvField(header) {
   // back into the price text on import instead of just being dropped).
   if (/(purchase|sale|sold).*date|date.*(purchase|sale|sold)/.test(h)) return "lastPurchaseDateHint";
   if (/(last|past|prior|known).*(purchase|bought|paid|sale\s*(amount|price))|purchase.*price/.test(h)) return "lastKnownPurchasePrice";
+  // Equity is a sharper "how well-capitalized / how liquid is this buyer"
+  // signal than raw estimated value alone (100% equity means free and
+  // clear -- a stronger cash-buyer signal than a high value with a big
+  // mortgage against it), so fold it in as a suffix on Portfolio Value
+  // rather than just discarding it. Checked before the plain "estimated
+  // value" rule below so "Estimated Equity Percent" doesn't get claimed by
+  // it instead (both contain "estimated").
+  if (/equity.*percent|percent.*equity/.test(h)) return "equityHint";
   if (/portfolio|estimated\s*value|market\s*value/.test(h)) return "portfolioValue";
   if (/price.*(min|low)|(min|low).*price/.test(h)) return "priceRangeMin";
   if (/price.*(max|high)|(max|high).*price/.test(h)) return "priceRangeMax";
@@ -1769,6 +1778,15 @@ function formatMoneyish(raw) {
   return "$" + Math.round(Number(trimmed)).toLocaleString();
 }
 
+// Same idea as formatMoneyish but for a raw decimal percent like
+// "100.000000000" -- rounds to "100%".
+function formatPercentish(raw) {
+  const trimmed = String(raw || "").trim();
+  if (!trimmed) return "";
+  if (!/^-?\d+(\.\d+)?%?$/.test(trimmed)) return trimmed;
+  return Math.round(Number(trimmed.replace("%", ""))) + "%";
+}
+
 // A skip-trace/MLS "Property Type" column ("Multi-Family 5+ Units",
 // "Single Family Residence") won't literally match this app's own Asset
 // Category vocabulary ("Multifamily (4+ Units)", "Single Family") --
@@ -1808,14 +1826,27 @@ function mappedCsvRows() {
       // field's own placeholder example) instead of losing it.
       const purchasePrice = formatMoneyish(get("lastKnownPurchasePrice"));
       const purchaseDateHint = get("lastPurchaseDateHint");
-      const lastKnownPurchasePrice = purchasePrice && purchaseDateHint ? purchasePrice + " (" + purchaseDateHint + ")" : (purchasePrice || purchaseDateHint);
+      // Many skip-trace exports (e.g. Propwire on vacant land) populate the
+      // sale date but leave the sale amount blank. Falling back to a bare
+      // date here would read as a price in this $-labeled column, so make
+      // the "no amount" case explicit instead.
+      const lastKnownPurchasePrice = purchasePrice && purchaseDateHint ? purchasePrice + " (" + purchaseDateHint + ")" :
+        purchasePrice ? purchasePrice :
+        purchaseDateHint ? "Unknown price (sold " + purchaseDateHint + ")" : "";
+      // Same fold-in pattern as the purchase price/date above -- equity is
+      // a stronger "how liquid is this buyer" signal than raw value alone,
+      // so it rides along as "$X (Y% equity)" instead of needing its own
+      // separate field.
+      const portfolioBase = formatMoneyish(get("portfolioValue"));
+      const equityHint = formatPercentish(get("equityHint"));
+      const portfolioValue = portfolioBase && equityHint ? portfolioBase + " (" + equityHint + " equity)" : (portfolioBase || (equityHint ? equityHint + " equity" : ""));
       return {
         buyerName: get("buyerName"), phone: get("phone"), phoneType: normalizePhoneType(get("phoneType")),
         phone2: get("phone2"), phone2Type: normalizePhoneType(get("phone2Type")),
         phone3: get("phone3"), phone3Type: normalizePhoneType(get("phone3Type")),
         city: get("city"), state: get("state"), zip: get("zip"), county: get("county"), email: get("email"),
         assetCategories: normalizeAssetCategoryValue(get("assetCategories")), lastKnownPurchasePrice: lastKnownPurchasePrice,
-        portfolioValue: formatMoneyish(get("portfolioValue")),
+        portfolioValue: portfolioValue,
         priceRangeMin: get("priceRangeMin"), priceRangeMax: get("priceRangeMax")
       };
     });

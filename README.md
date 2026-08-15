@@ -150,7 +150,13 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   exports (Propwire and similar) out of the box: a raw decimal like
   "21200000.000000000" becomes "$21,200,000"; if the amount and date of a
   last sale/purchase are in two separate columns, mapping both folds them
-  into one "$X (date)" value instead of losing the date; a Property Type
+  into one "$X (date)" value instead of losing the date (and if the export
+  only has a sale date with no amount — common on vacant-land records — it
+  shows "Unknown price (sold date)" instead of a bare, easily-misread date);
+  an Estimated Equity Percent column folds into Portfolio Value as "$X (Y%
+  equity)" since 100% equity is a stronger "how liquid is this buyer" signal
+  than the raw value alone, e.g. a good sign they could pay cash and close
+  fast; a Property Type
   column like "Multi-Family 5+ Units" is translated to this app's own Asset
   Category wording ("Multifamily (4+ Units)") so buyer-matching against a
   deal's Asset Category still works instead of silently never matching (an
