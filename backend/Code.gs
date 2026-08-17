@@ -2165,9 +2165,18 @@ function getMyPitches(body, session) {
   const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
   const allContacts = sheetToObjects(contactsSheet).filter(function (c) { return String(c['Username'] || '').toLowerCase() === session.u; });
 
+  const addressGrants = loadAddressGrantsSet();
   const withStatus = pitchesWithStatus(myPitches, allContacts, dealsById);
   withStatus.forEach(function (p) {
     const lead = leadsById[p['BuyerLeadID']];
+    const rawDeal = dealsById[p['DealID']];
+    // Full deal context (Address if granted, Description, financials,
+    // General Drive Link) so a rep can see everything about the deal a
+    // buyer match is for without leaving this pitch to look it up
+    // separately -- same secrecy rules as the deal detail view itself
+    // (applyAddressSecrecy strips Address unless specifically granted, and
+    // always strips the admin-only fields).
+    p.deal = rawDeal ? applyAddressSecrecy(withComputedFields(rawDeal), session, addressGrants) : null;
     p.buyerName = lead ? lead['BuyerName'] : '(deleted buyer)';
     p.phone = lead ? lead['Phone'] : '';
     p.phoneType = lead ? lead['PhoneType'] : '';

@@ -614,6 +614,40 @@ function updateContactMethodOptions(slots) {
   methodSelect.innerHTML = '<option value="Call">Call</option>' + (canTextThisSlot ? '<option value="Text">Text</option>' : '');
 }
 
+// Same fields/wording as the rep's deal-detail confidentiality banner
+// (openRepDealDetail) -- shown here too since a rep can reach this same
+// deal context from a matched buyer's pitch without ever opening the deal
+// itself. deal.addressGranted/deal.Address already come pre-filtered by
+// applyAddressSecrecy on the backend (getMyPitches), so there's nothing
+// else to check here.
+function renderPitchDealInfo(deal) {
+  if (!deal) return "";
+  const addressBanner = deal.addressGranted && deal.Address
+    ? '<div class="banner danger"><strong>Confidential &mdash; do not share.</strong> Admin has given you access to this deal\'s exact address. Only share it with a legitimate, matched buyer' +
+      ' &mdash; and only with admin approval, once that buyer has expressed real interest and specifically wants to review the full address. Sharing it any earlier, or with anyone else,' +
+      ' risks losing us this deal and getting paid on it, and will get you removed as a dispositions team member.</div>'
+    : "";
+  return (
+    '<div class="section-title">Deal Info</div>' +
+    addressBanner +
+    '<div class="banner info">' +
+      (deal.addressGranted && deal.Address ? '<div><strong>Address:</strong> ' + esc(deal.Address) + '</div>' : "") +
+      (deal.AssetType ? '<div style="margin-top:8px;"><strong>Asset Type:</strong> ' + esc(deal.AssetType) + '</div>' : "") +
+      (deal.Price ? '<div><strong>Price:</strong> ' + esc(deal.Price) + '</div>' : "") +
+      (deal.ARV ? '<div><strong>ARV:</strong> ' + esc(deal.ARV) + '</div>' : "") +
+      (deal.RehabEstimate ? '<div><strong>Rehab Estimate:</strong> ' + esc(deal.RehabEstimate) + '</div>' : "") +
+      (deal.ARV || deal.RehabEstimate ? '<div><strong>Gross Margin:</strong> ' + formatGrossMargin(deal.GrossMargin) + '</div>' : "") +
+      (deal.AsIsValue ? '<div><strong>As-Is Value:</strong> ' + esc(deal.AsIsValue) + '</div>' : "") +
+      (deal.AsIsValue ? '<div><strong>As-Is Equity:</strong> ' + formatAsIsEquity(deal.AsIsEquity) + '</div>' : "") +
+      (deal.GeneralDriveLink ? '<div style="margin-top:8px;"><strong>Deal Documents:</strong> <a href="' + esc(deal.GeneralDriveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
+    '</div>' +
+    (deal.Description
+      ? '<details open style="margin-top:10px;"><summary style="cursor:pointer; font-weight:600;">Description / Notes <span class="small-muted">(click to collapse)</span></summary>' +
+        '<div style="margin-top:6px; white-space:pre-wrap;">' + esc(deal.Description) + '</div></details>'
+      : "")
+  );
+}
+
 async function openPitchDetail(pitchId) {
   const pitch = myPitches.find(function (p) { return p.PitchID === pitchId; });
   if (!pitch) return;
@@ -659,6 +693,8 @@ async function openPitchDetail(pitchId) {
       (pitch.email ? '<div style="margin-top:8px;"><strong>Email:</strong> <a href="mailto:' + esc(pitch.email) + '">' + esc(pitch.email) + '</a></div>' : "") +
       (pitch.driveLink ? '<div style="margin-top:8px;"><strong>Documents:</strong> <a href="' + esc(pitch.driveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
     '</div>' +
+
+    renderPitchDealInfo(pitch.deal) +
 
     '<div class="section-title">Buyer Info</div>' +
     '<p class="small-muted">Fill in anything missing — asset types they buy, price range, last known purchase price, extra numbers — so this buyer is easier to match and pitch next time.</p>' +

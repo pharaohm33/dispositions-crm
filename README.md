@@ -55,6 +55,16 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   about a buyer while working them, you can fill it in without needing admin
   to touch the backend sheet. It's always one buyer at a time; only admin can
   mass-edit many at once (see Buyer Leads below).
+- That same pitch detail also has a **Deal Info** section, so a rep can see
+  everything about the deal a matched buyer is for without leaving the
+  pitch to go look it up separately: the Address (only if admin has
+  specifically granted this rep access to it for this deal — same grant
+  system and confidentiality warning as the deal's own detail page, not a
+  new exception), Asset Type, Price, ARV, Rehab Estimate, Gross Margin,
+  As-Is Value, As-Is Equity, the deal's own Drive Folder link (separate
+  from the buyer's own Documents link right above it), and a Description /
+  Notes block a rep can collapse — click its header to minimize it out of
+  the way once they've read it, or expand it again any time.
 - **Buyer Leads** — a separate "Buyer Leads" tab shows every buyer they've
   been given for a deal we currently have to sell (never a bare contact list
   with nothing to offer them), laid out as a scrollable table — paginated at
