@@ -574,6 +574,7 @@ function renderMyPitches() {
       '<td>' + esc(p.phone) + (typeHint ? '<div class="small-muted">' + esc(typeHint) + '</div>' : "") + '</td>' +
       '<td>' + esc(p.dealCode || "Deal") + '</td>' +
       '<td>' + [p.city, p.state].filter(Boolean).join(", ") + '</td>' +
+      '<td class="small-muted">' + (p.portfolioValue ? esc(p.portfolioValue) : "&mdash;") + '</td>' +
       '<td>' + statusCell + '</td>' +
       '<td class="small-muted">' + (p.GivenAt ? formatDate(p.GivenAt) : "") + '</td>' +
       '</tr>';
@@ -2255,6 +2256,7 @@ function renderBuyerLeadsAdmin() {
       '<td>' + esc(l.Email || "") + '</td>' +
       '<td>' + esc(l.PhoneType || "") + '</td>' +
       '<td>' + [l.City, l.State, l.Zip, l.County ? l.County + " County" : ""].filter(Boolean).join(", ") + '</td>' +
+      '<td class="small-muted">' + (l.PortfolioValue ? esc(l.PortfolioValue) : "&mdash;") + '</td>' +
       '<td class="small-muted">' + esc(l.AssetCategories || "") + '</td>' +
       '<td class="small-muted">' + esc(notesPreview) + '</td>' +
       '<td class="small-muted">' + (l.PendingDealID ? esc(dealLabelFor(l.PendingDealID)) : "&mdash;") + '</td>' +

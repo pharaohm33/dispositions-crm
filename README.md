@@ -193,7 +193,10 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   original Propwire (or similar) record is also kept on the lead, but it's
   admin-only — never sent to or editable by reps, enforced both in what the
   UI shows and on the backend itself (a rep can't write it even by calling
-  the API directly).
+  the API directly). Portfolio Value also shows as its own column right in
+  the table — both admin's Buyer Leads table and a rep's My Pitches list —
+  so it's visible for every buyer at a glance without opening each one
+  individually.
   Every contact a rep logs — and every "Interested Buyer" logged on a deal
   page — can optionally record what % of ARV or as-is value that buyer
   expressed interest at, building real data over time on what buyers

@@ -2180,6 +2180,10 @@ function getMyPitches(body, session) {
     p.generalNotes = lead ? lead['GeneralNotes'] : '';
     p.email = lead ? lead['Email'] : '';
     p.driveLink = lead ? lead['DriveLink'] : '';
+    // Shown as its own column in the rep's pitch list, not just inside
+    // leadProfile, so a rep can see it for every buyer at a glance without
+    // opening each one -- same as it already is for admin's table.
+    p.portfolioValue = lead ? lead['PortfolioValue'] : '';
     p.doNotContact = !!(lead && (lead['DoNotContact'] === true || lead['DoNotContact'] === 'TRUE'));
     p.hasResponded = allContacts.some(function (c) { return c['PitchID'] === p['PitchID'] && (c['Responded'] === true || c['Responded'] === 'TRUE'); });
     p.callingHours = lead ? callingHoursInfo(lead['State']) : null;
