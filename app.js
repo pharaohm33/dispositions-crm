@@ -617,9 +617,14 @@ function updateContactMethodOptions(slots) {
 // Same fields/wording as the rep's deal-detail confidentiality banner
 // (openRepDealDetail) -- shown here too since a rep can reach this same
 // deal context from a matched buyer's pitch without ever opening the deal
-// itself. deal.addressGranted/deal.Address already come pre-filtered by
-// applyAddressSecrecy on the backend (getMyPitches), so there's nothing
-// else to check here.
+// itself. For a real rep session, deal.Address only arrives here at all if
+// applyAddressSecrecy (backend, getMyPitches) let it through -- so simply
+// checking deal.Address is enough, no need to also check addressGranted.
+// An admin session skips applyAddressSecrecy entirely (same as
+// getDeal/getDeals), so deal.Address is always present there and
+// addressGranted is never set -- the grant-specific warning banner is
+// skipped in that case since admin always has full access, not a
+// specifically-granted one.
 function renderPitchDealInfo(deal) {
   if (!deal) return "";
   const addressBanner = deal.addressGranted && deal.Address
@@ -631,7 +636,7 @@ function renderPitchDealInfo(deal) {
     '<div class="section-title">Deal Info</div>' +
     addressBanner +
     '<div class="banner info">' +
-      (deal.addressGranted && deal.Address ? '<div><strong>Address:</strong> ' + esc(deal.Address) + '</div>' : "") +
+      (deal.Address ? '<div><strong>Address:</strong> ' + esc(deal.Address) + '</div>' : "") +
       (deal.AssetType ? '<div style="margin-top:8px;"><strong>Asset Type:</strong> ' + esc(deal.AssetType) + '</div>' : "") +
       (deal.Price ? '<div><strong>Price:</strong> ' + esc(deal.Price) + '</div>' : "") +
       (deal.ARV ? '<div><strong>ARV:</strong> ' + esc(deal.ARV) + '</div>' : "") +

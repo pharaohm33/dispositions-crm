@@ -64,7 +64,10 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   As-Is Value, As-Is Equity, the deal's own Drive Folder link (separate
   from the buyer's own Documents link right above it), and a Description /
   Notes block a rep can collapse — click its header to minimize it out of
-  the way once they've read it, or expand it again any time.
+  the way once they've read it, or expand it again any time. Admin always
+  sees the Address here too, with no grant needed and no warning banner —
+  same as admin already does on the deal itself — including while using
+  **Work as Rep** to preview a rep's screen.
 - **Buyer Leads** — a separate "Buyer Leads" tab shows every buyer they've
   been given for a deal we currently have to sell (never a bare contact list
   with nothing to offer them), laid out as a scrollable table — paginated at

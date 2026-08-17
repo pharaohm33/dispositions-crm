@@ -2173,10 +2173,14 @@ function getMyPitches(body, session) {
     // Full deal context (Address if granted, Description, financials,
     // General Drive Link) so a rep can see everything about the deal a
     // buyer match is for without leaving this pitch to look it up
-    // separately -- same secrecy rules as the deal detail view itself
-    // (applyAddressSecrecy strips Address unless specifically granted, and
-    // always strips the admin-only fields).
-    p.deal = rawDeal ? applyAddressSecrecy(withComputedFields(rawDeal), session, addressGrants) : null;
+    // separately -- same secrecy rules as the deal detail view itself:
+    // applyAddressSecrecy strips Address unless specifically granted for a
+    // real rep session, but same as getDeal/getDeals, an admin session
+    // (including admin previewing this screen via "Work as Rep") always
+    // sees the address without needing a grant -- it's the same person who
+    // could just open the deal itself and see it there anyway.
+    const dealWithFields = rawDeal ? withComputedFields(rawDeal) : null;
+    p.deal = dealWithFields ? (session.a ? dealWithFields : applyAddressSecrecy(dealWithFields, session, addressGrants)) : null;
     p.buyerName = lead ? lead['BuyerName'] : '(deleted buyer)';
     p.phone = lead ? lead['Phone'] : '';
     p.phoneType = lead ? lead['PhoneType'] : '';
