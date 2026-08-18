@@ -489,6 +489,12 @@ function switchRepTab(tab) {
 const LEAD_STATUS_PRIORITY = ["Follow-Up Due", "Follow-Up In Progress", "Awaiting Response", "Not Contacted", "Responded", "Fully Worked"];
 const MY_PITCHES_PAGE_SIZE = 50;
 let myPitchesCurrentPage = 1;
+// Purely a local "don't lose my place" bookmark while scrolling through a
+// long list and cross-checking a deal open elsewhere -- not saved to the
+// backend or tied to anything about the pitch itself, so it's fine that it
+// resets on reload. A rep can mark more than one row at a time (e.g.
+// tracking a couple of names while working down the list).
+let markedPitchIds = new Set();
 
 async function loadMyPitches() {
   const res = await api("getMyPitches", {});
@@ -569,8 +575,9 @@ function renderMyPitches() {
     const statusCell = p.dealStillActive
       ? '<span class="status-pill ' + statusClass(p.status) + '">' + esc(p.status) + '</span>'
       : '<span class="status-pill status-fully-worked">Deal ' + esc((p.dealStatus || "closed").toLowerCase()) + '</span>';
-    return '<tr class="clickable" data-pitch-id="' + esc(p.PitchID) + '">' +
-      '<td>' + esc(p.buyerName) + '</td>' +
+    const isMarked = markedPitchIds.has(p.PitchID);
+    return '<tr class="clickable' + (isMarked ? " row-marked" : "") + '" data-pitch-id="' + esc(p.PitchID) + '">' +
+      '<td><button type="button" class="row-marker-btn' + (isMarked ? " active" : "") + '" data-marker-pitch-id="' + esc(p.PitchID) + '" title="Mark this row so you don\'t lose your place while scrolling">' + (isMarked ? "&#9654;" : "&#9675;") + '</button>' + esc(p.buyerName) + '</td>' +
       '<td>' + esc(p.phone) + (typeHint ? '<div class="small-muted">' + esc(typeHint) + '</div>' : "") + '</td>' +
       '<td>' + esc(p.dealCode || "Deal") + '</td>' +
       '<td>' + [p.city, p.state].filter(Boolean).join(", ") + '</td>' +
@@ -581,6 +588,14 @@ function renderMyPitches() {
   }).join("");
   Array.from(tbody.querySelectorAll("tr")).forEach(function (row) {
     row.addEventListener("click", function () { openPitchDetail(row.getAttribute("data-pitch-id")); });
+  });
+  Array.from(tbody.querySelectorAll(".row-marker-btn")).forEach(function (btn) {
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      const id = btn.getAttribute("data-marker-pitch-id");
+      if (markedPitchIds.has(id)) markedPitchIds.delete(id); else markedPitchIds.add(id);
+      renderMyPitches();
+    });
   });
 }
 

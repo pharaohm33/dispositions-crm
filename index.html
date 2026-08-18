@@ -120,6 +120,10 @@
   table.crm-table th { background: #eef1f4; color: var(--muted); font-weight: 600; }
   table.crm-table tr:last-child td { border-bottom: none; }
   table.crm-table tr.clickable:hover td { background: #fafbfc; cursor: pointer; }
+  table.crm-table tr.row-marked td { background: var(--accent-light); }
+  table.crm-table tr.row-marked.clickable:hover td { background: #dcf0e8; }
+  .row-marker-btn { border: none; background: transparent; cursor: pointer; font-size: 13px; line-height: 1; padding: 0; margin-right: 8px; color: var(--muted); vertical-align: middle; }
+  .row-marker-btn.active { color: var(--accent); font-size: 15px; }
 
   .status-pill { padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; white-space: nowrap; }
   .status-active { background: var(--accent-light); color: #145039; }
@@ -749,7 +753,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=25"></script>
-<script src="app.js?v=25"></script>
+<script src="config.js?v=26"></script>
+<script src="app.js?v=26"></script>
 </body>
 </html>

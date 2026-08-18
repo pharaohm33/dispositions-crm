@@ -83,6 +83,12 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   one specific status (e.g. just Not Contacted, or everything already
   contacted), and sort by what needs attention first (the default),
   alphabetically by deal, or by when it was given — newest or oldest first.
+  A small circle to the left of each buyer's name toggles into a filled
+  green arrow when clicked, with the whole row highlighted — a purely
+  visual, local bookmark (not saved anywhere) so a rep can mark their place
+  while scrolling up and down a long list and cross-checking a deal open
+  elsewhere, without losing track of which name they're on. Click it again
+  to unmark; more than one row can be marked at once.
   If a deal closes before a buyer responds, that item just shows "deal
   closed — no action needed" instead of piling up as overdue. Logging a
   contact records the method, which number
