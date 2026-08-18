@@ -948,7 +948,7 @@ function renderAdminDeals() {
       '<td>' + esc(d.AssetType || "") + '</td>' +
       '<td>' + esc(d.Price || "") + '</td>' +
       '<td><span class="status-pill ' + statusClass(d.Status) + '">' + esc(d.Status || "") + '</span></td>' +
-      '<td>' + (d.repsWithAccessCount === 0 ? '<span class="status-pill status-dead">0 reps</span>' : (d.repsWithAccessCount === undefined ? "&mdash;" : d.repsWithAccessCount)) + '</td>' +
+      '<td>' + (d.repsWithAccessCount === undefined ? "&mdash;" : "Admin" + (d.repsWithAccessCount > 0 ? " + " + d.repsWithAccessCount : "")) + '</td>' +
       '<td class="small-muted">Manage &rarr;</td>' +
       '</tr>';
   }).join("");
@@ -1067,6 +1067,15 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
 
   const availableReps = allReps.filter(function (r) { return assignedUsernames.indexOf(r.username) === -1; });
 
+  // Admin already has full access to every deal regardless of assignment,
+  // so this is purely an organizational "I'm personally on this one too"
+  // marker, not a permission change -- same ASSIGNMENTS_SHEET rows a
+  // regular rep gets, just excluded from the dropdown above (allReps is
+  // built from non-admin reps only) since it deserves its own one-click
+  // toggle rather than being buried in that list.
+  const currentUsername = String((getSession() || {}).username || "").trim().toLowerCase();
+  const adminIsAssigned = assignedUsernames.map(function (u) { return String(u).toLowerCase(); }).indexOf(currentUsername) !== -1;
+
   // Only reps who can actually work this deal (all-access, or specifically
   // assigned) are eligible to be granted its address -- granting it to
   // someone with no deal access at all wouldn't make sense.
@@ -1129,10 +1138,14 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     '</div>' +
 
     '<div class="section-title">Access &mdash; who can work this deal</div>' +
-    '<p class="small-muted">Team members with "all-deal access" can already see every deal and don\'t need to be listed here.</p>' +
+    '<p class="small-muted">Team members with "all-deal access" can already see every deal and don\'t need to be listed here. Admin already has access to every deal regardless of this list — assigning yourself here is just a marker for the team that you\'re personally on this one too, reflected as "Admin" (plus however many other reps) in the deals table.</p>' +
+    '<div class="nav-row" style="justify-content:flex-start; margin-bottom:10px;">' +
+      '<button class="btn ' + (adminIsAssigned ? "secondary" : "primary") + ' small" id="assign-myself-btn">' + (adminIsAssigned ? "Remove Myself From This Deal" : "Assign Myself To This Deal") + '</button>' +
+    '</div>' +
     '<div class="chip-list" id="assigned-chip-list">' +
       assignedUsernames.map(function (u) {
-        return '<span class="chip">' + esc(u) + '<button data-username="' + esc(u) + '" class="unassign-btn">&times;</button></span>';
+        const isMe = String(u).toLowerCase() === currentUsername;
+        return '<span class="chip">' + (isMe ? "Admin (You)" : esc(u)) + '<button data-username="' + esc(u) + '" class="unassign-btn">&times;</button></span>';
       }).join("") +
     '</div>' +
     (availableReps.length > 0
@@ -1307,6 +1320,14 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
       showToast("Access granted.");
     });
   }
+
+  document.getElementById("assign-myself-btn").addEventListener("click", async function () {
+    const btn = this;
+    btn.disabled = true;
+    await api(adminIsAssigned ? "adminUnassignRep" : "adminAssignRep", { dealId: deal.DealID, username: currentUsername });
+    openAdminDealDetail(deal.DealID);
+    showToast(adminIsAssigned ? "Removed yourself from this deal." : "You're now assigned to this deal.");
+  });
 
   Array.from(panel.querySelectorAll(".revoke-address-btn")).forEach(function (btn) {
     btn.addEventListener("click", async function () {

@@ -122,8 +122,9 @@
   table.crm-table tr.clickable:hover td { background: #fafbfc; cursor: pointer; }
   table.crm-table tr.row-marked td { background: var(--accent-light); }
   table.crm-table tr.row-marked.clickable:hover td { background: #dcf0e8; }
-  .row-marker-btn { border: none; background: transparent; cursor: pointer; font-size: 13px; line-height: 1; padding: 0; margin-right: 8px; color: var(--muted); vertical-align: middle; }
-  .row-marker-btn.active { color: var(--accent); font-size: 15px; }
+  .row-marker-btn { border: none; background: transparent; cursor: pointer; font-size: 20px; line-height: 1; padding: 8px 10px; margin: -8px 2px -8px -10px; border-radius: 6px; color: var(--muted); vertical-align: middle; }
+  .row-marker-btn:hover { background: #eef1f4; }
+  .row-marker-btn.active { color: var(--accent); font-size: 20px; }
 
   .status-pill { padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; white-space: nowrap; }
   .status-active { background: var(--accent-light); color: #145039; }
@@ -344,7 +345,7 @@
       <button class="btn primary" id="add-deal-btn">+ Add Deal</button>
     </div>
     <table class="crm-table">
-      <thead><tr><th>Deal Code</th><th>Address</th><th>Asset Type</th><th>Price</th><th>Status</th><th># Reps</th><th>Access</th></tr></thead>
+      <thead><tr><th>Deal Code</th><th>Address</th><th>Asset Type</th><th>Price</th><th>Status</th><th>Coverage</th><th>Access</th></tr></thead>
       <tbody id="admin-deals-tbody"></tbody>
     </table>
     <div id="admin-deals-empty" class="small-muted" style="padding:20px;" hidden>No deals yet.</div>
@@ -753,7 +754,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=29"></script>
-<script src="app.js?v=29"></script>
+<script src="config.js?v=30"></script>
+<script src="app.js?v=30"></script>
 </body>
 </html>
