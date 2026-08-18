@@ -1483,7 +1483,13 @@ function pitchesWithStatus(pitchRows, allContacts, dealsById) {
     const deal = dealsById[p['DealID']];
     const contacts = contactsByPitch[p['PitchID']] || [];
     const copy = Object.assign({}, p);
-    copy.status = computeLeadStatus(p._phoneType, contacts);
+    // Do Not Contact overrides the call-progress status entirely -- once a
+    // buyer's marked DNC there's no more "New"/"Called"/"Responded" to
+    // track, and this is the one place that status is ever displayed from,
+    // so every pitch list (admin's whole-team Pitches tab, a buyer's own
+    // pitch history, a rep's My Pitches) shows it consistently without each
+    // caller needing its own check.
+    copy.status = p._doNotContact ? 'Do Not Contact' : computeLeadStatus(p._phoneType, contacts);
     copy.contactCount = contacts.length;
     copy.dealAddress = deal ? deal['Address'] : '(deleted deal)';
     copy.dealCode = deal ? deal['DealCode'] : '';
@@ -1903,7 +1909,10 @@ function adminGetPitchesForBuyerLead(body) {
   const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
   const dealsById = {};
   sheetToObjects(dealsSheet).forEach(function (d) { dealsById[d['DealID']] = d; });
-  pitches.forEach(function (p) { p._phoneType = lead ? lead['PhoneType'] : ''; });
+  pitches.forEach(function (p) {
+    p._phoneType = lead ? lead['PhoneType'] : '';
+    p._doNotContact = !!(lead && (lead['DoNotContact'] === true || lead['DoNotContact'] === 'TRUE'));
+  });
 
   const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
   const allContacts = sheetToObjects(contactsSheet).filter(function (c) { return c['BuyerLeadID'] === body.buyerLeadId; });
@@ -1931,6 +1940,7 @@ function adminGetAllPitches(body) {
   pitches.forEach(function (p) {
     const lead = leadsById[p['BuyerLeadID']];
     p._phoneType = lead ? lead['PhoneType'] : '';
+    p._doNotContact = !!(lead && (lead['DoNotContact'] === true || lead['DoNotContact'] === 'TRUE'));
     p.buyerName = lead ? lead['BuyerName'] : '(deleted buyer)';
     p.buyerPhone = lead ? lead['Phone'] : '';
   });
@@ -2156,7 +2166,11 @@ function getMyPitches(body, session) {
   const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
   const leadsById = {};
   sheetToObjects(leadsSheet).forEach(function (l) { leadsById[l['BuyerLeadID']] = l; });
-  myPitches.forEach(function (p) { p._phoneType = leadsById[p['BuyerLeadID']] ? leadsById[p['BuyerLeadID']]['PhoneType'] : ''; });
+  myPitches.forEach(function (p) {
+    const lead = leadsById[p['BuyerLeadID']];
+    p._phoneType = lead ? lead['PhoneType'] : '';
+    p._doNotContact = !!(lead && (lead['DoNotContact'] === true || lead['DoNotContact'] === 'TRUE'));
+  });
 
   const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
   const dealsById = {};

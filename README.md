@@ -76,7 +76,10 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   = call or text) — a rep picks which number they're using each time they
   log a contact — plus which deal it's for and a status (Not Contacted,
   Awaiting Response, Follow-Up Due, Follow-Up In Progress, Responded, Fully
-  Worked). Search by buyer/phone/city, filter down to one specific deal or
+  Worked, or **Do Not Contact** — overrides every other status the moment
+  either admin or the rep themselves marks that buyer DNC, everywhere that
+  status shows: this list, admin's whole-team Pitches tab, and a buyer's
+  own pitch history). Search by buyer/phone/city, filter down to one specific deal or
   one specific status (e.g. just Not Contacted, or everything already
   contacted), and sort by what needs attention first (the default),
   alphabetically by deal, or by when it was given — newest or oldest first.
