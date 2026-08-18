@@ -629,6 +629,19 @@ function updateContactMethodOptions(slots) {
   const chosen = slots.find(function (s) { return s.slot === slotSelect.value; }) || slots[0];
   const canTextThisSlot = chosen && chosen.type !== "Landline" && window.__pitchHasResponded;
   methodSelect.innerHTML = '<option value="Call">Call</option>' + (canTextThisSlot ? '<option value="Text">Text</option>' : '');
+  updateVoicemailRowVisibility();
+}
+
+// A voicemail only makes sense to log on a Call, not a Text -- hides the
+// checkbox (and un-checks it, so a stale check from a prior Call selection
+// can't silently ride along into a Text log) whenever Method isn't Call.
+function updateVoicemailRowVisibility() {
+  const methodSelect = document.getElementById("contact-method-input");
+  const row = document.getElementById("contact-voicemail-row");
+  if (!methodSelect || !row) return;
+  const isCall = methodSelect.value === "Call";
+  row.hidden = !isCall;
+  if (!isCall) document.getElementById("contact-voicemail-input").checked = false;
 }
 
 // Same fields/wording as the rep's deal-detail confidentiality banner
@@ -738,6 +751,7 @@ async function openPitchDetail(pitchId) {
     '<label class="field-label">Method</label>' +
     '<select id="contact-method-input"></select>' +
     '<label class="checkbox-row"><input type="checkbox" id="contact-responded-input"> Buyer responded during this contact</label>' +
+    '<label class="checkbox-row" id="contact-voicemail-row"><input type="checkbox" id="contact-voicemail-input"> Left a voicemail</label>' +
     '<div class="row2">' +
       '<div><label class="field-label">% of ARV interested at <span class="small-muted">(if mentioned)</span></label><input type="text" id="contact-arvpercent-input" placeholder="e.g. 70"></div>' +
       '<div><label class="field-label">% of As-Is Value <span class="small-muted">(if mentioned)</span></label><input type="text" id="contact-asispercent-input" placeholder="e.g. 85"></div>' +
@@ -785,17 +799,19 @@ async function openPitchDetail(pitchId) {
   if (phoneSelect) {
     updateContactMethodOptions(slots);
     phoneSelect.addEventListener("change", function () { updateContactMethodOptions(slots); });
+    document.getElementById("contact-method-input").addEventListener("change", updateVoicemailRowVisibility);
 
     document.getElementById("contact-add-submit").addEventListener("click", async function () {
       const phoneSlot = phoneSelect.value;
       const method = document.getElementById("contact-method-input").value;
       const responded = document.getElementById("contact-responded-input").checked;
+      const voicemailLeft = document.getElementById("contact-voicemail-input").checked;
       const arvPercent = document.getElementById("contact-arvpercent-input").value.trim();
       const asIsPercent = document.getElementById("contact-asispercent-input").value.trim();
       const notes = document.getElementById("contact-notes-input").value.trim();
       const errorEl = document.getElementById("contact-add-error");
       errorEl.classList.remove("show");
-      const res = await api("addPitchContact", { pitchId: pitchId, phoneSlot: phoneSlot, method: method, responded: responded, arvPercent: arvPercent, asIsPercent: asIsPercent, notes: notes });
+      const res = await api("addPitchContact", { pitchId: pitchId, phoneSlot: phoneSlot, method: method, responded: responded, voicemailLeft: voicemailLeft, arvPercent: arvPercent, asIsPercent: asIsPercent, notes: notes });
       if (!res.ok) {
         errorEl.textContent = res.error || "Could not log contact.";
         errorEl.classList.add("show");
@@ -806,6 +822,7 @@ async function openPitchDetail(pitchId) {
       document.getElementById("contact-arvpercent-input").value = "";
       document.getElementById("contact-asispercent-input").value = "";
       document.getElementById("contact-responded-input").checked = false;
+      document.getElementById("contact-voicemail-input").checked = false;
       const fresh = await api("getPitchContacts", { pitchId: pitchId });
       document.getElementById("contact-history-list").innerHTML = renderContactHistory(fresh.ok ? fresh.contacts : []);
       showToast("Contact logged.");
@@ -820,7 +837,8 @@ function renderContactHistory(contacts) {
     return '<div class="item-row">' +
       '<span class="ts">' + formatDate(c.ContactedAt) + ' &middot; ' + esc(c.Username) + ' &middot; ' + esc(c.Method) +
       (c.PhoneSlot && c.PhoneSlot !== "Phone" ? ' (' + esc(c.PhoneSlot) + ')' : '') +
-      (c.Responded === true || c.Responded === "TRUE" ? ' &middot; <strong>Responded</strong>' : '') + '</span>' +
+      (c.Responded === true || c.Responded === "TRUE" ? ' &middot; <strong>Responded</strong>' : '') +
+      (c.VoicemailLeft === true || c.VoicemailLeft === "TRUE" ? ' &middot; Left voicemail' : '') + '</span>' +
       (c.ARVPercent || c.AsIsPercent ? '<div class="small-muted" style="margin-top:4px;">' +
         [c.ARVPercent ? esc(c.ARVPercent) + "% of ARV" : "", c.AsIsPercent ? esc(c.AsIsPercent) + "% of As-Is Value" : ""].filter(Boolean).join(" &middot; ") +
         '</div>' : "") +

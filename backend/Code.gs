@@ -151,7 +151,7 @@ const PITCH_COLUMNS = ['PitchID', 'BuyerLeadID', 'DealID', 'Username', 'GivenAt'
 // as-is value the buyer expressed interest at during this specific
 // touchpoint, same purpose as on BUYER_COLUMNS but for the buyer-leads
 // calling-list side of the app.
-const BUYER_LEAD_CONTACT_COLUMNS = ['ContactID', 'PitchID', 'BuyerLeadID', 'DealID', 'Username', 'Method', 'PhoneSlot', 'ContactedAt', 'Responded', 'ARVPercent', 'AsIsPercent', 'Notes'];
+const BUYER_LEAD_CONTACT_COLUMNS = ['ContactID', 'PitchID', 'BuyerLeadID', 'DealID', 'Username', 'Method', 'PhoneSlot', 'ContactedAt', 'Responded', 'VoicemailLeft', 'ARVPercent', 'AsIsPercent', 'Notes'];
 
 // e is undefined if you click "Run" on doGet directly in the Apps Script
 // editor (it doesn't simulate a real request) -- guarded so that doesn't
@@ -2299,7 +2299,7 @@ function addPitchContact(body, session) {
   appendRowByHeaders(sheet, {
     'ContactID': contactId, 'PitchID': body.pitchId, 'BuyerLeadID': pitch['BuyerLeadID'], 'DealID': pitch['DealID'],
     'Username': session.u, 'Method': body.method, 'PhoneSlot': phone.slot, 'ContactedAt': new Date().toISOString(),
-    'Responded': !!body.responded, 'ARVPercent': body.arvPercent || '', 'AsIsPercent': body.asIsPercent || '', 'Notes': body.notes || ''
+    'Responded': !!body.responded, 'VoicemailLeft': !!body.voicemailLeft, 'ARVPercent': body.arvPercent || '', 'AsIsPercent': body.asIsPercent || '', 'Notes': body.notes || ''
   });
   return { ok: true, contactId: contactId };
 }

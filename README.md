@@ -94,7 +94,9 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   If a deal closes before a buyer responds, that item just shows "deal
   closed — no action needed" instead of piling up as overdue. Logging a
   contact records the method, which number
-  was used, whether the buyer responded, and deal-specific feedback notes; a
+  was used, whether the buyer responded, whether a voicemail was left (Call
+  only — the checkbox is hidden for Text, since it doesn't apply), and
+  deal-specific feedback notes; a
   separate **General Buyer Notes** field (ARV%, price range, areas of
   interest, cash vs. financed) travels with the buyer across every deal
   they're ever pitched, anywhere in the country — so a buyer who passed on a
