@@ -82,7 +82,9 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   own pitch history). Search by buyer/phone/city, filter down to one specific deal or
   one specific status (e.g. just Not Contacted, or everything already
   contacted), and sort by what needs attention first (the default),
-  alphabetically by deal, or by when it was given — newest or oldest first.
+  alphabetically by deal, or by when it was given — newest or oldest first;
+  Do Not Contact buyers always sink to the bottom of the list no matter
+  which sort is picked, since there's nothing left to do with them.
   A small circle to the left of each buyer's name toggles into a filled
   green arrow when clicked, with the whole row highlighted — a purely
   visual, local bookmark (not saved anywhere) so a rep can mark their place

@@ -537,20 +537,22 @@ function getFilteredSortedMyPitches() {
     return true;
   });
 
-  const sorted = filtered.slice();
-  if (sortMode === "deal") {
-    sorted.sort(function (a, b) { return String(a.dealCode || "").localeCompare(String(b.dealCode || "")); });
-  } else if (sortMode === "newest") {
-    sorted.sort(function (a, b) { return new Date(b.GivenAt || 0) - new Date(a.GivenAt || 0); });
-  } else if (sortMode === "oldest") {
-    sorted.sort(function (a, b) { return new Date(a.GivenAt || 0) - new Date(b.GivenAt || 0); });
-  } else {
-    sorted.sort(function (a, b) {
+  const comparator =
+    sortMode === "deal" ? function (a, b) { return String(a.dealCode || "").localeCompare(String(b.dealCode || "")); } :
+    sortMode === "newest" ? function (a, b) { return new Date(b.GivenAt || 0) - new Date(a.GivenAt || 0); } :
+    sortMode === "oldest" ? function (a, b) { return new Date(a.GivenAt || 0) - new Date(b.GivenAt || 0); } :
+    function (a, b) {
       if (a.dealStillActive !== b.dealStillActive) return a.dealStillActive ? -1 : 1;
       return LEAD_STATUS_PRIORITY.indexOf(a.status) - LEAD_STATUS_PRIORITY.indexOf(b.status);
-    });
-  }
-  return sorted;
+    };
+
+  // A Do Not Contact buyer needs no further action -- sink them to the
+  // bottom no matter which sort is chosen (same idea as dealStillActive
+  // already sinking closed-deal pitches within the default sort), instead
+  // of leaving them mixed in among buyers still worth calling.
+  const active = filtered.filter(function (p) { return !p.doNotContact; }).sort(comparator);
+  const dnc = filtered.filter(function (p) { return p.doNotContact; }).sort(comparator);
+  return active.concat(dnc);
 }
 
 function renderMyPitches() {
