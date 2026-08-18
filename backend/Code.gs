@@ -534,17 +534,25 @@ function getDeals(body, session) {
     const grants = loadAddressGrantsSet();
     deals = deals.map(function (d) { return applyAddressSecrecy(d, session, grants); });
   } else {
-    // Admin-only: how many active, non-admin team members can currently
-    // work each deal -- an all-access rep counts toward every deal,
-    // everyone else only counts for deals they're specifically assigned
-    // to (same math as the Team tab's per-rep "# Deals", just inverted to
-    // per-deal). Lets admin spot at a glance which deals are thin on
-    // coverage and could use another rep pushed onto them.
+    // Admin-only: how many active team members can currently work each
+    // deal -- an all-access rep counts toward every deal, everyone else
+    // only counts for deals they're specifically assigned to (same math as
+    // the Team tab's per-rep "# Deals", just inverted to per-deal). Lets
+    // admin spot at a glance which deals are thin on coverage and could use
+    // another rep pushed onto them.
+    //
+    // Admin rows are included here too (not excluded), same rules as any
+    // other rep -- an admin's AllAccess toggle and any deal they've
+    // specifically assigned themselves to (see adminAssignRep) both count.
+    // This matters for record-keeping: turning AllAccess off for an admin
+    // account is meant to let it show up per-deal, only where actually
+    // assigned, rather than unconditionally on every deal. The requesting
+    // admin's OWN coverage on each deal is broken out separately
+    // (currentAdminHasAccess) so the frontend can call it out by name
+    // ("Admin") instead of folding it into the generic count.
     const repsSheet = getSheet(REPS_SHEET, REP_COLUMNS);
     const activeReps = sheetToObjects(repsSheet).filter(function (r) {
-      const active = !(r['Active'] === false || r['Active'] === 'FALSE');
-      const isAdmin = r['IsAdmin'] === true || r['IsAdmin'] === 'TRUE';
-      return active && !isAdmin;
+      return !(r['Active'] === false || r['Active'] === 'FALSE');
     });
     const allAccessCount = activeReps.filter(function (r) { return r['AllAccess'] === true || r['AllAccess'] === 'TRUE'; }).length;
     const specificallyAssignableUsernames = {};
@@ -554,15 +562,28 @@ function getDeals(body, session) {
 
     const assignmentsSheet = getSheet(ASSIGNMENTS_SHEET, ASSIGNMENT_COLUMNS);
     const specificCountByDeal = {};
+    const specificallyAssignedUsernamesByDeal = {};
     sheetToObjects(assignmentsSheet).forEach(function (a) {
       const u = String(a['Username'] || '').trim().toLowerCase();
-      if (!specificallyAssignableUsernames[u]) return; // inactive, admin, or already counted via all-access
+      if (!specificallyAssignableUsernames[u]) return; // inactive or already counted via all-access
       specificCountByDeal[a['DealID']] = (specificCountByDeal[a['DealID']] || 0) + 1;
+      if (!specificallyAssignedUsernamesByDeal[a['DealID']]) specificallyAssignedUsernamesByDeal[a['DealID']] = {};
+      specificallyAssignedUsernamesByDeal[a['DealID']][u] = true;
     });
+
+    const currentAdminRow = activeReps.find(function (r) { return String(r['Username'] || '').trim().toLowerCase() === session.u; });
+    const currentAdminAllAccess = !!(currentAdminRow && (currentAdminRow['AllAccess'] === true || currentAdminRow['AllAccess'] === 'TRUE'));
 
     deals = deals.map(function (d) {
       const copy = Object.assign({}, d);
-      copy.repsWithAccessCount = allAccessCount + (specificCountByDeal[d['DealID']] || 0);
+      const totalCount = allAccessCount + (specificCountByDeal[d['DealID']] || 0);
+      const adminCoversThis = currentAdminAllAccess ||
+        !!(specificallyAssignedUsernamesByDeal[d['DealID']] && specificallyAssignedUsernamesByDeal[d['DealID']][session.u]);
+      copy.currentAdminHasAccess = adminCoversThis;
+      // "Other" reps -- excludes the requesting admin's own coverage so the
+      // frontend doesn't double-count them once as "Admin" and again in
+      // this number.
+      copy.repsWithAccessCount = totalCount - (adminCoversThis ? 1 : 0);
       return copy;
     });
   }

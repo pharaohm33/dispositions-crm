@@ -128,12 +128,18 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   there's something to actually work once you switch over.
 
 - **Deals** — the table shows a **Coverage** column for each deal, e.g.
-  "Admin" or "Admin + 2" — admin always has full access to every deal
-  regardless of assignment, so it's shown unconditionally as the baseline,
-  with "+ N" for however many other active team members can currently work
-  it on top of that (an all-access rep counts toward every deal, everyone
-  else only for deals they're specifically assigned to — same math as the
-  Team tab's per-rep "# Deals," just inverted). Add deals, change a deal's
+  "Admin + 2" or just "2 reps" — worked out with the exact same rule for
+  admin as for any other team member: an all-access account counts toward
+  every deal, everyone else only for deals they're specifically assigned to
+  (same math as the Team tab's per-rep "# Deals," just inverted). If the
+  logged-in admin themselves has all-deal access, or has specifically
+  assigned themselves to a given deal (see **Assign Myself** below), it's
+  called out by name as "Admin" with "+ N" for however many other team
+  members also cover it; if not, it just shows the plain rep count for that
+  deal (flagged in red if it's 0 — nobody, including admin, is on it).
+  Turning an admin account's All Access off in the Team tab makes their
+  coverage genuinely per-deal from then on, exactly like a regular rep,
+  instead of showing up everywhere regardless. Add deals, change a deal's
   status (Active, Sold, Dead, Under Contract, On Hold, or whatever
   categories you've defined), edit the **Address / City / State / Zip** at
   any time after creation (e.g. a typo, or details that firm up after the
