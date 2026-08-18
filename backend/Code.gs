@@ -1100,16 +1100,20 @@ function adminGetBuyerRequests(body) {
 // pre-response is rejected server-side), which means status would already
 // read 'Responded' above before this even matters.
 function computeLeadStatus(phoneType, contacts) {
-  if (!contacts || contacts.length === 0) return 'Not Contacted';
-  const responded = contacts.some(function (c) { return c['Responded'] === true || c['Responded'] === 'TRUE'; });
+  // A "Skipped" entry (see addPitchContact) is a rep's own note, not a real
+  // outreach attempt -- excluded here so it never counts toward the
+  // two-touch follow-up SOP or moves a lead off "Not Contacted" by itself.
+  const realContacts = (contacts || []).filter(function (c) { return c['Method'] !== 'Skipped'; });
+  if (realContacts.length === 0) return 'Not Contacted';
+  const responded = realContacts.some(function (c) { return c['Responded'] === true || c['Responded'] === 'TRUE'; });
   if (responded) return 'Responded';
 
-  const sorted = contacts.slice().sort(function (a, b) { return new Date(a['ContactedAt']) - new Date(b['ContactedAt']); });
+  const sorted = realContacts.slice().sort(function (a, b) { return new Date(a['ContactedAt']) - new Date(b['ContactedAt']); });
   const hoursSinceFirst = (Date.now() - new Date(sorted[0]['ContactedAt']).getTime()) / (60 * 60 * 1000);
-  const followUpSatisfied = contacts.length >= 2;
+  const followUpSatisfied = realContacts.length >= 2;
 
   if (followUpSatisfied) return 'Fully Worked';
-  if (hoursSinceFirst < FOLLOWUP_HOURS) return contacts.length === 1 ? 'Awaiting Response' : 'Follow-Up In Progress';
+  if (hoursSinceFirst < FOLLOWUP_HOURS) return realContacts.length === 1 ? 'Awaiting Response' : 'Follow-Up In Progress';
   return 'Follow-Up Due';
 }
 
@@ -2257,7 +2261,12 @@ function phoneForSlot(lead, slot) {
 
 function addPitchContact(body, session) {
   if (!body.pitchId || !body.method) return { ok: false, error: 'Missing pitchId or method.' };
-  if (body.method !== 'Call' && body.method !== 'Text') return { ok: false, error: 'Method must be Call or Text.' };
+  // "Skipped" is a rep's own quick "moving on for now" note -- mainly meant
+  // for landline-only buyers with no mobile to text, but left flexible for
+  // whatever a rep finds it useful for. Logged the same way as a Call/Text
+  // so it's on record, but computeLeadStatus filters Method === 'Skipped'
+  // out of its follow-up math entirely, so it never counts as a real touch.
+  if (['Call', 'Text', 'Skipped'].indexOf(body.method) === -1) return { ok: false, error: 'Method must be Call, Text, or Skipped.' };
 
   const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
   const pitch = sheetToObjects(pitchesSheet).find(function (p) { return p['PitchID'] === body.pitchId; });
@@ -2299,7 +2308,9 @@ function addPitchContact(body, session) {
   appendRowByHeaders(sheet, {
     'ContactID': contactId, 'PitchID': body.pitchId, 'BuyerLeadID': pitch['BuyerLeadID'], 'DealID': pitch['DealID'],
     'Username': session.u, 'Method': body.method, 'PhoneSlot': phone.slot, 'ContactedAt': new Date().toISOString(),
-    'Responded': !!body.responded, 'VoicemailLeft': !!body.voicemailLeft, 'ARVPercent': body.arvPercent || '', 'AsIsPercent': body.asIsPercent || '', 'Notes': body.notes || ''
+    'Responded': body.method === 'Skipped' ? false : !!body.responded,
+    'VoicemailLeft': body.method === 'Skipped' ? false : !!body.voicemailLeft,
+    'ARVPercent': body.arvPercent || '', 'AsIsPercent': body.asIsPercent || '', 'Notes': body.notes || ''
   });
   return { ok: true, contactId: contactId };
 }

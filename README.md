@@ -96,7 +96,13 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   contact records the method, which number
   was used, whether the buyer responded, whether a voicemail was left (Call
   only — the checkbox is hidden for Text, since it doesn't apply), and
-  deal-specific feedback notes; a
+  deal-specific feedback notes. A **Skip &amp; Next** button sits right next
+  to Log Contact — mainly meant for landline-only buyers with no mobile to
+  text, but it's flexible, use it however's useful. It logs a quick
+  "Skipped" note (visible in Contact History, doesn't count toward the
+  two-touch follow-up SOP or move a lead off Not Contacted by itself) and
+  immediately opens the next lead in the rep's current filtered/sorted
+  list — no need to close out and go re-find their place. A
   separate **General Buyer Notes** field (ARV%, price range, areas of
   interest, cash vs. financed) travels with the buyer across every deal
   they're ever pitched, anywhere in the country — so a buyer who passed on a

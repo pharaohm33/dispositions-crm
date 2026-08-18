@@ -759,8 +759,12 @@ async function openPitchDetail(pitchId) {
     '<label class="field-label">Notes (buyer feedback on this deal specifically)</label>' +
     '<textarea id="contact-notes-input"></textarea>' +
     '<div class="error-text" id="contact-add-error"></div>' +
-    '<div class="nav-row" style="justify-content:flex-end;">' +
-      '<button class="btn primary" id="contact-add-submit">Log Contact</button>' +
+    '<div class="nav-row" style="justify-content:space-between; align-items:center;">' +
+      '<span class="small-muted" style="max-width:260px;">Mainly for landline-only buyers with no mobile to text, but use it however\'s useful — logs a quick "Skipped" note (doesn\'t count toward the two-touch follow-up) and jumps straight to the next lead.</span>' +
+      '<div style="display:flex; gap:8px;">' +
+        '<button class="btn secondary" id="contact-skip-btn">Skip &amp; Next</button>' +
+        '<button class="btn primary" id="contact-add-submit">Log Contact</button>' +
+      '</div>' +
     '</div>') +
 
     '<div class="section-title">Contact History</div>' +
@@ -828,6 +832,44 @@ async function openPitchDetail(pitchId) {
       showToast("Contact logged.");
       if (responded) { await loadMyPitches(); openPitchDetail(pitchId); }
     });
+
+    document.getElementById("contact-skip-btn").addEventListener("click", async function () {
+      const phoneSlot = phoneSelect.value;
+      const notes = document.getElementById("contact-notes-input").value.trim();
+      const errorEl = document.getElementById("contact-add-error");
+      errorEl.classList.remove("show");
+      // Logged the same way as a Call/Text (so it's on record and admin can
+      // see it in Contact History), but Method "Skipped" is filtered out of
+      // computeLeadStatus's follow-up math server-side -- it never counts
+      // as a real touch or moves the two-touch SOP forward.
+      const res = await api("addPitchContact", { pitchId: pitchId, phoneSlot: phoneSlot, method: "Skipped", notes: notes });
+      if (!res.ok) {
+        errorEl.textContent = res.error || "Could not skip this lead.";
+        errorEl.classList.add("show");
+        showToast(res.error || "Could not skip this lead.", true);
+        return;
+      }
+      showToast("Skipped — moving to next lead.");
+      await openNextPitchAfter(pitchId);
+    });
+  }
+}
+
+// Advances straight to the next lead in the rep's current filtered/sorted
+// list after a Skip, instead of dumping them back at the full table to
+// re-find their place. Reads myPitches as it stands right now (not
+// reloaded from the backend first) so the list order stays stable and
+// matches exactly what the rep was just looking at.
+async function openNextPitchAfter(pitchId) {
+  const list = getFilteredSortedMyPitches();
+  const idx = list.findIndex(function (p) { return p.PitchID === pitchId; });
+  const next = idx !== -1 ? list[idx + 1] : null;
+  if (next) {
+    await openPitchDetail(next.PitchID);
+  } else {
+    document.getElementById("detail-overlay").hidden = true;
+    await loadMyPitches();
+    showToast("That was the last one in your current list.");
   }
 }
 
