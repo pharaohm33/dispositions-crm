@@ -278,6 +278,23 @@ async function initRepView() {
   }
   repDeals = res.deals;
   renderRepDeals();
+
+  const session = getSession() || {};
+  // A Buyer signup isn't out hunting for buyers themselves -- skip the
+  // whole "build your own list" card and guide for them. Everyone else
+  // (blank/Wholesaler/Realtor/Other) gets it.
+  document.getElementById("rep-buyerlist-card").hidden = session.personType === "Buyer";
+  // The text-in SOP is specifically for the three self-identified outside
+  // contributor types, not a traditional admin-added rep (blank) or a
+  // Buyer -- and only shows once there's an actual phone number to text.
+  const textSopApplies = ["Wholesaler", "Realtor", "Other"].indexOf(session.personType) !== -1;
+  const textSopRow = document.getElementById("rep-text-sop-row");
+  if (textSopApplies && joinContactCache && joinContactCache.phone) {
+    document.getElementById("rep-text-sop-phone").textContent = joinContactCache.phone;
+    textSopRow.hidden = false;
+  } else {
+    textSopRow.hidden = true;
+  }
 }
 
 document.getElementById("rep-search-input").addEventListener("input", renderRepDeals);
@@ -1007,6 +1024,166 @@ function renderContactHistory(contacts) {
       '</div>';
   }).join("");
 }
+
+/* ============================================================
+   REP VIEW — BUILD YOUR OWN BUYER LIST
+   Deliberately a separate, simpler module from admin's CSV importer below
+   (no per-column mapping-override table -- just auto-guessed columns) so
+   the two don't share DOM ids or mutable module state. Reuses the same
+   pure parsing/formatting helpers (parseCsvText, guessCsvField,
+   normalizePhoneType, formatMoneyish, formatPercentish, formatWholeNumber,
+   formatAdminMoney, normalizeAssetCategoryValue), which are all defined
+   further down but hoisted, since none of them touch the DOM themselves.
+   ============================================================ */
+
+let repCsvRows = [];
+let repCsvHeaders = [];
+
+document.getElementById("rep-csv-file-input").addEventListener("change", function (e) {
+  const file = e.target.files[0];
+  const errorEl = document.getElementById("rep-csv-parse-error");
+  errorEl.classList.remove("show");
+  document.getElementById("rep-csv-import-result").textContent = "";
+  document.getElementById("rep-csv-import-error").classList.remove("show");
+  document.getElementById("rep-csv-portfolio-min-input").value = "";
+  document.getElementById("rep-csv-portfolio-max-input").value = "";
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function () {
+    const parsed = parseCsvText(String(reader.result || ""));
+    if (parsed.length === 0) {
+      errorEl.textContent = "Couldn't find any rows in that file.";
+      errorEl.classList.add("show");
+      return;
+    }
+    const hasHeader = document.getElementById("rep-csv-has-header").checked;
+    repCsvHeaders = hasHeader ? parsed[0] : parsed[0].map(function (_, i) { return "Column " + (i + 1); });
+    repCsvRows = hasHeader ? parsed.slice(1) : parsed;
+    if (repCsvRows.length === 0) {
+      errorEl.textContent = "That file only has a header row — no buyer rows to import.";
+      errorEl.classList.add("show");
+      return;
+    }
+    renderRepCsvPreview();
+  };
+  reader.onerror = function () {
+    errorEl.textContent = "Could not read that file.";
+    errorEl.classList.add("show");
+  };
+  reader.readAsText(file);
+});
+
+document.getElementById("rep-csv-has-header").addEventListener("change", function () {
+  const fileInput = document.getElementById("rep-csv-file-input");
+  if (fileInput.files[0]) fileInput.dispatchEvent(new Event("change"));
+});
+
+["rep-csv-portfolio-min-input", "rep-csv-portfolio-max-input"].forEach(function (id) {
+  document.getElementById(id).addEventListener("input", function () {
+    if (!document.getElementById("rep-csv-preview-section").hidden) renderRepCsvPreview();
+  });
+});
+
+// No manual override dropdowns for reps -- first column that guesses to a
+// given field wins, same "most specific wins" behavior as guessCsvField
+// itself already provides per-column.
+function repAutoMapping() {
+  const mapping = {};
+  repCsvHeaders.forEach(function (h, i) {
+    const field = guessCsvField(h);
+    if (field && mapping[field] === undefined) mapping[field] = i;
+  });
+  return mapping;
+}
+
+function repCsvPortfolioOverrideValue() {
+  const minEl = document.getElementById("rep-csv-portfolio-min-input");
+  const maxEl = document.getElementById("rep-csv-portfolio-max-input");
+  const min = formatAdminMoney(minEl ? minEl.value : "");
+  const max = formatAdminMoney(maxEl ? maxEl.value : "");
+  if (min && max) return min + " – " + max;
+  if (min) return min + "+";
+  if (max) return "Up to " + max;
+  return "";
+}
+
+function repMappedCsvRows() {
+  const mapping = repAutoMapping();
+  return repCsvRows
+    .filter(function (row) { return row.some(function (cell) { return String(cell || "").trim() !== ""; }); })
+    .map(function (row) {
+      const get = function (field) { return mapping[field] !== undefined ? String(row[mapping[field]] || "").trim() : ""; };
+      const purchasePrice = formatMoneyish(get("lastKnownPurchasePrice"));
+      const purchaseDateHint = get("lastPurchaseDateHint");
+      const lastKnownPurchasePrice = purchasePrice && purchaseDateHint ? purchasePrice + " (" + purchaseDateHint + ")" :
+        purchasePrice ? purchasePrice :
+        purchaseDateHint ? "Unknown price (sold " + purchaseDateHint + ")" : "";
+      const estimatedBase = formatMoneyish(get("estimatedPropertyValue"));
+      const equityHint = formatPercentish(get("equityHint"));
+      const estimatedPropertyValue = estimatedBase && equityHint ? estimatedBase + " (" + equityHint + " equity)" : (estimatedBase || (equityHint ? equityHint + " equity" : ""));
+      const portfolioValue = repCsvPortfolioOverrideValue();
+      return {
+        buyerName: get("buyerName"), phone: get("phone"), phoneType: normalizePhoneType(get("phoneType")),
+        phone2: get("phone2"), phone2Type: normalizePhoneType(get("phone2Type")),
+        phone3: get("phone3"), phone3Type: normalizePhoneType(get("phone3Type")),
+        city: get("city"), state: get("state"), zip: get("zip"), county: get("county"), email: get("email"),
+        assetCategories: normalizeAssetCategoryValue(get("assetCategories")), lastKnownPurchasePrice: lastKnownPurchasePrice,
+        estimatedPropertyValue: estimatedPropertyValue,
+        portfolioValue: portfolioValue,
+        ownershipLengthMonths: formatWholeNumber(get("ownershipLengthMonths")),
+        propertyUrl: get("propertyUrl"),
+        priceRangeMin: get("priceRangeMin"), priceRangeMax: get("priceRangeMax")
+      };
+    });
+}
+
+function renderRepCsvPreview() {
+  document.getElementById("rep-csv-preview-section").hidden = false;
+  const rows = repMappedCsvRows();
+  const tbody = document.querySelector("#rep-csv-preview-table tbody");
+  tbody.innerHTML = rows.slice(0, 5).map(function (r) {
+    return '<tr>' +
+      '<td>' + esc(r.buyerName) + '</td>' + '<td>' + esc(r.phone) + '</td>' + '<td>' + esc(r.phoneType) + '</td>' +
+      '<td>' + esc(r.city) + '</td>' + '<td>' + esc(r.state) + '</td>' +
+      '<td>' + esc(r.assetCategories) + '</td>' +
+      '<td>' + esc(r.estimatedPropertyValue) + '</td>' +
+      '<td>' + esc(r.portfolioValue) + '</td>' +
+      '</tr>';
+  }).join("");
+  const missingBuyerNameOrPhone = rows.filter(function (r) { return !r.buyerName || !r.phone; }).length;
+  document.getElementById("rep-csv-preview-note").textContent =
+    "Showing " + Math.min(5, rows.length) + " of " + rows.length + " row(s)." +
+    (missingBuyerNameOrPhone > 0 ? " " + missingBuyerNameOrPhone + " row(s) are missing a Buyer Name or Phone and will be skipped." : "");
+}
+
+document.getElementById("rep-csv-import-btn").addEventListener("click", async function () {
+  const btn = this;
+  const errorEl = document.getElementById("rep-csv-import-error");
+  const resultEl = document.getElementById("rep-csv-import-result");
+  errorEl.classList.remove("show");
+  const rows = repMappedCsvRows().filter(function (r) { return r.buyerName && r.phone; });
+  if (rows.length === 0) {
+    errorEl.textContent = "No rows have both a Buyer Name and a Phone — nothing to import.";
+    errorEl.classList.add("show");
+    return;
+  }
+  if (btn.disabled) return;
+  btn.disabled = true;
+  const res = await api("importBuyerLeads", { rows: rows });
+  btn.disabled = false;
+  if (!res.ok) {
+    errorEl.textContent = res.error || "Import failed.";
+    errorEl.classList.add("show");
+    showToast(res.error || "Import failed.", true);
+    return;
+  }
+  resultEl.textContent = "Imported " + res.imported + " buyer(s) — private to you." +
+    (res.skippedDuplicates ? " Skipped " + res.skippedDuplicates + " duplicate phone number(s)." : "");
+  document.getElementById("rep-csv-file-input").value = "";
+  repCsvRows = []; repCsvHeaders = [];
+  document.getElementById("rep-csv-preview-section").hidden = true;
+  showToast("Imported " + res.imported + " buyer(s).");
+});
 
 /* ============================================================
    ADMIN VIEW
@@ -2269,7 +2446,7 @@ document.getElementById("csv-import-btn").addEventListener("click", async functi
   }
   if (btn.disabled) return;
   btn.disabled = true;
-  const res = await api("adminImportBuyerLeads", { rows: rows });
+  const res = await api("importBuyerLeads", { rows: rows });
   btn.disabled = false;
   if (!res.ok) {
     errorEl.textContent = res.error || "Import failed.";
@@ -2299,7 +2476,7 @@ document.getElementById("buyerleads-import-btn").addEventListener("click", async
   }
   if (btn.disabled) return;
   btn.disabled = true;
-  const res = await api("adminImportBuyerLeads", { pasteText: text });
+  const res = await api("importBuyerLeads", { pasteText: text });
   btn.disabled = false;
   if (!res.ok) {
     errorEl.textContent = res.error || "Import failed.";
@@ -2527,6 +2704,7 @@ function renderBuyerLeadsAdmin() {
       '<td class="small-muted">' + esc(notesPreview) + '</td>' +
       '<td class="small-muted">' + (l.PendingDealID ? esc(dealLabelFor(l.PendingDealID)) : "&mdash;") + '</td>' +
       '<td class="small-muted">' + (l.CreatedAt ? formatDate(l.CreatedAt) : "&mdash;") + '</td>' +
+      '<td class="small-muted">' + (l.UploadedBy ? esc(l.UploadedBy) : "&mdash;") + '</td>' +
       '<td>' + (l.openPitches.length || "&mdash;") + '</td>' +
       '<td style="white-space:nowrap;"><button class="btn secondary small view-buyer-btn" data-lead-id="' + esc(l.BuyerLeadID) + '">View / Give</button></td>' +
       '</tr>';

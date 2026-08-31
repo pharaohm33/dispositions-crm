@@ -18,16 +18,19 @@ backend (see [SETUP.md](SETUP.md)).
 
 - Anyone can create their own account from the login screen — **Sign Up**
   toggles to a form for Name, Email, Phone (optional), a self-identified
-  **I am a...** (Buyer, Wholesaler, Realtor, or Other — informational, shown
-  in the Team tab so admin can see who's who, doesn't gate any
-  functionality), and a password (8+ characters). Username is just the
-  email, lowercased. The account is **active immediately** — no approval
-  queue — but starts with zero deal access: no all-deal access, not
-  assigned to anything, so a brand-new signup sees an empty Deals tab until
-  admin assigns them something (individually, or via **Assign to all
-  users** / **Assign to all users with no assigned deals** the next time a
-  deal's added — see Deals below). Admin gets an email the moment someone
-  signs up. Self-signup can never create an admin account.
+  **I am a...** (Buyer, Wholesaler, Realtor, or Other), and a password (8+
+  characters). Username is just the email, lowercased. The account is
+  **active immediately** — no approval queue — but starts with zero deal
+  access: no all-deal access, not assigned to anything, so a brand-new
+  signup sees an empty Deals tab until admin assigns them something
+  (individually, or via **Assign to all users** / **Assign to all users
+  with no assigned deals** the next time a deal's added — see Deals below).
+  Admin gets an email the moment someone signs up. Self-signup can never
+  create an admin account. Type is shown in the Team tab so admin can see
+  who's who, and it does gate a couple of things: a **Buyer** never sees
+  the "build your own buyer list" card or its guide/SOP at all (see Buyer
+  Leads below); **Wholesaler**, **Realtor**, and **Other** additionally get
+  a "text us once you have an interested buyer" line on the Deals tab SOP.
 - **Forgot password?** on the login screen doesn't reset anything itself —
   there's no email-reset flow — it just surfaces the same **"Want to
   Join?"** contact info admin's already set (Team tab) so the person knows
@@ -83,6 +86,12 @@ backend (see [SETUP.md](SETUP.md)).
      to email admin and ask for it. Sharing an address early, or with
      anyone besides that one legitimate buyer who asked, risks losing the
      deal and getting removed from the team.
+  4. For a **Wholesaler**, **Realtor**, or **Other** signup specifically
+     (not a Buyer, not a traditional admin-added account), this same banner
+     adds one more line: once you have an interested buyer, text the "Want
+     to Join?" phone number saying "Interested and want more information?"
+     — in addition to, not instead of, logging them under Interested Buyers
+     above.
 - Every Facebook post submission and every interested-buyer submission emails
   the admin automatically.
 - On a buyer's pitch detail, a rep can edit that one buyer's own info right
@@ -370,6 +379,19 @@ backend (see [SETUP.md](SETUP.md)).
   would otherwise duplicate one the kept lead already has on the same deal —
   and any profile field the kept lead is missing gets backfilled from a
   duplicate that has it) and removed.
+- Reps (anyone whose Type isn't Buyer, or a traditional admin-added account)
+  get their own, simpler version of this same importer on their own Buyer
+  Leads tab — same "How to Build a Buyer List" guide, same auto-detected
+  columns, but no manual per-column override table. A rep's own upload is
+  **private to them**: an **Uploaded By** column (this admin-only column
+  only, never sent to any rep session, including the uploader's own) shows
+  you who brought in each lead, and admin's Give actions and Auto-Feed will
+  never hand a rep-uploaded lead to anyone but the rep who uploaded it —
+  blank Uploaded By (admin's own imports) stays shared with the whole team
+  like always. Both guides also warn explicitly against cold-texting a
+  freshly skip-traced list — call first (with a voicemail if there's no
+  answer); texting only unlocks once that person has actually responded to
+  a call, same rule the rest of the app already enforces.
 - **Pitches** — every open pitch across the whole team in one table, instead
   of having to open each buyer's detail panel one at a time. Search by buyer
   or deal, filter by team member or deal, and reassign or **Withdraw** any

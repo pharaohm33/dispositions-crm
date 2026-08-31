@@ -131,7 +131,7 @@ const FB_COLUMNS = ['RequestID', 'DealID', 'Username', 'PostText', 'TargetGroups
 // what the buyer has told us they want to spend, if known; like
 // AssetCategories, a buyer with neither set is treated as open to any
 // price for matching purposes.
-const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'OwnershipLengthMonths', 'PropertyURL', 'PriceRangeMin', 'PriceRangeMax', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'PendingDealID', 'CreatedAt'];
+const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'OwnershipLengthMonths', 'PropertyURL', 'PriceRangeMin', 'PriceRangeMax', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'PendingDealID', 'CreatedAt', 'UploadedBy'];
 
 // A Pitch is "give this buyer lead to this rep, to work against this one
 // specific deal." This is the only thing that creates an actionable item in
@@ -217,6 +217,8 @@ function doPost(e) {
         return jsonOut(withSession(body, addPitchContact));
       case 'requestAddressAccess':
         return jsonOut(withSession(body, requestAddressAccess));
+      case 'importBuyerLeads':
+        return jsonOut(withSession(body, importBuyerLeads));
       case 'updateBuyerLeadNotes':
         return jsonOut(withSession(body, updateBuyerLeadNotes));
       case 'updateBuyerLeadDoNotContact':
@@ -255,8 +257,6 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminDecideFbRequest));
       case 'adminGetBuyerRequests':
         return jsonOut(withAdminSession(body, adminGetBuyerRequests));
-      case 'adminImportBuyerLeads':
-        return jsonOut(withAdminSession(body, adminImportBuyerLeads));
       case 'adminGetBuyerLeads':
         return jsonOut(withAdminSession(body, adminGetBuyerLeads));
       case 'adminFindDuplicateBuyerLeads':
@@ -504,7 +504,11 @@ function login(body) {
     name: rep['Name'],
     username: rep['Username'],
     isAdmin: rep['IsAdmin'] === true || rep['IsAdmin'] === 'TRUE',
-    allAccess: rep['AllAccess'] === true || rep['AllAccess'] === 'TRUE'
+    allAccess: rep['AllAccess'] === true || rep['AllAccess'] === 'TRUE',
+    // Self-identified at signup (see publicSignup) -- purely for the
+    // frontend to decide what to show this person (e.g. a Buyer doesn't
+    // get the "build a buyer list" SOP), never a permission check.
+    personType: rep['PersonType'] || ''
   };
 }
 
@@ -1577,9 +1581,18 @@ function adminMergeBuyerLeads(body) {
   });
 }
 
-function adminImportBuyerLeads(body) {
+// Any authenticated rep can import their own buyer list (not just admin) --
+// when a rep does it, every new lead is tagged UploadedBy that rep's
+// username and stays private to them (see buyerLeadVisibleTo /
+// adminGiveBuyerLeadToRep and friends, which refuse to hand a
+// rep-uploaded lead to anyone but the uploader). Admin's own imports leave
+// UploadedBy blank, same as before, since those are meant to be shared
+// across the whole team. UploadedBy is admin-only information -- never
+// sent back to a rep session (see adminGetBuyerLeads / getMyPitches).
+function importBuyerLeads(body, session) {
   const rows = body.pasteText ? parseBuyerLeadRows(body.pasteText) : (body.rows || []);
   if (rows.length === 0) return { ok: false, error: 'No rows found to import.' };
+  const uploadedBy = session.a ? '' : session.u;
 
   const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
   const existing = sheetToObjects(sheet);
@@ -1610,7 +1623,8 @@ function adminImportBuyerLeads(body) {
       'EstimatedPropertyValue': r.estimatedPropertyValue || '', 'PortfolioValue': r.portfolioValue || '',
       'OwnershipLengthMonths': r.ownershipLengthMonths || '', 'PropertyURL': r.propertyUrl || '',
       'PriceRangeMin': r.priceRangeMin || '', 'PriceRangeMax': r.priceRangeMax || '',
-      'GeneralNotes': '', 'DriveLink': '', 'DoNotContact': false, 'PendingDealID': '', 'CreatedAt': now
+      'GeneralNotes': '', 'DriveLink': '', 'DoNotContact': false, 'PendingDealID': '', 'CreatedAt': now,
+      'UploadedBy': uploadedBy
     });
   });
   appendRowsByHeaders(sheet, newRows);
@@ -1805,6 +1819,16 @@ function updateBuyerLeadDoNotContact(body, session) {
   return { ok: true };
 }
 
+// A buyer lead a rep uploaded themselves (see importBuyerLeads) stays
+// private to them -- never given to any other rep, whether by admin's
+// manual Give actions or Auto-Feed. Blank UploadedBy (admin's own imports,
+// or anything uploaded before this field existed) is shared with everyone,
+// same as always.
+function leadVisibleToUsername(lead, username) {
+  const uploadedBy = String(lead['UploadedBy'] || '').trim().toLowerCase();
+  return !uploadedBy || uploadedBy === String(username || '').trim().toLowerCase();
+}
+
 // Gives one buyer lead to one rep for one specific deal -- creates a Pitch.
 // Two reps can each have their own pitch on the same buyer for two
 // different deals, but giving the SAME deal to two different reps for the
@@ -1818,6 +1842,9 @@ function adminGiveBuyerLeadToRep(body) {
     const lead = sheetToObjects(leadsSheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
     if (lead && (lead['DoNotContact'] === true || lead['DoNotContact'] === 'TRUE')) {
       return { ok: false, error: 'This buyer is marked Do Not Contact and cannot be given a new pitch.' };
+    }
+    if (lead && !leadVisibleToUsername(lead, username)) {
+      return { ok: false, error: 'This buyer lead was uploaded privately by another team member and can\'t be given to anyone else.' };
     }
     const sheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
     const existing = sheetToObjects(sheet);
@@ -1866,7 +1893,7 @@ function adminGiveBuyerLeadsBulk(body) {
 
     const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
     let pool = sheetToObjects(leadsSheet).filter(function (l) {
-      return !alreadyPitchedByThisRepForThisDeal[l['BuyerLeadID']] && l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE';
+      return !alreadyPitchedByThisRepForThisDeal[l['BuyerLeadID']] && l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE' && leadVisibleToUsername(l, username);
     });
     if (hasOverride) {
       if (body.city) pool = pool.filter(function (l) { return normalizeText(l['City']) === normalizeText(body.city); });
@@ -1908,7 +1935,7 @@ function adminGiveSelectedBuyerLeads(body) {
     const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
     const candidates = sheetToObjects(leadsSheet).filter(function (l) {
       return wanted[l['BuyerLeadID']] && !alreadyPitchedByThisRepForThisDeal[l['BuyerLeadID']] &&
-        l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE';
+        l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE' && leadVisibleToUsername(l, username);
     });
 
     const now = new Date().toISOString();
@@ -2291,7 +2318,8 @@ function autoFeedCheckLocked(props) {
       if (stillNeedsAction) return;
 
       const pool = allLeads.filter(function (l) {
-        return !alreadyPitchedForThisDeal[l['BuyerLeadID']] && l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE' && buyerMatchesDeal(l, deal);
+        return !alreadyPitchedForThisDeal[l['BuyerLeadID']] && l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE' &&
+          leadVisibleToUsername(l, username) && buyerMatchesDeal(l, deal);
       });
       if (pool.length === 0) return;
 
