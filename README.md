@@ -207,14 +207,22 @@ backend (see [SETUP.md](SETUP.md)).
   Turning an admin account's All Access off in the Team tab makes their
   coverage genuinely per-deal from then on, exactly like a regular rep,
   instead of showing up everywhere regardless. When adding a new deal,
-  **Assign This Deal To** offers a one-click bulk assignment right at
-  creation — **All Users** (every active, non-all-access rep gets an
-  Assignments row for it) or **All Users With No Assigned Deals Right Now**
-  (same, but only reps who currently have zero deals at all, checked at the
-  moment you save — once a rep has any deal they drop out of future
-  "unassigned" batches until they're back down to zero). All-access reps
+  **Tell These Reps To Work This Deal** offers a one-click bulk assignment
+  right at creation — **All Users** or **All Users With No Assigned Deals
+  Right Now** (checked at the moment you save — once a rep has any deal
+  they drop out of future "unassigned" batches until they're back down to
+  zero). If the deal has an **Asset Category** set, this grants those reps
+  **standing access to every deal in that category** — current ones right
+  away, and any new one added later, automatically, with no need to hand
+  it to them one at a time — rather than just this one deal; with no
+  category set, it's a one-off grant for this deal only, same as before.
+  Category access is what shows as **"Deals They're Specifically Told To
+  Work On"** on a rep's Team tab row, and is editable there any time (Edit
+  Details → check/uncheck a category) — not just at deal-creation time; a
+  deal's own detail page also lists, read-only, who has access to it via
+  category, pointing back to the Team tab to change it. All-access reps
   and admin are skipped either way, since they already see every deal
-  without needing an assignment row. Add deals, change a deal's
+  without needing any of this. Add deals, change a deal's
   status (Active, Sold, Dead, Under Contract, On Hold, or whatever
   categories you've defined), edit the **Address / City / State / Zip** at
   any time after creation (e.g. a typo, or details that firm up after the
@@ -243,15 +251,20 @@ backend (see [SETUP.md](SETUP.md)).
   access" or admin rights per person, reset anyone's password. Each rep's
   row (including your own admin account) shows their **phone number**,
   **email**, self-identified **Type** (Buyer, Wholesaler, Realtor, Other,
-  or blank for an admin-added account that never set one), **# of active
-  deals** they can currently work (every active deal for an all-access rep,
-  otherwise however many they've been specifically assigned), and **last
-  active** (their most recent login) — a quick way to spot who's overloaded
-  or who's gone quiet. **Edit Details** on a rep lets you set/update their
-  phone, email, Type, and preferred buyer-lead area — city and zip are still
-  single values, but **states are now a comma-separated list** (e.g. "AZ,
-  NV, CA"), so a rep who works multiple states can be matched across all of
-  them instead of just one. A separate **"Want to Join?" Contact** box at
+  or blank for an admin-added account that never set one), **Deals They're
+  Specifically Told To Work On** — every active deal they can currently
+  work, whether that's because they're all-access, individually assigned
+  to it, or have standing category access to it (see **Deals** above) —
+  and **last active** (their most recent login) — a quick way to spot
+  who's overloaded or who's gone quiet. **Edit Details** on a rep lets you
+  set/update their phone, email, Type, preferred buyer-lead area — city and
+  zip are still single values, but **states are now a comma-separated
+  list** (e.g. "AZ, NV, CA"), so a rep who works multiple states can be
+  matched across all of them instead of just one — and which **Asset
+  Categories** they're specifically told to work: check one and they
+  automatically get every deal in it, current and future, easy to
+  change back any time right from this same modal. A separate **"Want to
+  Join?" Contact** box at
   the top of the Team tab sets the name/phone/email shown on the login
   page for anyone without an account yet who's asking how to get set up
   with deals — it isn't tied to any real login, so you can point it at

@@ -59,7 +59,7 @@ const FOLLOWUP_HOURS = 24;
 const MATCH_STATUSES = ['Active Match', 'Negotiating', 'Closing', 'Dead Match'];
 const DEFAULT_ASSET_CATEGORIES = ['Single Family', 'Condominium / Townhouse', 'Multifamily (1-4 Units)', 'Multifamily (4+ Units)', 'Fix and Flip', 'Residential Vacant Land', 'Commercial'];
 
-const REP_COLUMNS = ['Username', 'Name', 'Phone', 'Email', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'LastActive', 'PreferredCity', 'PreferredState', 'PreferredZip', 'PersonType'];
+const REP_COLUMNS = ['Username', 'Name', 'Phone', 'Email', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'LastActive', 'PreferredCity', 'PreferredState', 'PreferredZip', 'PersonType', 'CategoryAccess'];
 
 // Self-identified at signup -- informational only (admin visibility/
 // filtering in the Team tab), doesn't gate any functionality. Not
@@ -576,13 +576,37 @@ function getSupportEmail() {
 
 // ---------- Access control ----------
 
+// A rep's CategoryAccess (comma-separated Asset Categories, see the Team
+// tab's Edit Details) is a standing grant -- it covers every deal in that
+// category automatically, present AND future, not just whatever existed
+// when it was set. Distinct from ASSIGNMENTS_SHEET, which is a one-off
+// grant to one specific deal. Both are checked wherever deal access is
+// checked (canAccessDeal, accessibleDealIds, getDeals coverage counting,
+// Auto-Feed eligibility) so a category-access rep behaves exactly like a
+// specifically-assigned one everywhere.
+function repCategoryList(rep) {
+  return rep ? splitCommaList(rep['CategoryAccess']).map(normalizeText).filter(Boolean) : [];
+}
+
+function findRepByUsername(username) {
+  const repsSheet = getSheet(REPS_SHEET, REP_COLUMNS);
+  return sheetToObjects(repsSheet).find(function (r) { return String(r['Username'] || '').trim().toLowerCase() === username; });
+}
+
 function canAccessDeal(session, dealId) {
   if (session.a || session.all) return true;
   const sheet = getSheet(ASSIGNMENTS_SHEET, ASSIGNMENT_COLUMNS);
   const assignments = sheetToObjects(sheet);
-  return assignments.some(function (row) {
+  const directlyAssigned = assignments.some(function (row) {
     return row['DealID'] === dealId && String(row['Username'] || '').trim().toLowerCase() === session.u;
   });
+  if (directlyAssigned) return true;
+
+  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === dealId; });
+  if (!deal || !deal['AssetCategory']) return false;
+  const categories = repCategoryList(findRepByUsername(session.u));
+  return categories.indexOf(normalizeText(deal['AssetCategory'])) !== -1;
 }
 
 function accessibleDealIds(session) {
@@ -592,6 +616,14 @@ function accessibleDealIds(session) {
   assignments.forEach(function (row) {
     if (String(row['Username'] || '').trim().toLowerCase() === session.u) ids[row['DealID']] = true;
   });
+
+  const categories = repCategoryList(findRepByUsername(session.u));
+  if (categories.length > 0) {
+    const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+    sheetToObjects(dealsSheet).forEach(function (d) {
+      if (d['AssetCategory'] && categories.indexOf(normalizeText(d['AssetCategory'])) !== -1) ids[d['DealID']] = true;
+    });
+  }
   return ids;
 }
 
@@ -631,19 +663,24 @@ function getDeals(body, session) {
     });
     const allAccessCount = activeReps.filter(function (r) { return r['AllAccess'] === true || r['AllAccess'] === 'TRUE'; }).length;
     const specificallyAssignableUsernames = {};
+    const categoryListByUsername = {};
     activeReps.forEach(function (r) {
-      if (!(r['AllAccess'] === true || r['AllAccess'] === 'TRUE')) specificallyAssignableUsernames[String(r['Username'] || '').trim().toLowerCase()] = true;
+      if (!(r['AllAccess'] === true || r['AllAccess'] === 'TRUE')) {
+        const u = String(r['Username'] || '').trim().toLowerCase();
+        specificallyAssignableUsernames[u] = true;
+        categoryListByUsername[u] = repCategoryList(r);
+      }
     });
 
     const assignmentsSheet = getSheet(ASSIGNMENTS_SHEET, ASSIGNMENT_COLUMNS);
-    const specificCountByDeal = {};
-    const specificallyAssignedUsernamesByDeal = {};
+    // Everyone (directly assigned OR standing category access) who counts
+    // toward each deal's coverage, deduped per deal per username.
+    const accessUsernamesByDeal = {};
     sheetToObjects(assignmentsSheet).forEach(function (a) {
       const u = String(a['Username'] || '').trim().toLowerCase();
       if (!specificallyAssignableUsernames[u]) return; // inactive or already counted via all-access
-      specificCountByDeal[a['DealID']] = (specificCountByDeal[a['DealID']] || 0) + 1;
-      if (!specificallyAssignedUsernamesByDeal[a['DealID']]) specificallyAssignedUsernamesByDeal[a['DealID']] = {};
-      specificallyAssignedUsernamesByDeal[a['DealID']][u] = true;
+      if (!accessUsernamesByDeal[a['DealID']]) accessUsernamesByDeal[a['DealID']] = {};
+      accessUsernamesByDeal[a['DealID']][u] = true;
     });
 
     const currentAdminRow = activeReps.find(function (r) { return String(r['Username'] || '').trim().toLowerCase() === session.u; });
@@ -651,9 +688,15 @@ function getDeals(body, session) {
 
     deals = deals.map(function (d) {
       const copy = Object.assign({}, d);
-      const totalCount = allAccessCount + (specificCountByDeal[d['DealID']] || 0);
-      const adminCoversThis = currentAdminAllAccess ||
-        !!(specificallyAssignedUsernamesByDeal[d['DealID']] && specificallyAssignedUsernamesByDeal[d['DealID']][session.u]);
+      const dealCategory = normalizeText(d['AssetCategory']);
+      const accessUsernames = Object.assign({}, accessUsernamesByDeal[d['DealID']] || {});
+      if (dealCategory) {
+        Object.keys(categoryListByUsername).forEach(function (u) {
+          if (categoryListByUsername[u].indexOf(dealCategory) !== -1) accessUsernames[u] = true;
+        });
+      }
+      const totalCount = allAccessCount + Object.keys(accessUsernames).length;
+      const adminCoversThis = currentAdminAllAccess || !!accessUsernames[session.u];
       copy.currentAdminHasAccess = adminCoversThis;
       // "Other" reps -- excludes the requesting admin's own coverage so the
       // frontend doesn't double-count them once as "Admin" and again in
@@ -777,16 +820,43 @@ function adminAddDeal(body) {
       const allAccess = r['AllAccess'] === true || r['AllAccess'] === 'TRUE';
       return active && !isAdmin && !allAccess;
     });
-    const assignmentsSheet = getSheet(ASSIGNMENTS_SHEET, ASSIGNMENT_COLUMNS);
-    const existingAssignments = sheetToObjects(assignmentsSheet);
     if (body.assignMode === 'unassigned') {
+      // "No deals right now" means no direct Assignments row AND no
+      // standing category access -- a rep already covered by a category
+      // grant effectively already has deals even with zero Assignments
+      // rows, so they shouldn't count as unassigned.
+      const assignmentsSheet = getSheet(ASSIGNMENTS_SHEET, ASSIGNMENT_COLUMNS);
       const assignedUsernames = {};
-      existingAssignments.forEach(function (a) { assignedUsernames[String(a['Username'] || '').trim().toLowerCase()] = true; });
-      eligibleReps = eligibleReps.filter(function (r) { return !assignedUsernames[String(r['Username'] || '').trim().toLowerCase()]; });
+      sheetToObjects(assignmentsSheet).forEach(function (a) { assignedUsernames[String(a['Username'] || '').trim().toLowerCase()] = true; });
+      eligibleReps = eligibleReps.filter(function (r) {
+        const u = String(r['Username'] || '').trim().toLowerCase();
+        return !assignedUsernames[u] && repCategoryList(r).length === 0;
+      });
     }
-    appendRowsByHeaders(assignmentsSheet, eligibleReps.map(function (r) {
-      return { 'DealID': dealId, 'Username': String(r['Username'] || '').trim().toLowerCase(), 'AssignedAt': now };
-    }));
+
+    const category = normalizeText(d.assetCategory);
+    if (category) {
+      // Standing, category-wide access -- these reps get every current AND
+      // future deal in this category automatically (see canAccessDeal /
+      // accessibleDealIds / getDeals / autoFeedCheckLocked), not just this
+      // one deal. This is what "tell these reps to work Land deals" (or
+      // whatever the category is) actually means, versus a one-off grant
+      // to a single deal.
+      eligibleReps.forEach(function (r) {
+        const existing = repCategoryList(r);
+        if (existing.indexOf(category) === -1) {
+          const updated = splitCommaList(r['CategoryAccess']).concat([d.assetCategory]).join(', ');
+          repsSheet.getRange(r._row, getColumnIndex(repsSheet, 'CategoryAccess')).setValue(updated);
+        }
+      });
+    } else {
+      // No category set on this deal -- nothing to key standing access off
+      // of, so fall back to a one-off grant for just this deal.
+      const assignmentsSheet = getSheet(ASSIGNMENTS_SHEET, ASSIGNMENT_COLUMNS);
+      appendRowsByHeaders(assignmentsSheet, eligibleReps.map(function (r) {
+        return { 'DealID': dealId, 'Username': String(r['Username'] || '').trim().toLowerCase(), 'AssignedAt': now };
+      }));
+    }
     assignedCount = eligibleReps.length;
   }
 
@@ -867,33 +937,48 @@ function adminRemoveStatusOption(body) {
 // number always matches what they'd actually see in their own app).
 function adminGetReps(body) {
   const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
-  const activeDealIds = {};
-  let activeDealsCount = 0;
-  sheetToObjects(dealsSheet).forEach(function (d) {
-    if (dealIsActive(d)) { activeDealIds[d['DealID']] = true; activeDealsCount++; }
-  });
+  const activeDeals = sheetToObjects(dealsSheet).filter(dealIsActive);
+  const activeDealsCount = activeDeals.length;
 
   const assignmentsSheet = getSheet(ASSIGNMENTS_SHEET, ASSIGNMENT_COLUMNS);
-  const assignedActiveCountByUsername = {};
+  // Every active deal a rep is specifically told to work, direct or via
+  // standing category access, deduped so a deal that's both doesn't get
+  // double-counted -- this is the actual "# Deals They're Specifically
+  // Told To Work On" figure, not just raw Assignments rows.
+  const specificallyWorkedDealIdsByUsername = {};
+  const activeDealIds = {};
+  activeDeals.forEach(function (d) { activeDealIds[d['DealID']] = true; });
   sheetToObjects(assignmentsSheet).forEach(function (a) {
     if (!activeDealIds[a['DealID']]) return;
     const u = String(a['Username'] || '').trim().toLowerCase();
-    assignedActiveCountByUsername[u] = (assignedActiveCountByUsername[u] || 0) + 1;
+    if (!specificallyWorkedDealIdsByUsername[u]) specificallyWorkedDealIdsByUsername[u] = {};
+    specificallyWorkedDealIdsByUsername[u][a['DealID']] = true;
   });
 
   const sheet = getSheet(REPS_SHEET, REP_COLUMNS);
   const reps = sheetToObjects(sheet).map(function (r) {
     const allAccess = r['AllAccess'] === true || r['AllAccess'] === 'TRUE';
     const username = String(r['Username'] || '').trim().toLowerCase();
+    const categories = repCategoryList(r);
+    if (categories.length > 0) {
+      if (!specificallyWorkedDealIdsByUsername[username]) specificallyWorkedDealIdsByUsername[username] = {};
+      activeDeals.forEach(function (d) {
+        if (d['AssetCategory'] && categories.indexOf(normalizeText(d['AssetCategory'])) !== -1) {
+          specificallyWorkedDealIdsByUsername[username][d['DealID']] = true;
+        }
+      });
+    }
+    const dealsAssignedCount = allAccess ? activeDealsCount :
+      Object.keys(specificallyWorkedDealIdsByUsername[username] || {}).length;
     return {
       username: r['Username'], name: r['Name'], phone: r['Phone'] || '', email: r['Email'] || '',
       allAccess: allAccess,
       isAdmin: r['IsAdmin'] === true || r['IsAdmin'] === 'TRUE',
       active: !(r['Active'] === false || r['Active'] === 'FALSE'),
       createdAt: r['CreatedAt'], lastActive: r['LastActive'] || '',
-      dealsAssignedCount: allAccess ? activeDealsCount : (assignedActiveCountByUsername[username] || 0),
+      dealsAssignedCount: dealsAssignedCount,
       preferredCity: r['PreferredCity'] || '', preferredState: r['PreferredState'] || '', preferredZip: r['PreferredZip'] || '',
-      personType: r['PersonType'] || ''
+      personType: r['PersonType'] || '', categoryAccess: r['CategoryAccess'] || ''
     };
   });
   return { ok: true, reps: reps };
@@ -2223,6 +2308,16 @@ function adminSetRepPreferredArea(body) {
     if (body.personType && PERSON_TYPES.indexOf(body.personType) === -1) return { ok: false, error: 'Invalid type.' };
     sheet.getRange(match._row, getColumnIndex(sheet, 'PersonType')).setValue(body.personType || '');
   }
+  if (body.categoryAccess !== undefined) {
+    // Standing access to every deal in these categories, present and
+    // future -- see canAccessDeal/accessibleDealIds/getDeals/
+    // autoFeedCheckLocked, all of which check this the same way they
+    // check a specific-deal Assignments row. body.categoryAccess is an
+    // array of category names from the checkbox list; stored the same
+    // comma-separated way PreferredState already is.
+    const categories = Array.isArray(body.categoryAccess) ? body.categoryAccess : splitCommaList(body.categoryAccess);
+    sheet.getRange(match._row, getColumnIndex(sheet, 'CategoryAccess')).setValue(categories.join(', '));
+  }
   return { ok: true };
 }
 
@@ -2336,9 +2431,11 @@ function autoFeedCheckLocked(props) {
   const fed = [];
   const newPitchRows = [];
   activeDeals.forEach(function (deal) {
+    const dealCategory = normalizeText(deal['AssetCategory']);
     const eligibleReps = reps.filter(function (rep) {
       const hasAccess = rep['AllAccess'] === true || rep['AllAccess'] === 'TRUE' ||
-        (assignedUsernamesByDeal[deal['DealID']] || []).indexOf(rep['Username']) !== -1;
+        (assignedUsernamesByDeal[deal['DealID']] || []).indexOf(rep['Username']) !== -1 ||
+        (dealCategory && repCategoryList(rep).indexOf(dealCategory) !== -1);
       return hasAccess && repMatchesArea(rep, deal);
     });
     if (eligibleReps.length === 0) return;

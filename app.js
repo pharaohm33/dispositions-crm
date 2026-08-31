@@ -1433,7 +1433,21 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
   const overlay = document.getElementById("detail-overlay");
   const panel = document.getElementById("detail-panel");
 
-  const availableReps = allReps.filter(function (r) { return assignedUsernames.indexOf(r.username) === -1; });
+  // Reps who have standing access to this deal via its Asset Category
+  // (see the Team tab's "Deals They're Specifically Told To Work On"
+  // checkboxes) -- read-only here, since that's managed per-rep in the
+  // Team tab, not per-deal. Excluded from the "Add Access" dropdown below
+  // since they already have it, and folded into who's eligible for an
+  // address grant, same as anyone directly assigned.
+  const dealCategoryNorm = String(deal.AssetCategory || "").trim().toLowerCase();
+  const categoryAccessReps = dealCategoryNorm
+    ? allReps.filter(function (r) {
+        return String(r.categoryAccess || "").split(",").map(function (c) { return c.trim().toLowerCase(); }).indexOf(dealCategoryNorm) !== -1;
+      })
+    : [];
+  const categoryAccessUsernames = categoryAccessReps.map(function (r) { return r.username; });
+
+  const availableReps = allReps.filter(function (r) { return assignedUsernames.indexOf(r.username) === -1 && categoryAccessUsernames.indexOf(r.username) === -1; });
 
   // Admin already has full access to every deal regardless of assignment,
   // so this is purely an organizational "I'm personally on this one too"
@@ -1444,10 +1458,10 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
   const currentUsername = String((getSession() || {}).username || "").trim().toLowerCase();
   const adminIsAssigned = assignedUsernames.map(function (u) { return String(u).toLowerCase(); }).indexOf(currentUsername) !== -1;
 
-  // Only reps who can actually work this deal (all-access, or specifically
-  // assigned) are eligible to be granted its address -- granting it to
-  // someone with no deal access at all wouldn't make sense.
-  const repsWithDealAccess = activeReps.filter(function (r) { return r.allAccess || assignedUsernames.indexOf(r.username) !== -1; });
+  // Only reps who can actually work this deal (all-access, specifically
+  // assigned, or via category) are eligible to be granted its address --
+  // granting it to someone with no deal access at all wouldn't make sense.
+  const repsWithDealAccess = activeReps.filter(function (r) { return r.allAccess || assignedUsernames.indexOf(r.username) !== -1 || categoryAccessUsernames.indexOf(r.username) !== -1; });
   const ungrantedReps = repsWithDealAccess.filter(function (r) { return grantedUsernames.indexOf(r.username) === -1; });
 
   panel.innerHTML =
@@ -1505,7 +1519,7 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
       '<button class="btn secondary small" id="save-financials-btn">Save Financials</button>' +
     '</div>' +
 
-    '<div class="section-title">Access &mdash; who can work this deal</div>' +
+    '<div class="section-title">Deals They\'re Specifically Told To Work On</div>' +
     '<p class="small-muted">Team members with "all-deal access" can already see every deal and don\'t need to be listed here. Admin already has access to every deal regardless of this list — assigning yourself here is just a marker for the team that you\'re personally on this one too, reflected as "Admin" (plus however many other reps) in the deals table.</p>' +
     '<div class="nav-row" style="justify-content:flex-start; margin-bottom:10px;">' +
       '<button class="btn ' + (adminIsAssigned ? "secondary" : "primary") + ' small" id="assign-myself-btn">' + (adminIsAssigned ? "Remove Myself From This Deal" : "Assign Myself To This Deal") + '</button>' +
@@ -1524,6 +1538,10 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
           '<button class="btn secondary small" id="assign-rep-btn">Add Access</button>' +
         '</div>'
       : '<p class="small-muted" style="margin-top:8px;">Every non all-access team member is already assigned.</p>') +
+    (categoryAccessReps.length > 0
+      ? '<p class="small-muted" style="margin-top:10px;">Also have standing access via the <strong>' + esc(deal.AssetCategory) + '</strong> category (every deal in it, not just this one) — manage this per-rep from Team &rarr; Edit Details: ' +
+        categoryAccessReps.map(function (r) { return esc(r.name) + ' (' + esc(r.username) + ')'; }).join(", ") + '</p>'
+      : "") +
 
     '<div class="section-title">Address Access</div>' +
     '<p class="small-muted">Nobody sees this deal\'s exact address by default. Grant it to a specific team member once you\'ve seen they can be trusted to work correctly, and revoke it any time.</p>' +
@@ -1820,7 +1838,7 @@ function renderReps() {
       '<td class="small-muted">' + [r.preferredCity, r.preferredState, r.preferredZip].filter(Boolean).join(", ") + '</td>' +
       '<td style="white-space:nowrap;">' +
         '<button class="btn secondary small reset-pw-btn" data-username="' + esc(r.username) + '" data-name="' + esc(r.name) + '">Reset Password</button> ' +
-        '<button class="btn secondary small area-btn" data-username="' + esc(r.username) + '" data-name="' + esc(r.name) + '" data-phone="' + esc(r.phone) + '" data-email="' + esc(r.email) + '" data-city="' + esc(r.preferredCity) + '" data-state="' + esc(r.preferredState) + '" data-zip="' + esc(r.preferredZip) + '" data-persontype="' + esc(r.personType || "") + '">Edit Details</button>' +
+        '<button class="btn secondary small area-btn" data-username="' + esc(r.username) + '" data-name="' + esc(r.name) + '" data-phone="' + esc(r.phone) + '" data-email="' + esc(r.email) + '" data-city="' + esc(r.preferredCity) + '" data-state="' + esc(r.preferredState) + '" data-zip="' + esc(r.preferredZip) + '" data-persontype="' + esc(r.personType || "") + '" data-categoryaccess="' + esc(r.categoryAccess || "") + '">Edit Details</button>' +
       '</td>' +
       '</tr>';
   }).join("");
@@ -1843,12 +1861,13 @@ function renderReps() {
   Array.from(tbody.querySelectorAll(".area-btn")).forEach(function (btn) {
     btn.addEventListener("click", function () {
       openAreaModal(btn.getAttribute("data-username"), btn.getAttribute("data-name"), btn.getAttribute("data-phone"), btn.getAttribute("data-email"),
-        btn.getAttribute("data-city"), btn.getAttribute("data-state"), btn.getAttribute("data-zip"), btn.getAttribute("data-persontype"));
+        btn.getAttribute("data-city"), btn.getAttribute("data-state"), btn.getAttribute("data-zip"), btn.getAttribute("data-persontype"),
+        btn.getAttribute("data-categoryaccess"));
     });
   });
 }
 
-function openAreaModal(username, name, phone, email, city, state, zip, personType) {
+function openAreaModal(username, name, phone, email, city, state, zip, personType, categoryAccess) {
   document.getElementById("area-modal-who").textContent = name + " (" + username + ")";
   document.getElementById("area-phone-input").value = phone || "";
   document.getElementById("area-email-input").value = email || "";
@@ -1856,6 +1875,11 @@ function openAreaModal(username, name, phone, email, city, state, zip, personTyp
   document.getElementById("area-state-input").value = state || "";
   document.getElementById("area-zip-input").value = zip || "";
   document.getElementById("area-persontype-input").value = personType || "";
+  const checkedCategories = String(categoryAccess || "").split(",").map(function (c) { return c.trim().toLowerCase(); }).filter(Boolean);
+  document.getElementById("area-categoryaccess-list").innerHTML = assetCategoryOptionsCache.map(function (c) {
+    const checked = checkedCategories.indexOf(c.toLowerCase()) !== -1 ? " checked" : "";
+    return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="area-categoryaccess-checkbox" value="' + esc(c) + '"' + checked + '> ' + esc(c) + '</label>';
+  }).join("");
   document.getElementById("area-modal").hidden = false;
   document.getElementById("area-modal-save").setAttribute("data-username", username);
 }
@@ -1876,7 +1900,8 @@ document.getElementById("area-modal-save").addEventListener("click", async funct
     city: document.getElementById("area-city-input").value.trim(),
     state: document.getElementById("area-state-input").value.trim(),
     zip: document.getElementById("area-zip-input").value.trim(),
-    personType: document.getElementById("area-persontype-input").value
+    personType: document.getElementById("area-persontype-input").value,
+    categoryAccess: Array.from(document.querySelectorAll(".area-categoryaccess-checkbox:checked")).map(function (cb) { return cb.value; })
   });
   btn.disabled = false;
   document.getElementById("area-modal").hidden = true;

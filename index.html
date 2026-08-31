@@ -501,7 +501,7 @@
       <button class="btn primary" id="add-rep-btn">+ Add Team Member</button>
     </div>
     <table class="crm-table">
-      <thead><tr><th>Name</th><th>Username</th><th>Phone</th><th>Email</th><th>Type</th><th>All-Deal Access</th><th>Admin</th><th>Active</th><th># Deals</th><th>Last Active</th><th>Preferred Buyer-Lead Area</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Name</th><th>Username</th><th>Phone</th><th>Email</th><th>Type</th><th>All-Deal Access</th><th>Admin</th><th>Active</th><th>Deals They're Told To Work On</th><th>Last Active</th><th>Preferred Buyer-Lead Area</th><th>Actions</th></tr></thead>
       <tbody id="reps-tbody"></tbody>
     </table>
     <div id="reps-empty" class="small-muted" style="padding:20px;" hidden>No team members yet.</div>
@@ -859,13 +859,13 @@
     <label class="field-label">Private Admin Notes</label>
     <textarea id="deal-admin-notes-input"></textarea>
 
-    <div class="section-title">Assign This Deal To</div>
+    <div class="section-title">Tell These Reps To Work This Deal</div>
     <select id="deal-assignmode-input">
       <option value="">Nobody yet &mdash; I'll assign it myself later</option>
       <option value="all">All Users</option>
       <option value="unassigned">All Users With No Assigned Deals Right Now</option>
     </select>
-    <p class="small-muted">All-access team members and admin already see every deal regardless of this — this only writes an assignment for everyone else. "No assigned deals" is checked at the moment you save, so it only catches reps with zero deals right now.</p>
+    <p class="small-muted">All-access team members and admin already see every deal regardless of this — this only affects everyone else. If this deal has an <strong>Asset Category</strong> set above, the reps you pick here get standing access to <strong>every deal in that category</strong> — current ones right away and any new one added later, not just this one — shown as "Deals They're Specifically Told To Work On" on their Team tab row (edit it any time from Edit Details there). With no category set, it's a one-off grant for just this deal instead. "No assigned deals right now" means zero deals — direct or by category — checked the moment you save.</p>
 
     <div class="error-text" id="deal-modal-error"></div>
     <div class="nav-row">
@@ -916,7 +916,7 @@
 
 <!-- Rep details modal: phone + preferred buyer-lead area -->
 <div class="modal-backdrop" id="area-modal" hidden>
-  <div class="modal-box" style="max-width:340px;">
+  <div class="modal-box" style="max-width:420px;">
     <h3>Edit Details</h3>
     <p class="small-muted" id="area-modal-who"></p>
     <label class="field-label">Phone <span class="small-muted">(optional)</span></label>
@@ -938,6 +938,11 @@
     <label class="field-label">Zip</label>
     <input type="text" id="area-zip-input">
     <p class="small-muted">Leave City/States/Zip blank to not filter by it. Used by Auto-Feed to keep this person working the same area(s).</p>
+
+    <label class="field-label">Deals They're Specifically Told To Work On <span class="small-muted">(by category)</span></label>
+    <p class="small-muted">Check a category and this person automatically gets every deal in it — current ones right away, and any new one added later, no need to hand it to them one at a time.</p>
+    <div class="chip-list" id="area-categoryaccess-list"></div>
+
     <div class="nav-row">
       <button class="btn secondary" id="area-modal-cancel">Cancel</button>
       <button class="btn primary" id="area-modal-save">Save</button>
@@ -950,7 +955,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=36"></script>
-<script src="app.js?v=36"></script>
+<script src="config.js?v=37"></script>
+<script src="app.js?v=37"></script>
 </body>
 </html>
