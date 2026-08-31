@@ -412,6 +412,12 @@
           <div><label class="field-label">Max</label><input type="text" id="rep-csv-portfolio-max-input" placeholder="e.g. 2000000"></div>
         </div>
 
+        <div class="section-title">Which Deal Is This List For? <span class="small-muted">(optional)</span></div>
+        <p class="small-muted">If this batch is buyers you pulled specifically for one of your deals, tag it here so admin can see it's earmarked for that deal. This doesn't give anyone a pitch by itself — it's just a label on your list.</p>
+        <select id="rep-csv-dealid-input">
+          <option value="">No specific deal</option>
+        </select>
+
         <div class="error-text" id="rep-csv-import-error"></div>
         <div class="nav-row" style="justify-content:flex-end;">
           <button class="btn primary" id="rep-csv-import-btn">Import My Buyer List</button>
@@ -967,7 +973,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=39"></script>
-<script src="app.js?v=39"></script>
+<script src="config.js?v=40"></script>
+<script src="app.js?v=40"></script>
 </body>
 </html>

@@ -1717,7 +1717,7 @@ function adminMergeBuyerLeads(body) {
 const BUYER_LEAD_ENRICHABLE_FIELDS = ['Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County',
   'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'OwnershipLengthMonths', 'PropertyURL', 'PriceRangeMin', 'PriceRangeMax'];
 
-function buildBuyerLeadRow(r, now, uploadedBy, duplicateOfId) {
+function buildBuyerLeadRow(r, now, uploadedBy, duplicateOfId, pendingDealId) {
   return {
     'BuyerLeadID': Utilities.getUuid(), 'BuyerName': r.buyerName, 'Phone': r.phone, 'PhoneType': r.phoneType || '',
     'Phone2': r.phone2 || '', 'Phone2Type': r.phone2Type || '', 'Phone3': r.phone3 || '', 'Phone3Type': r.phone3Type || '',
@@ -1726,7 +1726,7 @@ function buildBuyerLeadRow(r, now, uploadedBy, duplicateOfId) {
     'EstimatedPropertyValue': r.estimatedPropertyValue || '', 'PortfolioValue': r.portfolioValue || '',
     'OwnershipLengthMonths': r.ownershipLengthMonths || '', 'PropertyURL': r.propertyUrl || '',
     'PriceRangeMin': r.priceRangeMin || '', 'PriceRangeMax': r.priceRangeMax || '',
-    'GeneralNotes': '', 'DriveLink': '', 'DoNotContact': false, 'PendingDealID': '', 'CreatedAt': now,
+    'GeneralNotes': '', 'DriveLink': '', 'DoNotContact': false, 'PendingDealID': pendingDealId || '', 'CreatedAt': now,
     'UploadedBy': uploadedBy, 'DuplicateOfBuyerLeadID': duplicateOfId || ''
   };
 }
@@ -1770,6 +1770,16 @@ function importBuyerLeads(body, session) {
   if (rows.length === 0) return { ok: false, error: 'No rows found to import.' };
   const uploadedBy = session.a ? '' : session.u;
 
+  // Optional: tag this whole batch as earmarked for one deal (see
+  // adminTagBuyerLeadsForDeal's comment on PendingDealID -- purely
+  // organizational, never auto-creates a pitch). A rep can only pick a
+  // deal they can actually see; re-check server-side rather than trusting
+  // whatever the dropdown sent, since body.dealId is client-supplied.
+  let pendingDealId = '';
+  if (body.dealId) {
+    if (session.a || canAccessDeal(session, body.dealId)) pendingDealId = body.dealId;
+  }
+
   const existingByPhone = {};
   const existingByEmail = {};
   sheetToObjects(sheet).forEach(function (l) {
@@ -1802,12 +1812,12 @@ function importBuyerLeads(body, session) {
 
     const existingMatch = (normalizedPhone && existingByPhone[normalizedPhone]) || (normalizedEmail && existingByEmail[normalizedEmail]);
     if (!existingMatch) {
-      newRows.push(buildBuyerLeadRow(r, now, uploadedBy, ''));
+      newRows.push(buildBuyerLeadRow(r, now, uploadedBy, '', pendingDealId));
       return;
     }
 
     if (!session.a) {
-      newRows.push(buildBuyerLeadRow(r, now, uploadedBy, existingMatch['BuyerLeadID']));
+      newRows.push(buildBuyerLeadRow(r, now, uploadedBy, existingMatch['BuyerLeadID'], pendingDealId));
       return;
     }
 

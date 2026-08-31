@@ -5,12 +5,26 @@
 async function api(action, payload) {
   const session = getSession();
   const body = Object.assign({ action, token: session ? session.token : undefined }, payload || {});
-  const res = await fetch(window.APP_CONFIG.APPS_SCRIPT_URL, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(body)
-  });
-  return res.json();
+  // Every call site checks res.ok and shows res.error, so a network failure
+  // or a non-JSON response (e.g. the Apps Script deployment is down, or its
+  // access setting bounced the POST to an HTML sign-in/error page instead
+  // of running doPost) must resolve to that same shape -- otherwise the
+  // promise rejects with nothing awaiting it, and from the user's side a
+  // button click just silently does nothing forever.
+  try {
+    const res = await fetch(window.APP_CONFIG.APPS_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(body)
+    });
+    try {
+      return await res.json();
+    } catch (parseErr) {
+      return { ok: false, error: "Server returned an unexpected response (not JSON). The Apps Script deployment may be down or out of date -- ask admin to check it." };
+    }
+  } catch (networkErr) {
+    return { ok: false, error: "Could not reach the server. Check your connection and try again." };
+  }
 }
 
 function getSession() {
@@ -297,6 +311,7 @@ async function initRepView() {
   }
   repDeals = res.deals;
   renderRepDeals();
+  renderRepCsvDealOptions();
 
   const session = getSession() || {};
   // A Buyer signup isn't out hunting for buyers themselves -- skip the
@@ -1195,6 +1210,22 @@ function repMappedCsvRows() {
     });
 }
 
+// Lets a rep tag an uploaded buyer list with one of their own deals
+// (purely a label -- see importBuyerLeads' PendingDealID handling). Only
+// offers deals this rep can actually see, same list as their Deals tab,
+// so the dropdown can't be used to name a deal they don't have access to.
+function renderRepCsvDealOptions() {
+  const select = document.getElementById("rep-csv-dealid-input");
+  if (!select) return;
+  const current = select.value;
+  select.innerHTML = '<option value="">No specific deal</option>' +
+    repDeals.map(function (d) {
+      const label = (d.DealCode ? d.DealCode + " — " : "") + [d.City, d.State].filter(Boolean).join(", ") + (d.AssetType ? " (" + d.AssetType + ")" : "");
+      return '<option value="' + esc(d.DealID) + '">' + esc(label) + '</option>';
+    }).join("");
+  if (repDeals.some(function (d) { return d.DealID === current; })) select.value = current;
+}
+
 function renderRepCsvPreview() {
   document.getElementById("rep-csv-preview-section").hidden = false;
   const rows = repMappedCsvRows();
@@ -1227,7 +1258,8 @@ document.getElementById("rep-csv-import-btn").addEventListener("click", async fu
   }
   if (btn.disabled) return;
   btn.disabled = true;
-  const res = await api("importBuyerLeads", { rows: rows });
+  const dealId = document.getElementById("rep-csv-dealid-input").value;
+  const res = await api("importBuyerLeads", { rows: rows, dealId: dealId });
   btn.disabled = false;
   if (!res.ok) {
     errorEl.textContent = res.error || "Import failed.";
@@ -1240,6 +1272,7 @@ document.getElementById("rep-csv-import-btn").addEventListener("click", async fu
   document.getElementById("rep-csv-file-input").value = "";
   repCsvRows = []; repCsvHeaders = [];
   document.getElementById("rep-csv-preview-section").hidden = true;
+  document.getElementById("rep-csv-dealid-input").value = "";
   showToast("Imported " + res.imported + " buyer(s).");
 });
 

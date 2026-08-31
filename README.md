@@ -328,7 +328,16 @@ backend (see [SETUP.md](SETUP.md)).
   itself, so **Portfolio Value** always comes from the **Portfolio Value
   For This Batch** min/max box on the import screen instead — enter the
   range you filtered on (or just a minimum) once and it's applied to every
-  buyer in that upload, e.g. "$500,000 – $1,000,000" or "$500,000+". Also
+  buyer in that upload, e.g. "$500,000 – $1,000,000" or "$500,000+". A
+  **Which Deal Is This List For?** dropdown (optional, defaults to "No
+  specific deal") lets a rep tag the whole batch as pulled for one of their
+  own deals — only deals they can actually see are offered, same list as
+  their Deals tab, and it's re-checked on the backend so the dropdown can't
+  be used to name a deal outside their access. It's purely a label (the
+  same `PendingDealID` tag admin uses to earmark leads for a deal without
+  creating a pitch) — it doesn't hand the buyer to anyone or create a pitch
+  by itself, it just shows up on admin's Buyer Leads table so admin can see
+  which deal a rep's private upload was meant for. Also
   picks up an "Ownership Length (Months)" column (stored as a plain number
   so it stays filterable, shown as "19 yrs" wherever it's displayed) and a
   "Property URL" column (saved as-is, not shown in the preview table since
