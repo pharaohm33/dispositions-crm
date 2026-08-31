@@ -1770,15 +1770,17 @@ function importBuyerLeads(body, session) {
   if (rows.length === 0) return { ok: false, error: 'No rows found to import.' };
   const uploadedBy = session.a ? '' : session.u;
 
-  // Optional: tag this whole batch as earmarked for one deal (see
+  // Optional: tag this whole batch as earmarked for one or more deals (see
   // adminTagBuyerLeadsForDeal's comment on PendingDealID -- purely
-  // organizational, never auto-creates a pitch). A rep can only pick a
-  // deal they can actually see; re-check server-side rather than trusting
-  // whatever the dropdown sent, since body.dealId is client-supplied.
-  let pendingDealId = '';
-  if (body.dealId) {
-    if (session.a || canAccessDeal(session, body.dealId)) pendingDealId = body.dealId;
-  }
+  // organizational, never auto-creates a pitch). Stored comma-separated,
+  // same convention as AssetCategories, since a buyer list often matches
+  // several deals at once (e.g. multiple NC land deals). A rep can only
+  // pick deals they can actually see; re-checked server-side rather than
+  // trusting whatever the dropdown sent, since body.dealIds is client-supplied.
+  const requestedDealIds = body.dealIds || (body.dealId ? [body.dealId] : []);
+  const pendingDealId = requestedDealIds
+    .filter(function (id) { return id && (session.a || canAccessDeal(session, id)); })
+    .join(', ');
 
   const existingByPhone = {};
   const existingByEmail = {};
@@ -2203,20 +2205,23 @@ function adminGiveSelectedBuyerLeads(body) {
       return { 'PitchID': Utilities.getUuid(), 'BuyerLeadID': l['BuyerLeadID'], 'DealID': body.dealId, 'Username': username, 'GivenAt': now };
     }));
 
-    // A lead tagged "pending" for this exact deal just became a real pitch
-    // for it, so the pending tag has served its purpose -- clear it (one
-    // batched read+write, not a per-row call). Leaves alone any lead
-    // pending for a *different* deal, in case it's deliberately being
-    // tracked for both.
-    const clearIds = {};
-    candidates.forEach(function (l) { if (l['PendingDealID'] === body.dealId) clearIds[l['BuyerLeadID']] = true; });
-    if (Object.keys(clearIds).length > 0) {
+    // A lead tagged "pending" for this deal just became a real pitch for
+    // it, so drop just this deal out of its (possibly multi-deal, see
+    // importBuyerLeads) pending list -- one batched read+write, not a
+    // per-row call. Leaves alone any *other* deal still on the list, in
+    // case it's deliberately being tracked for more than one.
+    const toUpdate = {};
+    candidates.forEach(function (l) {
+      const remaining = splitCommaList(l['PendingDealID']).filter(function (id) { return id !== body.dealId; });
+      if (remaining.length !== splitCommaList(l['PendingDealID']).length) toUpdate[l['BuyerLeadID']] = remaining.join(', ');
+    });
+    if (Object.keys(toUpdate).length > 0) {
       const values = leadsSheet.getDataRange().getValues();
       const headers = values[0];
       const idCol = headers.indexOf('BuyerLeadID');
       const pendingCol = headers.indexOf('PendingDealID');
       for (let i = 1; i < values.length; i++) {
-        if (clearIds[values[i][idCol]]) values[i][pendingCol] = '';
+        if (toUpdate.hasOwnProperty(values[i][idCol])) values[i][pendingCol] = toUpdate[values[i][idCol]];
       }
       leadsSheet.getRange(1, 1, values.length, headers.length).setValues(values);
     }

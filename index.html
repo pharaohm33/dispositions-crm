@@ -412,11 +412,9 @@
           <div><label class="field-label">Max</label><input type="text" id="rep-csv-portfolio-max-input" placeholder="e.g. 2000000"></div>
         </div>
 
-        <div class="section-title">Which Deal Is This List For? <span class="small-muted">(optional)</span></div>
-        <p class="small-muted">If this batch is buyers you pulled specifically for one of your deals, tag it here so admin can see it's earmarked for that deal. This doesn't give anyone a pitch by itself — it's just a label on your list.</p>
-        <select id="rep-csv-dealid-input">
-          <option value="">No specific deal</option>
-        </select>
+        <div class="section-title">Which Deal(s) Is This List For? <span class="small-muted">(optional)</span></div>
+        <p class="small-muted">If this batch is buyers you pulled specifically for one or more of your deals — e.g. several North Carolina land deals a buyer could take any of — tag it here so admin can see it's earmarked for those. Hold Ctrl (Windows) or Cmd (Mac) to select more than one, or leave nothing selected. This doesn't give anyone a pitch by itself — it's just a label on your list.</p>
+        <select id="rep-csv-dealid-input" multiple size="4"></select>
 
         <div class="error-text" id="rep-csv-import-error"></div>
         <div class="nav-row" style="justify-content:flex-end;">
@@ -602,6 +600,10 @@
         </div>
         <p class="small-muted" id="csv-preview-note"></p>
 
+        <div class="section-title">Which Deal(s) Is This List For? <span class="small-muted">(optional)</span></div>
+        <p class="small-muted">Tag this batch as earmarked for one or more deals — e.g. several North Carolina land deals a buyer could take any of. Hold Ctrl (Windows) or Cmd (Mac) to select more than one, or leave nothing selected. This doesn't give anyone a pitch by itself — it's just a label, shown on the table below and filterable via "Pending Deal Tag."</p>
+        <select id="csv-dealid-input" multiple size="4"></select>
+
         <div class="error-text" id="csv-import-error"></div>
         <div class="nav-row" style="justify-content:flex-end;">
           <button class="btn primary" id="csv-import-btn">Import</button>
@@ -614,6 +616,8 @@
       <div class="section-title" style="margin-top:0;">Or Paste Rows Directly</div>
       <p class="small-muted">Paste rows copied from Excel/Sheets/CSV: <strong>Name (or LLC), Phone, Phone Type (Mobile/Landline), City, State, Zip, Email, County</strong> — comma or tab separated, one buyer per line. Email and County are both optional and must come last, in that order (leave either blank or off entirely if you don't have it). A header row is detected and skipped automatically. Use the CSV upload above if you need Phone 2/3 or Asset Categories too.</p>
       <textarea id="buyerleads-import-text" style="min-height:120px;" placeholder="Jane Doe LLC, 555-123-4567, Mobile, Phoenix, AZ, 85001, jane@example.com"></textarea>
+      <div class="section-title">Which Deal(s) Is This List For? <span class="small-muted">(optional)</span></div>
+      <select id="buyerleads-import-dealid-input" multiple size="4"></select>
       <div class="error-text" id="buyerleads-import-error"></div>
       <div class="nav-row" style="justify-content:flex-end;">
         <button class="btn primary" id="buyerleads-import-btn">Import</button>
@@ -973,7 +977,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=40"></script>
-<script src="app.js?v=40"></script>
+<script src="config.js?v=41"></script>
+<script src="app.js?v=41"></script>
 </body>
 </html>

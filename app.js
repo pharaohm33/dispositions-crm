@@ -1210,20 +1210,26 @@ function repMappedCsvRows() {
     });
 }
 
-// Lets a rep tag an uploaded buyer list with one of their own deals
-// (purely a label -- see importBuyerLeads' PendingDealID handling). Only
+// Values of every currently-selected <option> in a multi-select.
+function selectedOptionValues(select) {
+  return Array.from(select.selectedOptions || []).map(function (o) { return o.value; });
+}
+
+// Lets a rep tag an uploaded buyer list with one or more of their own
+// deals (purely a label -- see importBuyerLeads' PendingDealID handling).
+// A buyer list often matches more than one deal at once (e.g. several NC
+// land deals a buyer could take any of), so this is a multi-select. Only
 // offers deals this rep can actually see, same list as their Deals tab,
-// so the dropdown can't be used to name a deal they don't have access to.
+// so it can't be used to name a deal they don't have access to.
 function renderRepCsvDealOptions() {
   const select = document.getElementById("rep-csv-dealid-input");
   if (!select) return;
-  const current = select.value;
-  select.innerHTML = '<option value="">No specific deal</option>' +
-    repDeals.map(function (d) {
-      const label = (d.DealCode ? d.DealCode + " — " : "") + [d.City, d.State].filter(Boolean).join(", ") + (d.AssetType ? " (" + d.AssetType + ")" : "");
-      return '<option value="' + esc(d.DealID) + '">' + esc(label) + '</option>';
-    }).join("");
-  if (repDeals.some(function (d) { return d.DealID === current; })) select.value = current;
+  const current = selectedOptionValues(select);
+  select.innerHTML = repDeals.map(function (d) {
+    const label = (d.DealCode ? d.DealCode + " — " : "") + [d.City, d.State].filter(Boolean).join(", ") + (d.AssetType ? " (" + d.AssetType + ")" : "");
+    return '<option value="' + esc(d.DealID) + '">' + esc(label) + '</option>';
+  }).join("");
+  Array.from(select.options).forEach(function (o) { o.selected = current.indexOf(o.value) !== -1; });
 }
 
 function renderRepCsvPreview() {
@@ -1258,8 +1264,8 @@ document.getElementById("rep-csv-import-btn").addEventListener("click", async fu
   }
   if (btn.disabled) return;
   btn.disabled = true;
-  const dealId = document.getElementById("rep-csv-dealid-input").value;
-  const res = await api("importBuyerLeads", { rows: rows, dealId: dealId });
+  const dealIds = selectedOptionValues(document.getElementById("rep-csv-dealid-input"));
+  const res = await api("importBuyerLeads", { rows: rows, dealIds: dealIds });
   btn.disabled = false;
   if (!res.ok) {
     errorEl.textContent = res.error || "Import failed.";
@@ -1272,7 +1278,7 @@ document.getElementById("rep-csv-import-btn").addEventListener("click", async fu
   document.getElementById("rep-csv-file-input").value = "";
   repCsvRows = []; repCsvHeaders = [];
   document.getElementById("rep-csv-preview-section").hidden = true;
-  document.getElementById("rep-csv-dealid-input").value = "";
+  Array.from(document.getElementById("rep-csv-dealid-input").options).forEach(function (o) { o.selected = false; });
   showToast("Imported " + res.imported + " buyer(s).");
 });
 
@@ -2175,6 +2181,13 @@ async function populateBulkGiveSelects() {
     }).join("");
     document.getElementById("bulk-give-deal-select").innerHTML = dealOptions;
     document.getElementById("give-selected-deal-select").innerHTML = dealOptions;
+    // Multi-select deal tags on the two import screens (see importBuyerLeads'
+    // PendingDealID handling) -- admin isn't restricted to their own deals
+    // the way a rep is, so this offers every non-closed deal.
+    ["csv-dealid-input", "buyerleads-import-dealid-input"].forEach(function (id) {
+      const select = document.getElementById(id);
+      if (select) select.innerHTML = dealOptions;
+    });
   }
 }
 
@@ -2642,7 +2655,8 @@ document.getElementById("csv-import-btn").addEventListener("click", async functi
   }
   if (btn.disabled) return;
   btn.disabled = true;
-  const res = await api("importBuyerLeads", { rows: rows });
+  const dealIds = selectedOptionValues(document.getElementById("csv-dealid-input"));
+  const res = await api("importBuyerLeads", { rows: rows, dealIds: dealIds });
   btn.disabled = false;
   if (!res.ok) {
     errorEl.textContent = res.error || "Import failed.";
@@ -2655,6 +2669,7 @@ document.getElementById("csv-import-btn").addEventListener("click", async functi
     (res.pendingMerges && res.pendingMerges.length > 0 ? " " + res.pendingMerges.length + " duplicate(s) below have new data — review them." : "");
   document.getElementById("csv-file-input").value = "";
   csvRows = []; csvHeaders = [];
+  Array.from(document.getElementById("csv-dealid-input").options).forEach(function (o) { o.selected = false; });
   markLastImportedBuyerLeads(res.importedIds, res.imported, res.importedAt);
   renderMergeReview(res.pendingMerges);
   await loadBuyerLeadsAdmin();
@@ -2675,7 +2690,8 @@ document.getElementById("buyerleads-import-btn").addEventListener("click", async
   }
   if (btn.disabled) return;
   btn.disabled = true;
-  const res = await api("importBuyerLeads", { pasteText: text });
+  const dealIds = selectedOptionValues(document.getElementById("buyerleads-import-dealid-input"));
+  const res = await api("importBuyerLeads", { pasteText: text, dealIds: dealIds });
   btn.disabled = false;
   if (!res.ok) {
     errorEl.textContent = res.error || "Import failed.";
@@ -2687,6 +2703,7 @@ document.getElementById("buyerleads-import-btn").addEventListener("click", async
     (res.skippedDuplicates ? " Skipped " + res.skippedDuplicates + " duplicate(s) with nothing new to add." : "") +
     (res.pendingMerges && res.pendingMerges.length > 0 ? " " + res.pendingMerges.length + " duplicate(s) below have new data — review them." : "");
   document.getElementById("buyerleads-import-text").value = "";
+  Array.from(document.getElementById("buyerleads-import-dealid-input").options).forEach(function (o) { o.selected = false; });
   markLastImportedBuyerLeads(res.importedIds, res.imported, res.importedAt);
   renderMergeReview(res.pendingMerges);
   await loadBuyerLeadsAdmin();
@@ -2782,13 +2799,21 @@ function dealLabelFor(dealId) {
   return deal.DealCode ? deal.DealCode + " — " + deal.Address : deal.Address;
 }
 
+// PendingDealID is stored comma-separated (see importBuyerLeads) since a
+// buyer list can be earmarked for more than one deal at once.
+function pendingDealIdList(lead) {
+  return String(lead.PendingDealID || "").split(",").map(function (v) { return v.trim(); }).filter(Boolean);
+}
+
 function populatePendingDealFilter() {
   const select = document.getElementById("buyerleads-filter-pendingdeal");
   const prevValue = select.value;
   const seen = {};
   const dealIds = [];
   adminBuyerLeads.forEach(function (l) {
-    if (l.PendingDealID && !seen[l.PendingDealID]) { seen[l.PendingDealID] = true; dealIds.push(l.PendingDealID); }
+    pendingDealIdList(l).forEach(function (id) {
+      if (!seen[id]) { seen[id] = true; dealIds.push(id); }
+    });
   });
   select.innerHTML = '<option value="">Any Pending Deal Tag</option>' +
     dealIds.map(function (id) { return '<option value="' + esc(id) + '">' + esc(dealLabelFor(id)) + '</option>'; }).join("");
@@ -2851,7 +2876,7 @@ function getFilteredBuyerLeads() {
     if (cities.length > 0 && cities.indexOf(String(l.City || "").trim().toLowerCase()) === -1) return false;
     if (excludeCities.length > 0 && excludeCities.indexOf(String(l.City || "").trim().toLowerCase()) !== -1) return false;
     if (lastUploadOnly && !(lastImportedBuyerLeadIds && lastImportedBuyerLeadIds.has(l.BuyerLeadID))) return false;
-    if (pendingDeal && l.PendingDealID !== pendingDeal) return false;
+    if (pendingDeal && pendingDealIdList(l).indexOf(pendingDeal) === -1) return false;
     if (ownerType === "company" && !isCompanyBuyerName(l.BuyerName)) return false;
     if (ownerType === "individual" && isCompanyBuyerName(l.BuyerName)) return false;
     if (minEquity !== null) {
@@ -2909,7 +2934,7 @@ function renderBuyerLeadsAdmin() {
       '<td class="small-muted">' + (l.PortfolioValue ? esc(l.PortfolioValue) : "&mdash;") + '</td>' +
       '<td class="small-muted">' + esc(l.AssetCategories || "") + '</td>' +
       '<td class="small-muted">' + esc(notesPreview) + '</td>' +
-      '<td class="small-muted">' + (l.PendingDealID ? esc(dealLabelFor(l.PendingDealID)) : "&mdash;") + '</td>' +
+      '<td class="small-muted">' + (pendingDealIdList(l).length > 0 ? esc(pendingDealIdList(l).map(dealLabelFor).join(", ")) : "&mdash;") + '</td>' +
       '<td class="small-muted">' + (l.CreatedAt ? formatDate(l.CreatedAt) : "&mdash;") + '</td>' +
       '<td class="small-muted">' + (l.UploadedBy ? esc(l.UploadedBy) : "&mdash;") + '</td>' +
       '<td>' + (l.openPitches.length || "&mdash;") + '</td>' +
