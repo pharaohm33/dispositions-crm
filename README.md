@@ -35,9 +35,11 @@ backend (see [SETUP.md](SETUP.md)).
   there's no email-reset flow — it just surfaces the same **"Want to
   Join?"** contact info admin's already set (Team tab) so the person knows
   who to actually ask. That same contact is also who gets emailed for a
-  rep's **Request Address Access** (see Address disclosure below) — one
-  designated support contact for both, not two separate things to keep in
-  sync. Falls back to `ADMIN_NOTIFY_EMAIL` if no join contact email is set.
+  rep's **Request Address Access** (see Address disclosure below), and once
+  logged in, any non-admin session sees "Support: [phone]" in the header at
+  all times, on every tab — one designated support contact for all three,
+  not several things to keep in sync. Falls back to `ADMIN_NOTIFY_EMAIL` if
+  no join contact email is set.
 
 **Rep side** (after logging in):
 
@@ -68,6 +70,15 @@ backend (see [SETUP.md](SETUP.md)).
   whose selling point is being undervalued as-is rather than a rehab
   spread, so it doesn't need ARV/Rehab filled in at all to still show reps
   the number that actually sells it.
+- Right on the deal detail, **Match My Buyer Leads To This Deal** lets a
+  rep self-serve the same auto-matching admin uses (same State, City equal
+  to the deal's City or one of its Match Cities, compatible Asset Category)
+  — pick how many, hit the button, and it gives that batch of matching
+  leads to themselves for this deal (scoped to leads they can actually see:
+  their own private uploads plus anything shared/admin-uploaded — never
+  someone else's private list). They show up right after on the rep's own
+  Buyer Leads tab to start calling. A rep can only give leads to
+  themselves this way; giving to anyone else is still admin-only.
 - Each deal shows the standing SOP:
   1. Contact buyers from the lead list, or submit a Facebook post here for
      admin approval before posting — including which groups you intend to

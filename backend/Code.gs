@@ -219,6 +219,8 @@ function doPost(e) {
         return jsonOut(withSession(body, requestAddressAccess));
       case 'importBuyerLeads':
         return jsonOut(withSession(body, importBuyerLeads));
+      case 'giveMyBuyerLeads':
+        return jsonOut(withSession(body, giveMyBuyerLeads));
       case 'updateBuyerLeadNotes':
         return jsonOut(withSession(body, updateBuyerLeadNotes));
       case 'updateBuyerLeadDoNotContact':
@@ -1902,6 +1904,47 @@ function adminGiveBuyerLeadsBulk(body) {
     } else {
       pool = pool.filter(function (l) { return buyerMatchesDeal(l, deal); });
     }
+
+    const batch = pool.slice(0, Number(body.count));
+    const now = new Date().toISOString();
+    appendRowsByHeaders(pitchesSheet, batch.map(function (l) {
+      return { 'PitchID': Utilities.getUuid(), 'BuyerLeadID': l['BuyerLeadID'], 'DealID': body.dealId, 'Username': username, 'GivenAt': now };
+    }));
+    return { ok: true, givenCount: batch.length, remainingInPool: pool.length - batch.length };
+  });
+}
+
+// Rep-facing self-service version of adminGiveBuyerLeadsBulk -- a rep can
+// give THEMSELVES a batch of buyer leads for a deal they already have
+// access to, auto-matched the exact same way (same State, City equal to
+// the deal's City or one of its MatchCities, AssetCategory compatible).
+// Scoped to leads this rep can actually see -- their own private uploads
+// plus anything shared/admin-uploaded (leadVisibleToUsername) -- so this
+// can never leak someone else's private list to them. A rep can only give
+// to themselves here; giving to anyone else stays admin-only
+// (adminGiveBuyerLeadsBulk/adminGiveBuyerLeadToRep/adminGiveSelectedBuyerLeads).
+function giveMyBuyerLeads(body, session) {
+  if (!body.dealId || !body.count) return { ok: false, error: 'Missing dealId or count.' };
+  if (!canAccessDeal(session, body.dealId)) return { ok: false, error: 'You do not have access to this deal.' };
+  const username = session.u;
+
+  return withLock(function () {
+    const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+    const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === body.dealId; });
+    if (!deal) return { ok: false, error: 'Deal not found.' };
+
+    const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+    const existingPitches = sheetToObjects(pitchesSheet);
+    const alreadyPitchedByMeForThisDeal = {};
+    existingPitches.forEach(function (p) {
+      if (p['DealID'] === body.dealId && String(p['Username'] || '').toLowerCase() === username) alreadyPitchedByMeForThisDeal[p['BuyerLeadID']] = true;
+    });
+
+    const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+    const pool = sheetToObjects(leadsSheet).filter(function (l) {
+      return !alreadyPitchedByMeForThisDeal[l['BuyerLeadID']] && l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE' &&
+        leadVisibleToUsername(l, username) && buyerMatchesDeal(l, deal);
+    });
 
     const batch = pool.slice(0, Number(body.count));
     const now = new Date().toISOString();

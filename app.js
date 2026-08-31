@@ -81,9 +81,26 @@ function formatDate(iso) {
    ============================================================ */
 
 const els = {};
-["login-view", "rep-view", "admin-view", "who-label", "logout-btn", "switch-view-btn"].forEach(function (id) {
+["login-view", "rep-view", "admin-view", "who-label", "header-support-label", "logout-btn", "switch-view-btn"].forEach(function (id) {
   els[id] = document.getElementById(id);
 });
+
+// Same "Want to Join?" phone number used pre-login and for the
+// Wholesaler/Realtor/Other interested-buyer text-SOP -- also shown as a
+// general support contact in the header once any rep is logged in, not
+// just those two other places. Admin doesn't need to see it (they're the
+// ones who set it). Called both from showView (session changes) and once
+// loadJoinContact resolves, since whichever of the two loads last is what
+// actually has the data to show.
+function updateHeaderSupportLabel() {
+  const session = getSession();
+  if (session && !session.isAdmin && joinContactCache && joinContactCache.phone) {
+    els["header-support-label"].textContent = "Support: " + joinContactCache.phone;
+    els["header-support-label"].hidden = false;
+  } else {
+    els["header-support-label"].hidden = true;
+  }
+}
 
 // Lets an admin drop into the same screens a rep uses -- handy while the
 // rep side is still being built out / the team is still small, so admin
@@ -100,6 +117,7 @@ function showView(session) {
   els["who-label"].hidden = !session;
   els["logout-btn"].hidden = !session;
   els["switch-view-btn"].hidden = !session || !session.isAdmin;
+  updateHeaderSupportLabel();
 
   if (!session) return;
   els["who-label"].textContent = session.name + (session.isAdmin ? " (Admin)" : "");
@@ -244,6 +262,7 @@ showView(getSession());
   const res = await api("getJoinContact", {});
   if (!res.ok) return;
   joinContactCache = res;
+  updateHeaderSupportLabel();
   const parts = [];
   if (res.name) parts.push(esc(res.name));
   if (res.phone) parts.push(esc(res.phone));
@@ -400,6 +419,14 @@ async function openRepDealDetail(dealId) {
         '<div class="small-muted" style="margin-top:6px;">Pitch off the general deal info first — only use this once a buyer has responded, is genuinely interested, and specifically asks you for the address. This just emails admin to ask; it does not grant it.</div></div>' : "") +
     '</div>' +
 
+    '<div class="section-title">Match My Buyer Leads To This Deal</div>' +
+    '<p class="small-muted">Auto-matches buyer leads you can see (your own uploads, plus anything shared by the team) to this deal by state/city/asset category — same matching admin uses — and gives them to yourself, so they show up on your Buyer Leads tab to start calling.</p>' +
+    '<div class="row2">' +
+      '<div><label class="field-label">How many</label><input type="number" id="give-myself-count" value="25" min="1"></div>' +
+      '<div style="display:flex; align-items:flex-end;"><button class="btn secondary" id="give-myself-btn" style="width:100%;">Match &amp; Give To Myself</button></div>' +
+    '</div>' +
+    '<div id="give-myself-result" class="small-muted"></div>' +
+
     '<div class="section-title">Step 1 &middot; Submit a Facebook Post for Approval</div>' +
     '<p class="small-muted">Want to cold email buyers about this deal instead? Talk to admin first — there\'s a specific approach we use so those emails don\'t land in spam.</p>' +
     '<label class="field-label">Post text</label>' +
@@ -432,6 +459,20 @@ async function openRepDealDetail(dealId) {
 
   wireBuyerMatchListHandlers(document.getElementById("buyer-list"), function () { return refreshBuyerMatchList(dealId, "buyer-list"); });
   wireRequestAddressButton();
+
+  document.getElementById("give-myself-btn").addEventListener("click", async function () {
+    const btn = this;
+    const resultEl = document.getElementById("give-myself-result");
+    const count = document.getElementById("give-myself-count").value;
+    if (!count) { resultEl.textContent = "Enter how many to match."; return; }
+    if (btn.disabled) return;
+    btn.disabled = true;
+    const res = await api("giveMyBuyerLeads", { dealId: dealId, count: count });
+    btn.disabled = false;
+    if (!res.ok) { resultEl.textContent = res.error || "Could not match leads."; showToast(res.error || "Could not match leads.", true); return; }
+    resultEl.textContent = "Gave yourself " + res.givenCount + " lead(s) for this deal. " + res.remainingInPool + " still unmatched for it.";
+    showToast("Gave yourself " + res.givenCount + " lead(s) — check your Buyer Leads tab.");
+  });
 
   document.getElementById("close-detail-btn").addEventListener("click", function () { overlay.hidden = true; });
 
