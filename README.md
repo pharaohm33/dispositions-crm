@@ -264,12 +264,18 @@ backend (see [SETUP.md](SETUP.md)).
   above the importer for anyone new to this: find cash buyers on Propwire
   (Cash Buyers filter, plus Fix &amp; Flip or switch Property Type to Land
   depending on the deal, with Portfolio Value set to roughly 3x–20x the
-  subject property's price), skip-trace the export (free/manual at
+  subject property's price, aiming for a master list of 500+ if the filters
+  return that many), **split the export into batches of 100** (copy 100
+  rows at a time into new CSVs until a 500+ list becomes 5+ separate files
+  — work one deal's worth, 100 buyers, at a time rather than the whole
+  thing at once), skip-trace each batch of 100 (free/manual at
   truepeoplesearch.com, a VA, Propwire's own paid skip trace, or a
-  third-party vendor), then come back and import the resulting CSV below.
-  It's a written walkthrough, not a live integration — Propwire and
-  skip-trace steps happen on those sites directly. Upload a CSV file in any
-  column order and it guesses
+  third-party vendor — **quickly**, since skip tracing itself doesn't make
+  money, only calling buyers does), then come back and import the
+  resulting CSV below. Closes with a volume target: **reach out to 50+
+  buyers a day** to actually get a deal sold. It's a written walkthrough,
+  not a live integration — Propwire and skip-trace steps happen on those
+  sites directly. Upload a CSV file in any column order and it guesses
   which column is which (Name, Phone × 3, Phone Type × 3, City, State, Zip,
   County, Email, Asset Categories, Last Known Purchase Price, Estimated
   Value) from your headers, shows you a preview and the guessed mapping so
