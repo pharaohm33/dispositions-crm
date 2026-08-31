@@ -318,6 +318,20 @@ async function initRepView() {
 
 document.getElementById("rep-search-input").addEventListener("input", renderRepDeals);
 
+// Ranks a deal's Status by how close it is to actually closing, lowest
+// number first: Under Contract (a buyer's already locked in, just needs to
+// close) > Active (still being marketed) > On Hold (paused, not dead) >
+// Sold (already closed -- done, no more action needed, but a good outcome
+// worth keeping visible rather than lumped in with Dead) > Dead (fell
+// through, sinks to the very bottom). Admin can rename/add statuses
+// (Status Categories tab), so an unrecognized value falls back to
+// somewhere in the middle rather than breaking the sort.
+const DEAL_STATUS_PRIORITY = ['Under Contract', 'Active', 'On Hold', 'Sold', 'Dead'];
+function dealStatusRank(status) {
+  const idx = DEAL_STATUS_PRIORITY.indexOf(status);
+  return idx === -1 ? 1.5 : idx;
+}
+
 function renderRepDeals() {
   const q = document.getElementById("rep-search-input").value.trim().toLowerCase();
   const container = document.getElementById("rep-deals-container");
@@ -326,12 +340,15 @@ function renderRepDeals() {
     if (!q) return true;
     return [d.DealCode, d.City, d.State, d.County, d.AssetType].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; });
   });
-  // Organized by State, then City within that state, then County as a final
-  // tiebreaker -- so a rep scanning a long list sees deals in the same area
-  // clustered together instead of in whatever order they happened to be
-  // added, making it easy to work through one region at a time.
+  // Organized by how close to closing the deal is first (Under Contract,
+  // then Active, On Hold, Sold, Dead sinks to the bottom), then State
+  // alphabetically, then City within that state, then County as a final
+  // tiebreaker -- so the deals actually worth working land at the top, and
+  // within that a rep still sees deals in the same area clustered
+  // together instead of in whatever order they happened to be added.
   filtered.sort(function (a, b) {
-    return String(a.State || "").localeCompare(String(b.State || "")) ||
+    return dealStatusRank(a.Status) - dealStatusRank(b.Status) ||
+      String(a.State || "").localeCompare(String(b.State || "")) ||
       String(a.City || "").localeCompare(String(b.City || "")) ||
       String(a.County || "").localeCompare(String(b.County || ""));
   });
@@ -1276,6 +1293,15 @@ function renderAdminDeals() {
   const filtered = adminDeals.filter(function (d) {
     if (!q) return true;
     return [d.DealCode, d.Address, d.City, d.AssetType, d.Status].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; });
+  });
+  // Same organization as the rep's Deals tab: closest to closing first
+  // (Under Contract, Active, On Hold, Sold, then Dead at the bottom), State
+  // alphabetically behind that, then City/County as tiebreakers.
+  filtered.sort(function (a, b) {
+    return dealStatusRank(a.Status) - dealStatusRank(b.Status) ||
+      String(a.State || "").localeCompare(String(b.State || "")) ||
+      String(a.City || "").localeCompare(String(b.City || "")) ||
+      String(a.County || "").localeCompare(String(b.County || ""));
   });
   empty.hidden = filtered.length > 0;
   tbody.innerHTML = filtered.map(function (d) {

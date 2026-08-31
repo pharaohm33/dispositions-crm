@@ -44,10 +44,15 @@ backend (see [SETUP.md](SETUP.md)).
 **Rep side** (after logging in):
 
 - Sees every deal they've been given access to (either specific deals, or
-  "all deals" if the admin granted that), sorted by **State, then City
-  within that state, then County** as a final tiebreaker — so deals in the
-  same area cluster together instead of showing up in whatever order they
-  were added, making it easy to work through one region at a time —
+  "all deals" if the admin granted that), organized by **how close each one
+  is to actually closing** — Under Contract first, then Active, On Hold,
+  Sold, with Dead sinking to the very bottom — and **State (alphabetically),
+  then City within that state, then County** as tiebreakers behind status,
+  so deals in the same area still cluster together within each status
+  group instead of showing up in whatever order they were added. A custom
+  status admin's added that isn't one of those five default ones lands
+  between Active and On Hold rather than breaking the sort. Same
+  organization on admin's own Deals table. Each deal is
   identified only by a **Deal Code**
   (e.g. "A-1") plus City/State/Zip/County/Price. The exact street address is
   hidden by default, with one deliberate exception: admin can disclose it to
