@@ -1543,6 +1543,18 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
         categoryAccessReps.map(function (r) { return esc(r.name) + ' (' + esc(r.username) + ')'; }).join(", ") + '</p>'
       : "") +
 
+    '<div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border);">' +
+      '<div style="font-weight:600; margin-bottom:6px;">Tell These Reps To Work This Deal</div>' +
+      '<select id="deal-detail-bulk-assignmode-select">' +
+        '<option value="all">All Users</option>' +
+        '<option value="unassigned">All Users With No Assigned Deals Right Now</option>' +
+      '</select>' +
+      '<p class="small-muted">"No assigned deals right now" only counts deals given to a rep one-by-one (via Add Access or Assign Myself above) — deals a rep received from a previous batch like this one, or via standing category access, don\'t disqualify them. Give someone the "Bulk Override" toggle on the Team tab to always sweep them into these batches regardless.</p>' +
+      '<div class="nav-row" style="justify-content:flex-start;">' +
+        '<button class="btn secondary small" id="deal-detail-bulk-assign-btn">Assign Now</button>' +
+      '</div>' +
+    '</div>' +
+
     '<div class="section-title">Address Access</div>' +
     '<p class="small-muted">Nobody sees this deal\'s exact address by default. Grant it to a specific team member once you\'ve seen they can be trusted to work correctly, and revoke it any time.</p>' +
     '<div class="chip-list" id="address-grant-chip-list">' +
@@ -1715,6 +1727,20 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     showToast(adminIsAssigned ? "Removed yourself from this deal." : "You're now assigned to this deal.");
   });
 
+  document.getElementById("deal-detail-bulk-assign-btn").addEventListener("click", async function () {
+    const btn = this;
+    btn.disabled = true;
+    const assignMode = document.getElementById("deal-detail-bulk-assignmode-select").value;
+    const res = await api("adminBulkAssignDeal", { dealId: deal.DealID, assignMode: assignMode });
+    if (!res.ok) {
+      btn.disabled = false;
+      showToast(res.error || "Could not assign reps.", true);
+      return;
+    }
+    openAdminDealDetail(deal.DealID);
+    showToast("Assigned to " + res.assignedCount + " rep(s).");
+  });
+
   Array.from(panel.querySelectorAll(".revoke-address-btn")).forEach(function (btn) {
     btn.addEventListener("click", async function () {
       btn.disabled = true;
@@ -1825,7 +1851,7 @@ function renderReps() {
   empty.hidden = adminReps.length > 0;
   tbody.innerHTML = adminReps.map(function (r) {
     return '<tr>' +
-      '<td>' + esc(r.name) + '</td>' +
+      '<td>' + esc(r.name) + (r.bulkAssignOverride ? ' <span class="status-pill status-negotiating" title="Always included in a future \'All Users With No Assigned Deals\' batch, even though they already have a deal manually given to them">Bulk Override</span>' : "") + '</td>' +
       '<td>' + esc(r.username) + '</td>' +
       '<td>' + esc(r.phone || "") + '</td>' +
       '<td>' + esc(r.email || "") + '</td>' +
@@ -1834,6 +1860,7 @@ function renderReps() {
       '<td><label class="toggle-row"><input type="checkbox" class="rep-toggle" data-username="' + esc(r.username) + '" data-field="isAdmin"' + (r.isAdmin ? " checked" : "") + '></label></td>' +
       '<td><label class="toggle-row"><input type="checkbox" class="rep-toggle" data-username="' + esc(r.username) + '" data-field="active"' + (r.active ? " checked" : "") + '></label></td>' +
       '<td>' + (r.dealsAssignedCount || 0) + (r.allAccess ? ' <span class="small-muted">(all)</span>' : "") + '</td>' +
+      '<td><label class="toggle-row"><input type="checkbox" class="rep-toggle" data-username="' + esc(r.username) + '" data-field="bulkOverride"' + (r.bulkAssignOverride ? " checked" : "") + '></label></td>' +
       '<td class="small-muted">' + (r.lastActive ? formatDate(r.lastActive) : "Never") + '</td>' +
       '<td class="small-muted">' + [r.preferredCity, r.preferredState, r.preferredZip].filter(Boolean).join(", ") + '</td>' +
       '<td style="white-space:nowrap;">' +

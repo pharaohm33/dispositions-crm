@@ -59,7 +59,7 @@ const FOLLOWUP_HOURS = 24;
 const MATCH_STATUSES = ['Active Match', 'Negotiating', 'Closing', 'Dead Match'];
 const DEFAULT_ASSET_CATEGORIES = ['Single Family', 'Condominium / Townhouse', 'Multifamily (1-4 Units)', 'Multifamily (4+ Units)', 'Fix and Flip', 'Residential Vacant Land', 'Commercial'];
 
-const REP_COLUMNS = ['Username', 'Name', 'Phone', 'Email', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'LastActive', 'PreferredCity', 'PreferredState', 'PreferredZip', 'PersonType', 'CategoryAccess'];
+const REP_COLUMNS = ['Username', 'Name', 'Phone', 'Email', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'LastActive', 'PreferredCity', 'PreferredState', 'PreferredZip', 'PersonType', 'CategoryAccess', 'BulkAssignOverride'];
 
 // Self-identified at signup -- informational only (admin visibility/
 // filtering in the Team tab), doesn't gate any functionality. Not
@@ -83,7 +83,15 @@ const PERSON_TYPES = ['Buyer', 'Wholesaler', 'Realtor', 'Other'];
 // free-text description field ("SFR - 3bd/2ba") separate from the
 // structured AssetCategory used for matching.
 const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt'];
-const ASSIGNMENT_COLUMNS = ['DealID', 'Username', 'AssignedAt'];
+// Source distinguishes a deliberate, one-deal-at-a-time grant ('manual' --
+// the Access section's "Add Access" dropdown, or "Assign Myself") from one
+// written by the bulk-assign mechanism ('bulk' -- see applyDealAssignMode).
+// Only 'manual' rows count as "already has deals" for a future "All Users
+// With No Assigned Deals" bulk run -- a rep swept into an earlier bulk
+// batch isn't excluded from being swept into a later one too, so the
+// "generic, nobody's specifically looking out for them" pool doesn't
+// shrink to nothing the first time this gets used.
+const ASSIGNMENT_COLUMNS = ['DealID', 'Username', 'AssignedAt', 'Source'];
 // MatchStatus tracks the buyer<->deal relationship itself ('Active Match' by
 // default, through 'Negotiating'/'Closing', or 'Dead Match' once the buyer
 // couldn't agree) -- separate from the one-time approval gate this used to
@@ -245,6 +253,8 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminAssignRep));
       case 'adminUnassignRep':
         return jsonOut(withAdminSession(body, adminUnassignRep));
+      case 'adminBulkAssignDeal':
+        return jsonOut(withAdminSession(body, adminBulkAssignDeal));
       case 'adminGetAssignments':
         return jsonOut(withAdminSession(body, adminGetAssignments));
       case 'adminGrantAddressAccess':
@@ -811,56 +821,80 @@ function adminAddDeal(body) {
     'CreatedAt': now, 'UpdatedAt': now
   });
 
-  let assignedCount = 0;
-  if (body.assignMode === 'all' || body.assignMode === 'unassigned') {
-    const repsSheet = getSheet(REPS_SHEET, REP_COLUMNS);
-    let eligibleReps = sheetToObjects(repsSheet).filter(function (r) {
-      const active = !(r['Active'] === false || r['Active'] === 'FALSE');
-      const isAdmin = r['IsAdmin'] === true || r['IsAdmin'] === 'TRUE';
-      const allAccess = r['AllAccess'] === true || r['AllAccess'] === 'TRUE';
-      return active && !isAdmin && !allAccess;
-    });
-    if (body.assignMode === 'unassigned') {
-      // "No deals right now" means no direct Assignments row AND no
-      // standing category access -- a rep already covered by a category
-      // grant effectively already has deals even with zero Assignments
-      // rows, so they shouldn't count as unassigned.
-      const assignmentsSheet = getSheet(ASSIGNMENTS_SHEET, ASSIGNMENT_COLUMNS);
-      const assignedUsernames = {};
-      sheetToObjects(assignmentsSheet).forEach(function (a) { assignedUsernames[String(a['Username'] || '').trim().toLowerCase()] = true; });
-      eligibleReps = eligibleReps.filter(function (r) {
-        const u = String(r['Username'] || '').trim().toLowerCase();
-        return !assignedUsernames[u] && repCategoryList(r).length === 0;
-      });
-    }
+  const assignedCount = applyDealAssignMode(dealId, d.assetCategory, body.assignMode, now);
+  return { ok: true, dealId: dealId, assignedCount: assignedCount };
+}
 
-    const category = normalizeText(d.assetCategory);
-    if (category) {
-      // Standing, category-wide access -- these reps get every current AND
-      // future deal in this category automatically (see canAccessDeal /
-      // accessibleDealIds / getDeals / autoFeedCheckLocked), not just this
-      // one deal. This is what "tell these reps to work Land deals" (or
-      // whatever the category is) actually means, versus a one-off grant
-      // to a single deal.
-      eligibleReps.forEach(function (r) {
-        const existing = repCategoryList(r);
-        if (existing.indexOf(category) === -1) {
-          const updated = splitCommaList(r['CategoryAccess']).concat([d.assetCategory]).join(', ');
-          repsSheet.getRange(r._row, getColumnIndex(repsSheet, 'CategoryAccess')).setValue(updated);
-        }
-      });
-    } else {
-      // No category set on this deal -- nothing to key standing access off
-      // of, so fall back to a one-off grant for just this deal.
-      const assignmentsSheet = getSheet(ASSIGNMENTS_SHEET, ASSIGNMENT_COLUMNS);
-      appendRowsByHeaders(assignmentsSheet, eligibleReps.map(function (r) {
-        return { 'DealID': dealId, 'Username': String(r['Username'] || '').trim().toLowerCase(), 'AssignedAt': now };
-      }));
-    }
-    assignedCount = eligibleReps.length;
+// Shared by adminAddDeal (a brand new deal) and adminBulkAssignDeal (an
+// existing one, opened later) -- the actual "who gets swept into this
+// batch" mechanics behind "Tell These Reps To Work This Deal".
+//   - 'all': every active, non-admin, non-all-access rep.
+//   - 'unassigned': same, but only reps with no MANUAL (Source='manual')
+//     Assignments row -- a rep whose only access came from a past bulk
+//     run (this same mechanism, Source='bulk') or standing category
+//     access never disqualifies them from a future "unassigned" batch,
+//     so that pool doesn't shrink to nothing after the first use. An
+//     admin can also flag a specific rep's BulkAssignOverride (Team tab)
+//     to force-include them in 'unassigned' batches even if they DO have
+//     a manual assignment -- shown as an obvious "Override" badge there.
+// With an AssetCategory on the deal, this grants standing access to the
+// whole category (current deals AND any future one) instead of just this
+// one deal -- see canAccessDeal/accessibleDealIds/getDeals/
+// autoFeedCheckLocked, all of which treat that the same as a direct
+// Assignments row. With no category, it's a one-off Source='bulk' grant
+// for just this deal.
+function applyDealAssignMode(dealId, assetCategory, assignMode, now) {
+  if (assignMode !== 'all' && assignMode !== 'unassigned') return 0;
+  const repsSheet = getSheet(REPS_SHEET, REP_COLUMNS);
+  let eligibleReps = sheetToObjects(repsSheet).filter(function (r) {
+    const active = !(r['Active'] === false || r['Active'] === 'FALSE');
+    const isAdmin = r['IsAdmin'] === true || r['IsAdmin'] === 'TRUE';
+    const allAccess = r['AllAccess'] === true || r['AllAccess'] === 'TRUE';
+    return active && !isAdmin && !allAccess;
+  });
+
+  const assignmentsSheet = getSheet(ASSIGNMENTS_SHEET, ASSIGNMENT_COLUMNS);
+  if (assignMode === 'unassigned') {
+    const manuallyAssignedUsernames = {};
+    sheetToObjects(assignmentsSheet).forEach(function (a) {
+      if (a['Source'] === 'manual') manuallyAssignedUsernames[String(a['Username'] || '').trim().toLowerCase()] = true;
+    });
+    eligibleReps = eligibleReps.filter(function (r) {
+      const u = String(r['Username'] || '').trim().toLowerCase();
+      const overridden = r['BulkAssignOverride'] === true || r['BulkAssignOverride'] === 'TRUE';
+      return overridden || !manuallyAssignedUsernames[u];
+    });
   }
 
-  return { ok: true, dealId: dealId, assignedCount: assignedCount };
+  const category = normalizeText(assetCategory);
+  if (category) {
+    eligibleReps.forEach(function (r) {
+      const existing = repCategoryList(r);
+      if (existing.indexOf(category) === -1) {
+        const updated = splitCommaList(r['CategoryAccess']).concat([assetCategory]).join(', ');
+        repsSheet.getRange(r._row, getColumnIndex(repsSheet, 'CategoryAccess')).setValue(updated);
+      }
+    });
+  } else {
+    appendRowsByHeaders(assignmentsSheet, eligibleReps.map(function (r) {
+      return { 'DealID': dealId, 'Username': String(r['Username'] || '').trim().toLowerCase(), 'AssignedAt': now, 'Source': 'bulk' };
+    }));
+  }
+  return eligibleReps.length;
+}
+
+// Same bulk-assign, but for a deal that already exists -- admin opens it
+// later and realizes it needs more coverage, instead of only being able
+// to do this once, at creation time.
+function adminBulkAssignDeal(body) {
+  if (!body.dealId || (body.assignMode !== 'all' && body.assignMode !== 'unassigned')) {
+    return { ok: false, error: 'Missing dealId or assignMode.' };
+  }
+  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === body.dealId; });
+  if (!deal) return { ok: false, error: 'Deal not found.' };
+  const assignedCount = applyDealAssignMode(body.dealId, deal['AssetCategory'], body.assignMode, new Date().toISOString());
+  return { ok: true, assignedCount: assignedCount };
 }
 
 function adminUpdateDeal(body) {
@@ -978,7 +1012,8 @@ function adminGetReps(body) {
       createdAt: r['CreatedAt'], lastActive: r['LastActive'] || '',
       dealsAssignedCount: dealsAssignedCount,
       preferredCity: r['PreferredCity'] || '', preferredState: r['PreferredState'] || '', preferredZip: r['PreferredZip'] || '',
-      personType: r['PersonType'] || '', categoryAccess: r['CategoryAccess'] || ''
+      personType: r['PersonType'] || '', categoryAccess: r['CategoryAccess'] || '',
+      bulkAssignOverride: r['BulkAssignOverride'] === true || r['BulkAssignOverride'] === 'TRUE'
     };
   });
   return { ok: true, reps: reps };
@@ -1008,10 +1043,10 @@ function adminSetRepAccess(body) {
   const reps = sheetToObjects(sheet);
   const match = reps.find(function (r) { return String(r['Username'] || '').trim().toLowerCase() === username; });
   if (!match) return { ok: false, error: 'Rep not found.' };
-  ['allAccess', 'isAdmin', 'active'].forEach(function (field) {
+  const fieldColumns = { allAccess: 'AllAccess', isAdmin: 'IsAdmin', active: 'Active', bulkOverride: 'BulkAssignOverride' };
+  Object.keys(fieldColumns).forEach(function (field) {
     if (body[field] === undefined) return;
-    const col = getColumnIndex(sheet, field === 'allAccess' ? 'AllAccess' : field === 'isAdmin' ? 'IsAdmin' : 'Active');
-    sheet.getRange(match._row, col).setValue(!!body[field]);
+    sheet.getRange(match._row, getColumnIndex(sheet, fieldColumns[field])).setValue(!!body[field]);
   });
   return { ok: true };
 }
@@ -1038,7 +1073,7 @@ function adminAssignRep(body) {
   const rows = sheetToObjects(sheet);
   const exists = rows.some(function (r) { return r['DealID'] === body.dealId && String(r['Username'] || '').trim().toLowerCase() === username; });
   if (exists) return { ok: true };
-  appendRowByHeaders(sheet, { 'DealID': body.dealId, 'Username': username, 'AssignedAt': new Date().toISOString() });
+  appendRowByHeaders(sheet, { 'DealID': body.dealId, 'Username': username, 'AssignedAt': new Date().toISOString(), 'Source': 'manual' });
   return { ok: true };
 }
 

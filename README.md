@@ -209,9 +209,22 @@ backend (see [SETUP.md](SETUP.md)).
   instead of showing up everywhere regardless. When adding a new deal,
   **Tell These Reps To Work This Deal** offers a one-click bulk assignment
   right at creation — **All Users** or **All Users With No Assigned Deals
-  Right Now** (checked at the moment you save — once a rep has any deal
-  they drop out of future "unassigned" batches until they're back down to
-  zero). If the deal has an **Asset Category** set, this grants those reps
+  Right Now**; the same section also appears on an *existing* deal's detail
+  page (below the one-by-one **Add Access** controls), with an **Assign
+  Now** button, so you're not limited to sweeping reps in only at the
+  moment a deal is created. "No assigned deals right now" is checked at
+  the moment you click, and only counts deals a rep was given **one by
+  one** — via **Add Access** or **Assign Myself** on a deal's detail page.
+  A deal a rep received from a *previous* bulk batch (this same feature),
+  or standing access via an **Asset Category**, does **not** count as
+  "assigned" for this purpose — reps only drop out of future "unassigned"
+  batches once someone hand-picks them for a specific deal. To keep a rep
+  in the running for future "unassigned" batches even after they've been
+  hand-picked for something, flip their **Bulk Assign Override** toggle on
+  the Team tab (shown next to their name as an orange **Bulk Override**
+  badge whenever it's on, so it stays obvious at a glance) — it bypasses
+  the one-by-one exclusion entirely for that rep. If the deal has an
+  **Asset Category** set, bulk-assigning also grants those reps
   **standing access to every deal in that category** — current ones right
   away, and any new one added later, automatically, with no need to hand
   it to them one at a time — rather than just this one deal; with no
