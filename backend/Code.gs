@@ -131,7 +131,7 @@ const FB_COLUMNS = ['RequestID', 'DealID', 'Username', 'PostText', 'TargetGroups
 // what the buyer has told us they want to spend, if known; like
 // AssetCategories, a buyer with neither set is treated as open to any
 // price for matching purposes.
-const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'OwnershipLengthMonths', 'PropertyURL', 'PriceRangeMin', 'PriceRangeMax', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'PendingDealID', 'CreatedAt', 'UploadedBy'];
+const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'OwnershipLengthMonths', 'PropertyURL', 'PriceRangeMin', 'PriceRangeMax', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'PendingDealID', 'CreatedAt', 'UploadedBy', 'DuplicateOfBuyerLeadID'];
 
 // A Pitch is "give this buyer lead to this rep, to work against this one
 // specific deal." This is the only thing that creates an actionable item in
@@ -1676,50 +1676,137 @@ function adminMergeBuyerLeads(body) {
 // UploadedBy blank, same as before, since those are meant to be shared
 // across the whole team. UploadedBy is admin-only information -- never
 // sent back to a rep session (see adminGetBuyerLeads / getMyPitches).
+// Fields eligible for the admin duplicate-merge flow below -- deliberately
+// excludes identity fields (BuyerName, Phone, PhoneType) since those are
+// what defines the duplicate match itself, not "new data" to add.
+const BUYER_LEAD_ENRICHABLE_FIELDS = ['Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County',
+  'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'OwnershipLengthMonths', 'PropertyURL', 'PriceRangeMin', 'PriceRangeMax'];
+
+function buildBuyerLeadRow(r, now, uploadedBy, duplicateOfId) {
+  return {
+    'BuyerLeadID': Utilities.getUuid(), 'BuyerName': r.buyerName, 'Phone': r.phone, 'PhoneType': r.phoneType || '',
+    'Phone2': r.phone2 || '', 'Phone2Type': r.phone2Type || '', 'Phone3': r.phone3 || '', 'Phone3Type': r.phone3Type || '',
+    'Email': r.email || '', 'City': r.city || '', 'State': r.state || '', 'Zip': r.zip || '', 'County': r.county || '',
+    'AssetCategories': r.assetCategories || '', 'LastKnownPurchasePrice': r.lastKnownPurchasePrice || '',
+    'EstimatedPropertyValue': r.estimatedPropertyValue || '', 'PortfolioValue': r.portfolioValue || '',
+    'OwnershipLengthMonths': r.ownershipLengthMonths || '', 'PropertyURL': r.propertyUrl || '',
+    'PriceRangeMin': r.priceRangeMin || '', 'PriceRangeMax': r.priceRangeMax || '',
+    'GeneralNotes': '', 'DriveLink': '', 'DoNotContact': false, 'PendingDealID': '', 'CreatedAt': now,
+    'UploadedBy': uploadedBy, 'DuplicateOfBuyerLeadID': duplicateOfId || ''
+  };
+}
+
+// Duplicates are never silently blocked anymore -- see file notes below --
+// but admin and rep uploads handle a duplicate row differently:
+//   - Rep: always creates their own row regardless of who else already has
+//     this buyer, tagged DuplicateOfBuyerLeadID so admin can spot/hide it
+//     later (see adminGetBuyerLeads's isDuplicate + the Buyer Leads table's
+//     Hide Duplicates filter). Reps are never blocked by data they can't
+//     even see (someone else's private list, or the shared pool).
+//   - Admin: never silently overwrites an existing lead. If the new row
+//     has data the existing lead doesn't already have (blank -> filled
+//     in only, never a conflicting overwrite), that's held back as a
+//     pendingMerge for the frontend to show admin and let them decide
+//     field by field, rather than being written automatically. If there's
+//     truly nothing new, it's just skipped, same as the old behavior.
+//     A second call with body.confirmMerges actually applies whichever
+//     ones admin approved.
 function importBuyerLeads(body, session) {
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+
+  if (body.confirmMerges) {
+    if (!session.a) return { ok: false, error: 'Only admin can add data to an existing lead.' };
+    const byId = {};
+    sheetToObjects(sheet).forEach(function (l) { byId[l['BuyerLeadID']] = l; });
+    let mergedCount = 0;
+    body.confirmMerges.forEach(function (m) {
+      const lead = byId[m.buyerLeadId];
+      if (!lead || !m.fields) return;
+      Object.keys(m.fields).forEach(function (field) {
+        if (BUYER_LEAD_ENRICHABLE_FIELDS.indexOf(field) === -1) return; // guard against writing an arbitrary column
+        sheet.getRange(lead._row, getColumnIndex(sheet, field)).setValue(m.fields[field] || '');
+      });
+      mergedCount++;
+    });
+    return { ok: true, mergedCount: mergedCount };
+  }
+
   const rows = body.pasteText ? parseBuyerLeadRows(body.pasteText) : (body.rows || []);
   if (rows.length === 0) return { ok: false, error: 'No rows found to import.' };
   const uploadedBy = session.a ? '' : session.u;
 
-  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
-  const existing = sheetToObjects(sheet);
-  const existingPhones = {};
-  const existingEmails = {};
-  existing.forEach(function (l) {
+  const existingByPhone = {};
+  const existingByEmail = {};
+  sheetToObjects(sheet).forEach(function (l) {
     const p = normalizePhoneForDedup(l['Phone']);
-    if (p) existingPhones[p] = true;
+    if (p) existingByPhone[p] = l;
     const e = normalizeText(l['Email']);
-    if (e) existingEmails[e] = true;
+    if (e) existingByEmail[e] = l;
   });
 
-  let skippedDuplicates = 0;
   const now = new Date().toISOString();
   const newRows = [];
+  const pendingMerges = [];
+  let skippedDuplicates = 0;
+  const seenPhonesThisBatch = {};
+  const seenEmailsThisBatch = {};
+
   rows.forEach(function (r) {
     if (!r.buyerName || !r.phone) return;
     const normalizedPhone = normalizePhoneForDedup(r.phone);
     const normalizedEmail = normalizeText(r.email);
-    if (existingPhones[normalizedPhone] || (normalizedEmail && existingEmails[normalizedEmail])) { skippedDuplicates++; return; }
-    existingPhones[normalizedPhone] = true;
-    if (normalizedEmail) existingEmails[normalizedEmail] = true;
-    newRows.push({
-      'BuyerLeadID': Utilities.getUuid(), 'BuyerName': r.buyerName, 'Phone': r.phone, 'PhoneType': r.phoneType || '',
-      'Phone2': r.phone2 || '', 'Phone2Type': r.phone2Type || '', 'Phone3': r.phone3 || '', 'Phone3Type': r.phone3Type || '',
-      'Email': r.email || '', 'City': r.city || '', 'State': r.state || '', 'Zip': r.zip || '', 'County': r.county || '',
-      'AssetCategories': r.assetCategories || '', 'LastKnownPurchasePrice': r.lastKnownPurchasePrice || '',
-      'EstimatedPropertyValue': r.estimatedPropertyValue || '', 'PortfolioValue': r.portfolioValue || '',
-      'OwnershipLengthMonths': r.ownershipLengthMonths || '', 'PropertyURL': r.propertyUrl || '',
-      'PriceRangeMin': r.priceRangeMin || '', 'PriceRangeMax': r.priceRangeMax || '',
-      'GeneralNotes': '', 'DriveLink': '', 'DoNotContact': false, 'PendingDealID': '', 'CreatedAt': now,
-      'UploadedBy': uploadedBy
+
+    // A second row in THIS SAME upload matching an earlier one in it --
+    // always just skip the repeat, same as before.
+    if ((normalizedPhone && seenPhonesThisBatch[normalizedPhone]) || (normalizedEmail && seenEmailsThisBatch[normalizedEmail])) {
+      skippedDuplicates++;
+      return;
+    }
+    if (normalizedPhone) seenPhonesThisBatch[normalizedPhone] = true;
+    if (normalizedEmail) seenEmailsThisBatch[normalizedEmail] = true;
+
+    const existingMatch = (normalizedPhone && existingByPhone[normalizedPhone]) || (normalizedEmail && existingByEmail[normalizedEmail]);
+    if (!existingMatch) {
+      newRows.push(buildBuyerLeadRow(r, now, uploadedBy, ''));
+      return;
+    }
+
+    if (!session.a) {
+      newRows.push(buildBuyerLeadRow(r, now, uploadedBy, existingMatch['BuyerLeadID']));
+      return;
+    }
+
+    const newFieldMap = {
+      Phone2: r.phone2, Phone2Type: r.phone2Type, Phone3: r.phone3, Phone3Type: r.phone3Type, Email: r.email,
+      City: r.city, State: r.state, Zip: r.zip, County: r.county, AssetCategories: r.assetCategories,
+      LastKnownPurchasePrice: r.lastKnownPurchasePrice, EstimatedPropertyValue: r.estimatedPropertyValue, PortfolioValue: r.portfolioValue,
+      OwnershipLengthMonths: r.ownershipLengthMonths, PropertyURL: r.propertyUrl, PriceRangeMin: r.priceRangeMin, PriceRangeMax: r.priceRangeMax
+    };
+    const fieldsToAdd = {};
+    BUYER_LEAD_ENRICHABLE_FIELDS.forEach(function (f) {
+      const newVal = String(newFieldMap[f] || '').trim();
+      const existingVal = String(existingMatch[f] || '').trim();
+      if (newVal && !existingVal) fieldsToAdd[f] = newVal;
     });
+    if (Object.keys(fieldsToAdd).length > 0) {
+      pendingMerges.push({
+        buyerLeadId: existingMatch['BuyerLeadID'], existingName: existingMatch['BuyerName'], existingPhone: existingMatch['Phone'],
+        newBuyerName: r.buyerName, fields: fieldsToAdd
+      });
+    } else {
+      skippedDuplicates++;
+    }
   });
   appendRowsByHeaders(sheet, newRows);
 
   // Lets the frontend offer a "just show what I uploaded" view right after
   // an import, instead of the new batch getting lost in however many leads
   // were already in the sheet.
-  return { ok: true, imported: newRows.length, skippedDuplicates: skippedDuplicates, importedIds: newRows.map(function (r) { return r['BuyerLeadID']; }), importedAt: now };
+  return {
+    ok: true, imported: newRows.length, skippedDuplicates: skippedDuplicates,
+    importedIds: newRows.map(function (r) { return r['BuyerLeadID']; }), importedAt: now,
+    pendingMerges: pendingMerges
+  };
 }
 
 // Joins every pitch to its contacts and computes each one's live status,

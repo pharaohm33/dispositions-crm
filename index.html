@@ -615,6 +615,17 @@
       <div id="buyerleads-import-result" class="small-muted"></div>
     </div>
 
+    <div class="card" id="csv-merge-review-card" hidden>
+      <div class="section-title" style="margin-top:0;">Possible Duplicates With New Data</div>
+      <p class="small-muted">These rows matched an existing lead by phone or email. Nothing here ever overwrites anything already on file — each one only ever <em>fills in</em> a field the existing lead doesn't already have a value for. Uncheck any you don't want, then apply — anything left unchecked (or if you just dismiss this) is skipped, same as before.</p>
+      <div id="csv-merge-review-list"></div>
+      <div class="nav-row" style="justify-content:flex-end;">
+        <button class="btn secondary small" id="csv-merge-dismiss-btn">Dismiss (Skip All)</button>
+        <button class="btn primary small" id="csv-merge-apply-btn">Add Checked Data</button>
+      </div>
+      <div id="csv-merge-review-result" class="small-muted"></div>
+    </div>
+
     <div class="card">
       <div class="section-title" style="margin-top:0;">Give Buyer Leads for a Deal</div>
       <p class="small-muted">Gives a batch of buyer leads to one team member, paired specifically with the deal you pick below — that pairing (a "pitch") is what shows up in their queue. Leads already pitched for this same deal are skipped.</p>
@@ -678,6 +689,7 @@
         </select>
         <label class="small-muted" style="display:flex; align-items:center; gap:4px;">Min Equity % <input type="number" id="buyerleads-filter-minequity" min="0" max="100" style="width:70px;"></label>
         <label class="small-muted" style="display:flex; align-items:center; gap:4px;">Held N+ Years <input type="number" id="buyerleads-filter-minheldyears" min="0" style="width:70px;"></label>
+        <label class="checkbox-row" style="margin:0;"><input type="checkbox" id="buyerleads-filter-hideduplicates"> Hide Possible Duplicates</label>
       </div>
       <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
         <button class="btn secondary small" id="buyerleads-select-page-btn">Select All On This Page</button>
@@ -955,7 +967,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=37"></script>
-<script src="app.js?v=37"></script>
+<script src="config.js?v=38"></script>
+<script src="app.js?v=38"></script>
 </body>
 </html>

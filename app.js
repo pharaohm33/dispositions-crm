@@ -1236,7 +1236,7 @@ document.getElementById("rep-csv-import-btn").addEventListener("click", async fu
     return;
   }
   resultEl.textContent = "Imported " + res.imported + " buyer(s) — private to you." +
-    (res.skippedDuplicates ? " Skipped " + res.skippedDuplicates + " duplicate phone number(s)." : "");
+    (res.skippedDuplicates ? " Skipped " + res.skippedDuplicates + " repeated row(s) within this file." : "");
   document.getElementById("rep-csv-file-input").value = "";
   repCsvRows = []; repCsvHeaders = [];
   document.getElementById("rep-csv-preview-section").hidden = true;
@@ -2518,6 +2518,50 @@ function markLastImportedBuyerLeads(ids, count, importedAt) {
   checkbox.checked = true;
 }
 
+// Rows that duplicated an existing lead by phone/email AND had at least
+// one field the existing lead didn't already have a value for -- held
+// back from adminImportBuyerLeads for review instead of being written
+// automatically, per the "ask before adding, never silently overwrite"
+// rule. Field-name -> value pairs on each entry are always a fill-in-the-
+// blank operation (see BUYER_LEAD_ENRICHABLE_FIELDS server-side), never a
+// conflicting overwrite of something that already has a value.
+let pendingMergesCache = [];
+
+function renderMergeReview(pendingMerges) {
+  pendingMergesCache = pendingMerges || [];
+  const card = document.getElementById("csv-merge-review-card");
+  document.getElementById("csv-merge-review-result").textContent = "";
+  if (pendingMergesCache.length === 0) { card.hidden = true; return; }
+  card.hidden = false;
+  document.getElementById("csv-merge-review-list").innerHTML = pendingMergesCache.map(function (m, i) {
+    const fieldSummary = Object.keys(m.fields).map(function (f) { return f + ": " + m.fields[f]; }).join(", ");
+    return '<div class="item-row">' +
+      '<label class="checkbox-row" style="margin:0;"><input type="checkbox" class="csv-merge-item-checkbox" data-index="' + i + '" checked> ' +
+        '<strong>' + esc(m.existingName) + '</strong> (' + esc(m.existingPhone) + ') &mdash; matched your upload row for "' + esc(m.newBuyerName) + '"</label>' +
+      '<div class="small-muted" style="margin-left:24px; margin-top:2px;">New: ' + esc(fieldSummary) + '</div>' +
+      '</div>';
+  }).join("");
+}
+
+document.getElementById("csv-merge-dismiss-btn").addEventListener("click", function () {
+  renderMergeReview([]);
+});
+
+document.getElementById("csv-merge-apply-btn").addEventListener("click", async function () {
+  const btn = this;
+  const checked = Array.from(document.querySelectorAll(".csv-merge-item-checkbox:checked")).map(function (cb) { return pendingMergesCache[Number(cb.getAttribute("data-index"))]; });
+  const resultEl = document.getElementById("csv-merge-review-result");
+  if (checked.length === 0) { renderMergeReview([]); return; }
+  if (btn.disabled) return;
+  btn.disabled = true;
+  const res = await api("importBuyerLeads", { confirmMerges: checked.map(function (m) { return { buyerLeadId: m.buyerLeadId, fields: m.fields }; }) });
+  btn.disabled = false;
+  if (!res.ok) { resultEl.textContent = res.error || "Could not add that data."; showToast(res.error || "Could not add that data.", true); return; }
+  renderMergeReview([]);
+  await loadBuyerLeadsAdmin();
+  showToast("Added new data to " + res.mergedCount + " existing lead(s).");
+});
+
 document.getElementById("csv-import-btn").addEventListener("click", async function () {
   const btn = this;
   const errorEl = document.getElementById("csv-import-error");
@@ -2546,10 +2590,13 @@ document.getElementById("csv-import-btn").addEventListener("click", async functi
     showToast(res.error || "Import failed.", true);
     return;
   }
-  resultEl.textContent = "Imported " + res.imported + " buyer(s)." + (res.skippedDuplicates ? " Skipped " + res.skippedDuplicates + " duplicate phone number(s)." : "");
+  resultEl.textContent = "Imported " + res.imported + " buyer(s)." +
+    (res.skippedDuplicates ? " Skipped " + res.skippedDuplicates + " duplicate(s) with nothing new to add." : "") +
+    (res.pendingMerges && res.pendingMerges.length > 0 ? " " + res.pendingMerges.length + " duplicate(s) below have new data — review them." : "");
   document.getElementById("csv-file-input").value = "";
   csvRows = []; csvHeaders = [];
   markLastImportedBuyerLeads(res.importedIds, res.imported, res.importedAt);
+  renderMergeReview(res.pendingMerges);
   await loadBuyerLeadsAdmin();
   showToast("Imported " + res.imported + " buyer(s).");
 });
@@ -2576,9 +2623,12 @@ document.getElementById("buyerleads-import-btn").addEventListener("click", async
     showToast(res.error || "Import failed.", true);
     return;
   }
-  resultEl.textContent = "Imported " + res.imported + " buyer(s)." + (res.skippedDuplicates ? " Skipped " + res.skippedDuplicates + " duplicate phone number(s)." : "");
+  resultEl.textContent = "Imported " + res.imported + " buyer(s)." +
+    (res.skippedDuplicates ? " Skipped " + res.skippedDuplicates + " duplicate(s) with nothing new to add." : "") +
+    (res.pendingMerges && res.pendingMerges.length > 0 ? " " + res.pendingMerges.length + " duplicate(s) below have new data — review them." : "");
   document.getElementById("buyerleads-import-text").value = "";
   markLastImportedBuyerLeads(res.importedIds, res.imported, res.importedAt);
+  renderMergeReview(res.pendingMerges);
   await loadBuyerLeadsAdmin();
   showToast("Imported " + res.imported + " buyer(s).");
 });
@@ -2653,6 +2703,7 @@ document.getElementById("buyerleads-sort").addEventListener("change", function (
 document.getElementById("buyerleads-filter-ownertype").addEventListener("change", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
 document.getElementById("buyerleads-filter-minequity").addEventListener("input", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
 document.getElementById("buyerleads-filter-minheldyears").addEventListener("input", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
+document.getElementById("buyerleads-filter-hideduplicates").addEventListener("change", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
 
 async function loadBuyerLeadsAdmin() {
   const res = await api("adminGetBuyerLeads", {});
@@ -2731,7 +2782,9 @@ function getFilteredBuyerLeads() {
   const minEquity = minEquityRaw === "" ? null : Number(minEquityRaw);
   const minHeldYearsRaw = document.getElementById("buyerleads-filter-minheldyears").value.trim();
   const minHeldMonths = minHeldYearsRaw === "" ? null : Number(minHeldYearsRaw) * 12;
+  const hideDuplicates = document.getElementById("buyerleads-filter-hideduplicates").checked;
   const filtered = adminBuyerLeads.filter(function (l) {
+    if (hideDuplicates && l.DuplicateOfBuyerLeadID) return false;
     if (q && ![l.BuyerName, l.Phone, l.Email, l.City, l.State, l.Zip, l.County].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; })) return false;
     if (category && (l.AssetCategories || "").split(",").map(function (c) { return c.trim().toLowerCase(); }).indexOf(category.toLowerCase()) === -1) return false;
     if (state && String(l.State || "").trim().toLowerCase() !== state) return false;
@@ -2786,7 +2839,9 @@ function renderBuyerLeadsAdmin() {
     const checked = buyerLeadsSelectedIds.has(l.BuyerLeadID) ? " checked" : "";
     return '<tr>' +
       '<td><input type="checkbox" class="buyerlead-select-checkbox" data-lead-id="' + esc(l.BuyerLeadID) + '"' + checked + (isDnc ? " disabled" : "") + '></td>' +
-      '<td>' + esc(l.BuyerName) + (isCompanyBuyerName(l.BuyerName) ? ' <span class="status-pill status-fully-worked">Co</span>' : "") + (isDnc ? ' <span class="status-pill status-dead-match">DNC</span>' : "") + '</td>' +
+      '<td>' + esc(l.BuyerName) + (isCompanyBuyerName(l.BuyerName) ? ' <span class="status-pill status-fully-worked">Co</span>' : "") +
+        (l.DuplicateOfBuyerLeadID ? ' <span class="status-pill status-onhold" title="Same phone/email as an existing lead">Possible Dup</span>' : "") +
+        (isDnc ? ' <span class="status-pill status-dead-match">DNC</span>' : "") + '</td>' +
       '<td>' + esc(l.Phone) + '</td>' +
       '<td>' + esc(l.Email || "") + '</td>' +
       '<td>' + esc(l.PhoneType || "") + '</td>' +

@@ -403,17 +403,25 @@ backend (see [SETUP.md](SETUP.md)).
   (Asset Categories, County, Last Known Purchase Price, Price Range) and it
   applies only those to every selected lead at once, leaving everything else
   untouched. Handy for "I never set Asset Type on these 50 imports and don't
-  want to open the spreadsheet." Importing now also checks email (not just
-  phone) for duplicates, and phone matching ignores formatting and a leading
-  "1" country code, so "555-123-4567" and "+1 (555) 123-4567" are recognized
-  as the same number. For anything that slipped in before that — old
-  imports, manual paste, or direct spreadsheet edits — **Scan for
-  Duplicates** finds existing leads sharing a phone or email, groups them,
-  and lets you pick which one to keep; the rest get folded into it (their
-  pitches and full contact history move over — dropping only a pitch that
-  would otherwise duplicate one the kept lead already has on the same deal —
-  and any profile field the kept lead is missing gets backfilled from a
-  duplicate that has it) and removed.
+  want to open the spreadsheet." Duplicates (matched by phone or email —
+  phone matching ignores formatting and a leading "1" country code, so
+  "555-123-4567" and "+1 (555) 123-4567" are recognized as the same number)
+  are never silently dropped or silently overwritten. When **admin**
+  imports a row that matches an existing lead: if it has data that lead
+  doesn't already have (a blank field getting filled in — never a
+  conflicting overwrite of something already set), it's held back as a
+  **Possible Duplicates With New Data** review right on the import screen
+  — shows exactly what's new for each one ("County: Travis, Portfolio
+  Value: $500,000+"), and you pick which to actually add, or dismiss the
+  whole batch to skip all of them. A duplicate row with nothing new is
+  just skipped automatically, no need to review it. For anything that
+  slipped in before this existed — old imports, manual paste, or direct
+  spreadsheet edits — **Scan for Duplicates** finds existing leads sharing
+  a phone or email, groups them, and lets you pick which one to keep; the
+  rest get folded into it (their pitches and full contact history move
+  over — dropping only a pitch that would otherwise duplicate one the kept
+  lead already has on the same deal — and any profile field the kept lead
+  is missing gets backfilled from a duplicate that has it) and removed.
 - Reps (anyone whose Type isn't Buyer, or a traditional admin-added account)
   get their own, simpler version of this same importer on their own Buyer
   Leads tab — same "How to Build a Buyer List" guide, same auto-detected
@@ -423,10 +431,16 @@ backend (see [SETUP.md](SETUP.md)).
   you who brought in each lead, and admin's Give actions and Auto-Feed will
   never hand a rep-uploaded lead to anyone but the rep who uploaded it —
   blank Uploaded By (admin's own imports) stays shared with the whole team
-  like always. Both guides also warn explicitly against cold-texting a
-  freshly skip-traced list — call first (with a voicemail if there's no
-  answer); texting only unlocks once that person has actually responded to
-  a call, same rule the rest of the app already enforces.
+  like always. A rep is never blocked by a duplicate they can't even see
+  (someone else's private list, or the shared pool) — their own row is
+  always created regardless, tagged **Possible Dup** (another admin-only
+  marker) so you can spot it later; a **Hide Possible Duplicates** filter
+  on the Buyer Leads table lets you tuck those out of the way when you're
+  reusing lists other people already uploaded. Both guides also warn
+  explicitly against cold-texting a freshly skip-traced list — call first
+  (with a voicemail if there's no answer); texting only unlocks once that
+  person has actually responded to a call, same rule the rest of the app
+  already enforces.
 - **Pitches** — every open pitch across the whole team in one table, instead
   of having to open each buyer's detail panel one at a time. Search by buyer
   or deal, filter by team member or deal, and reassign or **Withdraw** any
