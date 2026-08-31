@@ -151,6 +151,91 @@ async function doLogin() {
   showView(res);
 }
 
+/* ---------- Sign Up / Forgot Password (login screen) ---------- */
+
+document.getElementById("show-signup-link").addEventListener("click", function () {
+  document.getElementById("login-form-card").hidden = true;
+  document.getElementById("signup-form-card").hidden = false;
+});
+document.getElementById("show-login-link").addEventListener("click", function () {
+  document.getElementById("signup-form-card").hidden = true;
+  document.getElementById("login-form-card").hidden = false;
+});
+
+// Same contact info as the "Want to Join?" card below -- support for
+// forgot-password is deliberately this same admin-configurable contact,
+// not a separate concept, and not a self-service reset link (there's no
+// email-sending flow for that; someone has to know it's really you).
+let joinContactCache = null;
+document.getElementById("forgot-password-link").addEventListener("click", function () {
+  const textEl = document.getElementById("forgot-password-text");
+  const parts = [];
+  if (joinContactCache) {
+    if (joinContactCache.name) parts.push(esc(joinContactCache.name));
+    if (joinContactCache.phone) parts.push(esc(joinContactCache.phone));
+    if (joinContactCache.email) parts.push('<a href="mailto:' + esc(joinContactCache.email) + '">' + esc(joinContactCache.email) + '</a>');
+  }
+  textEl.innerHTML = parts.length > 0
+    ? '<strong>Forgot your password?</strong> Contact ' + parts.join(" &middot; ") + ' to have it reset.'
+    : '<strong>Forgot your password?</strong> Contact your admin to have it reset.';
+  textEl.hidden = false;
+});
+
+document.getElementById("signup-btn").addEventListener("click", async function () {
+  const btn = this;
+  const name = document.getElementById("signup-name").value.trim();
+  const email = document.getElementById("signup-email").value.trim();
+  const phone = document.getElementById("signup-phone").value.trim();
+  const personType = document.getElementById("signup-persontype").value;
+  const password = document.getElementById("signup-password").value;
+  const confirm = document.getElementById("signup-confirm").value;
+  const errorEl = document.getElementById("signup-error");
+  errorEl.classList.remove("show");
+  if (!name || !email || !password) {
+    errorEl.textContent = "Name, email, and password are required.";
+    errorEl.classList.add("show");
+    return;
+  }
+  if (!personType) {
+    errorEl.textContent = "Select what best describes you.";
+    errorEl.classList.add("show");
+    return;
+  }
+  if (password.length < 8) {
+    errorEl.textContent = "Password must be at least 8 characters.";
+    errorEl.classList.add("show");
+    return;
+  }
+  if (password !== confirm) {
+    errorEl.textContent = "Passwords don't match.";
+    errorEl.classList.add("show");
+    return;
+  }
+  if (btn.disabled) return;
+  btn.disabled = true;
+  const signupRes = await api("publicSignup", { name: name, email: email, phone: phone, personType: personType, password: password });
+  if (!signupRes.ok) {
+    btn.disabled = false;
+    errorEl.textContent = signupRes.error || "Could not create your account.";
+    errorEl.classList.add("show");
+    return;
+  }
+  // Active immediately -- log straight in with the same credentials
+  // instead of bouncing them back to a login form to retype everything.
+  const loginRes = await api("login", { username: email, password: password });
+  btn.disabled = false;
+  if (!loginRes.ok) {
+    document.getElementById("signup-form-card").hidden = true;
+    document.getElementById("login-form-card").hidden = false;
+    document.getElementById("login-username").value = email;
+    showToast("Account created — log in below.");
+    return;
+  }
+  setSession(loginRes);
+  showView(loginRes);
+  showToast("Welcome! Your account is ready.");
+});
+
 showView(getSession());
 
 // Shown on the login page for anyone without an account yet -- loads
@@ -158,6 +243,7 @@ showView(getSession());
 (async function loadJoinContact() {
   const res = await api("getJoinContact", {});
   if (!res.ok) return;
+  joinContactCache = res;
   const parts = [];
   if (res.name) parts.push(esc(res.name));
   if (res.phone) parts.push(esc(res.phone));
@@ -203,6 +289,15 @@ function renderRepDeals() {
   const filtered = repDeals.filter(function (d) {
     if (!q) return true;
     return [d.DealCode, d.City, d.State, d.County, d.AssetType].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; });
+  });
+  // Organized by State, then City within that state, then County as a final
+  // tiebreaker -- so a rep scanning a long list sees deals in the same area
+  // clustered together instead of in whatever order they happened to be
+  // added, making it easy to work through one region at a time.
+  filtered.sort(function (a, b) {
+    return String(a.State || "").localeCompare(String(b.State || "")) ||
+      String(a.City || "").localeCompare(String(b.City || "")) ||
+      String(a.County || "").localeCompare(String(b.County || ""));
   });
   empty.hidden = filtered.length > 0;
   container.innerHTML = filtered.map(function (d) {
@@ -284,6 +379,8 @@ async function openRepDealDetail(dealId) {
       (deal.AsIsValue ? '<div><strong>As-Is Equity:</strong> ' + formatAsIsEquity(deal.AsIsEquity) + '</div>' : "") +
       (deal.Description ? '<div style="margin-top:8px;">' + esc(deal.Description) + '</div>' : "") +
       (deal.GeneralDriveLink ? '<div style="margin-top:8px;"><a href="' + esc(deal.GeneralDriveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
+      (!deal.Address ? '<div style="margin-top:10px;"><button class="btn secondary small" id="request-address-btn" data-deal-id="' + esc(deal.DealID) + '">Request Address Access</button>' +
+        '<div class="small-muted" style="margin-top:6px;">Pitch off the general deal info first — only use this once a buyer has responded, is genuinely interested, and specifically asks you for the address. This just emails admin to ask; it does not grant it.</div></div>' : "") +
     '</div>' +
 
     '<div class="section-title">Step 1 &middot; Submit a Facebook Post for Approval</div>' +
@@ -317,6 +414,7 @@ async function openRepDealDetail(dealId) {
     '<div id="buyer-list">' + renderBuyerMatchList(buyers) + '</div>';
 
   wireBuyerMatchListHandlers(document.getElementById("buyer-list"), function () { return refreshBuyerMatchList(dealId, "buyer-list"); });
+  wireRequestAddressButton();
 
   document.getElementById("close-detail-btn").addEventListener("click", function () { overlay.hidden = true; });
 
@@ -644,6 +742,23 @@ function updateVoicemailRowVisibility() {
   if (!isCall) document.getElementById("contact-voicemail-input").checked = false;
 }
 
+// Shared by openRepDealDetail and openPitchDetail -- both render a
+// "Request Address Access" button with the same id/data attribute when the
+// deal's Address isn't visible yet, so this just needs to be called once
+// after either one sets panel.innerHTML.
+function wireRequestAddressButton() {
+  const btn = document.getElementById("request-address-btn");
+  if (!btn) return;
+  btn.addEventListener("click", async function () {
+    if (btn.disabled) return;
+    btn.disabled = true;
+    const res = await api("requestAddressAccess", { dealId: btn.getAttribute("data-deal-id") });
+    btn.disabled = false;
+    if (!res.ok) { showToast(res.error || "Could not send the request.", true); return; }
+    showToast("Address requested — admin has been notified.");
+  });
+}
+
 // Same fields/wording as the rep's deal-detail confidentiality banner
 // (openRepDealDetail) -- shown here too since a rep can reach this same
 // deal context from a matched buyer's pitch without ever opening the deal
@@ -675,6 +790,8 @@ function renderPitchDealInfo(deal) {
       (deal.AsIsValue ? '<div><strong>As-Is Value:</strong> ' + esc(deal.AsIsValue) + '</div>' : "") +
       (deal.AsIsValue ? '<div><strong>As-Is Equity:</strong> ' + formatAsIsEquity(deal.AsIsEquity) + '</div>' : "") +
       (deal.GeneralDriveLink ? '<div style="margin-top:8px;"><strong>Deal Documents:</strong> <a href="' + esc(deal.GeneralDriveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
+      (!deal.Address ? '<div style="margin-top:10px;"><button class="btn secondary small" id="request-address-btn" data-deal-id="' + esc(deal.DealID) + '">Request Address Access</button>' +
+        '<div class="small-muted" style="margin-top:6px;">Pitch off the general deal info first — only use this once a buyer has responded, is genuinely interested, and specifically asks you for the address. This just emails admin to ask; it does not grant it.</div></div>' : "") +
     '</div>' +
     (deal.Description
       ? '<details open style="margin-top:10px;"><summary style="cursor:pointer; font-weight:600;">Description / Notes <span class="small-muted">(click to collapse)</span></summary>' +
@@ -798,6 +915,8 @@ async function openPitchDetail(pitchId) {
     openPitchDetail(pitchId);
     showToast(willBeDnc ? "Marked Do Not Contact." : "Contact allowed again.");
   });
+
+  wireRequestAddressButton();
 
   const phoneSelect = document.getElementById("contact-phone-select");
   if (phoneSelect) {
@@ -980,6 +1099,7 @@ function openDealModal() {
   document.getElementById("deal-sensitive-drive-input").value = "";
   document.getElementById("deal-admin-notes-input").value = "";
   document.getElementById("deal-source-link-input").value = "";
+  document.getElementById("deal-assignmode-input").value = "";
   const statusSelect = document.getElementById("deal-status-input");
   statusSelect.innerHTML = statusOptionsCache.map(function (s) { return '<option value="' + esc(s) + '">' + esc(s) + '</option>'; }).join("");
   const categorySelect = document.getElementById("deal-assetcategory-input");
@@ -1026,7 +1146,8 @@ document.getElementById("deal-modal-save").addEventListener("click", async funct
     adminPrivateNotes: document.getElementById("deal-admin-notes-input").value.trim(),
     sourceLink: document.getElementById("deal-source-link-input").value.trim()
   };
-  const res = await api("adminAddDeal", { data: data });
+  const assignMode = document.getElementById("deal-assignmode-input").value;
+  const res = await api("adminAddDeal", { data: data, assignMode: assignMode });
   btn.disabled = false;
   if (!res.ok) {
     errorEl.textContent = res.error || "Could not save deal.";
@@ -1036,7 +1157,7 @@ document.getElementById("deal-modal-save").addEventListener("click", async funct
   }
   document.getElementById("deal-modal").hidden = true;
   await loadAdminDeals();
-  showToast("Deal added.");
+  showToast(assignMode ? "Deal added and assigned to " + res.assignedCount + " rep(s)." : "Deal added.");
 });
 
 async function openAdminDealDetail(dealId) {
@@ -1446,6 +1567,7 @@ function renderReps() {
       '<td>' + esc(r.username) + '</td>' +
       '<td>' + esc(r.phone || "") + '</td>' +
       '<td>' + esc(r.email || "") + '</td>' +
+      '<td class="small-muted">' + (r.personType ? esc(r.personType) : "&mdash;") + '</td>' +
       '<td><label class="toggle-row"><input type="checkbox" class="rep-toggle" data-username="' + esc(r.username) + '" data-field="allAccess"' + (r.allAccess ? " checked" : "") + '></label></td>' +
       '<td><label class="toggle-row"><input type="checkbox" class="rep-toggle" data-username="' + esc(r.username) + '" data-field="isAdmin"' + (r.isAdmin ? " checked" : "") + '></label></td>' +
       '<td><label class="toggle-row"><input type="checkbox" class="rep-toggle" data-username="' + esc(r.username) + '" data-field="active"' + (r.active ? " checked" : "") + '></label></td>' +
@@ -1454,7 +1576,7 @@ function renderReps() {
       '<td class="small-muted">' + [r.preferredCity, r.preferredState, r.preferredZip].filter(Boolean).join(", ") + '</td>' +
       '<td style="white-space:nowrap;">' +
         '<button class="btn secondary small reset-pw-btn" data-username="' + esc(r.username) + '" data-name="' + esc(r.name) + '">Reset Password</button> ' +
-        '<button class="btn secondary small area-btn" data-username="' + esc(r.username) + '" data-name="' + esc(r.name) + '" data-phone="' + esc(r.phone) + '" data-email="' + esc(r.email) + '" data-city="' + esc(r.preferredCity) + '" data-state="' + esc(r.preferredState) + '" data-zip="' + esc(r.preferredZip) + '">Edit Details</button>' +
+        '<button class="btn secondary small area-btn" data-username="' + esc(r.username) + '" data-name="' + esc(r.name) + '" data-phone="' + esc(r.phone) + '" data-email="' + esc(r.email) + '" data-city="' + esc(r.preferredCity) + '" data-state="' + esc(r.preferredState) + '" data-zip="' + esc(r.preferredZip) + '" data-persontype="' + esc(r.personType || "") + '">Edit Details</button>' +
       '</td>' +
       '</tr>';
   }).join("");
@@ -1477,18 +1599,19 @@ function renderReps() {
   Array.from(tbody.querySelectorAll(".area-btn")).forEach(function (btn) {
     btn.addEventListener("click", function () {
       openAreaModal(btn.getAttribute("data-username"), btn.getAttribute("data-name"), btn.getAttribute("data-phone"), btn.getAttribute("data-email"),
-        btn.getAttribute("data-city"), btn.getAttribute("data-state"), btn.getAttribute("data-zip"));
+        btn.getAttribute("data-city"), btn.getAttribute("data-state"), btn.getAttribute("data-zip"), btn.getAttribute("data-persontype"));
     });
   });
 }
 
-function openAreaModal(username, name, phone, email, city, state, zip) {
+function openAreaModal(username, name, phone, email, city, state, zip, personType) {
   document.getElementById("area-modal-who").textContent = name + " (" + username + ")";
   document.getElementById("area-phone-input").value = phone || "";
   document.getElementById("area-email-input").value = email || "";
   document.getElementById("area-city-input").value = city || "";
   document.getElementById("area-state-input").value = state || "";
   document.getElementById("area-zip-input").value = zip || "";
+  document.getElementById("area-persontype-input").value = personType || "";
   document.getElementById("area-modal").hidden = false;
   document.getElementById("area-modal-save").setAttribute("data-username", username);
 }
@@ -1508,7 +1631,8 @@ document.getElementById("area-modal-save").addEventListener("click", async funct
     email: document.getElementById("area-email-input").value.trim(),
     city: document.getElementById("area-city-input").value.trim(),
     state: document.getElementById("area-state-input").value.trim(),
-    zip: document.getElementById("area-zip-input").value.trim()
+    zip: document.getElementById("area-zip-input").value.trim(),
+    personType: document.getElementById("area-persontype-input").value
   });
   btn.disabled = false;
   document.getElementById("area-modal").hidden = true;

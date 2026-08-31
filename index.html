@@ -221,18 +221,52 @@
 
 <!-- ================= LOGIN ================= -->
 <div class="wrap" id="login-view">
-  <div class="card">
+  <div class="card" id="login-form-card">
     <h2 class="step-title">Log In</h2>
-    <p class="step-sub">Enter the username and password your admin set up for you.</p>
+    <p class="step-sub">Enter your username (or email) and password.</p>
     <label class="field-label">Username</label>
     <input type="text" id="login-username" autocomplete="username">
     <label class="field-label">Password</label>
     <input type="password" id="login-password" autocomplete="current-password">
     <div class="error-text" id="login-error"></div>
-    <div class="nav-row" style="justify-content:flex-end;">
+    <div class="nav-row" style="justify-content:space-between; align-items:center;">
+      <button class="link-btn" type="button" id="forgot-password-link">Forgot password?</button>
       <button class="btn primary" id="login-btn">Log In</button>
     </div>
+    <p class="small-muted" id="forgot-password-text" style="margin-top:10px;" hidden></p>
+    <div class="nav-row" style="justify-content:center; margin-top:16px;">
+      <button class="link-btn" type="button" id="show-signup-link">Don't have an account? Sign Up</button>
+    </div>
   </div>
+
+  <div class="card" id="signup-form-card" hidden>
+    <h2 class="step-title">Sign Up</h2>
+    <p class="step-sub">Create your own account with an email and password — admin will assign you deals once you're set up.</p>
+    <label class="field-label">Name</label>
+    <input type="text" id="signup-name" autocomplete="name">
+    <label class="field-label">Email</label>
+    <input type="email" id="signup-email" autocomplete="email">
+    <label class="field-label">Phone <span class="small-muted">(optional)</span></label>
+    <input type="text" id="signup-phone" autocomplete="tel">
+    <label class="field-label">I am a...</label>
+    <select id="signup-persontype">
+      <option value="">&mdash; select one &mdash;</option>
+      <option value="Buyer">Buyer</option>
+      <option value="Wholesaler">Wholesaler</option>
+      <option value="Realtor">Realtor</option>
+      <option value="Other">Other</option>
+    </select>
+    <label class="field-label">Password <span class="small-muted">(at least 8 characters)</span></label>
+    <input type="password" id="signup-password" autocomplete="new-password">
+    <label class="field-label">Confirm Password</label>
+    <input type="password" id="signup-confirm" autocomplete="new-password">
+    <div class="error-text" id="signup-error"></div>
+    <div class="nav-row" style="justify-content:space-between; align-items:center;">
+      <button class="link-btn" type="button" id="show-login-link">Already have an account? Log In</button>
+      <button class="btn primary" id="signup-btn">Sign Up</button>
+    </div>
+  </div>
+
   <div class="card" id="join-contact-card" hidden>
     <p class="small-muted" style="margin:0;" id="join-contact-text"></p>
   </div>
@@ -258,6 +292,16 @@
         <strong>Step 2.</strong> As soon as a buyer shows real interest, log them under "Interested Buyers" on that
         deal — this emails admin right away. Keep the conversation notes updated there as things progress, and mark
         the match Negotiating, Closing, or Dead as it plays out, so it's easy to follow which deals are closing.
+      </div>
+      <div style="margin-top:8px;">
+        <strong>Address disclosure.</strong> Every deal's exact street address is locked by default — you'll only ever
+        see its Deal Code, City/State/Zip, County, price, and other general info until admin specifically grants you
+        that one deal's address. Pitch buyers off that general info first. Only once a buyer has actually responded
+        to that pitch, is genuinely interested, and specifically asks you for the address — never before, and never
+        just because a deal looks like a good fit to you — hit <strong>Request Address Access</strong> on that deal
+        to ask admin for it. Never share an address you haven't been granted, and never share a granted address with
+        anyone besides that one legitimate, matched buyer who asked for it. Sharing it early, or with the wrong
+        person, risks losing us the deal entirely and getting removed as a team member.
       </div>
     </div>
     <div style="display:flex; gap:8px; margin-bottom:16px;">
@@ -370,7 +414,7 @@
       <button class="btn primary" id="add-rep-btn">+ Add Team Member</button>
     </div>
     <table class="crm-table">
-      <thead><tr><th>Name</th><th>Username</th><th>Phone</th><th>Email</th><th>All-Deal Access</th><th>Admin</th><th>Active</th><th># Deals</th><th>Last Active</th><th>Preferred Buyer-Lead Area</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Name</th><th>Username</th><th>Phone</th><th>Email</th><th>Type</th><th>All-Deal Access</th><th>Admin</th><th>Active</th><th># Deals</th><th>Last Active</th><th>Preferred Buyer-Lead Area</th><th>Actions</th></tr></thead>
       <tbody id="reps-tbody"></tbody>
     </table>
     <div id="reps-empty" class="small-muted" style="padding:20px;" hidden>No team members yet.</div>
@@ -390,6 +434,37 @@
 
   <!-- Buyer leads tab -->
   <div id="tab-buyerleads" hidden>
+    <div class="card">
+      <details open>
+        <summary class="section-title" style="margin-top:0; cursor:pointer; display:inline-block;">How to Build a Buyer List (click to collapse)</summary>
+        <p class="small-muted">A step-by-step guide, not an automated integration — Propwire and skip-trace steps below all happen on those sites directly; come back here to import the CSV once you have it.</p>
+
+        <p><strong>Step 1 — Find cash buyers on Propwire</strong></p>
+        <p class="small-muted">
+          Go to <a href="https://propwire.com" target="_blank" rel="noopener">propwire.com</a> and start a new search. Filter to <strong>Cash Buyers</strong>, then pick the category that matches the deal you're building a list for:
+        </p>
+        <ul class="small-muted" style="margin:6px 0 12px 20px;">
+          <li><strong>Fix &amp; Flip deals</strong> — filter to buyers with a recent Fix &amp; Flip purchase.</li>
+          <li><strong>Land deals</strong> — switch Property Type to <strong>Land</strong> instead, still Cash Buyers.</li>
+        </ul>
+        <p class="small-muted">
+          Then set <strong>Portfolio Value</strong> to a range of roughly <strong>3x to 20x the subject property's price</strong> — e.g. a $100,000 deal → filter buyers with a $300,000–$2,000,000 portfolio. This targets buyers who can comfortably afford this specific deal without being so large they're not responsive to a deal this size.
+        </p>
+
+        <p><strong>Step 2 — Skip trace the list</strong></p>
+        <p class="small-muted">Propwire's export usually won't include phone/email for every owner. Get that with one of:</p>
+        <ul class="small-muted" style="margin:6px 0 12px 20px;">
+          <li>Manually, for free, one at a time at <a href="https://www.truepeoplesearch.com" target="_blank" rel="noopener">truepeoplesearch.com</a> — free but slow, fine for a short list.</li>
+          <li>Have a VA do the manual lookups for you at scale.</li>
+          <li>Pay Propwire's own built-in skip trace on the export.</li>
+          <li>Pay a third-party skip-trace vendor to run the whole list at once.</li>
+        </ul>
+
+        <p><strong>Step 3 — Import it here</strong></p>
+        <p class="small-muted">Once you have a CSV with names, phone numbers, and (ideally) portfolio value, use the importer below — it auto-guesses column mapping for common skip-trace export formats, including Propwire's.</p>
+      </details>
+    </div>
+
     <div class="card">
       <div class="section-title" style="margin-top:0;">Import Buyer Leads From a CSV File</div>
       <p class="small-muted">Upload a CSV file in any column order — we'll guess which column is which based on its header, show you the guess, and let you fix anything before importing. Duplicate phone numbers are skipped automatically.</p>
@@ -679,6 +754,15 @@
     <input type="text" id="deal-source-link-input" placeholder="https://...">
     <label class="field-label">Private Admin Notes</label>
     <textarea id="deal-admin-notes-input"></textarea>
+
+    <div class="section-title">Assign This Deal To</div>
+    <select id="deal-assignmode-input">
+      <option value="">Nobody yet &mdash; I'll assign it myself later</option>
+      <option value="all">All Users</option>
+      <option value="unassigned">All Users With No Assigned Deals Right Now</option>
+    </select>
+    <p class="small-muted">All-access team members and admin already see every deal regardless of this — this only writes an assignment for everyone else. "No assigned deals" is checked at the moment you save, so it only catches reps with zero deals right now.</p>
+
     <div class="error-text" id="deal-modal-error"></div>
     <div class="nav-row">
       <button class="btn secondary" id="deal-modal-cancel">Cancel</button>
@@ -735,6 +819,14 @@
     <input type="text" id="area-phone-input">
     <label class="field-label">Email <span class="small-muted">(optional)</span></label>
     <input type="text" id="area-email-input">
+    <label class="field-label">Type <span class="small-muted">(optional)</span></label>
+    <select id="area-persontype-input">
+      <option value="">&mdash; not set &mdash;</option>
+      <option value="Buyer">Buyer</option>
+      <option value="Wholesaler">Wholesaler</option>
+      <option value="Realtor">Realtor</option>
+      <option value="Other">Other</option>
+    </select>
     <label class="field-label">City</label>
     <input type="text" id="area-city-input">
     <label class="field-label">States <span class="small-muted">(comma separated, e.g. AZ, NV, CA)</span></label>
@@ -754,7 +846,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=31"></script>
-<script src="app.js?v=31"></script>
+<script src="config.js?v=32"></script>
+<script src="app.js?v=32"></script>
 </body>
 </html>

@@ -59,7 +59,12 @@ const FOLLOWUP_HOURS = 24;
 const MATCH_STATUSES = ['Active Match', 'Negotiating', 'Closing', 'Dead Match'];
 const DEFAULT_ASSET_CATEGORIES = ['Single Family', 'Condominium / Townhouse', 'Multifamily (1-4 Units)', 'Multifamily (4+ Units)', 'Fix and Flip', 'Residential Vacant Land', 'Commercial'];
 
-const REP_COLUMNS = ['Username', 'Name', 'Phone', 'Email', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'LastActive', 'PreferredCity', 'PreferredState', 'PreferredZip'];
+const REP_COLUMNS = ['Username', 'Name', 'Phone', 'Email', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'LastActive', 'PreferredCity', 'PreferredState', 'PreferredZip', 'PersonType'];
+
+// Self-identified at signup -- informational only (admin visibility/
+// filtering in the Team tab), doesn't gate any functionality. Not
+// required for an admin-created rep, only for public signup.
+const PERSON_TYPES = ['Buyer', 'Wholesaler', 'Realtor', 'Other'];
 // DealCode (e.g. "A-1") plus City/State/Zip/County/Price is everything a
 // rep ever sees to identify a deal -- Address is admin-only, unconditionally
 // (see file header comment). GeneralDriveLink is visible to any rep with
@@ -178,6 +183,8 @@ function doPost(e) {
     switch (action) {
       case 'login':
         return jsonOut(login(body));
+      case 'publicSignup':
+        return jsonOut(publicSignup(body));
       case 'getJoinContact':
         return jsonOut(getJoinContact());
 
@@ -208,6 +215,8 @@ function doPost(e) {
         return jsonOut(withSession(body, getPitchContacts));
       case 'addPitchContact':
         return jsonOut(withSession(body, addPitchContact));
+      case 'requestAddressAccess':
+        return jsonOut(withSession(body, requestAddressAccess));
       case 'updateBuyerLeadNotes':
         return jsonOut(withSession(body, updateBuyerLeadNotes));
       case 'updateBuyerLeadDoNotContact':
@@ -499,6 +508,66 @@ function login(body) {
   };
 }
 
+// Anyone can create their own account with an email + password -- no
+// invite code, no admin action needed first. Username is just the email,
+// lowercased, so login() (which looks up by Username) needs no changes.
+// New accounts are Active immediately (can log in right away) but start
+// with no deal access at all -- AllAccess is false and there's no
+// Assignments row yet, so they see an empty Deals tab until admin either
+// bulk-assigns them via a new deal's "assign to all/unassigned users"
+// option, or assigns them individually. Self-signup is deliberately never
+// IsAdmin.
+function publicSignup(body) {
+  const email = String(body.email || '').trim().toLowerCase();
+  const name = String(body.name || '').trim();
+  const password = String(body.password || '');
+  const personType = String(body.personType || '').trim();
+  if (!email || !name || !password) return { ok: false, error: 'Name, email, and password are required.' };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, error: 'Enter a valid email address.' };
+  if (password.length < 8) return { ok: false, error: 'Password must be at least 8 characters.' };
+  if (PERSON_TYPES.indexOf(personType) === -1) return { ok: false, error: 'Select what best describes you.' };
+
+  const sheet = getSheet(REPS_SHEET, REP_COLUMNS);
+  const reps = sheetToObjects(sheet);
+  const taken = reps.some(function (r) {
+    return String(r['Username'] || '').trim().toLowerCase() === email || String(r['Email'] || '').trim().toLowerCase() === email;
+  });
+  if (taken) return { ok: false, error: 'An account with that email already exists — log in instead, or use Forgot Password to reach support.' };
+
+  const salt = Utilities.getUuid();
+  const now = new Date().toISOString();
+  appendRowByHeaders(sheet, {
+    'Username': email, 'Name': name, 'Phone': String(body.phone || '').trim(), 'Email': email,
+    'PasswordHash': hashPassword(password, salt), 'Salt': salt,
+    'AllAccess': false, 'IsAdmin': false, 'Active': true, 'CreatedAt': now, 'LastActive': '',
+    'PreferredCity': '', 'PreferredState': '', 'PreferredZip': '', 'PersonType': personType
+  });
+
+  const supportEmail = getSupportEmail();
+  if (supportEmail) {
+    MailApp.sendEmail({
+      to: supportEmail,
+      subject: 'SendMyBuyer — new account signed up (' + personType + ')',
+      body: name + ' (' + email + ') just created their own account as a ' + personType + ' and is active immediately.\n\n' +
+        'They have no deals assigned yet — add them individually from a deal\'s Access section, or use ' +
+        '"Assign to all users" / "Assign to all users with no assigned deals" the next time you upload a deal.'
+    });
+  }
+
+  return { ok: true };
+}
+
+// Shared "who is support" for forgot-password and address-request
+// notifications -- reuses the existing "Want to Join?" contact email
+// (shown on the login page, admin-configurable, not tied to a real
+// login) since that's already the designated point of contact for anyone
+// without full access. Falls back to ADMIN_NOTIFY_EMAIL if no join
+// contact email is set.
+function getSupportEmail() {
+  const props = PropertiesService.getScriptProperties();
+  return props.getProperty('JOIN_CONTACT_EMAIL') || props.getProperty('ADMIN_NOTIFY_EMAIL') || '';
+}
+
 // ---------- Access control ----------
 
 function canAccessDeal(session, dealId) {
@@ -669,6 +738,14 @@ function applyAddressSecrecy(deal, session, grants) {
   return copy;
 }
 
+// body.assignMode (optional): 'all' bulk-assigns every active, non-admin,
+// non-all-access rep to the new deal; 'unassigned' does the same but only
+// for reps who have zero Assignments rows at all right now (checked at
+// this exact moment -- a rep who already has any deal, even one that's
+// since sold or gone dead, doesn't qualify until they're back down to
+// zero). All-access reps are skipped either way since they already see
+// every deal without needing an Assignments row, and so is admin (use the
+// separate Assign Myself toggle on the deal detail for that).
 function adminAddDeal(body) {
   const d = body.data || {};
   if (!d.address) return { ok: false, error: 'Address is required.' };
@@ -684,7 +761,30 @@ function adminAddDeal(body) {
     'AdminPrivateNotes': d.adminPrivateNotes || '', 'SourceLink': d.sourceLink || '',
     'CreatedAt': now, 'UpdatedAt': now
   });
-  return { ok: true, dealId: dealId };
+
+  let assignedCount = 0;
+  if (body.assignMode === 'all' || body.assignMode === 'unassigned') {
+    const repsSheet = getSheet(REPS_SHEET, REP_COLUMNS);
+    let eligibleReps = sheetToObjects(repsSheet).filter(function (r) {
+      const active = !(r['Active'] === false || r['Active'] === 'FALSE');
+      const isAdmin = r['IsAdmin'] === true || r['IsAdmin'] === 'TRUE';
+      const allAccess = r['AllAccess'] === true || r['AllAccess'] === 'TRUE';
+      return active && !isAdmin && !allAccess;
+    });
+    const assignmentsSheet = getSheet(ASSIGNMENTS_SHEET, ASSIGNMENT_COLUMNS);
+    const existingAssignments = sheetToObjects(assignmentsSheet);
+    if (body.assignMode === 'unassigned') {
+      const assignedUsernames = {};
+      existingAssignments.forEach(function (a) { assignedUsernames[String(a['Username'] || '').trim().toLowerCase()] = true; });
+      eligibleReps = eligibleReps.filter(function (r) { return !assignedUsernames[String(r['Username'] || '').trim().toLowerCase()]; });
+    }
+    appendRowsByHeaders(assignmentsSheet, eligibleReps.map(function (r) {
+      return { 'DealID': dealId, 'Username': String(r['Username'] || '').trim().toLowerCase(), 'AssignedAt': now };
+    }));
+    assignedCount = eligibleReps.length;
+  }
+
+  return { ok: true, dealId: dealId, assignedCount: assignedCount };
 }
 
 function adminUpdateDeal(body) {
@@ -786,7 +886,8 @@ function adminGetReps(body) {
       active: !(r['Active'] === false || r['Active'] === 'FALSE'),
       createdAt: r['CreatedAt'], lastActive: r['LastActive'] || '',
       dealsAssignedCount: allAccess ? activeDealsCount : (assignedActiveCountByUsername[username] || 0),
-      preferredCity: r['PreferredCity'] || '', preferredState: r['PreferredState'] || '', preferredZip: r['PreferredZip'] || ''
+      preferredCity: r['PreferredCity'] || '', preferredState: r['PreferredState'] || '', preferredZip: r['PreferredZip'] || '',
+      personType: r['PersonType'] || ''
     };
   });
   return { ok: true, reps: reps };
@@ -899,6 +1000,35 @@ function adminGetAddressGrants(body) {
   const sheet = getSheet(ADDRESS_GRANTS_SHEET, ADDRESS_GRANT_COLUMNS);
   const rows = sheetToObjects(sheet).filter(function (r) { return r['DealID'] === body.dealId; });
   return { ok: true, usernames: rows.map(function (r) { return r['Username']; }) };
+}
+
+// The in-app version of the "ask admin for the address" SOP -- a rep hits
+// this from the pitch/deal screen once a matched buyer has expressed real
+// interest and specifically wants the address, instead of that request
+// happening off-platform with no record of it. Just sends an email (same
+// support contact as publicSignup/forgot-password); the actual grant is
+// still a deliberate, separate admin action via
+// adminGrantAddressAccess, this only asks for it. Never includes the
+// Address itself -- this rep doesn't have it yet, that's the whole point.
+function requestAddressAccess(body, session) {
+  if (!body.dealId) return { ok: false, error: 'Missing dealId.' };
+  if (!canAccessDeal(session, body.dealId)) return { ok: false, error: 'You do not have access to this deal.' };
+  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === body.dealId; });
+  if (!deal) return { ok: false, error: 'Deal not found.' };
+
+  const supportEmail = getSupportEmail();
+  if (!supportEmail) return { ok: false, error: 'No support contact is set up yet — ask admin to set the "Want to Join?" contact email in the Team tab.' };
+
+  MailApp.sendEmail({
+    to: supportEmail,
+    subject: 'SendMyBuyer — address requested for ' + (deal['DealCode'] || deal['DealID']),
+    body: (session.n || session.u) + ' is requesting the full address for ' + (deal['DealCode'] || deal['DealID']) +
+      ' (' + [deal['City'], deal['State']].filter(Boolean).join(', ') + ').\n\n' +
+      (body.note ? 'Note from rep: ' + body.note + '\n\n' : '') +
+      'Grant or deny from that deal\'s Address Access section in the admin panel.'
+  });
+  return { ok: true };
 }
 
 // ---------- Interested buyers ----------
@@ -2016,6 +2146,13 @@ function adminSetRepPreferredArea(body) {
   sheet.getRange(match._row, getColumnIndex(sheet, 'PreferredCity')).setValue(body.city || '');
   sheet.getRange(match._row, getColumnIndex(sheet, 'PreferredState')).setValue(body.state || '');
   sheet.getRange(match._row, getColumnIndex(sheet, 'PreferredZip')).setValue(body.zip || '');
+  if (body.personType !== undefined) {
+    // Blank is allowed here (admin clearing/not setting it for an
+    // internally-added rep) even though public signup itself requires a
+    // real PERSON_TYPES value -- this is just correcting/backfilling it.
+    if (body.personType && PERSON_TYPES.indexOf(body.personType) === -1) return { ok: false, error: 'Invalid type.' };
+    sheet.getRange(match._row, getColumnIndex(sheet, 'PersonType')).setValue(body.personType || '');
+  }
   return { ok: true };
 }
 

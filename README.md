@@ -5,17 +5,45 @@ deals to specific reps (or gives them access to everything), and each rep
 works their SOP against every deal they can see.
 
 Same spirit as [SendMySeller](https://github.com/pharaohm33/seller-lead-form)
-— plain HTML/CSS/JS, no build step, no framework — except this one's audience
-is your own team rather than the public, so it's a username/password login
-instead of a public wizard. Hosted on GitHub Pages; data lives in a Google
-Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
+— plain HTML/CSS/JS, no build step, no framework. Unlike SendMySeller's
+public wizard, this one's login-gated — but anyone can create their own
+account (see **Accounts &amp; Sign Up** below), it's just that a brand-new
+account starts with zero deal access until admin assigns some. Hosted on
+GitHub Pages; data lives in a Google Sheet you own via a small Apps Script
+backend (see [SETUP.md](SETUP.md)).
 
 ## What it does
+
+**Accounts &amp; Sign Up:**
+
+- Anyone can create their own account from the login screen — **Sign Up**
+  toggles to a form for Name, Email, Phone (optional), a self-identified
+  **I am a...** (Buyer, Wholesaler, Realtor, or Other — informational, shown
+  in the Team tab so admin can see who's who, doesn't gate any
+  functionality), and a password (8+ characters). Username is just the
+  email, lowercased. The account is **active immediately** — no approval
+  queue — but starts with zero deal access: no all-deal access, not
+  assigned to anything, so a brand-new signup sees an empty Deals tab until
+  admin assigns them something (individually, or via **Assign to all
+  users** / **Assign to all users with no assigned deals** the next time a
+  deal's added — see Deals below). Admin gets an email the moment someone
+  signs up. Self-signup can never create an admin account.
+- **Forgot password?** on the login screen doesn't reset anything itself —
+  there's no email-reset flow — it just surfaces the same **"Want to
+  Join?"** contact info admin's already set (Team tab) so the person knows
+  who to actually ask. That same contact is also who gets emailed for a
+  rep's **Request Address Access** (see Address disclosure below) — one
+  designated support contact for both, not two separate things to keep in
+  sync. Falls back to `ADMIN_NOTIFY_EMAIL` if no join contact email is set.
 
 **Rep side** (after logging in):
 
 - Sees every deal they've been given access to (either specific deals, or
-  "all deals" if the admin granted that) — identified only by a **Deal Code**
+  "all deals" if the admin granted that), sorted by **State, then City
+  within that state, then County** as a final tiebreaker — so deals in the
+  same area cluster together instead of showing up in whatever order they
+  were added, making it easy to work through one region at a time —
+  identified only by a **Deal Code**
   (e.g. "A-1") plus City/State/Zip/County/Price. The exact street address is
   hidden by default, with one deliberate exception: admin can disclose it to
   a specific team member for a specific deal (once they've proven they work
@@ -47,6 +75,14 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
      **Active Match**, **Negotiating**, **Closing**, or **Dead Match** (buyer
      couldn't agree) as it plays out — an easy-to-follow, deal-by-deal picture
      of who's actually closing.
+  3. **Address disclosure**, spelled out right in this same banner: pitch
+     off the general deal info first (Deal Code, City/State/Zip, County,
+     price — never the address). Only once a buyer has actually responded
+     and specifically asks for the address — not just because a rep thinks
+     it looks like a good fit — hit **Request Address Access** on that deal
+     to email admin and ask for it. Sharing an address early, or with
+     anyone besides that one legitimate buyer who asked, risks losing the
+     deal and getting removed from the team.
 - Every Facebook post submission and every interested-buyer submission emails
   the admin automatically.
 - On a buyer's pitch detail, a rep can edit that one buyer's own info right
@@ -67,7 +103,13 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   the way once they've read it, or expand it again any time. Admin always
   sees the Address here too, with no grant needed and no warning banner —
   same as admin already does on the deal itself — including while using
-  **Work as Rep** to preview a rep's screen.
+  **Work as Rep** to preview a rep's screen. When the address isn't
+  disclosed yet, a **Request Address Access** button sits right there
+  instead — the actual SOP: once a matched buyer has expressed real
+  interest and specifically wants the address, a rep hits this (rather than
+  asking off-platform) and it emails admin to grant it from that deal's
+  Address Access section. Admin still makes the actual call on granting it;
+  this only asks.
 - **Buyer Leads** — a separate "Buyer Leads" tab shows every buyer they've
   been given for a deal we currently have to sell (never a bare contact list
   with nothing to offer them), laid out as a scrollable table — paginated at
@@ -139,7 +181,15 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   deal (flagged in red if it's 0 — nobody, including admin, is on it).
   Turning an admin account's All Access off in the Team tab makes their
   coverage genuinely per-deal from then on, exactly like a regular rep,
-  instead of showing up everywhere regardless. Add deals, change a deal's
+  instead of showing up everywhere regardless. When adding a new deal,
+  **Assign This Deal To** offers a one-click bulk assignment right at
+  creation — **All Users** (every active, non-all-access rep gets an
+  Assignments row for it) or **All Users With No Assigned Deals Right Now**
+  (same, but only reps who currently have zero deals at all, checked at the
+  moment you save — once a rep has any deal they drop out of future
+  "unassigned" batches until they're back down to zero). All-access reps
+  and admin are skipped either way, since they already see every deal
+  without needing an assignment row. Add deals, change a deal's
   status (Active, Sold, Dead, Under Contract, On Hold, or whatever
   categories you've defined), edit the **Address / City / State / Zip** at
   any time after creation (e.g. a typo, or details that firm up after the
@@ -162,22 +212,27 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   Notes** section on every deal is visible to you alone — paste the original
   online listing link, track sourcing details, whatever you don't want any
   rep to ever see.
-- **Team** — add/remove team members, toggle "all-deal access" or admin
-  rights per person, reset anyone's password. No self-serve signup — you
-  create every login yourself. Each rep's row (including your own admin
-  account) shows their **phone number** and **email**, **# of active deals**
-  they can currently work (every active deal for an all-access rep,
+- **Team** — every account also shows up here whether you created it or
+  someone self-signed-up for it (see **Accounts &amp; Sign Up** above) —
+  add/remove team members yourself too if you want, toggle "all-deal
+  access" or admin rights per person, reset anyone's password. Each rep's
+  row (including your own admin account) shows their **phone number**,
+  **email**, self-identified **Type** (Buyer, Wholesaler, Realtor, Other,
+  or blank for an admin-added account that never set one), **# of active
+  deals** they can currently work (every active deal for an all-access rep,
   otherwise however many they've been specifically assigned), and **last
   active** (their most recent login) — a quick way to spot who's overloaded
   or who's gone quiet. **Edit Details** on a rep lets you set/update their
-  phone, email, and preferred buyer-lead area — city and zip are still
+  phone, email, Type, and preferred buyer-lead area — city and zip are still
   single values, but **states are now a comma-separated list** (e.g. "AZ,
   NV, CA"), so a rep who works multiple states can be matched across all of
   them instead of just one. A separate **"Want to Join?" Contact** box at
   the top of the Team tab sets the name/phone/email shown on the login
   page for anyone without an account yet who's asking how to get set up
   with deals — it isn't tied to any real login, so you can point it at
-  yourself, someone else, or swap it any time.
+  yourself, someone else, or swap it any time. That same email is also
+  where **Forgot Password** clicks and a rep's **Request Address Access**
+  land — one contact to keep current, not several.
 - **Facebook Approvals** — every pending post request across all deals in one
   place, approve or reject with an optional note.
 - **Buyer Matches** — every interested-buyer match across all deals in one
@@ -185,7 +240,16 @@ Sheet you own via a small Apps Script backend (see [SETUP.md](SETUP.md)).
   the conversation (rep's notes are visible to you the moment they're
   logged) to close the deal yourself, keeping the rep who brought the buyer
   updated as it moves.
-- **Buyer Leads** — upload a CSV file in any column order and it guesses
+- **Buyer Leads** — a collapsible **"How to Build a Buyer List"** guide sits
+  above the importer for anyone new to this: find cash buyers on Propwire
+  (Cash Buyers filter, plus Fix &amp; Flip or switch Property Type to Land
+  depending on the deal, with Portfolio Value set to roughly 3x–20x the
+  subject property's price), skip-trace the export (free/manual at
+  truepeoplesearch.com, a VA, Propwire's own paid skip trace, or a
+  third-party vendor), then come back and import the resulting CSV below.
+  It's a written walkthrough, not a live integration — Propwire and
+  skip-trace steps happen on those sites directly. Upload a CSV file in any
+  column order and it guesses
   which column is which (Name, Phone × 3, Phone Type × 3, City, State, Zip,
   County, Email, Asset Categories, Last Known Purchase Price, Estimated
   Value) from your headers, shows you a preview and the guessed mapping so
