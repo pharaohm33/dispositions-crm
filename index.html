@@ -331,8 +331,10 @@
         <div class="small-muted" style="margin-top:4px;">"Interested and want more information?"</div>
       </div>
     </div>
-    <div style="display:flex; gap:8px; margin-bottom:16px;">
-      <input type="text" id="rep-search-input" placeholder="Search deals by address, city, or asset type..." style="flex:1;">
+    <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+      <input type="text" id="rep-search-input" placeholder="Search deals by address, city, or asset type..." style="flex:1; min-width:220px;">
+      <select id="rep-deals-filter-status" style="flex:0 0 auto; min-width:160px;"><option value="">All Statuses</option></select>
+      <select id="rep-deals-filter-category" style="flex:0 0 auto; min-width:180px;"><option value="">All Asset Categories</option></select>
     </div>
     <div id="rep-deals-container"></div>
     <div id="rep-deals-empty" class="small-muted" style="padding:20px;" hidden>No deals assigned to you yet — check back soon.</div>
@@ -513,9 +515,16 @@
 
   <!-- Deals tab -->
   <div id="tab-deals">
-    <div style="display:flex; justify-content:space-between; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+    <div style="display:flex; justify-content:space-between; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
       <input type="text" id="admin-deal-search" placeholder="Search deals..." style="flex:1; min-width:200px;">
+      <select id="admin-deals-filter-status" style="flex:0 0 auto; min-width:150px;"><option value="">All Statuses</option></select>
+      <select id="admin-deals-filter-category" style="flex:0 0 auto; min-width:170px;"><option value="">All Asset Categories</option></select>
+      <input type="text" id="admin-deals-filter-state" placeholder="State" style="flex:0 0 auto; max-width:100px;">
       <button class="btn primary" id="add-deal-btn">+ Add Deal</button>
+    </div>
+    <div class="nav-row" style="justify-content:flex-start; margin-bottom:10px;">
+      <button class="btn secondary small" id="check-all-deals-live-btn">Check All Source Links For Dead Listings</button>
+      <span class="small-muted" id="check-all-deals-live-result"></span>
     </div>
     <table class="crm-table">
       <thead><tr><th>Deal Code</th><th>Address</th><th>Asset Type</th><th>Price</th><th>Status</th><th>Coverage</th><th>Access</th></tr></thead>
@@ -1034,7 +1043,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=49"></script>
-<script src="app.js?v=49"></script>
+<script src="config.js?v=50"></script>
+<script src="app.js?v=50"></script>
 </body>
 </html>

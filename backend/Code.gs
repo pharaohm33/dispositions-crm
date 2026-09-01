@@ -249,6 +249,10 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminUpdateDeal));
       case 'adminUpdateDealStatus':
         return jsonOut(withAdminSession(body, adminUpdateDealStatus));
+      case 'adminCheckDealLive':
+        return jsonOut(withAdminSession(body, adminCheckDealLive));
+      case 'adminCheckAllDealsLive':
+        return jsonOut(withAdminSession(body, adminCheckAllDealsLive));
       case 'adminGetReps':
         return jsonOut(withAdminSession(body, adminGetReps));
       case 'adminAddRep':
@@ -983,6 +987,96 @@ function adminUpdateDealStatus(body) {
   const updatedCol = getColumnIndex(sheet, 'UpdatedAt');
   sheet.getRange(match._row, updatedCol).setValue(new Date().toISOString());
   return { ok: true };
+}
+
+// A dead/pulled InvestorLift listing renders a specific "property not
+// found" block server-side (confirmed by fetching a known-dead listing
+// with a browser User-Agent and inspecting the raw HTML -- InvestorLift's
+// CDN otherwise blocks non-browser requests with a 403, so the User-Agent
+// header below isn't optional). Matched on both the specific CSS class
+// InvestorLift currently uses AND the visible text, so a wording tweak
+// alone doesn't silently break this -- but a real markup change on
+// InvestorLift's end absolutely could, and this only ever gets updated by
+// hand when that happens; there's no way to detect "the check itself is
+// now unreliable" automatically.
+const DEAD_LISTING_MARKERS = ['dealcontent-propertyisnotfoundtitle', 'the property is not found'];
+const LIVE_CHECK_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+
+// Fetches one deal's Source Link and reports whether it looks pulled --
+// never touches Status itself here (see adminCheckDealLive/
+// adminCheckAllDealsLive, which call this and then decide what to do)
+// so a fetch error can never be mistaken for "still live."
+function checkSourceLinkDead(url) {
+  const res = UrlFetchApp.fetch(url, { headers: { 'User-Agent': LIVE_CHECK_USER_AGENT }, muteHttpExceptions: true, followRedirects: true });
+  const code = res.getResponseCode();
+  if (code === 404) return { ok: true, isDead: true };
+  if (code < 200 || code >= 300) return { ok: false, error: 'Source link returned HTTP ' + code + '.' };
+  const html = res.getContentText().toLowerCase();
+  const isDead = DEAD_LISTING_MARKERS.some(function (marker) { return html.indexOf(marker) !== -1; });
+  return { ok: true, isDead: isDead };
+}
+
+// Checks one deal's Source Link and marks it Dead if the listing looks
+// pulled -- never un-marks a deal that's already Sold or Dead (nothing to
+// gain from re-checking a closed deal, and a Sold deal going 404 on its
+// source listing is expected, not a signal to overwrite that Sold status).
+function adminCheckDealLive(body) {
+  if (!body.dealId) return { ok: false, error: 'Missing dealId.' };
+  const sheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const deals = sheetToObjects(sheet);
+  const match = deals.find(function (d) { return d['DealID'] === body.dealId; });
+  if (!match) return { ok: false, error: 'Deal not found.' };
+  if (!match['SourceLink']) return { ok: false, error: 'This deal has no Source Link set.' };
+
+  let checkResult;
+  try {
+    checkResult = checkSourceLinkDead(match['SourceLink']);
+  } catch (err) {
+    return { ok: false, error: 'Could not check the source link: ' + String(err) };
+  }
+  if (!checkResult.ok) return checkResult;
+
+  if (checkResult.isDead && match['Status'] !== 'Sold' && match['Status'] !== 'Dead') {
+    sheet.getRange(match._row, getColumnIndex(sheet, 'Status')).setValue('Dead');
+    sheet.getRange(match._row, getColumnIndex(sheet, 'UpdatedAt')).setValue(new Date().toISOString());
+  }
+  return { ok: true, isDead: checkResult.isDead, markedDead: checkResult.isDead && match['Status'] !== 'Sold' && match['Status'] !== 'Dead' };
+}
+
+// Same check across every deal that has a Source Link and isn't already
+// Sold/Dead -- one at a time (Apps Script has no concurrent UrlFetch), so
+// this scales to however many deals fit in a single execution's time
+// budget (roughly a few hundred at typical fetch speeds) before the
+// 6-minute Apps Script limit becomes a real concern; fine for the sizes
+// this app deals with today, but a very large deal list would need this
+// broken into batches down the line.
+function adminCheckAllDealsLive(body) {
+  const sheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const deals = sheetToObjects(sheet).filter(function (d) {
+    return d['SourceLink'] && d['Status'] !== 'Sold' && d['Status'] !== 'Dead';
+  });
+
+  let checkedCount = 0;
+  let markedDeadCount = 0;
+  const errors = [];
+  deals.forEach(function (d) {
+    checkedCount++;
+    let checkResult;
+    try {
+      checkResult = checkSourceLinkDead(d['SourceLink']);
+    } catch (err) {
+      errors.push((d['DealCode'] || d['Address'] || d['DealID']) + ': ' + String(err));
+      return;
+    }
+    if (!checkResult.ok) { errors.push((d['DealCode'] || d['Address'] || d['DealID']) + ': ' + checkResult.error); return; }
+    if (checkResult.isDead) {
+      sheet.getRange(d._row, getColumnIndex(sheet, 'Status')).setValue('Dead');
+      sheet.getRange(d._row, getColumnIndex(sheet, 'UpdatedAt')).setValue(new Date().toISOString());
+      markedDeadCount++;
+    }
+  });
+
+  return { ok: true, checkedCount: checkedCount, markedDeadCount: markedDeadCount, errors: errors };
 }
 
 // ---------- Status options ----------

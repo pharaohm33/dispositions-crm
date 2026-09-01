@@ -316,7 +316,25 @@ backend (see [SETUP.md](SETUP.md)).
   list showing exactly who currently does. A private **Source Link** + **Admin
   Notes** section on every deal is visible to you alone — paste the original
   online listing link, track sourcing details, whatever you don't want any
-  rep to ever see.
+  rep to ever see. Once a Source Link is set, a **Check If Still Live**
+  button appears right there — it fetches that link and looks for the
+  specific marker an InvestorLift listing shows once it's been pulled
+  ("The property is not found"), and if found, automatically flips this
+  deal's Status to Dead (never touches a deal already Sold or Dead). A
+  **Check All Source Links For Dead Listings** button on the Deals tab
+  runs this same check across every deal that has a Source Link and isn't
+  already closed, in one pass, and reports how many it marked Dead. This
+  is InvestorLift-specific and fragile by nature — it's matching on
+  InvestorLift's current page markup, fetched with a browser-like
+  User-Agent since their CDN otherwise blocks the request outright with a
+  403. If InvestorLift changes that page, this check will need updating
+  to match, and there's no way for the app to detect that on its own — a
+  string match either finds what it's looking for or it doesn't. The
+  Deals tab (both admin's and each rep's) also now has **Status** and
+  **Asset Category** filter dropdowns above the list (plus a **State**
+  filter on admin's side) — the same organize-by-category filtering
+  Buyer Leads has long had, applied to deals too, on top of the existing
+  free-text search.
 - **Team** — every account also shows up here whether you created it or
   someone self-signed-up for it (see **Accounts &amp; Sign Up** above) —
   add/remove team members yourself too if you want, toggle "all-deal

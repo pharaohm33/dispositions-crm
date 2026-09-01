@@ -310,6 +310,7 @@ async function initRepView() {
     return;
   }
   repDeals = res.deals;
+  populateRepDealsFilters();
   renderRepDeals();
   renderRepCsvDealOptions();
   renderMyBuyerListDealSelect();
@@ -336,6 +337,17 @@ async function initRepView() {
 }
 
 document.getElementById("rep-search-input").addEventListener("input", renderRepDeals);
+document.getElementById("rep-deals-filter-status").addEventListener("change", renderRepDeals);
+document.getElementById("rep-deals-filter-category").addEventListener("change", renderRepDeals);
+
+function populateRepDealsFilters() {
+  const statusSelect = document.getElementById("rep-deals-filter-status");
+  statusSelect.innerHTML = '<option value="">All Statuses</option>' +
+    statusOptionsCache.map(function (s) { return '<option value="' + esc(s) + '">' + esc(s) + '</option>'; }).join("");
+  const categorySelect = document.getElementById("rep-deals-filter-category");
+  categorySelect.innerHTML = '<option value="">All Asset Categories</option>' +
+    assetCategoryOptionsCache.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join("");
+}
 
 // Ranks a deal's Status by how close it is to actually closing, lowest
 // number first: Under Contract (a buyer's already locked in, just needs to
@@ -353,11 +365,15 @@ function dealStatusRank(status) {
 
 function renderRepDeals() {
   const q = document.getElementById("rep-search-input").value.trim().toLowerCase();
+  const statusFilter = document.getElementById("rep-deals-filter-status").value;
+  const categoryFilter = document.getElementById("rep-deals-filter-category").value.trim().toLowerCase();
   const container = document.getElementById("rep-deals-container");
   const empty = document.getElementById("rep-deals-empty");
   const filtered = repDeals.filter(function (d) {
-    if (!q) return true;
-    return [d.DealCode, d.City, d.State, d.County, d.AssetType].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; });
+    if (q && ![d.DealCode, d.City, d.State, d.County, d.AssetType].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; })) return false;
+    if (statusFilter && d.Status !== statusFilter) return false;
+    if (categoryFilter && String(d.AssetCategory || "").trim().toLowerCase() !== categoryFilter) return false;
+    return true;
   });
   // Organized by how close to closing the deal is first (Under Contract,
   // then Active, On Hold, Sold, Dead sinks to the bottom), then State
@@ -1580,6 +1596,16 @@ function switchAdminTab(tab) {
 async function initAdminView() {
   // Independent reads -- run together rather than one after another.
   await Promise.all([loadStatusOptions(), loadAssetCategoryOptions(), loadAdminDeals()]);
+  populateAdminDealsFilters();
+}
+
+function populateAdminDealsFilters() {
+  const statusSelect = document.getElementById("admin-deals-filter-status");
+  statusSelect.innerHTML = '<option value="">All Statuses</option>' +
+    statusOptionsCache.map(function (s) { return '<option value="' + esc(s) + '">' + esc(s) + '</option>'; }).join("");
+  const categorySelect = document.getElementById("admin-deals-filter-category");
+  categorySelect.innerHTML = '<option value="">All Asset Categories</option>' +
+    assetCategoryOptionsCache.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join("");
 }
 
 /* ---------- Deals tab ---------- */
@@ -1592,14 +1618,23 @@ async function loadAdminDeals() {
 }
 
 document.getElementById("admin-deal-search").addEventListener("input", renderAdminDeals);
+document.getElementById("admin-deals-filter-status").addEventListener("change", renderAdminDeals);
+document.getElementById("admin-deals-filter-category").addEventListener("change", renderAdminDeals);
+document.getElementById("admin-deals-filter-state").addEventListener("input", renderAdminDeals);
 
 function renderAdminDeals() {
   const q = document.getElementById("admin-deal-search").value.trim().toLowerCase();
+  const statusFilter = document.getElementById("admin-deals-filter-status").value;
+  const categoryFilter = document.getElementById("admin-deals-filter-category").value.trim().toLowerCase();
+  const stateFilter = document.getElementById("admin-deals-filter-state").value.trim().toLowerCase();
   const tbody = document.getElementById("admin-deals-tbody");
   const empty = document.getElementById("admin-deals-empty");
   const filtered = adminDeals.filter(function (d) {
-    if (!q) return true;
-    return [d.DealCode, d.Address, d.City, d.AssetType, d.Status].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; });
+    if (q && ![d.DealCode, d.Address, d.City, d.AssetType, d.Status].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; })) return false;
+    if (statusFilter && d.Status !== statusFilter) return false;
+    if (categoryFilter && String(d.AssetCategory || "").trim().toLowerCase() !== categoryFilter) return false;
+    if (stateFilter && String(d.State || "").trim().toLowerCase() !== stateFilter) return false;
+    return true;
   });
   // Same organization as the rep's Deals tab: closest to closing first
   // (Under Contract, Active, On Hold, Sold, then Dead at the bottom), State
@@ -1631,6 +1666,21 @@ function renderAdminDeals() {
 }
 
 document.getElementById("add-deal-btn").addEventListener("click", function () { openDealModal(); });
+
+document.getElementById("check-all-deals-live-btn").addEventListener("click", async function () {
+  const btn = this;
+  const resultEl = document.getElementById("check-all-deals-live-result");
+  if (btn.disabled) return;
+  btn.disabled = true;
+  resultEl.textContent = " Checking every deal with a Source Link — this can take a bit…";
+  const res = await api("adminCheckAllDealsLive", {});
+  btn.disabled = false;
+  if (!res.ok) { resultEl.textContent = " " + (res.error || "Could not run the check."); showToast(res.error || "Could not run the check.", true); return; }
+  resultEl.textContent = " Checked " + res.checkedCount + " deal(s), marked " + res.markedDeadCount + " Dead." +
+    (res.errors.length > 0 ? " " + res.errors.length + " couldn't be checked." : "");
+  showToast("Marked " + res.markedDeadCount + " deal(s) Dead.");
+  await loadAdminDeals();
+});
 
 function openDealModal() {
   document.getElementById("deal-code-input").value = "";
@@ -1921,6 +1971,10 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     '<div class="banner danger">Only you (admin) can see anything in this section &mdash; no rep ever receives it, in the UI or the API.</div>' +
     '<label class="field-label">Source Link <span class="small-muted">(where you found this deal online)</span></label>' +
     '<input type="text" id="deal-source-link-edit" value="' + esc(deal.SourceLink || "") + '" placeholder="https://...">' +
+    (deal.SourceLink
+      ? '<div class="nav-row" style="justify-content:flex-start; margin-top:6px;"><button class="btn secondary small" id="check-deal-live-btn">Check If Still Live</button><span class="small-muted" id="check-deal-live-result"></span></div>' +
+        '<p class="small-muted">Fetches the Source Link and looks for the specific "property not found" marker InvestorLift shows on a pulled listing — if it\'s there, this deal\'s Status is set to Dead automatically. Only works for InvestorLift links today, and will need updating if InvestorLift changes that page.</p>'
+      : "") +
     '<label class="field-label">Private Notes</label>' +
     '<textarea id="deal-admin-notes-edit">' + esc(deal.AdminPrivateNotes || "") + '</textarea>' +
     '<div class="nav-row" style="justify-content:flex-end;">' +
@@ -2013,6 +2067,29 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     btn.disabled = false;
     showToast("Private notes saved.");
   });
+
+  const checkLiveBtn = document.getElementById("check-deal-live-btn");
+  if (checkLiveBtn) {
+    checkLiveBtn.addEventListener("click", async function () {
+      const btn = this;
+      const resultEl = document.getElementById("check-deal-live-result");
+      btn.disabled = true;
+      resultEl.textContent = " Checking…";
+      const res = await api("adminCheckDealLive", { dealId: deal.DealID });
+      btn.disabled = false;
+      if (!res.ok) { resultEl.textContent = " " + (res.error || "Could not check."); showToast(res.error || "Could not check.", true); return; }
+      if (res.markedDead) {
+        resultEl.textContent = " Marked Dead — listing shows as removed.";
+        showToast("Marked Dead — source listing no longer found.");
+        openAdminDealDetail(deal.DealID);
+      } else if (res.isDead) {
+        resultEl.textContent = " Listing shows as removed (deal already " + deal.Status + ", left as-is).";
+      } else {
+        resultEl.textContent = " Still appears live.";
+        showToast("Still appears live.");
+      }
+    });
+  }
 
   document.getElementById("deal-status-select").addEventListener("change", async function (e) {
     e.target.disabled = true;
