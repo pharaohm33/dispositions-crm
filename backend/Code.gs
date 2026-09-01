@@ -229,6 +229,8 @@ function doPost(e) {
         return jsonOut(withSession(body, importBuyerLeads));
       case 'getMyBuyerLeads':
         return jsonOut(withSession(body, getMyBuyerLeads));
+      case 'deleteMyBuyerLeads':
+        return jsonOut(withSession(body, deleteMyBuyerLeads));
       case 'giveMyBuyerLeads':
         return jsonOut(withSession(body, giveMyBuyerLeads));
       case 'updateBuyerLeadNotes':
@@ -1887,6 +1889,42 @@ function getMyBuyerLeads(body, session) {
     return copy;
   });
   return { ok: true, leads: stripped };
+}
+
+// Lets a rep permanently remove buyer leads they personally uploaded --
+// never a shared/admin-uploaded lead, even by id, since that's not theirs
+// to remove. Only ids that are actually both requested AND owned by this
+// rep are deleted; anything else in the request is silently ignored
+// rather than failing the whole batch (the frontend only ever offers a
+// rep their own leads to pick from, so a mismatch here would only come
+// from a stale list, not normal use). A deleted lead's Pitches and
+// call-log Contacts go with it -- leaving them behind would just be
+// dangling references to a buyer that no longer exists.
+function deleteMyBuyerLeads(body, session) {
+  if (!body.buyerLeadIds || body.buyerLeadIds.length === 0) return { ok: false, error: 'No leads selected.' };
+  const wanted = {};
+  body.buyerLeadIds.forEach(function (id) { wanted[id] = true; });
+
+  return withLock(function () {
+    const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+    const toDelete = sheetToObjects(sheet).filter(function (l) {
+      return wanted[l['BuyerLeadID']] && String(l['UploadedBy'] || '').trim().toLowerCase() === session.u;
+    });
+    if (toDelete.length === 0) return { ok: false, error: 'None of the selected leads belong to you -- only buyers you personally uploaded can be deleted.' };
+    const deleteIds = {};
+    toDelete.forEach(function (l) { deleteIds[l['BuyerLeadID']] = true; });
+
+    const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+    const pitchRows = sheetToObjects(pitchesSheet).filter(function (p) { return deleteIds[p['BuyerLeadID']]; }).map(function (p) { return p._row; });
+    pitchRows.sort(function (a, b) { return b - a; }).forEach(function (row) { pitchesSheet.deleteRow(row); });
+
+    const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
+    const contactRows = sheetToObjects(contactsSheet).filter(function (c) { return deleteIds[c['BuyerLeadID']]; }).map(function (c) { return c._row; });
+    contactRows.sort(function (a, b) { return b - a; }).forEach(function (row) { contactsSheet.deleteRow(row); });
+
+    toDelete.sort(function (a, b) { return b._row - a._row; }).forEach(function (l) { sheet.deleteRow(l._row); });
+    return { ok: true, deletedCount: toDelete.length };
+  });
 }
 
 // Joins every pitch to its contacts and computes each one's live status,

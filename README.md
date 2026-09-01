@@ -366,7 +366,18 @@ backend (see [SETUP.md](SETUP.md)).
   unless/until it happened to get matched to a deal and become a real
   pitch; a rep can now always view and edit anything they uploaded
   themselves, the same as admin can, on top of the existing "have an open
-  pitch on this buyer" permission. Also
+  pitch on this buyer" permission. A rep can also permanently **delete**
+  any number of their own uploaded buyers from this same card — checkbox
+  per row plus Select All/Clear Selection, a **Delete Selected** button,
+  and a confirmation modal that requires typing **DELETE** (exact case)
+  before the button even enables, since this can't be undone. Deleting a
+  lead also removes any Pitches and call-log Contacts already made on it,
+  so nothing dangling is left pointing at a buyer that no longer exists.
+  This is strictly scoped to buyers that rep personally uploaded — never
+  an admin-uploaded or another rep's private lead, even if its id were
+  somehow included in the request; the backend re-checks ownership itself
+  rather than trusting whatever the frontend sends, and ignores (rather
+  than fails on) any id in the request that isn't actually this rep's own. Also
   picks up an "Ownership Length (Months)" column (stored as a plain number
   so it stays filterable, shown as "19 yrs" wherever it's displayed) and a
   "Property URL" column (saved as-is, not shown in the preview table since

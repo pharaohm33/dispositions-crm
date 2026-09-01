@@ -1319,11 +1319,13 @@ document.getElementById("rep-csv-import-btn").addEventListener("click", async fu
 /* ---------- My Buyer List (rep's own uploaded leads) ---------- */
 
 let repMyBuyerLeads = [];
+let repMyBuyerLeadsSelectedIds = new Set();
 
 async function loadMyBuyerLeads() {
   const res = await api("getMyBuyerLeads", {});
   if (!res.ok) return;
   repMyBuyerLeads = res.leads;
+  repMyBuyerLeadsSelectedIds = new Set();
   renderMyBuyerLeadsList();
 }
 
@@ -1349,7 +1351,9 @@ function renderMyBuyerLeadsList() {
   tbody.innerHTML = filtered.map(function (l) {
     const isDnc = !!(l.DoNotContact === true || l.DoNotContact === "TRUE");
     const dealTags = String(l.PendingDealID || "").split(",").map(function (v) { return v.trim(); }).filter(Boolean);
+    const checked = repMyBuyerLeadsSelectedIds.has(l.BuyerLeadID) ? " checked" : "";
     return '<tr>' +
+      '<td><input type="checkbox" class="mybuyerlist-select-checkbox" data-lead-id="' + esc(l.BuyerLeadID) + '"' + checked + '></td>' +
       '<td>' + esc(l.BuyerName) + '</td>' +
       '<td>' + esc(l.Phone) + '</td>' +
       '<td>' + [l.City, l.State].filter(Boolean).join(", ") + '</td>' +
@@ -1360,6 +1364,13 @@ function renderMyBuyerLeadsList() {
       '</tr>';
   }).join("");
 
+  Array.from(tbody.querySelectorAll(".mybuyerlist-select-checkbox")).forEach(function (cb) {
+    cb.addEventListener("change", function () {
+      const id = cb.getAttribute("data-lead-id");
+      if (cb.checked) repMyBuyerLeadsSelectedIds.add(id);
+      else repMyBuyerLeadsSelectedIds.delete(id);
+    });
+  });
   Array.from(tbody.querySelectorAll(".mybuyerlist-notes-input")).forEach(function (input) {
     input.addEventListener("change", async function () {
       await api("updateBuyerLeadNotes", { buyerLeadId: input.getAttribute("data-lead-id"), notes: input.value.trim() });
@@ -1377,6 +1388,56 @@ function renderMyBuyerLeadsList() {
 }
 
 document.getElementById("rep-mybuyerlist-search").addEventListener("input", renderMyBuyerLeadsList);
+
+document.getElementById("rep-mybuyerlist-select-all-btn").addEventListener("click", function () {
+  repMyBuyerLeadsSelectedIds = new Set(repMyBuyerLeads.map(function (l) { return l.BuyerLeadID; }));
+  renderMyBuyerLeadsList();
+});
+document.getElementById("rep-mybuyerlist-clear-selection-btn").addEventListener("click", function () {
+  repMyBuyerLeadsSelectedIds = new Set();
+  renderMyBuyerLeadsList();
+});
+
+document.getElementById("rep-mybuyerlist-delete-btn").addEventListener("click", function () {
+  if (repMyBuyerLeadsSelectedIds.size === 0) {
+    showToast("Select at least one buyer first.", true);
+    return;
+  }
+  const modal = document.getElementById("delete-mybuyers-modal");
+  const count = repMyBuyerLeadsSelectedIds.size;
+  document.getElementById("delete-mybuyers-warning").textContent =
+    "You're about to permanently delete " + count + " buyer" + (count === 1 ? "" : "s") + " from your list.";
+  document.getElementById("delete-mybuyers-confirm-input").value = "";
+  document.getElementById("delete-mybuyers-error").textContent = "";
+  document.getElementById("delete-mybuyers-confirm").disabled = true;
+  modal.hidden = false;
+});
+
+document.getElementById("delete-mybuyers-cancel").addEventListener("click", function () {
+  document.getElementById("delete-mybuyers-modal").hidden = true;
+});
+
+document.getElementById("delete-mybuyers-confirm-input").addEventListener("input", function () {
+  document.getElementById("delete-mybuyers-confirm").disabled = this.value.trim() !== "DELETE";
+});
+
+document.getElementById("delete-mybuyers-confirm").addEventListener("click", async function () {
+  const btn = this;
+  if (document.getElementById("delete-mybuyers-confirm-input").value.trim() !== "DELETE") return;
+  if (btn.disabled) return;
+  btn.disabled = true;
+  const buyerLeadIds = Array.from(repMyBuyerLeadsSelectedIds);
+  const res = await api("deleteMyBuyerLeads", { buyerLeadIds: buyerLeadIds });
+  btn.disabled = false;
+  if (!res.ok) {
+    document.getElementById("delete-mybuyers-error").textContent = res.error || "Could not delete.";
+    showToast(res.error || "Could not delete.", true);
+    return;
+  }
+  document.getElementById("delete-mybuyers-modal").hidden = true;
+  showToast("Deleted " + res.deletedCount + " buyer(s).");
+  await loadMyBuyerLeads();
+});
 
 /* ============================================================
    ADMIN VIEW

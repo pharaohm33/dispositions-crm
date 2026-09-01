@@ -432,11 +432,16 @@
 
     <div class="card" id="rep-mybuyerlist-card" hidden>
       <div class="section-title" style="margin-top:0;">My Buyer List</div>
-      <p class="small-muted">Everyone you've personally uploaded above — private to you, and yours to browse, tag Do Not Contact, or leave notes on any time, whether or not it's been matched to a deal yet.</p>
-      <input type="text" id="rep-mybuyerlist-search" placeholder="Search by buyer name, phone, or city...">
+      <p class="small-muted">Everyone you've personally uploaded above — private to you, and yours to browse, tag Do Not Contact, or leave notes on any time, whether or not it's been matched to a deal yet. You can only delete buyers you uploaded yourself, never anything admin uploaded.</p>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+        <input type="text" id="rep-mybuyerlist-search" placeholder="Search by buyer name, phone, or city..." style="flex:1; min-width:220px;">
+        <button class="btn secondary small" id="rep-mybuyerlist-select-all-btn">Select All</button>
+        <button class="btn secondary small" id="rep-mybuyerlist-clear-selection-btn">Clear Selection</button>
+        <button class="btn danger small" id="rep-mybuyerlist-delete-btn">Delete Selected</button>
+      </div>
       <div style="overflow-x:auto; margin-top:10px;">
         <table class="crm-table" id="rep-mybuyerlist-table">
-          <thead><tr><th>Buyer / LLC</th><th>Phone</th><th>City, State</th><th>Asset Categories</th><th>Tagged Deal(s)</th><th>Notes</th><th>DNC</th></tr></thead>
+          <thead><tr><th></th><th>Buyer / LLC</th><th>Phone</th><th>City, State</th><th>Asset Categories</th><th>Tagged Deal(s)</th><th>Notes</th><th>DNC</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -940,6 +945,21 @@
   </div>
 </div>
 
+<!-- Delete-my-buyer-leads confirmation modal -->
+<div class="modal-backdrop" id="delete-mybuyers-modal" hidden>
+  <div class="modal-box" style="max-width:420px;">
+    <h3>Delete Buyer(s)?</h3>
+    <p class="banner danger" id="delete-mybuyers-warning" style="margin-top:0;"></p>
+    <p class="small-muted">This permanently removes them (and any pitch/call history on them) from your buyer list — it cannot be undone. Type <strong>DELETE</strong> below to confirm.</p>
+    <input type="text" id="delete-mybuyers-confirm-input" autocomplete="off" placeholder="Type DELETE to confirm">
+    <div class="error-text" id="delete-mybuyers-error"></div>
+    <div class="nav-row">
+      <button class="btn secondary" id="delete-mybuyers-cancel">Cancel</button>
+      <button class="btn danger" id="delete-mybuyers-confirm" disabled>Delete</button>
+    </div>
+  </div>
+</div>
+
 <!-- Reset password modal -->
 <div class="modal-backdrop" id="reset-modal" hidden>
   <div class="modal-box" style="max-width:340px;">
@@ -996,7 +1016,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=42"></script>
-<script src="app.js?v=42"></script>
+<script src="config.js?v=43"></script>
+<script src="app.js?v=43"></script>
 </body>
 </html>
