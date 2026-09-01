@@ -346,8 +346,17 @@ backend (see [SETUP.md](SETUP.md)).
   deliberate case of "I've seen this person do well in this market,
   hand them this deal to focus on," not a first-resort or something
   that runs on its own; other deals in that same market can stay
-  unlocked and shared if there's more volume than one rep needs. Add
-  deals, change a deal's
+  unlocked and shared if there's more volume than one rep needs. A
+  **Give New Reps Access To The Open Pool** button on the Team tab is the
+  one-click version of running "All Users With No Assigned Deals Right
+  Now" across every open deal at once, instead of hand-assigning a fresh
+  signup to each one individually — "open" meaning not Locked (a
+  target-market deal stays reserved and is skipped entirely) and,
+  per-deal, the same "only a manual, one-by-one grant disqualifies a rep"
+  rule the single-deal version already uses. Safe to click again any time
+  a new rep signs up — reps and deals already swept in from a previous
+  click aren't re-added or duplicated, it only ever adds what's actually
+  missing. Add deals, change a deal's
   status (Active, Sold, Dead, Under Contract, On Hold, or whatever
   categories you've defined), edit the **Address / City / State / Zip** at
   any time after creation (e.g. a typo, or details that firm up after the

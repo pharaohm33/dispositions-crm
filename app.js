@@ -2577,6 +2577,22 @@ document.getElementById("area-modal-save").addEventListener("click", async funct
   showToast("Details saved.");
 });
 
+document.getElementById("give-open-pool-btn").addEventListener("click", async function () {
+  const btn = this;
+  const resultEl = document.getElementById("give-open-pool-result");
+  if (btn.disabled) return;
+  btn.disabled = true;
+  resultEl.textContent = "Sweeping every open deal…";
+  const res = await api("adminGiveUnassignedRepsOpenPool", {});
+  btn.disabled = false;
+  if (!res.ok) { resultEl.textContent = res.error || "Could not run this."; showToast(res.error || "Could not run this.", true); return; }
+  resultEl.textContent = res.totalAssignments === 0
+    ? "Nobody needed adding — everyone eligible is already on the open pool deals."
+    : "Added " + res.totalAssignments + " assignment(s) across " + res.dealsTouched + " of " + res.dealsConsidered + " open deal(s).";
+  showToast(res.totalAssignments === 0 ? "Already up to date." : "Added " + res.totalAssignments + " assignment(s).");
+  await loadReps();
+});
+
 document.getElementById("add-rep-btn").addEventListener("click", function () {
   document.getElementById("rep-name-input").value = "";
   document.getElementById("rep-phone-input").value = "";

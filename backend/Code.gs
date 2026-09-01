@@ -269,6 +269,8 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminUnassignRep));
       case 'adminBulkAssignDeal':
         return jsonOut(withAdminSession(body, adminBulkAssignDeal));
+      case 'adminGiveUnassignedRepsOpenPool':
+        return jsonOut(withAdminSession(body, adminGiveUnassignedRepsOpenPool));
       case 'adminSetDealLocked':
         return jsonOut(withAdminSession(body, adminSetDealLocked));
       case 'adminFindRepsByTargetMarket':
@@ -931,12 +933,26 @@ function applyDealAssignMode(dealId, assetCategory, assignMode, now) {
         repsSheet.getRange(r._row, getColumnIndex(repsSheet, 'CategoryAccess')).setValue(updated);
       }
     });
-  } else {
-    appendRowsByHeaders(assignmentsSheet, eligibleReps.map(function (r) {
-      return { 'DealID': dealId, 'Username': String(r['Username'] || '').trim().toLowerCase(), 'AssignedAt': now, 'Source': 'bulk' };
-    }));
+    return eligibleReps.length;
   }
-  return eligibleReps.length;
+
+  // Skip anyone already assigned to this exact deal (any Source) --
+  // without this, calling applyDealAssignMode more than once on the same
+  // deal (e.g. admin re-running a bulk assign, or a repeated "sweep in
+  // whoever's unassigned" pass every time new reps sign up) would append
+  // a duplicate Assignments row per rep per call, inflating their "#
+  // deals" count and duplicating chips in the UI.
+  const alreadyAssignedUsernames = {};
+  sheetToObjects(assignmentsSheet).forEach(function (a) {
+    if (a['DealID'] === dealId) alreadyAssignedUsernames[String(a['Username'] || '').trim().toLowerCase()] = true;
+  });
+  const toAssign = eligibleReps.filter(function (r) {
+    return !alreadyAssignedUsernames[String(r['Username'] || '').trim().toLowerCase()];
+  });
+  appendRowsByHeaders(assignmentsSheet, toAssign.map(function (r) {
+    return { 'DealID': dealId, 'Username': String(r['Username'] || '').trim().toLowerCase(), 'AssignedAt': now, 'Source': 'bulk' };
+  }));
+  return toAssign.length;
 }
 
 // Same bulk-assign, but for a deal that already exists -- admin opens it
@@ -959,6 +975,32 @@ function adminBulkAssignDeal(body) {
   }
   const assignedCount = applyDealAssignMode(body.dealId, deal['AssetCategory'], body.assignMode, new Date().toISOString());
   return { ok: true, assignedCount: assignedCount };
+}
+
+// One-click version of running "All Users With No Assigned Deals Right
+// Now" across every open deal at once, instead of admin having to click
+// into each deal individually every time a new rep signs up with nothing
+// assigned yet. "Open" here means the two things a deal can be walled off
+// by: Locked (reserved for whoever it's target-market-assigned to) is
+// skipped entirely, and within each deal applyDealAssignMode's own
+// "unassigned" rule already excludes any rep who has a manual, one-by-one
+// grant anywhere (so a rep hand-picked for one deal doesn't also get
+// swept into every open deal) -- this reuses that exact same eligibility
+// rule, just run over every open deal in one pass rather than one deal at
+// a time.
+function adminGiveUnassignedRepsOpenPool(body) {
+  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const openDeals = sheetToObjects(dealsSheet).filter(function (d) {
+    return dealIsActive(d) && d['Locked'] !== true && d['Locked'] !== 'TRUE';
+  });
+  const now = new Date().toISOString();
+  let totalAssignments = 0;
+  let dealsTouched = 0;
+  openDeals.forEach(function (d) {
+    const count = applyDealAssignMode(d['DealID'], d['AssetCategory'], 'unassigned', now);
+    if (count > 0) { totalAssignments += count; dealsTouched++; }
+  });
+  return { ok: true, dealsConsidered: openDeals.length, dealsTouched: dealsTouched, totalAssignments: totalAssignments };
 }
 
 function adminSetDealLocked(body) {
