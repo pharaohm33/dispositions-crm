@@ -410,15 +410,17 @@ async function openRepDealDetail(dealId) {
   const panel = document.getElementById("detail-panel");
   overlay.hidden = false;
 
-  const [dealRes, buyersRes, fbRes] = await Promise.all([
+  const [dealRes, buyersRes, fbRes, citiesRes] = await Promise.all([
     api("getDeal", { dealId: dealId }),
     api("getInterestedBuyers", { dealId: dealId }),
-    api("getMyFbRequests", { dealId: dealId })
+    api("getMyFbRequests", { dealId: dealId }),
+    api("getVisibleBuyerCities", {})
   ]);
   if (!dealRes.ok) { overlay.hidden = true; return; }
   const deal = dealRes.deal;
   const buyers = buyersRes.ok ? buyersRes.buyers : [];
   const fbRequests = fbRes.ok ? fbRes.requests : [];
+  const visibleCities = citiesRes.ok ? citiesRes.cities : [];
 
   const addressBanner = deal.addressGranted && deal.Address
     ? '<div class="banner danger"><strong>Confidential &mdash; do not share.</strong> Admin has given you access to this deal\'s exact address. Only share it with a legitimate, matched buyer' +
@@ -456,6 +458,10 @@ async function openRepDealDetail(dealId) {
 
     '<div class="section-title">Match My Buyer Leads To This Deal</div>' +
     '<p class="small-muted">Auto-matches buyer leads you can see (your own uploads, plus anything shared by the team) to this deal by state/city/asset category — same matching admin uses — and gives them to yourself, so they show up on your Buyer Leads tab to start calling.</p>' +
+    (visibleCities.length > 0
+      ? '<p class="small-muted"><strong>Or pick specific cities to cold call instead</strong> — overrides the state/city/asset category matching above entirely, pulling from exactly the city(s) you check below (grouped by state). Leave nothing checked to use the normal matching instead.</p>' +
+        '<div id="give-myself-cities" class="deal-checkbox-list" style="margin-bottom:10px;"></div>'
+      : "") +
     '<div class="row2">' +
       '<div><label class="field-label">How many</label><input type="number" id="give-myself-count" value="25" min="1"></div>' +
       '<div style="display:flex; align-items:flex-end;"><button class="btn secondary" id="give-myself-btn" style="width:100%;">Match &amp; Give To Myself</button></div>' +
@@ -494,6 +500,7 @@ async function openRepDealDetail(dealId) {
 
   wireBuyerMatchListHandlers(document.getElementById("buyer-list"), function () { return refreshBuyerMatchList(dealId, "buyer-list"); });
   wireRequestAddressButton();
+  if (visibleCities.length > 0) renderCityCheckboxList("give-myself-cities", visibleCities);
 
   document.getElementById("give-myself-btn").addEventListener("click", async function () {
     const btn = this;
@@ -502,7 +509,8 @@ async function openRepDealDetail(dealId) {
     if (!count) { resultEl.textContent = "Enter how many to match."; return; }
     if (btn.disabled) return;
     btn.disabled = true;
-    const res = await api("giveMyBuyerLeads", { dealId: dealId, count: count });
+    const cities = visibleCities.length > 0 ? checkedCityCheckboxValues("give-myself-cities") : [];
+    const res = await api("giveMyBuyerLeads", { dealId: dealId, count: count, cities: cities });
     btn.disabled = false;
     if (!res.ok) { resultEl.textContent = res.error || "Could not match leads."; showToast(res.error || "Could not match leads.", true); return; }
     resultEl.textContent = "Gave yourself " + res.givenCount + " lead(s) for this deal. " + res.remainingInPool + " still unmatched for it.";
@@ -1253,6 +1261,39 @@ function clearDealCheckboxList(containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
   Array.from(container.querySelectorAll(".deal-checkbox-item")).forEach(function (cb) { cb.checked = false; });
+}
+
+// Same grouped-by-state checkbox list as renderDealCheckboxList, but for
+// picking one or more raw city names (used for the "cold call these
+// cities instead" override on Match My Buyer Leads To This Deal) rather
+// than deal ids -- cities have no id of their own, so the checkbox value
+// is just the city name and duplicates across states are grouped/labeled
+// separately (a "Springfield, IL" and "Springfield, OH" both show up,
+// under their own state headers).
+function renderCityCheckboxList(containerId, cities) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const sorted = cities.slice().sort(function (a, b) {
+    return String(a.state || "￿").localeCompare(String(b.state || "￿")) ||
+      String(a.city || "").localeCompare(String(b.city || ""));
+  });
+  let lastGroup = null;
+  const parts = [];
+  sorted.forEach(function (c) {
+    const group = c.state || "Other";
+    if (group !== lastGroup) {
+      parts.push('<div class="deal-checkbox-group-label">' + esc(group) + '</div>');
+      lastGroup = group;
+    }
+    parts.push('<label class="checkbox-row"><input type="checkbox" class="city-checkbox-item" value="' + esc(c.city) + '"> ' + esc(c.city) + '</label>');
+  });
+  container.innerHTML = parts.length > 0 ? parts.join("") : '<p class="deal-checkbox-empty">No cities available yet.</p>';
+}
+
+function checkedCityCheckboxValues(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return [];
+  return Array.from(container.querySelectorAll(".city-checkbox-item:checked")).map(function (cb) { return cb.value; });
 }
 
 // Lets a rep tag an uploaded buyer list with one or more of their own

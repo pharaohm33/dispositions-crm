@@ -233,6 +233,8 @@ function doPost(e) {
         return jsonOut(withSession(body, deleteMyBuyerLeads));
       case 'giveMyBuyerLeads':
         return jsonOut(withSession(body, giveMyBuyerLeads));
+      case 'getVisibleBuyerCities':
+        return jsonOut(withSession(body, getVisibleBuyerCities));
       case 'updateBuyerLeadNotes':
         return jsonOut(withSession(body, updateBuyerLeadNotes));
       case 'updateBuyerLeadDoNotContact':
@@ -2170,6 +2172,10 @@ function adminGiveBuyerLeadsBulk(body) {
     const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
     const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === body.dealId; });
     if (!deal) return { ok: false, error: 'Deal not found.' };
+    // Checked explicitly here (not just inside buyerMatchesDeal) since the
+    // city/state/zip override branch below bypasses that function entirely
+    // -- a Dead or Sold deal must never get new leads either way.
+    if (!dealIsActive(deal)) return { ok: false, error: 'This deal is no longer active.' };
 
     const hasOverride = body.city || body.state || body.zip;
 
@@ -2210,6 +2216,30 @@ function adminGiveBuyerLeadsBulk(body) {
 // can never leak someone else's private list to them. A rep can only give
 // to themselves here; giving to anyone else stays admin-only
 // (adminGiveBuyerLeadsBulk/adminGiveBuyerLeadToRep/adminGiveSelectedBuyerLeads).
+// Distinct City/State pairs across every buyer lead this rep can actually
+// see (their own uploads plus the shared pool -- same visibility rule as
+// leadVisibleToUsername), for the city-override picker on "Match My Buyer
+// Leads To This Deal". DNC'd buyers are excluded since there's nothing to
+// cold call there anyway.
+function getVisibleBuyerCities(body, session) {
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const seen = {};
+  const cities = [];
+  sheetToObjects(sheet).forEach(function (l) {
+    if (l['DoNotContact'] === true || l['DoNotContact'] === 'TRUE') return;
+    if (!leadVisibleToUsername(l, session.u)) return;
+    const city = String(l['City'] || '').trim();
+    if (!city) return;
+    const state = String(l['State'] || '').trim();
+    const key = normalizeText(city) + '|' + normalizeText(state);
+    if (seen[key]) return;
+    seen[key] = true;
+    cities.push({ city: city, state: state });
+  });
+  cities.sort(function (a, b) { return a.state.localeCompare(b.state) || a.city.localeCompare(b.city); });
+  return { ok: true, cities: cities };
+}
+
 function giveMyBuyerLeads(body, session) {
   if (!body.dealId || !body.count) return { ok: false, error: 'Missing dealId or count.' };
   if (!canAccessDeal(session, body.dealId)) return { ok: false, error: 'You do not have access to this deal.' };
@@ -2219,6 +2249,7 @@ function giveMyBuyerLeads(body, session) {
     const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
     const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === body.dealId; });
     if (!deal) return { ok: false, error: 'Deal not found.' };
+    if (!dealIsActive(deal)) return { ok: false, error: 'This deal is no longer active.' };
 
     const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
     const existingPitches = sheetToObjects(pitchesSheet);
@@ -2227,10 +2258,20 @@ function giveMyBuyerLeads(body, session) {
       if (p['DealID'] === body.dealId && String(p['Username'] || '').toLowerCase() === username) alreadyPitchedByMeForThisDeal[p['BuyerLeadID']] = true;
     });
 
+    // A rep can override the deal's own City/Match Cities/Asset Category
+    // matching by hand-picking one or more cities from their own visible
+    // buyer pool (see getVisibleBuyerCities) -- useful to build a cold-call
+    // list for a deal that covers a wider area than what's formally set on
+    // it. Same idea as admin's city/state/zip override on the bulk-give
+    // tool, just city-only and rep-facing. Empty/absent cities means the
+    // normal buyerMatchesDeal matching applies, same as before.
+    const cityOverride = (body.cities || []).map(normalizeText).filter(Boolean);
+
     const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
     const pool = sheetToObjects(leadsSheet).filter(function (l) {
-      return !alreadyPitchedByMeForThisDeal[l['BuyerLeadID']] && l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE' &&
-        leadVisibleToUsername(l, username) && buyerMatchesDeal(l, deal);
+      if (alreadyPitchedByMeForThisDeal[l['BuyerLeadID']] || l['DoNotContact'] === true || l['DoNotContact'] === 'TRUE' || !leadVisibleToUsername(l, username)) return false;
+      if (cityOverride.length > 0) return cityOverride.indexOf(normalizeText(l['City'])) !== -1;
+      return buyerMatchesDeal(l, deal);
     });
 
     const batch = pool.slice(0, Number(body.count));

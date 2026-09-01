@@ -83,7 +83,16 @@ backend (see [SETUP.md](SETUP.md)).
   their own private uploads plus anything shared/admin-uploaded — never
   someone else's private list). They show up right after on the rep's own
   Buyer Leads tab to start calling. A rep can only give leads to
-  themselves this way; giving to anyone else is still admin-only.
+  themselves this way; giving to anyone else is still admin-only. Below
+  that, a rep can instead check off one or more **specific cities**
+  (grouped by state, sourced from every city that shows up across
+  whatever leads that rep can see) to build a cold-call list that bypasses
+  the deal's own State/City/Asset Category matching entirely — useful when
+  a deal's buyer pool should be wider than what's formally set on it, or a
+  rep wants to work a particular area on purpose. Leaving every city
+  unchecked falls back to the normal matching, same as before. A Dead or
+  Sold deal blocks this (and the normal matching above) either way — see
+  the buyer-matching note earlier in this section.
 - Each deal shows the standing SOP:
   1. Contact buyers from the lead list, or submit a Facebook post here for
      admin approval before posting — including which groups you intend to
