@@ -63,7 +63,8 @@ function dealMatchesBuyBox(deal, buyBox) {
   if (!buyBox) return true;
   const categories = (buyBox.assetCategories || []).slice();
   if (buyBox.otherAssetClass) categories.push(buyBox.otherAssetClass);
-  const hasAnyCriteria = buyBox.nationwide || (buyBox.states || []).length > 0 || (buyBox.cities || []).length > 0 || categories.length > 0;
+  const dealTypes = buyBox.dealTypes || [];
+  const hasAnyCriteria = buyBox.nationwide || (buyBox.states || []).length > 0 || (buyBox.cities || []).length > 0 || categories.length > 0 || dealTypes.length > 0;
   if (!hasAnyCriteria) return true;
 
   if (!buyBox.nationwide) {
@@ -80,7 +81,33 @@ function dealMatchesBuyBox(deal, buyBox) {
     const cats = categories.map(function (c) { return c.trim().toLowerCase(); });
     if (cats.indexOf(String(deal.AssetCategory || "").trim().toLowerCase()) === -1) return false;
   }
+  // Deal Type (Fix and Flip/Land/Buy and Hold) -- an OR match, same as the
+  // rest of these criteria: any overlap between what the buyer wants and
+  // what the deal is tagged counts. A deal with no DealTypes set at all
+  // isn't excluded just because a buyer has a Strategy preference -- same
+  // "no info yet, don't filter it out" treatment as an untagged AssetCategory
+  // would get if a buyer had left that blank.
+  if (dealTypes.length > 0) {
+    const dealDealTypes = splitCommaList(deal.DealTypes).map(function (t) { return t.toLowerCase(); });
+    if (dealDealTypes.length > 0) {
+      const wanted = dealTypes.map(function (t) { return t.trim().toLowerCase(); });
+      if (!wanted.some(function (t) { return dealDealTypes.indexOf(t) !== -1; })) return false;
+    }
+  }
   return true;
+}
+
+// Small colored tags for a deal's Fix and Flip/Land/Buy and Hold labels --
+// shared by every place a deal shows up (rep deal card, both detail
+// panels, admin deals table) so "what kind of deal is this" is visible at
+// a glance without opening it, per the ask to make these tags "easily
+// visible to everyone."
+function dealTypeTagsHtml(dealTypesStr) {
+  const types = splitCommaList(dealTypesStr);
+  if (types.length === 0) return "";
+  return types.map(function (t) {
+    return '<span class="status-pill status-active-match" style="margin-right:4px;">' + esc(t) + '</span>';
+  }).join("");
 }
 
 // A visible confirmation that a click actually registered -- separate from
@@ -636,7 +663,7 @@ function renderRepDeals() {
   let baseDeals = repDeals;
   if (session.personType === "Buyer" && session.buyBox) {
     const bb = session.buyBox;
-    const hasCriteria = bb.nationwide || (bb.states || []).length > 0 || (bb.cities || []).length > 0 || (bb.assetCategories || []).length > 0 || bb.otherAssetClass;
+    const hasCriteria = bb.nationwide || (bb.states || []).length > 0 || (bb.cities || []).length > 0 || (bb.assetCategories || []).length > 0 || bb.otherAssetClass || (bb.dealTypes || []).length > 0;
     if (hasCriteria) {
       const matches = repDeals.filter(function (d) { return dealMatchesBuyBox(d, bb); });
       if (matches.length === 0 && repDeals.length > 0) {
@@ -702,9 +729,11 @@ function renderRepDeals() {
       d.RehabEstimate ? "Rehab: " + esc(formatAdminMoney(d.RehabEstimate)) : "",
       d.AsIsValue ? "As-Is Value: " + esc(formatAdminMoney(d.AsIsValue)) : ""
     ].filter(Boolean).join(" &middot; ");
+    const dealTypeTags = dealTypeTagsHtml(d.DealTypes);
     return '<div class="deal-card" data-deal-id="' + esc(d.DealID) + '">' +
       '<div class="addr">' + codeTag + heading + '</div>' +
       countyLine +
+      (dealTypeTags ? '<div style="margin-top:4px;">' + dealTypeTags + '</div>' : "") +
       (financialsLine ? '<div class="small-muted" style="margin-top:2px;">' + financialsLine + '</div>' : "") +
       '<div class="meta">' + esc(d.AssetType || "") +
       ' <span class="status-pill ' + statusClass(d.Status) + '">' + esc(d.Status || "") + '</span>' +
@@ -753,7 +782,8 @@ async function openRepDealDetail(dealId) {
     '</div>' +
     addressBanner +
     '<div class="banner info">' +
-      '<span class="status-pill ' + statusClass(deal.Status) + '">' + esc(deal.Status || "") + '</span>' +
+      '<span class="status-pill ' + statusClass(deal.Status) + '">' + esc(deal.Status || "") + '</span> ' +
+      dealTypeTagsHtml(deal.DealTypes) +
       (deal.AssetType ? '<div style="margin-top:8px;"><strong>Asset Type:</strong> ' + esc(deal.AssetType) + '</div>' : "") +
       (deal.Price ? '<div><strong>Asking Price:</strong> ' + esc(formatAdminMoney(deal.Price)) + '</div>' : "") +
       (deal.ARV ? '<div><strong>ARV:</strong> ' + esc(formatAdminMoney(deal.ARV)) + '</div>' : "") +
@@ -1690,6 +1720,9 @@ function renderRepCsvDealOptions() {
   renderDealCheckboxList("rep-csv-dealid-input", repDeals, function (d) {
     return (d.DealCode ? d.DealCode + " — " : "") + [d.City, d.State].filter(Boolean).join(", ") + (d.AssetType ? " (" + d.AssetType + ")" : "");
   });
+  document.getElementById("rep-csv-dealtypes").innerHTML = BUY_BOX_DEAL_TYPES.map(function (t) {
+    return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="rep-csv-dealtype-checkbox" value="' + esc(t) + '"> ' + esc(t) + '</label>';
+  }).join("");
 }
 
 function renderRepCsvPreview() {
@@ -1725,7 +1758,8 @@ document.getElementById("rep-csv-import-btn").addEventListener("click", async fu
   if (btn.disabled) return;
   btn.disabled = true;
   const dealIds = checkedDealCheckboxIds("rep-csv-dealid-input");
-  const res = await api("importBuyerLeads", { rows: rows, dealIds: dealIds });
+  const dealTypes = Array.from(document.querySelectorAll(".rep-csv-dealtype-checkbox:checked")).map(function (cb) { return cb.value; });
+  const res = await api("importBuyerLeads", { rows: rows, dealIds: dealIds, dealTypes: dealTypes });
   btn.disabled = false;
   if (!res.ok) {
     errorEl.textContent = res.error || "Import failed.";
@@ -1739,6 +1773,7 @@ document.getElementById("rep-csv-import-btn").addEventListener("click", async fu
   repCsvRows = []; repCsvHeaders = [];
   document.getElementById("rep-csv-preview-section").hidden = true;
   clearDealCheckboxList("rep-csv-dealid-input");
+  Array.from(document.querySelectorAll(".rep-csv-dealtype-checkbox:checked")).forEach(function (cb) { cb.checked = false; });
   showToast("Imported " + res.imported + " buyer(s).");
   loadMyBuyerLeads();
 });
@@ -1785,7 +1820,7 @@ function renderMyBuyerLeadsList() {
       '<td>' + esc(l.Phone) + '</td>' +
       '<td>' + [l.City, l.State].filter(Boolean).join(", ") + '</td>' +
       '<td class="small-muted">' + esc(l.AssetCategories || "") + '</td>' +
-      '<td class="small-muted">' + (dealTags.length > 0 ? esc(dealTags.map(repDealLabelFor).join(", ")) : "&mdash;") + '</td>' +
+      '<td class="small-muted">' + (dealTags.length > 0 ? esc(dealTags.map(repDealLabelFor).join(", ")) : "&mdash;") + (dealTypeTagsHtml(l.DealTypes) ? '<div style="margin-top:4px;">' + dealTypeTagsHtml(l.DealTypes) + '</div>' : "") + '</td>' +
       '<td><input type="text" class="mybuyerlist-notes-input" data-lead-id="' + esc(l.BuyerLeadID) + '" value="' + esc(l.GeneralNotes || "") + '" placeholder="Add a note..." style="width:100%;"></td>' +
       '<td><label class="toggle-row"><input type="checkbox" class="mybuyerlist-dnc-toggle" data-lead-id="' + esc(l.BuyerLeadID) + '"' + (isDnc ? " checked" : "") + '></label></td>' +
       '</tr>';
@@ -1982,9 +2017,10 @@ function matchingBuyersForDeal(deal) {
       states: splitCommaList(r.buyBoxStates),
       cities: splitCommaList(r.buyBoxCities),
       assetCategories: splitCommaList(r.buyBoxAssetCategories),
-      otherAssetClass: r.buyBoxOtherAssetClass
+      otherAssetClass: r.buyBoxOtherAssetClass,
+      dealTypes: splitCommaList(r.buyBoxDealTypes)
     };
-    const hasCriteria = bb.nationwide || bb.states.length > 0 || bb.cities.length > 0 || bb.assetCategories.length > 0 || bb.otherAssetClass;
+    const hasCriteria = bb.nationwide || bb.states.length > 0 || bb.cities.length > 0 || bb.assetCategories.length > 0 || bb.otherAssetClass || bb.dealTypes.length > 0;
     return hasCriteria && dealMatchesBuyBox(deal, bb);
   });
 }
@@ -2022,7 +2058,7 @@ function renderAdminDeals() {
     return '<tr class="clickable" data-deal-id="' + esc(d.DealID) + '">' +
       '<td>' + (d.DealCode ? esc(d.DealCode) : "&mdash;") + ((d.Locked === true || d.Locked === "TRUE") ? ' <span class="status-pill status-dead-match" title="Bulk sweeps skip this deal">Locked</span>' : "") +
         (matchingBuyers.length > 0 ? ' <span class="status-pill status-active-match" title="' + esc(matchingBuyers.map(function (r) { return r.name; }).join(", ")) + '">' + matchingBuyers.length + ' buyer' + (matchingBuyers.length === 1 ? "" : "s") + ' match</span>' : "") + '</td>' +
-      '<td>' + esc(d.Address) + (d.City ? ", " + esc(d.City) : "") + '</td>' +
+      '<td>' + esc(d.Address) + (d.City ? ", " + esc(d.City) : "") + (dealTypeTagsHtml(d.DealTypes) ? '<div style="margin-top:4px;">' + dealTypeTagsHtml(d.DealTypes) + '</div>' : "") + '</td>' +
       '<td>' + esc(d.AssetType || "") + '</td>' +
       '<td>' + esc(d.Price ? formatAdminMoney(d.Price) : "") + '</td>' +
       '<td><span class="status-pill ' + statusClass(d.Status) + '">' + esc(d.Status || "") + '</span></td>' +
@@ -2079,6 +2115,9 @@ function openDealModal() {
   const categorySelect = document.getElementById("deal-assetcategory-input");
   categorySelect.innerHTML = '<option value="">&mdash; none &mdash;</option>' +
     assetCategoryOptionsCache.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join("");
+  document.getElementById("deal-dealtypes").innerHTML = BUY_BOX_DEAL_TYPES.map(function (t) {
+    return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="deal-dealtype-checkbox" value="' + esc(t) + '"> ' + esc(t) + '</label>';
+  }).join("");
   document.getElementById("deal-modal-error").classList.remove("show");
   document.getElementById("deal-modal").hidden = false;
 }
@@ -2113,6 +2152,7 @@ document.getElementById("deal-modal-save").addEventListener("click", async funct
     zip: document.getElementById("deal-zip-input").value.trim(),
     county: document.getElementById("deal-county-input").value.trim(),
     matchCities: document.getElementById("deal-matchcities-input").value.trim(),
+    dealTypes: Array.from(document.querySelectorAll(".deal-dealtype-checkbox:checked")).map(function (cb) { return cb.value; }),
     assetCategory: document.getElementById("deal-assetcategory-input").value,
     assetType: document.getElementById("deal-assettype-input").value.trim(),
     price: formatAdminMoney(document.getElementById("deal-price-input").value.trim()),
@@ -2209,6 +2249,7 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
         (deal.County ? ' &middot; ' + esc(deal.County) + ' County' : "") + '</p></div>' +
       '<button class="link-btn" id="close-detail-btn">Close</button>' +
     '</div>' +
+    (dealTypeTagsHtml(deal.DealTypes) ? '<div style="margin-bottom:8px;">' + dealTypeTagsHtml(deal.DealTypes) + '</div>' : "") +
 
     '<label class="field-label">Status</label>' +
     '<select id="deal-status-select">' +
@@ -2238,6 +2279,11 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     '</div>' +
     '<label class="field-label">Also Match These Cities <span class="small-muted">(same state, comma separated, in addition to ' + esc(deal.City || "the city above") + ')</span></label>' +
     '<input type="text" id="deal-matchcities-edit" value="' + esc(deal.MatchCities || "") + '" placeholder="e.g. Tempe, Mesa, Scottsdale">' +
+    '<label class="field-label">Deal Type <span class="small-muted">(for buyer matching &amp; shown as tags everywhere this deal appears)</span></label>' +
+    '<div>' + BUY_BOX_DEAL_TYPES.map(function (t) {
+      const checked = String(deal.DealTypes || "").split(",").map(function (s) { return s.trim(); }).indexOf(t) !== -1 ? " checked" : "";
+      return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="deal-dealtype-edit-checkbox" value="' + esc(t) + '"' + checked + '> ' + esc(t) + '</label>';
+    }).join("") + '</div>' +
     '<div class="nav-row" style="justify-content:flex-end;">' +
       '<button class="btn secondary small" id="save-code-btn">Save Deal Code / County / Matching</button>' +
     '</div>' +
@@ -2321,6 +2367,7 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
             return '<div class="item-row">' +
               '<strong>' + esc(r.name) + '</strong> (' + esc(r.username) + ')' +
               (r.phone ? ' &middot; ' + esc(r.phone) : "") + (r.email ? ' &middot; ' + esc(r.email) : "") +
+              (dealTypeTagsHtml(r.buyBoxDealTypes) ? '<div style="margin-top:4px;">' + dealTypeTagsHtml(r.buyBoxDealTypes) + '</div>' : "") +
               (r.buyBoxNotes ? '<div class="small-muted" style="margin-top:2px;">' + esc(r.buyBoxNotes) + '</div>' : "") +
               '</div>';
           }).join("") +
@@ -2429,7 +2476,8 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
         DealCode: document.getElementById("deal-code-edit").value.trim(),
         County: document.getElementById("deal-county-edit").value.trim(),
         AssetCategory: document.getElementById("deal-assetcategory-edit").value,
-        MatchCities: document.getElementById("deal-matchcities-edit").value.trim()
+        MatchCities: document.getElementById("deal-matchcities-edit").value.trim(),
+        DealTypes: Array.from(document.querySelectorAll(".deal-dealtype-edit-checkbox:checked")).map(function (cb) { return cb.value; })
       }
     });
     await loadAdminDeals();
@@ -3064,6 +3112,11 @@ async function populateBulkGiveSelects() {
         return d.DealCode ? d.DealCode + " — " + d.Address : d.Address;
       });
     });
+    ["csv-dealtypes", "buyerleads-import-dealtypes"].forEach(function (id) {
+      document.getElementById(id).innerHTML = BUY_BOX_DEAL_TYPES.map(function (t) {
+        return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="' + id + '-checkbox" value="' + esc(t) + '"> ' + esc(t) + '</label>';
+      }).join("");
+    });
   }
 }
 
@@ -3532,7 +3585,8 @@ document.getElementById("csv-import-btn").addEventListener("click", async functi
   if (btn.disabled) return;
   btn.disabled = true;
   const dealIds = checkedDealCheckboxIds("csv-dealid-input");
-  const res = await api("importBuyerLeads", { rows: rows, dealIds: dealIds });
+  const dealTypes = Array.from(document.querySelectorAll(".csv-dealtypes-checkbox:checked")).map(function (cb) { return cb.value; });
+  const res = await api("importBuyerLeads", { rows: rows, dealIds: dealIds, dealTypes: dealTypes });
   btn.disabled = false;
   if (!res.ok) {
     errorEl.textContent = res.error || "Import failed.";
@@ -3546,6 +3600,7 @@ document.getElementById("csv-import-btn").addEventListener("click", async functi
   document.getElementById("csv-file-input").value = "";
   csvRows = []; csvHeaders = [];
   clearDealCheckboxList("csv-dealid-input");
+  Array.from(document.querySelectorAll(".csv-dealtypes-checkbox:checked")).forEach(function (cb) { cb.checked = false; });
   markLastImportedBuyerLeads(res.importedIds, res.imported, res.importedAt);
   renderMergeReview(res.pendingMerges);
   await loadBuyerLeadsAdmin();
@@ -3567,7 +3622,8 @@ document.getElementById("buyerleads-import-btn").addEventListener("click", async
   if (btn.disabled) return;
   btn.disabled = true;
   const dealIds = checkedDealCheckboxIds("buyerleads-import-dealid-input");
-  const res = await api("importBuyerLeads", { pasteText: text, dealIds: dealIds });
+  const dealTypes = Array.from(document.querySelectorAll(".buyerleads-import-dealtypes-checkbox:checked")).map(function (cb) { return cb.value; });
+  const res = await api("importBuyerLeads", { pasteText: text, dealIds: dealIds, dealTypes: dealTypes });
   btn.disabled = false;
   if (!res.ok) {
     errorEl.textContent = res.error || "Import failed.";
@@ -3579,6 +3635,7 @@ document.getElementById("buyerleads-import-btn").addEventListener("click", async
     (res.skippedDuplicates ? " Skipped " + res.skippedDuplicates + " duplicate(s) with nothing new to add." : "") +
     (res.pendingMerges && res.pendingMerges.length > 0 ? " " + res.pendingMerges.length + " duplicate(s) below have new data — review them." : "");
   document.getElementById("buyerleads-import-text").value = "";
+  Array.from(document.querySelectorAll(".buyerleads-import-dealtypes-checkbox:checked")).forEach(function (cb) { cb.checked = false; });
   clearDealCheckboxList("buyerleads-import-dealid-input");
   markLastImportedBuyerLeads(res.importedIds, res.imported, res.importedAt);
   renderMergeReview(res.pendingMerges);
@@ -3785,7 +3842,7 @@ function renderBuyerLeadsAdmin() {
       '<td class="small-muted">' + (l.PortfolioValue ? esc(l.PortfolioValue) : "&mdash;") + '</td>' +
       '<td class="small-muted">' + esc(l.AssetCategories || "") + '</td>' +
       '<td class="small-muted">' + esc(notesPreview) + '</td>' +
-      '<td class="small-muted">' + (pendingDealIdList(l).length > 0 ? esc(pendingDealIdList(l).map(dealLabelFor).join(", ")) : "&mdash;") + '</td>' +
+      '<td class="small-muted">' + (pendingDealIdList(l).length > 0 ? esc(pendingDealIdList(l).map(dealLabelFor).join(", ")) : "&mdash;") + (dealTypeTagsHtml(l.DealTypes) ? '<div style="margin-top:4px;">' + dealTypeTagsHtml(l.DealTypes) + '</div>' : "") + '</td>' +
       '<td class="small-muted">' + (l.CreatedAt ? formatDate(l.CreatedAt) : "&mdash;") + '</td>' +
       '<td class="small-muted">' + (l.UploadedBy ? esc(l.UploadedBy) : "&mdash;") + '</td>' +
       '<td>' + (l.openPitches.length || "&mdash;") + '</td>' +

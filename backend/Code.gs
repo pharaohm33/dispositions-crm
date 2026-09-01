@@ -91,7 +91,7 @@ const PERSON_TYPES = ['Buyer', 'Wholesaler', 'Realtor', 'Other'];
 // buyer<->deal auto-matching -- see buyerMatchesDeal. AssetType stays a
 // free-text description field ("SFR - 3bd/2ba") separate from the
 // structured AssetCategory used for matching.
-const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt', 'Locked'];
+const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt', 'Locked', 'DealTypes'];
 // Source distinguishes a deliberate, one-deal-at-a-time grant ('manual' --
 // the Access section's "Add Access" dropdown, or "Assign Myself") from one
 // written by the bulk-assign mechanism ('bulk' -- see applyDealAssignMode).
@@ -148,7 +148,7 @@ const FB_COLUMNS = ['RequestID', 'DealID', 'Username', 'PostText', 'TargetGroups
 // what the buyer has told us they want to spend, if known; like
 // AssetCategories, a buyer with neither set is treated as open to any
 // price for matching purposes.
-const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'OwnershipLengthMonths', 'PropertyURL', 'PriceRangeMin', 'PriceRangeMax', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'PendingDealID', 'CreatedAt', 'UploadedBy', 'DuplicateOfBuyerLeadID'];
+const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'OwnershipLengthMonths', 'PropertyURL', 'PriceRangeMin', 'PriceRangeMax', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'PendingDealID', 'CreatedAt', 'UploadedBy', 'DuplicateOfBuyerLeadID', 'DealTypes'];
 
 // A Pitch is "give this buyer lead to this rep, to work against this one
 // specific deal." This is the only thing that creates an actionable item in
@@ -936,6 +936,12 @@ function adminAddDeal(body) {
   const sheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
   const dealId = Utilities.getUuid();
   const now = new Date().toISOString();
+  // Fix and Flip / Land / Buy and Hold -- the exact same three values a
+  // Buyer picks as their "Strategy" at signup (BUY_BOX_DEAL_TYPES), so
+  // tagging a deal with these actually closes the loop and lets
+  // dealMatchesBuyBox match on it, instead of Strategy being reference-only
+  // info nothing on a deal could ever be checked against.
+  const dealTypes = (Array.isArray(d.dealTypes) ? d.dealTypes : splitCommaList(d.dealTypes)).filter(function (t) { return BUY_BOX_DEAL_TYPES.indexOf(t) !== -1; });
   appendRowByHeaders(sheet, {
     'DealID': dealId, 'DealCode': d.dealCode || '', 'Address': d.address, 'City': d.city || '', 'State': d.state || '', 'Zip': d.zip || '',
     'County': d.county || '', 'MatchCities': d.matchCities || '', 'AssetType': d.assetType || '', 'AssetCategory': d.assetCategory || '',
@@ -943,7 +949,7 @@ function adminAddDeal(body) {
     'Status': d.status || DEFAULT_STATUSES[0],
     'Description': d.description || '', 'GeneralDriveLink': d.generalDriveLink || '', 'SensitiveDriveLink': d.sensitiveDriveLink || '',
     'AdminPrivateNotes': d.adminPrivateNotes || '', 'SourceLink': d.sourceLink || '',
-    'CreatedAt': now, 'UpdatedAt': now
+    'CreatedAt': now, 'UpdatedAt': now, 'DealTypes': dealTypes.join(', ')
   });
 
   const assignedCount = applyDealAssignMode(dealId, d.assetCategory, body.assignMode, now);
@@ -1122,6 +1128,14 @@ function adminUpdateDeal(body) {
     const col = getColumnIndex(sheet, field);
     sheet.getRange(match._row, col).setValue(d[field]);
   });
+  // Fix and Flip / Land / Buy and Hold tags -- same BUY_BOX_DEAL_TYPES
+  // vocabulary a Buyer picks as their Strategy, so dealMatchesBuyBox can
+  // actually match on it. Handled separately from the generic editable
+  // loop above since this is an array (checkboxes), not a plain string.
+  if (d.DealTypes !== undefined) {
+    const dealTypes = (Array.isArray(d.DealTypes) ? d.DealTypes : splitCommaList(d.DealTypes)).filter(function (t) { return BUY_BOX_DEAL_TYPES.indexOf(t) !== -1; });
+    sheet.getRange(match._row, getColumnIndex(sheet, 'DealTypes')).setValue(dealTypes.join(', '));
+  }
   const updatedCol = getColumnIndex(sheet, 'UpdatedAt');
   sheet.getRange(match._row, updatedCol).setValue(new Date().toISOString());
   return { ok: true };
@@ -2033,7 +2047,7 @@ function adminMergeBuyerLeads(body) {
 const BUYER_LEAD_ENRICHABLE_FIELDS = ['Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County',
   'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'OwnershipLengthMonths', 'PropertyURL', 'PriceRangeMin', 'PriceRangeMax'];
 
-function buildBuyerLeadRow(r, now, uploadedBy, duplicateOfId, pendingDealId) {
+function buildBuyerLeadRow(r, now, uploadedBy, duplicateOfId, pendingDealId, dealTypes) {
   return {
     'BuyerLeadID': Utilities.getUuid(), 'BuyerName': r.buyerName, 'Phone': r.phone, 'PhoneType': r.phoneType || '',
     'Phone2': r.phone2 || '', 'Phone2Type': r.phone2Type || '', 'Phone3': r.phone3 || '', 'Phone3Type': r.phone3Type || '',
@@ -2043,7 +2057,7 @@ function buildBuyerLeadRow(r, now, uploadedBy, duplicateOfId, pendingDealId) {
     'OwnershipLengthMonths': r.ownershipLengthMonths || '', 'PropertyURL': r.propertyUrl || '',
     'PriceRangeMin': r.priceRangeMin || '', 'PriceRangeMax': r.priceRangeMax || '',
     'GeneralNotes': '', 'DriveLink': '', 'DoNotContact': false, 'PendingDealID': pendingDealId || '', 'CreatedAt': now,
-    'UploadedBy': uploadedBy, 'DuplicateOfBuyerLeadID': duplicateOfId || ''
+    'UploadedBy': uploadedBy, 'DuplicateOfBuyerLeadID': duplicateOfId || '', 'DealTypes': dealTypes || ''
   };
 }
 
@@ -2098,6 +2112,14 @@ function importBuyerLeads(body, session) {
     .filter(function (id) { return id && (session.a || canAccessDeal(session, id)); })
     .join(', ');
 
+  // Same idea as pendingDealId above, but for tagging the batch with what
+  // kind of deal these buyers are for (Fix and Flip/Land/Buy and Hold) --
+  // no access check needed since these are just category tags, not a grant
+  // to any specific deal.
+  const dealTypesForBatch = (body.dealTypes || [])
+    .filter(function (t) { return BUY_BOX_DEAL_TYPES.indexOf(t) !== -1; })
+    .join(', ');
+
   const existingByPhone = {};
   const existingByEmail = {};
   sheetToObjects(sheet).forEach(function (l) {
@@ -2130,12 +2152,12 @@ function importBuyerLeads(body, session) {
 
     const existingMatch = (normalizedPhone && existingByPhone[normalizedPhone]) || (normalizedEmail && existingByEmail[normalizedEmail]);
     if (!existingMatch) {
-      newRows.push(buildBuyerLeadRow(r, now, uploadedBy, '', pendingDealId));
+      newRows.push(buildBuyerLeadRow(r, now, uploadedBy, '', pendingDealId, dealTypesForBatch));
       return;
     }
 
     if (!session.a) {
-      newRows.push(buildBuyerLeadRow(r, now, uploadedBy, existingMatch['BuyerLeadID'], pendingDealId));
+      newRows.push(buildBuyerLeadRow(r, now, uploadedBy, existingMatch['BuyerLeadID'], pendingDealId, dealTypesForBatch));
       return;
     }
 

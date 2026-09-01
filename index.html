@@ -484,6 +484,10 @@
         <p class="small-muted">If this batch is buyers you pulled specifically for one or more of your deals — e.g. several North Carolina land deals a buyer could take any of — check them here so admin can see it's earmarked for those. Grouped and sorted by state so you can quickly skip past ones that don't apply. Leave nothing checked if this list isn't for any specific deal. This doesn't give anyone a pitch by itself — it's just a label on your list.</p>
         <div id="rep-csv-dealid-input" class="deal-checkbox-list"></div>
 
+        <div class="section-title">Deal Type <span class="small-muted">(optional)</span></div>
+        <p class="small-muted">Tag this whole batch as Fix and Flip / Land / Buy and Hold buyers, if it's specific to one or more of those.</p>
+        <div id="rep-csv-dealtypes"></div>
+
         <div class="error-text" id="rep-csv-import-error"></div>
         <div class="nav-row" style="justify-content:flex-end;">
           <button class="btn primary" id="rep-csv-import-btn">Import My Buyer List</button>
@@ -718,6 +722,10 @@
         <p class="small-muted">Tag this batch as earmarked for one or more deals — e.g. several North Carolina land deals a buyer could take any of. Grouped and sorted by state so you can quickly skip past ones that don't apply. Leave nothing checked if this list isn't for any specific deal. This doesn't give anyone a pitch by itself — it's just a label, shown on the table below and filterable via "Pending Deal Tag."</p>
         <div id="csv-dealid-input" class="deal-checkbox-list"></div>
 
+        <div class="section-title">Deal Type <span class="small-muted">(optional)</span></div>
+        <p class="small-muted">Tag this whole batch as Fix and Flip / Land / Buy and Hold buyers, if it's specific to one or more of those.</p>
+        <div id="csv-dealtypes"></div>
+
         <div class="error-text" id="csv-import-error"></div>
         <div class="nav-row" style="justify-content:flex-end;">
           <button class="btn primary" id="csv-import-btn">Import</button>
@@ -732,6 +740,9 @@
       <textarea id="buyerleads-import-text" style="min-height:120px;" placeholder="Jane Doe LLC, 555-123-4567, Mobile, Phoenix, AZ, 85001, jane@example.com"></textarea>
       <div class="section-title">Which Deal(s) Is This List For? <span class="small-muted">(optional)</span></div>
       <div id="buyerleads-import-dealid-input" class="deal-checkbox-list"></div>
+      <div class="section-title">Deal Type <span class="small-muted">(optional)</span></div>
+      <p class="small-muted">Tag this whole batch as Fix and Flip / Land / Buy and Hold buyers, if it's specific to one or more of those.</p>
+      <div id="buyerleads-import-dealtypes"></div>
       <div class="error-text" id="buyerleads-import-error"></div>
       <div class="nav-row" style="justify-content:flex-end;">
         <button class="btn primary" id="buyerleads-import-btn">Import</button>
@@ -971,6 +982,8 @@
     </div>
     <label class="field-label">Also Match These Cities <span class="small-muted">(same state, comma separated — in addition to the city above)</span></label>
     <input type="text" id="deal-matchcities-input" placeholder="e.g. Tempe, Mesa, Scottsdale">
+    <label class="field-label">Deal Type <span class="small-muted">(for buyer matching &amp; shown as tags everywhere this deal appears)</span></label>
+    <div id="deal-dealtypes"></div>
     <div class="row2">
       <div><label class="field-label">Asset Type</label><input type="text" id="deal-assettype-input" placeholder="e.g. SFR, Multifamily, Commercial"></div>
       <div><label class="field-label">Asking Price</label><input type="text" id="deal-price-input"></div>
@@ -1153,7 +1166,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=60"></script>
-<script src="app.js?v=60"></script>
+<script src="config.js?v=61"></script>
+<script src="app.js?v=61"></script>
 </body>
 </html>
