@@ -105,16 +105,30 @@ backend (see [SETUP.md](SETUP.md)).
   their own uploads plus admin's shared pool, never another rep's private
   list.
 - Each deal shows the standing SOP:
-  1. Contact buyers from the lead list, or submit a Facebook post here for
-     admin approval before posting — including which groups you intend to
-     post it to.
+  1. **Call buyers from the lead list** — the main way to work a deal, and
+     what the banner leads with. Match yourself to buyers on the deal (or
+     cold-call specific cities from your own list, see above) and start
+     dialing. Cold emailing buyers is also allowed, but talk to admin
+     first — there's a specific outreach approach to keep those emails out
+     of spam.
   2. As soon as a buyer shows real interest, log them under "Interested
      Buyers" — this emails admin immediately. Keep pasting conversation
      updates into that buyer's notes as things progress, and mark the match
      **Active Match**, **Negotiating**, **Closing**, or **Dead Match** (buyer
      couldn't agree) as it plays out — an easy-to-follow, deal-by-deal picture
-     of who's actually closing.
-  3. **Address disclosure**, spelled out right in this same banner: pitch
+     of who's actually closing. This section sits first on a deal's detail
+     page too (labeled **Step 1**), right after the buyer-matching tools.
+  3. **Facebook posting is explicitly optional and secondary**, not a
+     first-resort — the banner and the deal detail page (labeled just
+     **"Optional"**, no step number, and using the muted secondary button
+     style rather than the primary one) both say to lead with calling
+     buyers instead. Once a post is approved and shared to a bunch of
+     groups there's no way to pull it back or delete it if something turns
+     out wrong (a bad price, the deal falling through, a typo) — every post
+     still needs admin approval first regardless, but this framing exists
+     so reps don't reach for it as the default the way they might for
+     Step 1.
+  4. **Address disclosure**, spelled out right in this same banner: pitch
      off the general deal info first (Deal Code, City/State/Zip, County,
      price — never the address). Only once a buyer has actually responded
      and specifically asks for the address — not just because a rep thinks
@@ -122,7 +136,7 @@ backend (see [SETUP.md](SETUP.md)).
      to email admin and ask for it. Sharing an address early, or with
      anyone besides that one legitimate buyer who asked, risks losing the
      deal and getting removed from the team.
-  4. For a **Wholesaler**, **Realtor**, or **Other** signup specifically
+  5. For a **Wholesaler**, **Realtor**, or **Other** signup specifically
      (not a Buyer, not a traditional admin-added account), this same banner
      adds one more line: once you have an interested buyer, text the "Want
      to Join?" phone number saying "Interested and want more information?"

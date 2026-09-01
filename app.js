@@ -469,19 +469,7 @@ async function openRepDealDetail(dealId) {
     '</div>' +
     '<div id="give-myself-result" class="small-muted"></div>' +
 
-    '<div class="section-title">Step 1 &middot; Submit a Facebook Post for Approval</div>' +
-    '<p class="small-muted">Want to cold email buyers about this deal instead? Talk to admin first — there\'s a specific approach we use so those emails don\'t land in spam.</p>' +
-    '<label class="field-label">Post text</label>' +
-    '<textarea id="fb-post-text"></textarea>' +
-    '<label class="field-label">Groups you intend to post it to</label>' +
-    '<textarea id="fb-post-groups" placeholder="e.g. Phoenix Off-Market Deals, Investor Network AZ"></textarea>' +
-    '<div class="error-text" id="fb-post-error"></div>' +
-    '<div class="nav-row" style="justify-content:flex-end;">' +
-      '<button class="btn primary" id="fb-post-submit">Submit for Approval</button>' +
-    '</div>' +
-    '<div id="fb-post-list">' + renderFbRequestList(fbRequests, false) + '</div>' +
-
-    '<div class="section-title">Step 2 &middot; Interested Buyers</div>' +
+    '<div class="section-title">Step 1 &middot; Interested Buyers</div>' +
     '<p class="small-muted">Log a buyer here as soon as they show interest — this emails admin immediately. Keep pasting conversation updates into their notes below as things progress, and mark the match Negotiating/Closing/Dead as it plays out.</p>' +
     '<label class="field-label">Buyer name</label>' +
     '<input type="text" id="buyer-name-input">' +
@@ -497,7 +485,19 @@ async function openRepDealDetail(dealId) {
     '<div class="nav-row" style="justify-content:flex-end;">' +
       '<button class="btn primary" id="buyer-add-submit">Add Interested Buyer</button>' +
     '</div>' +
-    '<div id="buyer-list">' + renderBuyerMatchList(buyers) + '</div>';
+    '<div id="buyer-list">' + renderBuyerMatchList(buyers) + '</div>' +
+
+    '<div class="section-title">Optional &middot; Facebook Post (Not The Main Way We Work Deals)</div>' +
+    '<p class="small-muted">Calling buyers directly from the lead list above gets far more control than a public post, so please lead with that instead of this. Once a post is approved and shared to a bunch of groups, there\'s no way to pull it back or delete it if something turns out wrong (a bad price, the deal falling through, a typo) — so this is a secondary option for now, and every post still needs admin approval before it goes out. Want to cold email buyers instead? Talk to admin first — there\'s a specific approach we use so those emails don\'t land in spam.</p>' +
+    '<label class="field-label">Post text</label>' +
+    '<textarea id="fb-post-text"></textarea>' +
+    '<label class="field-label">Groups you intend to post it to</label>' +
+    '<textarea id="fb-post-groups" placeholder="e.g. Phoenix Off-Market Deals, Investor Network AZ"></textarea>' +
+    '<div class="error-text" id="fb-post-error"></div>' +
+    '<div class="nav-row" style="justify-content:flex-end;">' +
+      '<button class="btn secondary" id="fb-post-submit">Submit for Approval</button>' +
+    '</div>' +
+    '<div id="fb-post-list">' + renderFbRequestList(fbRequests, false) + '</div>';
 
   wireBuyerMatchListHandlers(document.getElementById("buyer-list"), function () { return refreshBuyerMatchList(dealId, "buyer-list"); });
   wireRequestAddressButton();
