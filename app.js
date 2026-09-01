@@ -48,6 +48,41 @@ function esc(s) {
   });
 }
 
+// Shared by the Buyer's own Deals tab (filters the list down to matches)
+// and admin's deal views (flags which Buyer accounts match a given deal,
+// since there's no automated buyer-notification system yet -- this is
+// what tells admin who to reach out to directly, or hand to a rep).
+// State/City/Asset Category each optionally narrow the match (AND
+// between dimensions, OR within a dimension's own list) -- Deal Type
+// isn't matched here at all, since nothing on a deal records "Fix and
+// Flip vs. Land vs. Buy and Hold" for it to check against; it's kept as
+// reference info for admin to read, not something this can verify. A
+// buyer who hasn't set any buy box criteria matches everything (nothing
+// to narrow by), same as Nationwide explicitly checked.
+function dealMatchesBuyBox(deal, buyBox) {
+  if (!buyBox) return true;
+  const categories = (buyBox.assetCategories || []).slice();
+  if (buyBox.otherAssetClass) categories.push(buyBox.otherAssetClass);
+  const hasAnyCriteria = buyBox.nationwide || (buyBox.states || []).length > 0 || (buyBox.cities || []).length > 0 || categories.length > 0;
+  if (!hasAnyCriteria) return true;
+
+  if (!buyBox.nationwide) {
+    if ((buyBox.states || []).length > 0) {
+      const states = buyBox.states.map(function (s) { return s.trim().toLowerCase(); });
+      if (states.indexOf(String(deal.State || "").trim().toLowerCase()) === -1) return false;
+    }
+    if ((buyBox.cities || []).length > 0) {
+      const cities = buyBox.cities.map(function (c) { return c.trim().toLowerCase(); });
+      if (cities.indexOf(String(deal.City || "").trim().toLowerCase()) === -1) return false;
+    }
+  }
+  if (categories.length > 0) {
+    const cats = categories.map(function (c) { return c.trim().toLowerCase(); });
+    if (cats.indexOf(String(deal.AssetCategory || "").trim().toLowerCase()) === -1) return false;
+  }
+  return true;
+}
+
 // A visible confirmation that a click actually registered -- separate from
 // (and in addition to) any inline result text, since a small line of text
 // under a button is easy to miss and is exactly what leads to a second,
@@ -308,6 +343,42 @@ document.getElementById("forgot-password-link").addEventListener("click", functi
   textEl.hidden = false;
 });
 
+// The signup form loads before any session exists, so this uses a
+// dedicated public (unauthenticated) action rather than the normal
+// getAssetCategoryOptions, which requires a logged-in session.
+let signupAssetCategoriesCache = [];
+const BUY_BOX_DEAL_TYPES = ["Fix and Flip", "Land", "Buy and Hold"];
+
+async function loadSignupBuyBoxOptions() {
+  document.getElementById("signup-buybox-dealtypes").innerHTML = BUY_BOX_DEAL_TYPES.map(function (t) {
+    return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="signup-buybox-dealtype-checkbox" value="' + esc(t) + '"> ' + esc(t) + '</label>';
+  }).join("");
+  const res = await api("getSignupAssetCategoryOptions", {});
+  if (!res.ok) return;
+  signupAssetCategoriesCache = res.categories;
+  document.getElementById("signup-buybox-categories").innerHTML = signupAssetCategoriesCache.map(function (c) {
+    return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="signup-buybox-category-checkbox" value="' + esc(c) + '"> ' + esc(c) + '</label>';
+  }).join("");
+}
+
+document.getElementById("signup-persontype").addEventListener("change", function () {
+  const isBuyer = this.value === "Buyer";
+  document.getElementById("signup-buybox-section").hidden = !isBuyer;
+  if (isBuyer && signupAssetCategoriesCache.length === 0) loadSignupBuyBoxOptions();
+});
+
+function collectSignupBuyBox() {
+  return {
+    buyBoxNationwide: document.getElementById("signup-buybox-nationwide").checked,
+    buyBoxStates: document.getElementById("signup-buybox-states").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean),
+    buyBoxCities: document.getElementById("signup-buybox-cities").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean),
+    buyBoxDealTypes: Array.from(document.querySelectorAll(".signup-buybox-dealtype-checkbox:checked")).map(function (cb) { return cb.value; }),
+    buyBoxAssetCategories: Array.from(document.querySelectorAll(".signup-buybox-category-checkbox:checked")).map(function (cb) { return cb.value; }),
+    buyBoxOtherAssetClass: document.getElementById("signup-buybox-other").value.trim(),
+    buyBoxNotes: document.getElementById("signup-buybox-notes").value.trim()
+  };
+}
+
 document.getElementById("signup-btn").addEventListener("click", async function () {
   const btn = this;
   const name = document.getElementById("signup-name").value.trim();
@@ -351,11 +422,11 @@ document.getElementById("signup-btn").addEventListener("click", async function (
   }
   if (btn.disabled) return;
   btn.disabled = true;
-  const signupRes = await api("publicSignup", {
+  const signupRes = await api("publicSignup", Object.assign({
     name: name, email: email, phone: phone, personType: personType, password: password,
     captchaTargetX: signupCaptcha.targetX, captchaExpiresAt: signupCaptcha.expiresAt,
     captchaToken: signupCaptcha.token, captchaSubmittedX: sliderX
-  });
+  }, personType === "Buyer" ? collectSignupBuyBox() : {}));
   if (!signupRes.ok) {
     btn.disabled = false;
     errorEl.textContent = signupRes.error || "Could not create your account.";
@@ -437,6 +508,7 @@ async function initRepView() {
     document.getElementById("rep-buyerlist-card").hidden = !buildsOwnList;
     document.getElementById("rep-mybuyerlist-card").hidden = !buildsOwnList;
     if (buildsOwnList) loadMyBuyerLeads();
+    document.getElementById("rep-buybox-edit-row").hidden = session.personType !== "Buyer";
     // The text-in SOP is specifically for the three self-identified outside
     // contributor types, not a traditional admin-added rep (blank) or a
     // Buyer -- and only shows once there's an actual phone number to text.
@@ -456,6 +528,61 @@ async function initRepView() {
 document.getElementById("rep-search-input").addEventListener("input", renderRepDeals);
 document.getElementById("rep-deals-filter-status").addEventListener("change", renderRepDeals);
 document.getElementById("rep-deals-filter-category").addEventListener("change", renderRepDeals);
+
+document.getElementById("edit-my-buybox-btn").addEventListener("click", function () {
+  const session = getSession() || {};
+  const bb = session.buyBox || {};
+  document.getElementById("my-buybox-error").textContent = "";
+  document.getElementById("my-buybox-nationwide").checked = !!bb.nationwide;
+  document.getElementById("my-buybox-states").value = (bb.states || []).join(", ");
+  document.getElementById("my-buybox-cities").value = (bb.cities || []).join(", ");
+  document.getElementById("my-buybox-other").value = bb.otherAssetClass || "";
+  document.getElementById("my-buybox-notes").value = bb.notes || "";
+  const dealTypes = (bb.dealTypes || []).map(function (t) { return t.toLowerCase(); });
+  document.getElementById("my-buybox-dealtypes").innerHTML = BUY_BOX_DEAL_TYPES.map(function (t) {
+    const checked = dealTypes.indexOf(t.toLowerCase()) !== -1 ? " checked" : "";
+    return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="my-buybox-dealtype-checkbox" value="' + esc(t) + '"' + checked + '> ' + esc(t) + '</label>';
+  }).join("");
+  const categories = (bb.assetCategories || []).map(function (c) { return c.toLowerCase(); });
+  document.getElementById("my-buybox-categories").innerHTML = assetCategoryOptionsCache.map(function (c) {
+    const checked = categories.indexOf(c.toLowerCase()) !== -1 ? " checked" : "";
+    return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="my-buybox-category-checkbox" value="' + esc(c) + '"' + checked + '> ' + esc(c) + '</label>';
+  }).join("");
+  document.getElementById("my-buybox-modal").hidden = false;
+});
+
+document.getElementById("my-buybox-cancel").addEventListener("click", function () {
+  document.getElementById("my-buybox-modal").hidden = true;
+});
+
+document.getElementById("my-buybox-save").addEventListener("click", async function () {
+  const btn = this;
+  if (btn.disabled) return;
+  btn.disabled = true;
+  const res = await api("repUpdateMyBuyBox", {
+    buyBox: {
+      nationwide: document.getElementById("my-buybox-nationwide").checked,
+      states: document.getElementById("my-buybox-states").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean),
+      cities: document.getElementById("my-buybox-cities").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean),
+      dealTypes: Array.from(document.querySelectorAll(".my-buybox-dealtype-checkbox:checked")).map(function (cb) { return cb.value; }),
+      assetCategories: Array.from(document.querySelectorAll(".my-buybox-category-checkbox:checked")).map(function (cb) { return cb.value; }),
+      otherAssetClass: document.getElementById("my-buybox-other").value.trim(),
+      notes: document.getElementById("my-buybox-notes").value.trim()
+    }
+  });
+  btn.disabled = false;
+  if (!res.ok) {
+    document.getElementById("my-buybox-error").textContent = res.error || "Could not save.";
+    return;
+  }
+  // Update the session in place (same shape login() returns) so the Deals
+  // tab re-filters immediately without needing to log out and back in.
+  const session = getSession();
+  if (session) { session.buyBox = res.buyBox; setSession(session); }
+  document.getElementById("my-buybox-modal").hidden = true;
+  renderRepDeals();
+  showToast("Buy box saved.");
+});
 
 // Defaults reps to only ever seeing active deals -- nobody wants to
 // scroll past Dead (or Sold) deals just to find what's actually workable.
@@ -497,7 +624,35 @@ function renderRepDeals() {
   const categoryFilter = document.getElementById("rep-deals-filter-category").value.trim().toLowerCase();
   const container = document.getElementById("rep-deals-container");
   const empty = document.getElementById("rep-deals-empty");
-  const filtered = repDeals.filter(function (d) {
+
+  // A Buyer's list is pre-narrowed to their own buy box (see
+  // dealMatchesBuyBox) before any of the manual search/status/category
+  // filters below even apply. If they have real criteria set but nothing
+  // currently matches, fall back to showing everything with a banner
+  // explaining why, rather than an empty list -- once something does
+  // match, only the matches show, no banner.
+  const session = getSession() || {};
+  const buyBoxBanner = document.getElementById("rep-deals-buybox-banner");
+  let baseDeals = repDeals;
+  if (session.personType === "Buyer" && session.buyBox) {
+    const bb = session.buyBox;
+    const hasCriteria = bb.nationwide || (bb.states || []).length > 0 || (bb.cities || []).length > 0 || (bb.assetCategories || []).length > 0 || bb.otherAssetClass;
+    if (hasCriteria) {
+      const matches = repDeals.filter(function (d) { return dealMatchesBuyBox(d, bb); });
+      if (matches.length === 0 && repDeals.length > 0) {
+        if (buyBoxBanner) buyBoxBanner.hidden = false;
+      } else {
+        if (buyBoxBanner) buyBoxBanner.hidden = true;
+        baseDeals = matches;
+      }
+    } else if (buyBoxBanner) {
+      buyBoxBanner.hidden = true;
+    }
+  } else if (buyBoxBanner) {
+    buyBoxBanner.hidden = true;
+  }
+
+  const filtered = baseDeals.filter(function (d) {
     if (q && ![d.DealCode, d.City, d.State, d.County, d.AssetType].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; })) return false;
     if (statusFilter === REP_DEALS_ACTIVE_FILTER_VALUE) { if (d.Status === "Dead" || d.Status === "Sold") return false; }
     else if (statusFilter && d.Status !== statusFilter) return false;
@@ -1781,8 +1936,13 @@ function switchAdminTab(tab) {
 
 async function initAdminView() {
   // Independent reads -- run together rather than one after another.
-  await Promise.all([loadStatusOptions(), loadAssetCategoryOptions(), loadAdminDeals()]);
+  // adminGetReps here (not just when the Team tab is opened) is what lets
+  // the Deals tab flag which Buyer accounts' buy box matches each deal
+  // right away, without needing a detour through Team first.
+  const [, , , repsRes] = await Promise.all([loadStatusOptions(), loadAssetCategoryOptions(), loadAdminDeals(), api("adminGetReps", {})]);
+  if (repsRes.ok) adminReps = repsRes.reps;
   populateAdminDealsFilters();
+  renderAdminDeals();
 }
 
 function populateAdminDealsFilters() {
@@ -1807,6 +1967,31 @@ document.getElementById("admin-deal-search").addEventListener("input", renderAdm
 document.getElementById("admin-deals-filter-status").addEventListener("change", renderAdminDeals);
 document.getElementById("admin-deals-filter-category").addEventListener("change", renderAdminDeals);
 document.getElementById("admin-deals-filter-state").addEventListener("input", renderAdminDeals);
+
+// No automated buyer-notification system exists yet, so this is what
+// tells admin who to reach out to directly (or hand to a rep) for a given
+// deal -- every active Buyer account whose own buy box matches it. A
+// Buyer who's never set any buy box criteria is excluded here (an unset
+// buy box would otherwise "match" literally every deal, which is just
+// noise, not a real signal).
+function matchingBuyersForDeal(deal) {
+  return adminReps.filter(function (r) {
+    if (r.personType !== "Buyer" || !r.active) return false;
+    const bb = {
+      nationwide: r.buyBoxNationwide,
+      states: splitCommaList(r.buyBoxStates),
+      cities: splitCommaList(r.buyBoxCities),
+      assetCategories: splitCommaList(r.buyBoxAssetCategories),
+      otherAssetClass: r.buyBoxOtherAssetClass
+    };
+    const hasCriteria = bb.nationwide || bb.states.length > 0 || bb.cities.length > 0 || bb.assetCategories.length > 0 || bb.otherAssetClass;
+    return hasCriteria && dealMatchesBuyBox(deal, bb);
+  });
+}
+
+function splitCommaList(s) {
+  return String(s || "").split(",").map(function (v) { return v.trim(); }).filter(Boolean);
+}
 
 function renderAdminDeals() {
   const q = document.getElementById("admin-deal-search").value.trim().toLowerCase();
@@ -1833,8 +2018,10 @@ function renderAdminDeals() {
   });
   empty.hidden = filtered.length > 0;
   tbody.innerHTML = filtered.map(function (d) {
+    const matchingBuyers = matchingBuyersForDeal(d);
     return '<tr class="clickable" data-deal-id="' + esc(d.DealID) + '">' +
-      '<td>' + (d.DealCode ? esc(d.DealCode) : "&mdash;") + ((d.Locked === true || d.Locked === "TRUE") ? ' <span class="status-pill status-dead-match" title="Bulk sweeps skip this deal">Locked</span>' : "") + '</td>' +
+      '<td>' + (d.DealCode ? esc(d.DealCode) : "&mdash;") + ((d.Locked === true || d.Locked === "TRUE") ? ' <span class="status-pill status-dead-match" title="Bulk sweeps skip this deal">Locked</span>' : "") +
+        (matchingBuyers.length > 0 ? ' <span class="status-pill status-active-match" title="' + esc(matchingBuyers.map(function (r) { return r.name; }).join(", ")) + '">' + matchingBuyers.length + ' buyer' + (matchingBuyers.length === 1 ? "" : "s") + ' match</span>' : "") + '</td>' +
       '<td>' + esc(d.Address) + (d.City ? ", " + esc(d.City) : "") + '</td>' +
       '<td>' + esc(d.AssetType || "") + '</td>' +
       '<td>' + esc(d.Price ? formatAdminMoney(d.Price) : "") + '</td>' +
@@ -2119,6 +2306,27 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
       '<label class="checkbox-row" style="margin-top:8px;"><input type="checkbox" id="deal-detail-targetmarket-lock-checkbox"> Also lock this deal once I assign someone below</label>' +
       '<div id="deal-detail-targetmarket-results" style="margin-top:8px;"></div>' +
     '</div>' +
+
+    (function () {
+      // No automated buyer-notification system exists yet -- this is what
+      // tells admin who to reach out to directly (or hand to a rep) for
+      // this deal, since nothing emails a matching Buyer on its own.
+      const matchingBuyers = matchingBuyersForDeal(deal);
+      if (matchingBuyers.length === 0) return "";
+      return '<div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border);">' +
+        '<div style="font-weight:600; margin-bottom:6px;">Matching Buyers (' + matchingBuyers.length + ')</div>' +
+        '<p class="small-muted">Active Buyer accounts whose own buy box matches this deal — reach out yourself, or assign a rep to contact them. Nothing here happens automatically.</p>' +
+        '<div style="max-height:260px; overflow-y:auto; border:1px solid var(--border); border-radius:6px; padding:4px 10px;">' +
+          matchingBuyers.map(function (r) {
+            return '<div class="item-row">' +
+              '<strong>' + esc(r.name) + '</strong> (' + esc(r.username) + ')' +
+              (r.phone ? ' &middot; ' + esc(r.phone) : "") + (r.email ? ' &middot; ' + esc(r.email) : "") +
+              (r.buyBoxNotes ? '<div class="small-muted" style="margin-top:2px;">' + esc(r.buyBoxNotes) + '</div>' : "") +
+              '</div>';
+          }).join("") +
+        '</div>' +
+      '</div>';
+    })() +
 
     '<div class="section-title">Address Access</div>' +
     '<p class="small-muted">Nobody sees this deal\'s exact address by default. Grant it to a specific team member once you\'ve seen they can be trusted to work correctly, and revoke it any time.</p>' +
@@ -2518,7 +2726,7 @@ function renderReps() {
       '<td class="small-muted">' + [r.preferredCity, r.preferredState, r.preferredZip].filter(Boolean).join(", ") + '</td>' +
       '<td style="white-space:nowrap;">' +
         '<button class="btn secondary small reset-pw-btn" data-username="' + esc(r.username) + '" data-name="' + esc(r.name) + '">Reset Password</button> ' +
-        '<button class="btn secondary small area-btn" data-username="' + esc(r.username) + '" data-name="' + esc(r.name) + '" data-phone="' + esc(r.phone) + '" data-email="' + esc(r.email) + '" data-city="' + esc(r.preferredCity) + '" data-state="' + esc(r.preferredState) + '" data-zip="' + esc(r.preferredZip) + '" data-persontype="' + esc(r.personType || "") + '" data-categoryaccess="' + esc(r.categoryAccess || "") + '" data-targetmarket="' + esc(r.targetMarket || "") + '">Edit Details</button>' +
+        '<button class="btn secondary small area-btn" data-username="' + esc(r.username) + '">Edit Details</button>' +
       '</td>' +
       '</tr>';
   }).join("");
@@ -2540,30 +2748,55 @@ function renderReps() {
 
   Array.from(tbody.querySelectorAll(".area-btn")).forEach(function (btn) {
     btn.addEventListener("click", function () {
-      openAreaModal(btn.getAttribute("data-username"), btn.getAttribute("data-name"), btn.getAttribute("data-phone"), btn.getAttribute("data-email"),
-        btn.getAttribute("data-city"), btn.getAttribute("data-state"), btn.getAttribute("data-zip"), btn.getAttribute("data-persontype"),
-        btn.getAttribute("data-categoryaccess"), btn.getAttribute("data-targetmarket"));
+      const rep = adminReps.find(function (r) { return r.username === btn.getAttribute("data-username"); });
+      if (rep) openAreaModal(rep);
     });
   });
 }
 
-function openAreaModal(username, name, phone, email, city, state, zip, personType, categoryAccess, targetMarket) {
-  document.getElementById("area-modal-who").textContent = name + " (" + username + ")";
-  document.getElementById("area-phone-input").value = phone || "";
-  document.getElementById("area-email-input").value = email || "";
-  document.getElementById("area-city-input").value = city || "";
-  document.getElementById("area-state-input").value = state || "";
-  document.getElementById("area-zip-input").value = zip || "";
-  document.getElementById("area-persontype-input").value = personType || "";
-  document.getElementById("area-targetmarket-input").value = targetMarket || "";
-  const checkedCategories = String(categoryAccess || "").split(",").map(function (c) { return c.trim().toLowerCase(); }).filter(Boolean);
+function renderAreaBuyBoxCheckboxes(rep) {
+  const dealTypes = splitCommaList(rep.buyBoxDealTypes).map(function (t) { return t.toLowerCase(); });
+  document.getElementById("area-buybox-dealtypes").innerHTML = BUY_BOX_DEAL_TYPES.map(function (t) {
+    const checked = dealTypes.indexOf(t.toLowerCase()) !== -1 ? " checked" : "";
+    return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="area-buybox-dealtype-checkbox" value="' + esc(t) + '"' + checked + '> ' + esc(t) + '</label>';
+  }).join("");
+  const checkedCategories = splitCommaList(rep.buyBoxAssetCategories).map(function (c) { return c.toLowerCase(); });
+  document.getElementById("area-buybox-categories").innerHTML = assetCategoryOptionsCache.map(function (c) {
+    const checked = checkedCategories.indexOf(c.toLowerCase()) !== -1 ? " checked" : "";
+    return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="area-buybox-category-checkbox" value="' + esc(c) + '"' + checked + '> ' + esc(c) + '</label>';
+  }).join("");
+}
+
+function openAreaModal(rep) {
+  document.getElementById("area-modal-who").textContent = rep.name + " (" + rep.username + ")";
+  document.getElementById("area-phone-input").value = rep.phone || "";
+  document.getElementById("area-email-input").value = rep.email || "";
+  document.getElementById("area-city-input").value = rep.preferredCity || "";
+  document.getElementById("area-state-input").value = rep.preferredState || "";
+  document.getElementById("area-zip-input").value = rep.preferredZip || "";
+  document.getElementById("area-persontype-input").value = rep.personType || "";
+  document.getElementById("area-targetmarket-input").value = rep.targetMarket || "";
+  const checkedCategories = splitCommaList(rep.categoryAccess).map(function (c) { return c.toLowerCase(); });
   document.getElementById("area-categoryaccess-list").innerHTML = assetCategoryOptionsCache.map(function (c) {
     const checked = checkedCategories.indexOf(c.toLowerCase()) !== -1 ? " checked" : "";
     return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="area-categoryaccess-checkbox" value="' + esc(c) + '"' + checked + '> ' + esc(c) + '</label>';
   }).join("");
+
+  document.getElementById("area-buybox-nationwide").checked = !!rep.buyBoxNationwide;
+  document.getElementById("area-buybox-states").value = rep.buyBoxStates || "";
+  document.getElementById("area-buybox-cities").value = rep.buyBoxCities || "";
+  document.getElementById("area-buybox-other").value = rep.buyBoxOtherAssetClass || "";
+  document.getElementById("area-buybox-notes").value = rep.buyBoxNotes || "";
+  renderAreaBuyBoxCheckboxes(rep);
+  document.getElementById("area-buybox-section").hidden = rep.personType !== "Buyer";
+
   document.getElementById("area-modal").hidden = false;
-  document.getElementById("area-modal-save").setAttribute("data-username", username);
+  document.getElementById("area-modal-save").setAttribute("data-username", rep.username);
 }
+
+document.getElementById("area-persontype-input").addEventListener("change", function () {
+  document.getElementById("area-buybox-section").hidden = this.value !== "Buyer";
+});
 
 document.getElementById("area-modal-cancel").addEventListener("click", function () {
   document.getElementById("area-modal").hidden = true;
@@ -2583,7 +2816,16 @@ document.getElementById("area-modal-save").addEventListener("click", async funct
     zip: document.getElementById("area-zip-input").value.trim(),
     personType: document.getElementById("area-persontype-input").value,
     categoryAccess: Array.from(document.querySelectorAll(".area-categoryaccess-checkbox:checked")).map(function (cb) { return cb.value; }),
-    targetMarket: document.getElementById("area-targetmarket-input").value.trim()
+    targetMarket: document.getElementById("area-targetmarket-input").value.trim(),
+    buyBox: {
+      nationwide: document.getElementById("area-buybox-nationwide").checked,
+      states: document.getElementById("area-buybox-states").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean),
+      cities: document.getElementById("area-buybox-cities").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean),
+      dealTypes: Array.from(document.querySelectorAll(".area-buybox-dealtype-checkbox:checked")).map(function (cb) { return cb.value; }),
+      assetCategories: Array.from(document.querySelectorAll(".area-buybox-category-checkbox:checked")).map(function (cb) { return cb.value; }),
+      otherAssetClass: document.getElementById("area-buybox-other").value.trim(),
+      notes: document.getElementById("area-buybox-notes").value.trim()
+    }
   });
   btn.disabled = false;
   document.getElementById("area-modal").hidden = true;

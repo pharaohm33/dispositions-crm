@@ -59,7 +59,16 @@ const FOLLOWUP_HOURS = 24;
 const MATCH_STATUSES = ['Active Match', 'Negotiating', 'Closing', 'Dead Match'];
 const DEFAULT_ASSET_CATEGORIES = ['Single Family', 'Condominium / Townhouse', 'Multifamily (1-4 Units)', 'Multifamily (4+ Units)', 'Fix and Flip', 'Residential Vacant Land', 'Commercial'];
 
-const REP_COLUMNS = ['Username', 'Name', 'Phone', 'Email', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'LastActive', 'PreferredCity', 'PreferredState', 'PreferredZip', 'PersonType', 'CategoryAccess', 'BulkAssignOverride', 'TargetMarket'];
+const REP_COLUMNS = ['Username', 'Name', 'Phone', 'Email', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'LastActive', 'PreferredCity', 'PreferredState', 'PreferredZip', 'PersonType', 'CategoryAccess', 'BulkAssignOverride', 'TargetMarket', 'BuyBoxNationwide', 'BuyBoxStates', 'BuyBoxCities', 'BuyBoxDealTypes', 'BuyBoxAssetCategories', 'BuyBoxOtherAssetClass', 'BuyBoxNotes'];
+
+// A Buyer's self-reported purchase criteria, collected at signup (see
+// publicSignup) -- Deal Type is a fixed strategy list (does this buyer
+// flip, hold rentals, or want raw land), separate from and in addition
+// to Asset Category (the same site-wide category list every deal is
+// tagged with) since a buyer's strategy and their preferred property
+// type are two different questions. Admin can review/edit all of this
+// from a Buyer's row on the Team tab.
+const BUY_BOX_DEAL_TYPES = ['Fix and Flip', 'Land', 'Buy and Hold'];
 
 // Self-identified at signup -- informational only (admin visibility/
 // filtering in the Team tab), doesn't gate any functionality. Not
@@ -195,6 +204,8 @@ function doPost(e) {
         return jsonOut(publicSignup(body));
       case 'getSignupCaptcha':
         return jsonOut(getSignupCaptcha());
+      case 'getSignupAssetCategoryOptions':
+        return jsonOut(getAssetCategoryOptions(body));
       case 'getJoinContact':
         return jsonOut(getJoinContact());
 
@@ -239,6 +250,8 @@ function doPost(e) {
         return jsonOut(withSession(body, giveMySelectedBuyerLeads));
       case 'getVisibleBuyerCities':
         return jsonOut(withSession(body, getVisibleBuyerCities));
+      case 'repUpdateMyBuyBox':
+        return jsonOut(withSession(body, repUpdateMyBuyBox));
       case 'updateBuyerLeadNotes':
         return jsonOut(withSession(body, updateBuyerLeadNotes));
       case 'updateBuyerLeadDoNotContact':
@@ -546,7 +559,20 @@ function login(body) {
     // Self-identified at signup (see publicSignup) -- purely for the
     // frontend to decide what to show this person (e.g. a Buyer doesn't
     // get the "build a buyer list" SOP), never a permission check.
-    personType: rep['PersonType'] || ''
+    personType: rep['PersonType'] || '',
+    // A Buyer's self-reported purchase criteria, carried in the session so
+    // the Deals tab can filter to matching deals client-side without a
+    // separate round trip. Blank/false for anyone who isn't a Buyer, or a
+    // Buyer who hasn't set any of this.
+    buyBox: {
+      nationwide: rep['BuyBoxNationwide'] === true || rep['BuyBoxNationwide'] === 'TRUE',
+      states: splitCommaList(rep['BuyBoxStates']),
+      cities: splitCommaList(rep['BuyBoxCities']),
+      dealTypes: splitCommaList(rep['BuyBoxDealTypes']),
+      assetCategories: splitCommaList(rep['BuyBoxAssetCategories']),
+      otherAssetClass: rep['BuyBoxOtherAssetClass'] || '',
+      notes: rep['BuyBoxNotes'] || ''
+    }
   };
 }
 
@@ -613,11 +639,30 @@ function publicSignup(body) {
 
   const salt = Utilities.getUuid();
   const now = new Date().toISOString();
+  // A Buyer signup isn't a rep competing for exclusive deal coverage --
+  // they're the actual end buyer, so they should see the whole
+  // marketplace right away rather than needing to be swept into an open
+  // pool or wait on a Locked deal to free up. AllAccess doesn't touch
+  // address disclosure at all (that's the separate, always-hidden-by-
+  // default AddressGrants gate) -- a Buyer still sees Deal Code/City/
+  // State/Zip/County/price only, same as anyone else, until admin
+  // discloses a specific address once that buyer's actually interested.
+  const isBuyerSignup = personType === 'Buyer';
+  const dealTypes = (Array.isArray(body.buyBoxDealTypes) ? body.buyBoxDealTypes : splitCommaList(body.buyBoxDealTypes))
+    .filter(function (t) { return BUY_BOX_DEAL_TYPES.indexOf(t) !== -1; });
+  const buyBoxCategories = Array.isArray(body.buyBoxAssetCategories) ? body.buyBoxAssetCategories : splitCommaList(body.buyBoxAssetCategories);
   appendRowByHeaders(sheet, {
     'Username': email, 'Name': name, 'Phone': String(body.phone || '').trim(), 'Email': email,
     'PasswordHash': hashPassword(password, salt), 'Salt': salt,
-    'AllAccess': false, 'IsAdmin': false, 'Active': true, 'CreatedAt': now, 'LastActive': '',
-    'PreferredCity': '', 'PreferredState': '', 'PreferredZip': '', 'PersonType': personType
+    'AllAccess': isBuyerSignup, 'IsAdmin': false, 'Active': true, 'CreatedAt': now, 'LastActive': '',
+    'PreferredCity': '', 'PreferredState': '', 'PreferredZip': '', 'PersonType': personType,
+    'BuyBoxNationwide': !!body.buyBoxNationwide,
+    'BuyBoxStates': splitCommaList(body.buyBoxStates).join(', '),
+    'BuyBoxCities': splitCommaList(body.buyBoxCities).join(', '),
+    'BuyBoxDealTypes': dealTypes.join(', '),
+    'BuyBoxAssetCategories': buyBoxCategories.join(', '),
+    'BuyBoxOtherAssetClass': String(body.buyBoxOtherAssetClass || '').trim(),
+    'BuyBoxNotes': String(body.buyBoxNotes || '').trim()
   });
 
   // Opt-in (Team tab setting) -- when on, a fresh signup is immediately
@@ -1271,7 +1316,11 @@ function adminGetReps(body) {
       preferredCity: r['PreferredCity'] || '', preferredState: r['PreferredState'] || '', preferredZip: r['PreferredZip'] || '',
       personType: r['PersonType'] || '', categoryAccess: r['CategoryAccess'] || '',
       bulkAssignOverride: r['BulkAssignOverride'] === true || r['BulkAssignOverride'] === 'TRUE',
-      targetMarket: r['TargetMarket'] || ''
+      targetMarket: r['TargetMarket'] || '',
+      buyBoxNationwide: r['BuyBoxNationwide'] === true || r['BuyBoxNationwide'] === 'TRUE',
+      buyBoxStates: r['BuyBoxStates'] || '', buyBoxCities: r['BuyBoxCities'] || '',
+      buyBoxDealTypes: r['BuyBoxDealTypes'] || '', buyBoxAssetCategories: r['BuyBoxAssetCategories'] || '',
+      buyBoxOtherAssetClass: r['BuyBoxOtherAssetClass'] || '', buyBoxNotes: r['BuyBoxNotes'] || ''
     };
   });
   return { ok: true, reps: reps };
@@ -2986,7 +3035,53 @@ function adminSetRepPreferredArea(body) {
     const categories = Array.isArray(body.categoryAccess) ? body.categoryAccess : splitCommaList(body.categoryAccess);
     sheet.getRange(match._row, getColumnIndex(sheet, 'CategoryAccess')).setValue(categories.join(', '));
   }
+  // A Buyer's purchase criteria, editable by admin the same way it's set
+  // at signup -- e.g. a buyer calls in and asks to widen their area, or
+  // admin wants to correct something. Only touched when the caller
+  // explicitly sends buyBox, so this same function still works for
+  // saving just the fields above without wiping buy box data.
+  if (body.buyBox !== undefined) applyBuyBoxUpdate(sheet, match._row, body.buyBox);
   return { ok: true };
+}
+
+// Shared by adminSetRepPreferredArea (admin editing on someone's behalf)
+// and repUpdateMyBuyBox (a Buyer editing their own) -- same fields, same
+// normalization, one place to keep them in sync.
+function applyBuyBoxUpdate(sheet, row, buyBoxBody) {
+  const bb = buyBoxBody || {};
+  sheet.getRange(row, getColumnIndex(sheet, 'BuyBoxNationwide')).setValue(!!bb.nationwide);
+  sheet.getRange(row, getColumnIndex(sheet, 'BuyBoxStates')).setValue(splitCommaList(bb.states).join(', '));
+  sheet.getRange(row, getColumnIndex(sheet, 'BuyBoxCities')).setValue(splitCommaList(bb.cities).join(', '));
+  const dealTypes = (Array.isArray(bb.dealTypes) ? bb.dealTypes : splitCommaList(bb.dealTypes)).filter(function (t) { return BUY_BOX_DEAL_TYPES.indexOf(t) !== -1; });
+  sheet.getRange(row, getColumnIndex(sheet, 'BuyBoxDealTypes')).setValue(dealTypes.join(', '));
+  const assetCategories = Array.isArray(bb.assetCategories) ? bb.assetCategories : splitCommaList(bb.assetCategories);
+  sheet.getRange(row, getColumnIndex(sheet, 'BuyBoxAssetCategories')).setValue(assetCategories.join(', '));
+  sheet.getRange(row, getColumnIndex(sheet, 'BuyBoxOtherAssetClass')).setValue(String(bb.otherAssetClass || '').trim());
+  sheet.getRange(row, getColumnIndex(sheet, 'BuyBoxNotes')).setValue(String(bb.notes || '').trim());
+}
+
+// Lets a Buyer update their own purchase criteria any time, not just at
+// signup -- their Deals tab re-filters against it immediately (the
+// updated buyBox comes back in the response so the frontend can refresh
+// its session copy without a full re-login).
+function repUpdateMyBuyBox(body, session) {
+  const sheet = getSheet(REPS_SHEET, REP_COLUMNS);
+  const match = sheetToObjects(sheet).find(function (r) { return String(r['Username'] || '').trim().toLowerCase() === session.u; });
+  if (!match) return { ok: false, error: 'Account not found.' };
+  applyBuyBoxUpdate(sheet, match._row, body.buyBox);
+  const updated = sheetToObjects(sheet).find(function (r) { return r._row === match._row; });
+  return {
+    ok: true,
+    buyBox: {
+      nationwide: updated['BuyBoxNationwide'] === true || updated['BuyBoxNationwide'] === 'TRUE',
+      states: splitCommaList(updated['BuyBoxStates']),
+      cities: splitCommaList(updated['BuyBoxCities']),
+      dealTypes: splitCommaList(updated['BuyBoxDealTypes']),
+      assetCategories: splitCommaList(updated['BuyBoxAssetCategories']),
+      otherAssetClass: updated['BuyBoxOtherAssetClass'] || '',
+      notes: updated['BuyBoxNotes'] || ''
+    }
+  };
 }
 
 // ---------- "Want to join?" contact (shown on the login page) ----------

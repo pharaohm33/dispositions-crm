@@ -20,17 +20,52 @@ backend (see [SETUP.md](SETUP.md)).
   toggles to a form for Name, Email, Phone (optional), a self-identified
   **I am a...** (Buyer, Wholesaler, Realtor, or Other), and a password (8+
   characters). Username is just the email, lowercased. The account is
-  **active immediately** — no approval queue — but starts with zero deal
-  access: no all-deal access, not assigned to anything, so a brand-new
-  signup sees an empty Deals tab until admin assigns them something
-  (individually, or via **Assign to all users** / **Assign to all users
-  with no assigned deals** the next time a deal's added — see Deals below).
-  Admin gets an email the moment someone signs up. Self-signup can never
-  create an admin account. Type is shown in the Team tab so admin can see
-  who's who, and it does gate a couple of things: a **Buyer** never sees
-  the "build your own buyer list" card or its guide/SOP at all (see Buyer
-  Leads below); **Wholesaler**, **Realtor**, and **Other** additionally get
-  a "text us once you have an interested buyer" line on the Deals tab SOP.
+  **active immediately** — no approval queue. A **Wholesaler/Realtor/Other**
+  signup starts with zero deal access (no all-deal access, not assigned to
+  anything) until admin assigns them something (individually, or via
+  **Assign to all users** / **Assign to all users with no assigned deals**
+  the next time a deal's added, or the Team tab's **Give New Reps Access
+  To The Open Pool** / **Auto-Approve New Signups** — see Deals and Team
+  below). A **Buyer** signup is different: they're granted All-Deal Access
+  automatically and immediately, since they're the actual end buyer
+  browsing the marketplace, not a rep who needs to be swept into deal
+  coverage — see the **Buy Box** bullet below for what a Buyer additionally
+  sets up at signup. Admin gets an email the moment someone signs up.
+  Self-signup can never create an admin account. Type is shown in the Team
+  tab so admin can see who's who, and it does gate a couple of things: a
+  **Buyer** never sees the "build your own buyer list" card or its
+  guide/SOP at all (see Buyer Leads below); **Wholesaler**, **Realtor**,
+  and **Other** additionally get a "text us once you have an interested
+  buyer" line on the Deals tab SOP.
+- A **Buyer** signup also fills out a **Buy Box** right on the signup form
+  (all optional, but the more filled in the better the matching below):
+  **Nationwide** checkbox, **States** and **Cities** (comma separated —
+  cities optionally narrow within the states, not a replacement for them),
+  a fixed **Strategy** checklist (Fix and Flip / Land / Buy and Hold —
+  reference info only, not matched against anything since deals don't
+  record a "strategy" field to check it against), **Asset Class(es)**
+  checked from the same site-wide Asset Category list every deal uses
+  (plus a free-text **Other Asset Class** for anything not listed), and a
+  **Notes** field for anything else (price range, condition, financing,
+  timeline). A Buyer can come back and **edit their own Buy Box any time**
+  via an "Edit My Buy Box" button on their Deals tab — updates apply
+  immediately, no re-login needed. Admin can also view/edit any Buyer's Buy
+  Box from their Team tab row (Edit Details → a "Buyer's Buy Box" section
+  that only appears for Type = Buyer). The Buyer's own Deals tab
+  auto-filters to only deals matching their Buy Box (State/City/Asset
+  Class, each an optional narrowing filter, Deal Type not included since
+  there's nothing on a deal to match it against) — **if nothing currently
+  matches, it falls back to showing every active deal with a banner
+  explaining why**, rather than an empty list; the moment something does
+  match, only matches show. Since there's no automated buyer-notification
+  system yet, admin needs a way to actually see these matches too: the
+  admin Deals table flags each deal with a "N buyer(s) match" badge, and a
+  deal's own detail page lists every matching Buyer by name/phone/email/
+  notes (capped at a scrollable ~260px so a deal with a lot of matches
+  doesn't take over the page) — so admin can reach out directly, or hand
+  it to a rep to contact them. A Buyer who's never set any Buy Box
+  criteria is never flagged as a "match" for anything (an empty Buy Box
+  would otherwise match every deal, which is just noise).
   The signup form also has a small **slider-puzzle CAPTCHA** — drag a piece
   until it visually completes a puzzle before Sign Up will submit. It's a
   homegrown, no-dependency check (no reCAPTCHA/hCaptcha account needed):
