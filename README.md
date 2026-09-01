@@ -96,7 +96,14 @@ backend (see [SETUP.md](SETUP.md)).
   silently pull in the wrong state's list. Leaving every city unchecked
   falls back to the normal matching, same as before. A Dead or Sold deal
   blocks this (and the normal matching above) either way — see
-  the buyer-matching note earlier in this section.
+  the buyer-matching note earlier in this section. A **Full State** button
+  sits next to each state's header in that same city list — click it to
+  check every city under that state at once (handy when a list wasn't
+  uploaded in city order to begin with, so hand-picking each one would be
+  tedious), click it again to uncheck the whole state back off. Only
+  cities the rep can actually see are ever offered here to begin with —
+  their own uploads plus admin's shared pool, never another rep's private
+  list.
 - Each deal shows the standing SOP:
   1. Contact buyers from the lead list, or submit a Facebook post here for
      admin approval before posting — including which groups you intend to
@@ -390,7 +397,16 @@ backend (see [SETUP.md](SETUP.md)).
   an admin-uploaded or another rep's private lead, even if its id were
   somehow included in the request; the backend re-checks ownership itself
   rather than trusting whatever the frontend sends, and ignores (rather
-  than fails on) any id in the request that isn't actually this rep's own. Also
+  than fails on) any id in the request that isn't actually this rep's own.
+  The same checkboxes also feed a **Give Selected To This Deal** action
+  right below — pick any deal a rep can see (including a brand new one
+  added long after those buyers were uploaded) and hand-give the checked
+  buyers to themselves for it, no auto-matching involved. Before this, the
+  only way to connect an old uploaded buyer to a deal was the auto-matcher
+  on the deal detail page (state/city/category match, or the city-override
+  above), which only runs once at the moment it's clicked — there was no
+  way to come back later and deliberately point one specific buyer at one
+  specific new deal; this closes that gap. Also
   picks up an "Ownership Length (Months)" column (stored as a plain number
   so it stays filterable, shown as "19 yrs" wherever it's displayed) and a
   "Property URL" column (saved as-is, not shown in the preview table since

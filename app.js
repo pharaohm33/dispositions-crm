@@ -312,6 +312,7 @@ async function initRepView() {
   repDeals = res.deals;
   renderRepDeals();
   renderRepCsvDealOptions();
+  renderMyBuyerListDealSelect();
 
   const session = getSession() || {};
   // A Buyer signup isn't out hunting for buyers themselves -- skip the
@@ -1283,7 +1284,16 @@ function renderCityCheckboxList(containerId, cities) {
   sorted.forEach(function (c) {
     const group = c.state || "Other";
     if (group !== lastGroup) {
-      parts.push('<div class="deal-checkbox-group-label">' + esc(group) + '</div>');
+      // "Full State" -- a shortcut to checking every city under this one
+      // state at once, for calling everyone in that state rather than
+      // hand-picking cities one at a time (handy when a list wasn't
+      // uploaded in any particular city order to begin with).
+      parts.push(
+        '<div class="deal-checkbox-group-label" style="display:flex; justify-content:space-between; align-items:center;">' +
+          '<span>' + esc(group) + '</span>' +
+          '<button type="button" class="link-btn city-fullstate-btn" data-state="' + esc(group) + '" style="font-size:11px; text-transform:none; letter-spacing:normal; font-weight:600;">Full State</button>' +
+        '</div>'
+      );
       lastGroup = group;
     }
     parts.push(
@@ -1292,6 +1302,19 @@ function renderCityCheckboxList(containerId, cities) {
     );
   });
   container.innerHTML = parts.length > 0 ? parts.join("") : '<p class="deal-checkbox-empty">No cities available yet.</p>';
+
+  Array.from(container.querySelectorAll(".city-fullstate-btn")).forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      const state = btn.getAttribute("data-state");
+      const stateCheckboxes = Array.from(container.querySelectorAll('.city-checkbox-item[data-state="' + CSS.escape(state) + '"]'));
+      // A second click on the same state's button is a toggle, not just an
+      // "always check" -- if every city in this state is already checked
+      // (from clicking it before, or from checking them by hand), clicking
+      // again unchecks the whole state instead of doing nothing.
+      const allChecked = stateCheckboxes.every(function (cb) { return cb.checked; });
+      stateCheckboxes.forEach(function (cb) { cb.checked = !allChecked; });
+    });
+  });
 }
 
 function checkedCityCheckboxValues(containerId) {
@@ -1484,6 +1507,47 @@ document.getElementById("delete-mybuyers-confirm").addEventListener("click", asy
   document.getElementById("delete-mybuyers-modal").hidden = true;
   showToast("Deleted " + res.deletedCount + " buyer(s).");
   await loadMyBuyerLeads();
+});
+
+// Lets a rep point specific buyers from My Buyer List at any deal they
+// can see, including one added long after those buyers were uploaded --
+// the auto-matcher on the deal detail page only runs at the moment it's
+// clicked, so there was previously no way to come back later and hand-pick
+// an old buyer for a new deal.
+function renderMyBuyerListDealSelect() {
+  const select = document.getElementById("rep-mybuyerlist-give-deal-select");
+  if (!select) return;
+  const current = select.value;
+  select.innerHTML = '<option value="">Select a deal…</option>' +
+    repDeals.map(function (d) {
+      const label = (d.DealCode ? d.DealCode + " — " : "") + [d.City, d.State].filter(Boolean).join(", ") + (d.AssetType ? " (" + d.AssetType + ")" : "");
+      return '<option value="' + esc(d.DealID) + '">' + esc(label) + '</option>';
+    }).join("");
+  if (repDeals.some(function (d) { return d.DealID === current; })) select.value = current;
+}
+
+document.getElementById("rep-mybuyerlist-give-btn").addEventListener("click", async function () {
+  const btn = this;
+  const resultEl = document.getElementById("rep-mybuyerlist-give-result");
+  const dealId = document.getElementById("rep-mybuyerlist-give-deal-select").value;
+  if (!dealId || repMyBuyerLeadsSelectedIds.size === 0) {
+    resultEl.textContent = "Pick a deal and at least one buyer above.";
+    return;
+  }
+  if (btn.disabled) return;
+  btn.disabled = true;
+  const res = await api("giveMySelectedBuyerLeads", { dealId: dealId, buyerLeadIds: Array.from(repMyBuyerLeadsSelectedIds) });
+  btn.disabled = false;
+  if (!res.ok) {
+    resultEl.textContent = res.error || "Could not give these buyers.";
+    showToast(res.error || "Could not give these buyers.", true);
+    return;
+  }
+  resultEl.textContent = "Gave " + res.givenCount + " buyer(s) to yourself for this deal" +
+    (res.skipped ? " (" + res.skipped + " skipped — already pitched, Do Not Contact, or not visible to you)." : ".");
+  repMyBuyerLeadsSelectedIds = new Set();
+  renderMyBuyerLeadsList();
+  showToast("Gave " + res.givenCount + " buyer(s) — check your Buyer Leads tab.");
 });
 
 /* ============================================================

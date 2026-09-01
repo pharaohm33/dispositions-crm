@@ -439,6 +439,12 @@
         <button class="btn secondary small" id="rep-mybuyerlist-clear-selection-btn">Clear Selection</button>
         <button class="btn danger small" id="rep-mybuyerlist-delete-btn">Delete Selected</button>
       </div>
+      <p class="small-muted" style="margin-top:10px;">Check off any buyers above, pick a deal (including a brand new one that showed up since you uploaded them), and give them to yourself for it — no need to wait on the auto-matcher above.</p>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+        <select id="rep-mybuyerlist-give-deal-select" style="flex:1; min-width:220px;"><option value="">Select a deal…</option></select>
+        <button class="btn secondary small" id="rep-mybuyerlist-give-btn">Give Selected To This Deal</button>
+      </div>
+      <div id="rep-mybuyerlist-give-result" class="small-muted"></div>
       <div style="overflow-x:auto; margin-top:10px;">
         <table class="crm-table" id="rep-mybuyerlist-table">
           <thead><tr><th></th><th>Buyer / LLC</th><th>Phone</th><th>City, State</th><th>Asset Categories</th><th>Tagged Deal(s)</th><th>Notes</th><th>DNC</th></tr></thead>
@@ -1016,7 +1022,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=45"></script>
-<script src="app.js?v=45"></script>
+<script src="config.js?v=46"></script>
+<script src="app.js?v=46"></script>
 </body>
 </html>

@@ -233,6 +233,8 @@ function doPost(e) {
         return jsonOut(withSession(body, deleteMyBuyerLeads));
       case 'giveMyBuyerLeads':
         return jsonOut(withSession(body, giveMyBuyerLeads));
+      case 'giveMySelectedBuyerLeads':
+        return jsonOut(withSession(body, giveMySelectedBuyerLeads));
       case 'getVisibleBuyerCities':
         return jsonOut(withSession(body, getVisibleBuyerCities));
       case 'updateBuyerLeadNotes':
@@ -2286,6 +2288,53 @@ function giveMyBuyerLeads(body, session) {
       return { 'PitchID': Utilities.getUuid(), 'BuyerLeadID': l['BuyerLeadID'], 'DealID': body.dealId, 'Username': username, 'GivenAt': now };
     }));
     return { ok: true, givenCount: batch.length, remainingInPool: pool.length - batch.length };
+  });
+}
+
+// Lets a rep hand-pick specific buyers from their own list (see My Buyer
+// List / getMyBuyerLeads) and attach them to any deal they can see --
+// including a deal added well after those buyers were first uploaded.
+// Previously the only way to connect an old buyer to a deal was the
+// auto-matcher (giveMyBuyerLeads), which only runs at the moment it's
+// clicked and only matches on state/city/category -- there was no way to
+// go back later and deliberately point a specific buyer at a specific new
+// deal. No auto-matching filter here at all, since picking exact buyers
+// by hand is already the deliberate choice; still blocked on DoNotContact,
+// an existing pitch for this same deal, visibility (never someone else's
+// private list), and the deal being active.
+function giveMySelectedBuyerLeads(body, session) {
+  if (!body.dealId || !body.buyerLeadIds || body.buyerLeadIds.length === 0) {
+    return { ok: false, error: 'Missing dealId or buyerLeadIds.' };
+  }
+  if (!canAccessDeal(session, body.dealId)) return { ok: false, error: 'You do not have access to this deal.' };
+  const username = session.u;
+
+  return withLock(function () {
+    const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+    const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === body.dealId; });
+    if (!deal) return { ok: false, error: 'Deal not found.' };
+    if (!dealIsActive(deal)) return { ok: false, error: 'This deal is no longer active.' };
+
+    const wanted = {};
+    body.buyerLeadIds.forEach(function (id) { wanted[id] = true; });
+
+    const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+    const alreadyPitchedByMeForThisDeal = {};
+    sheetToObjects(pitchesSheet).forEach(function (p) {
+      if (p['DealID'] === body.dealId && String(p['Username'] || '').toLowerCase() === username) alreadyPitchedByMeForThisDeal[p['BuyerLeadID']] = true;
+    });
+
+    const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+    const candidates = sheetToObjects(leadsSheet).filter(function (l) {
+      return wanted[l['BuyerLeadID']] && !alreadyPitchedByMeForThisDeal[l['BuyerLeadID']] &&
+        l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE' && leadVisibleToUsername(l, username);
+    });
+
+    const now = new Date().toISOString();
+    appendRowsByHeaders(pitchesSheet, candidates.map(function (l) {
+      return { 'PitchID': Utilities.getUuid(), 'BuyerLeadID': l['BuyerLeadID'], 'DealID': body.dealId, 'Username': username, 'GivenAt': now };
+    }));
+    return { ok: true, givenCount: candidates.length, skipped: body.buyerLeadIds.length - candidates.length };
   });
 }
 
