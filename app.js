@@ -3039,25 +3039,71 @@ document.getElementById("autofeed-run-btn").addEventListener("click", async func
   await loadBuyerLeadsAdmin();
 });
 
-document.getElementById("buyerleads-search").addEventListener("input", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
-document.getElementById("buyerleads-filter-category").addEventListener("change", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
-document.getElementById("buyerleads-filter-state").addEventListener("input", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
-document.getElementById("buyerleads-filter-cities").addEventListener("input", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
-document.getElementById("buyerleads-filter-exclude-cities").addEventListener("input", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
-document.getElementById("buyerleads-filter-lastupload").addEventListener("change", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
-document.getElementById("buyerleads-filter-pendingdeal").addEventListener("change", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
-document.getElementById("buyerleads-sort").addEventListener("change", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
-document.getElementById("buyerleads-filter-ownertype").addEventListener("change", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
-document.getElementById("buyerleads-filter-minequity").addEventListener("input", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
-document.getElementById("buyerleads-filter-minheldyears").addEventListener("input", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
-document.getElementById("buyerleads-filter-hideduplicates").addEventListener("change", function () { buyerLeadsCurrentPage = 1; renderBuyerLeadsAdmin(); });
+// Debounces a typed-input handler so a fast typist doesn't fire a server
+// round trip on every keystroke -- waits for a short pause before actually
+// reloading. Dropdowns/checkboxes below don't use this since a "change"
+// event already only fires once per deliberate pick.
+function debounce(fn, delayMs) {
+  let timer = null;
+  return function () {
+    clearTimeout(timer);
+    timer = setTimeout(fn, delayMs);
+  };
+}
 
-async function loadBuyerLeadsAdmin() {
-  const res = await api("adminGetBuyerLeads", {});
-  if (!res.ok) return;
-  adminBuyerLeads = res.leads;
-  populatePendingDealFilter();
-  renderBuyerLeadsAdmin();
+const buyerLeadsReloadDebounced = debounce(function () { buyerLeadsCurrentPage = 1; loadBuyerLeadsAdmin(); }, 350);
+function buyerLeadsReloadNow() { buyerLeadsCurrentPage = 1; loadBuyerLeadsAdmin(); }
+
+document.getElementById("buyerleads-search").addEventListener("input", buyerLeadsReloadDebounced);
+document.getElementById("buyerleads-filter-category").addEventListener("change", buyerLeadsReloadNow);
+document.getElementById("buyerleads-filter-state").addEventListener("input", buyerLeadsReloadDebounced);
+document.getElementById("buyerleads-filter-cities").addEventListener("input", buyerLeadsReloadDebounced);
+document.getElementById("buyerleads-filter-exclude-cities").addEventListener("input", buyerLeadsReloadDebounced);
+document.getElementById("buyerleads-filter-lastupload").addEventListener("change", buyerLeadsReloadNow);
+document.getElementById("buyerleads-filter-pendingdeal").addEventListener("change", buyerLeadsReloadNow);
+document.getElementById("buyerleads-sort").addEventListener("change", buyerLeadsReloadNow);
+document.getElementById("buyerleads-filter-ownertype").addEventListener("change", buyerLeadsReloadNow);
+document.getElementById("buyerleads-filter-minequity").addEventListener("input", buyerLeadsReloadDebounced);
+document.getElementById("buyerleads-filter-minheldyears").addEventListener("input", buyerLeadsReloadDebounced);
+document.getElementById("buyerleads-filter-hideduplicates").addEventListener("change", buyerLeadsReloadNow);
+
+// Reads every filter control into the shape adminGetBuyerLeads/
+// adminGetBuyerLeadIdsForFilters expect -- the single source of truth for
+// "what does the admin Buyer Leads table currently have set," used by the
+// main load, "Select First N (Filtered)," and nothing else needs it since
+// "Select All On This Page" only touches what's already rendered.
+function currentBuyerLeadsFilters() {
+  const lastUploadOnly = !document.getElementById("buyerleads-lastupload-row").hidden &&
+    document.getElementById("buyerleads-filter-lastupload").checked;
+  return {
+    q: document.getElementById("buyerleads-search").value.trim(),
+    category: document.getElementById("buyerleads-filter-category").value,
+    state: document.getElementById("buyerleads-filter-state").value.trim(),
+    cities: document.getElementById("buyerleads-filter-cities").value,
+    excludeCities: document.getElementById("buyerleads-filter-exclude-cities").value,
+    pendingDeal: document.getElementById("buyerleads-filter-pendingdeal").value,
+    ownerType: document.getElementById("buyerleads-filter-ownertype").value,
+    minEquity: document.getElementById("buyerleads-filter-minequity").value.trim(),
+    minHeldYears: document.getElementById("buyerleads-filter-minheldyears").value.trim(),
+    hideDuplicates: document.getElementById("buyerleads-filter-hideduplicates").checked,
+    onlyIds: lastUploadOnly && lastImportedBuyerLeadIds ? Array.from(lastImportedBuyerLeadIds) : undefined
+  };
+}
+
+const BUYER_LEADS_PAGE_SIZE = 50;
+let buyerLeadsCurrentPage = 1;
+let buyerLeadsTotalCount = 0;
+let buyerLeadsSelectedIds = new Set();
+
+// A skip-trace/company-owned property is often held by a more active,
+// sophisticated investor than an individual owner -- useful to filter on
+// for dispositions outreach. Derived on the fly from BuyerName rather than
+// stored as its own field, since the name itself is already the source of
+// truth (an LLC name doesn't stop being an LLC name). Only used here for
+// the "Co" badge -- the actual company/individual filtering now happens
+// server-side (see Code.gs's identically-named function).
+function isCompanyBuyerName(name) {
+  return /\b(llc|inc|incorporated|corp|corporation|trust|lp|llp|ltd|company|co\.?|holdings|group|partners|properties|investments|capital)\b/i.test(String(name || ""));
 }
 
 // adminDeals (loaded once at admin login, see initAdminView) covers every
@@ -3075,120 +3121,49 @@ function pendingDealIdList(lead) {
   return String(lead.PendingDealID || "").split(",").map(function (v) { return v.trim(); }).filter(Boolean);
 }
 
-function populatePendingDealFilter() {
+// Fetches only the current page of leads matching whatever filters are
+// currently set (see currentBuyerLeadsFilters) -- previously this loaded
+// and filtered the ENTIRE buyer leads sheet in the browser on every load
+// and every filter change, which got slower as the list grew (now in the
+// thousands). The server does the filtering/sorting/pagination instead,
+// so only ~50 rows are ever actually transferred and rendered.
+async function loadBuyerLeadsAdmin() {
+  const tbody = document.getElementById("buyerleads-tbody");
+  tbody.innerHTML = '<tr><td colspan="14" class="small-muted" style="padding:16px; text-align:center;">Loading…</td></tr>';
+  const res = await api("adminGetBuyerLeads", {
+    filters: currentBuyerLeadsFilters(),
+    sort: document.getElementById("buyerleads-sort").value,
+    page: buyerLeadsCurrentPage,
+    pageSize: BUYER_LEADS_PAGE_SIZE
+  });
+  if (!res.ok) { tbody.innerHTML = ''; showToast(res.error || "Could not load buyer leads.", true); return; }
+  adminBuyerLeads = res.leads;
+  buyerLeadsTotalCount = res.totalCount;
+  populatePendingDealFilter(res.pendingDealIds);
+  renderBuyerLeadsAdmin();
+}
+
+function populatePendingDealFilter(pendingDealIds) {
   const select = document.getElementById("buyerleads-filter-pendingdeal");
   const prevValue = select.value;
-  const seen = {};
-  const dealIds = [];
-  adminBuyerLeads.forEach(function (l) {
-    pendingDealIdList(l).forEach(function (id) {
-      if (!seen[id]) { seen[id] = true; dealIds.push(id); }
-    });
-  });
   select.innerHTML = '<option value="">Any Pending Deal Tag</option>' +
-    dealIds.map(function (id) { return '<option value="' + esc(id) + '">' + esc(dealLabelFor(id)) + '</option>'; }).join("");
-  if (dealIds.indexOf(prevValue) !== -1) select.value = prevValue;
-}
-
-const BUYER_LEADS_PAGE_SIZE = 50;
-let buyerLeadsCurrentPage = 1;
-let buyerLeadsSelectedIds = new Set();
-
-// A skip-trace/company-owned property is often held by a more active,
-// sophisticated investor than an individual owner -- useful to filter on
-// for dispositions outreach. Derived on the fly from BuyerName rather than
-// stored as its own field, since the name itself is already the source of
-// truth (an LLC name doesn't stop being an LLC name).
-function isCompanyBuyerName(name) {
-  return /\b(llc|inc|incorporated|corp|corporation|trust|lp|llp|ltd|company|co\.?|holdings|group|partners|properties|investments|capital)\b/i.test(String(name || ""));
-}
-
-// Estimated Value folds equity in as a "(NN% equity)" suffix (see
-// mappedCsvRows) -- pulled back out here for filtering rather than stored
-// as a separate number, so there's one source of truth for the figure
-// instead of two copies that could drift apart.
-function extractEquityPercent(estimatedPropertyValue) {
-  const m = /\((\d+)%\s*equity\)/i.exec(String(estimatedPropertyValue || ""));
-  return m ? Number(m[1]) : null;
-}
-
-function getFilteredBuyerLeads() {
-  const q = document.getElementById("buyerleads-search").value.trim().toLowerCase();
-  const category = document.getElementById("buyerleads-filter-category").value;
-  const state = document.getElementById("buyerleads-filter-state").value.trim().toLowerCase();
-  // Same comma-separated, case/whitespace-insensitive convention as a
-  // deal's "Also Match These Cities" -- lets admin mass-select buyers
-  // across several cities in one state at once (e.g. "Phoenix, Tempe,
-  // Mesa") instead of only ever being able to filter to one exact city.
-  const cities = document.getElementById("buyerleads-filter-cities").value
-    .split(",").map(function (c) { return c.trim().toLowerCase(); }).filter(Boolean);
-  // Excluded cities apply on top of everything else -- e.g. State = AZ,
-  // Exclude Cities = "Phoenix" gets every Arizona buyer except Phoenix
-  // ones, useful for carving a saturated city out of an otherwise broad
-  // state-wide mass-select.
-  const excludeCities = document.getElementById("buyerleads-filter-exclude-cities").value
-    .split(",").map(function (c) { return c.trim().toLowerCase(); }).filter(Boolean);
-  const lastUploadOnly = !document.getElementById("buyerleads-lastupload-row").hidden &&
-    document.getElementById("buyerleads-filter-lastupload").checked;
-  const pendingDeal = document.getElementById("buyerleads-filter-pendingdeal").value;
-  const sortMode = document.getElementById("buyerleads-sort").value;
-  const ownerType = document.getElementById("buyerleads-filter-ownertype").value;
-  const minEquityRaw = document.getElementById("buyerleads-filter-minequity").value.trim();
-  const minEquity = minEquityRaw === "" ? null : Number(minEquityRaw);
-  const minHeldYearsRaw = document.getElementById("buyerleads-filter-minheldyears").value.trim();
-  const minHeldMonths = minHeldYearsRaw === "" ? null : Number(minHeldYearsRaw) * 12;
-  const hideDuplicates = document.getElementById("buyerleads-filter-hideduplicates").checked;
-  const filtered = adminBuyerLeads.filter(function (l) {
-    if (hideDuplicates && l.DuplicateOfBuyerLeadID) return false;
-    if (q && ![l.BuyerName, l.Phone, l.Email, l.City, l.State, l.Zip, l.County].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; })) return false;
-    if (category && (l.AssetCategories || "").split(",").map(function (c) { return c.trim().toLowerCase(); }).indexOf(category.toLowerCase()) === -1) return false;
-    if (state && String(l.State || "").trim().toLowerCase() !== state) return false;
-    if (cities.length > 0 && cities.indexOf(String(l.City || "").trim().toLowerCase()) === -1) return false;
-    if (excludeCities.length > 0 && excludeCities.indexOf(String(l.City || "").trim().toLowerCase()) !== -1) return false;
-    if (lastUploadOnly && !(lastImportedBuyerLeadIds && lastImportedBuyerLeadIds.has(l.BuyerLeadID))) return false;
-    if (pendingDeal && pendingDealIdList(l).indexOf(pendingDeal) === -1) return false;
-    if (ownerType === "company" && !isCompanyBuyerName(l.BuyerName)) return false;
-    if (ownerType === "individual" && isCompanyBuyerName(l.BuyerName)) return false;
-    if (minEquity !== null) {
-      const equity = extractEquityPercent(l.EstimatedPropertyValue);
-      if (equity === null || equity < minEquity) return false;
-    }
-    if (minHeldMonths !== null) {
-      const months = Number(l.OwnershipLengthMonths);
-      if (!l.OwnershipLengthMonths || isNaN(months) || months < minHeldMonths) return false;
-    }
-    return true;
-  });
-  // Lets admin browse chronologically by upload batch -- e.g. line up when
-  // a deal went dead against which round of leads came in around then,
-  // without needing to hunt across paginated default (sheet-insertion)
-  // order for a specific date.
-  if (sortMode === "newest") {
-    filtered.sort(function (a, b) { return new Date(b.CreatedAt || 0) - new Date(a.CreatedAt || 0); });
-  } else if (sortMode === "oldest") {
-    filtered.sort(function (a, b) { return new Date(a.CreatedAt || 0) - new Date(b.CreatedAt || 0); });
-  }
-  return filtered;
+    pendingDealIds.map(function (id) { return '<option value="' + esc(id) + '">' + esc(dealLabelFor(id)) + '</option>'; }).join("");
+  if (pendingDealIds.indexOf(prevValue) !== -1) select.value = prevValue;
 }
 
 function renderBuyerLeadsAdmin() {
   const tbody = document.getElementById("buyerleads-tbody");
   const empty = document.getElementById("buyerleads-admin-empty");
-  const filtered = getFilteredBuyerLeads();
-  empty.hidden = filtered.length > 0;
+  empty.hidden = buyerLeadsTotalCount > 0;
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / BUYER_LEADS_PAGE_SIZE));
-  if (buyerLeadsCurrentPage > totalPages) buyerLeadsCurrentPage = totalPages;
-  const pageStart = (buyerLeadsCurrentPage - 1) * BUYER_LEADS_PAGE_SIZE;
-  const pageItems = filtered.slice(pageStart, pageStart + BUYER_LEADS_PAGE_SIZE);
-
+  const totalPages = Math.max(1, Math.ceil(buyerLeadsTotalCount / BUYER_LEADS_PAGE_SIZE));
   document.getElementById("buyerleads-page-indicator").textContent =
-    filtered.length === 0 ? "No results" :
-    "Page " + buyerLeadsCurrentPage + " of " + totalPages + " (" + filtered.length + " total)";
+    buyerLeadsTotalCount === 0 ? "No results" :
+    "Page " + buyerLeadsCurrentPage + " of " + totalPages + " (" + buyerLeadsTotalCount + " total)";
   document.getElementById("buyerleads-prev-page-btn").disabled = buyerLeadsCurrentPage <= 1;
   document.getElementById("buyerleads-next-page-btn").disabled = buyerLeadsCurrentPage >= totalPages;
 
-  tbody.innerHTML = pageItems.map(function (l) {
+  tbody.innerHTML = adminBuyerLeads.map(function (l) {
     const notesPreview = l.GeneralNotes ? (l.GeneralNotes.length > 60 ? l.GeneralNotes.slice(0, 60) + "…" : l.GeneralNotes) : "";
     const isDnc = !!(l.DoNotContact === true || l.DoNotContact === "TRUE");
     const checked = buyerLeadsSelectedIds.has(l.BuyerLeadID) ? " checked" : "";
@@ -3234,24 +3209,34 @@ function updateBuyerLeadsSelectionUI() {
 }
 
 document.getElementById("buyerleads-prev-page-btn").addEventListener("click", function () {
-  if (buyerLeadsCurrentPage > 1) { buyerLeadsCurrentPage--; renderBuyerLeadsAdmin(); }
+  if (buyerLeadsCurrentPage > 1) { buyerLeadsCurrentPage--; loadBuyerLeadsAdmin(); }
 });
 document.getElementById("buyerleads-next-page-btn").addEventListener("click", function () {
-  buyerLeadsCurrentPage++; renderBuyerLeadsAdmin();
+  buyerLeadsCurrentPage++; loadBuyerLeadsAdmin();
 });
 
 document.getElementById("buyerleads-select-page-btn").addEventListener("click", function () {
   Array.from(document.querySelectorAll(".buyerlead-select-checkbox:not(:disabled)")).forEach(function (cb) {
     buyerLeadsSelectedIds.add(cb.getAttribute("data-lead-id"));
   });
-  renderBuyerLeadsAdmin();
+  updateBuyerLeadsSelectionUI();
 });
 
-document.getElementById("buyerleads-select-first-n-btn").addEventListener("click", function () {
+document.getElementById("buyerleads-select-first-n-btn").addEventListener("click", async function () {
+  const btn = this;
   const n = Number(document.getElementById("buyerleads-select-n").value) || 0;
-  const filtered = getFilteredBuyerLeads().filter(function (l) { return !(l.DoNotContact === true || l.DoNotContact === "TRUE"); });
-  buyerLeadsSelectedIds = new Set(filtered.slice(0, n).map(function (l) { return l.BuyerLeadID; }));
-  buyerLeadsCurrentPage = 1;
+  if (btn.disabled) return;
+  btn.disabled = true;
+  const res = await api("adminGetBuyerLeadIdsForFilters", {
+    filters: currentBuyerLeadsFilters(),
+    sort: document.getElementById("buyerleads-sort").value
+  });
+  btn.disabled = false;
+  if (!res.ok) { showToast(res.error || "Could not select leads.", true); return; }
+  buyerLeadsSelectedIds = new Set(res.buyerLeadIds.slice(0, n));
+  updateBuyerLeadsSelectionUI();
+  // Re-render (not reload) so the just-selected checkboxes reflect
+  // immediately on whatever page is currently showing.
   renderBuyerLeadsAdmin();
 });
 

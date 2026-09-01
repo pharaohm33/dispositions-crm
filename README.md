@@ -459,8 +459,24 @@ backend (see [SETUP.md](SETUP.md)).
   table for an at-a-glance read without opening the filter. Lets you select
   everyone on the page or the first N matching your filter (e.g. "give me
   50 Single Family buyers in Phoenix, Tempe, or Mesa"), and give that whole
-  selection to one rep for one deal at once — and paginates at 50 rows so a
-  list of 100+ never loads all at once. Every lead's row shows an
+  selection to one rep for one deal at once. Every filter, the sort, and
+  pagination itself all run **server-side** — every search keystroke,
+  dropdown change, or page turn asks the backend for exactly the ~50
+  matching rows it needs, rather than downloading the entire list into the
+  browser and filtering/paginating an ever-growing in-memory array (the
+  original design, which got noticeably slower as the sheet grew past a
+  few hundred rows since every keystroke re-filtered the whole thing
+  client-side, on top of the initial page load shipping every row's every
+  field regardless of what was actually visible). Typed filters (search,
+  state, cities, exclude cities, min equity, min held years) wait briefly
+  after you stop typing before reloading, so a fast typist doesn't fire a
+  request per keystroke; dropdowns and checkboxes reload immediately since
+  those only fire once per deliberate pick. "Select First N (Filtered)"
+  fetches just the matching ids (not full rows) so it still works
+  correctly across however many pages those N leads actually span,
+  without needing to page through them by hand first; "Select All On This
+  Page" only ever touches whatever's currently rendered, same as before.
+  Every lead's row shows an
   **Uploaded** timestamp, and a **Sort** control (newest/oldest uploaded
   first) lets you browse chronologically by batch — handy for lining up
   "this deal went dead around such-and-such date" with whichever round of

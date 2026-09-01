@@ -279,6 +279,8 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminGetBuyerRequests));
       case 'adminGetBuyerLeads':
         return jsonOut(withAdminSession(body, adminGetBuyerLeads));
+      case 'adminGetBuyerLeadIdsForFilters':
+        return jsonOut(withAdminSession(body, adminGetBuyerLeadIdsForFilters));
       case 'adminFindDuplicateBuyerLeads':
         return jsonOut(withAdminSession(body, adminFindDuplicateBuyerLeads));
       case 'adminMergeBuyerLeads':
@@ -1964,17 +1966,125 @@ function pitchesWithStatus(pitchRows, allContacts, dealsById) {
   });
 }
 
+// A skip-trace/company-owned property is often held by a more active,
+// sophisticated investor than an individual owner -- useful to filter on
+// for dispositions outreach. Derived on the fly from BuyerName rather than
+// stored as its own field, since the name itself is already the source of
+// truth (an LLC name doesn't stop being an LLC name). Mirrors the
+// frontend's identically-named helper -- separate runtimes, kept in sync
+// by hand since there's no shared module between them.
+function isCompanyBuyerName(name) {
+  return /\b(llc|inc|incorporated|corp|corporation|trust|lp|llp|ltd|company|co\.?|holdings|group|partners|properties|investments|capital)\b/i.test(String(name || ''));
+}
+
+// Estimated Value folds equity in as a "(NN% equity)" suffix (see the
+// frontend's mappedCsvRows) -- pulled back out here for filtering rather
+// than stored as its own column, so there's one source of truth for the
+// figure instead of two copies that could drift apart.
+function extractEquityPercent(estimatedPropertyValue) {
+  const m = /\((\d+)%\s*equity\)/i.exec(String(estimatedPropertyValue || ''));
+  return m ? Number(m[1]) : null;
+}
+
+// Every filter dimension the admin Buyer Leads tab offers, applied here
+// server-side instead of shipping the whole sheet to the browser and
+// filtering a giant in-memory array there. Shared between adminGetBuyerLeads
+// (which also paginates) and adminGetBuyerLeadIdsForFilters (ids only, for
+// "Select First N (Filtered)" without needing the full rows), so both stay
+// in sync on what "matches the current filters" actually means.
+function applyBuyerLeadFilters(leads, f) {
+  const q = normalizeText(f.q);
+  const category = normalizeText(f.category);
+  const state = normalizeText(f.state);
+  const cities = splitCommaList(f.cities).map(normalizeText);
+  const excludeCities = splitCommaList(f.excludeCities).map(normalizeText);
+  const pendingDeal = f.pendingDeal || '';
+  const ownerType = f.ownerType || '';
+  const minEquity = (f.minEquity === undefined || f.minEquity === null || f.minEquity === '') ? null : Number(f.minEquity);
+  const minHeldMonths = (f.minHeldYears === undefined || f.minHeldYears === null || f.minHeldYears === '') ? null : Number(f.minHeldYears) * 12;
+  const hideDuplicates = !!f.hideDuplicates;
+  // "Show only leads from the last upload" -- the frontend tracks which
+  // ids came back from its most recent import call (browser-session state,
+  // never stored server-side) and passes them here as an explicit allow
+  // list rather than the server trying to track "last upload" itself.
+  let onlyIds = null;
+  if (f.onlyIds && f.onlyIds.length > 0) {
+    onlyIds = {};
+    f.onlyIds.forEach(function (id) { onlyIds[id] = true; });
+  }
+
+  return leads.filter(function (l) {
+    if (onlyIds && !onlyIds[l['BuyerLeadID']]) return false;
+    if (hideDuplicates && l['DuplicateOfBuyerLeadID']) return false;
+    if (q && ![l['BuyerName'], l['Phone'], l['Email'], l['City'], l['State'], l['Zip'], l['County']].some(function (v) { return normalizeText(v).indexOf(q) !== -1; })) return false;
+    if (category && splitCommaList(l['AssetCategories']).map(normalizeText).indexOf(category) === -1) return false;
+    if (state && normalizeText(l['State']) !== state) return false;
+    if (cities.length > 0 && cities.indexOf(normalizeText(l['City'])) === -1) return false;
+    if (excludeCities.length > 0 && excludeCities.indexOf(normalizeText(l['City'])) !== -1) return false;
+    if (pendingDeal && splitCommaList(l['PendingDealID']).indexOf(pendingDeal) === -1) return false;
+    if (ownerType === 'company' && !isCompanyBuyerName(l['BuyerName'])) return false;
+    if (ownerType === 'individual' && isCompanyBuyerName(l['BuyerName'])) return false;
+    if (minEquity !== null) {
+      const equity = extractEquityPercent(l['EstimatedPropertyValue']);
+      if (equity === null || equity < minEquity) return false;
+    }
+    if (minHeldMonths !== null) {
+      const months = Number(l['OwnershipLengthMonths']);
+      if (!l['OwnershipLengthMonths'] || isNaN(months) || months < minHeldMonths) return false;
+    }
+    return true;
+  });
+}
+
+// Same "newest"/"oldest" upload-batch sort the admin Buyer Leads table
+// offers -- shared so adminGetBuyerLeads and adminGetBuyerLeadIdsForFilters
+// return leads/ids in the same order.
+function sortBuyerLeadsList(leads, sortMode) {
+  if (sortMode === 'newest') {
+    leads.sort(function (a, b) { return new Date(b['CreatedAt'] || 0) - new Date(a['CreatedAt'] || 0); });
+  } else if (sortMode === 'oldest') {
+    leads.sort(function (a, b) { return new Date(a['CreatedAt'] || 0) - new Date(b['CreatedAt'] || 0); });
+  }
+  return leads;
+}
+
+// Ids only (excludes Do Not Contact, same as the old client-side "first N"
+// behavior), matching whatever filters/sort the admin Buyer Leads table
+// currently has set -- backs "Select First N (Filtered)" without needing
+// to ship every matching lead's full row just to read off its id.
+function adminGetBuyerLeadIdsForFilters(body) {
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  let leads = applyBuyerLeadFilters(sheetToObjects(sheet), body.filters || {});
+  leads = leads.filter(function (l) { return l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE'; });
+  leads = sortBuyerLeadsList(leads, body.sort);
+  return { ok: true, buyerLeadIds: leads.map(function (l) { return l['BuyerLeadID']; }) };
+}
+
+// Filters, sorts, and paginates server-side -- only the requested page's
+// full rows (with their openPitches join) are ever serialized and sent to
+// the browser, instead of the whole sheet every time this tab loads or a
+// filter changes. Also returns totalCount (for "Page X of Y (N total)")
+// and pendingDealIds (every distinct tag across the FILTERED set, not
+// just the current page, so the "Pending Deal Tag" dropdown reflects
+// what's really out there) computed in the same pass.
 function adminGetBuyerLeads(body) {
   const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
-  let leads = sheetToObjects(sheet);
-  const f = body.filters || {};
-  if (f.city) leads = leads.filter(function (l) { return normalizeText(l['City']) === normalizeText(f.city); });
-  if (f.state) leads = leads.filter(function (l) { return normalizeText(l['State']) === normalizeText(f.state); });
-  if (f.zip) leads = leads.filter(function (l) { return String(l['Zip'] || '') === String(f.zip); });
-  if (f.assetCategory) {
-    leads = leads.filter(function (l) { return splitCommaList(l['AssetCategories']).map(normalizeText).indexOf(normalizeText(f.assetCategory)) !== -1; });
-  }
-  if (f.doNotContact === false) leads = leads.filter(function (l) { return l['DoNotContact'] !== true && l['DoNotContact'] !== 'TRUE'; });
+  let leads = applyBuyerLeadFilters(sheetToObjects(sheet), body.filters || {});
+  leads = sortBuyerLeadsList(leads, body.sort);
+  const totalCount = leads.length;
+
+  const pendingDealIdsSeen = {};
+  const pendingDealIds = [];
+  leads.forEach(function (l) {
+    splitCommaList(l['PendingDealID']).forEach(function (id) {
+      if (!pendingDealIdsSeen[id]) { pendingDealIdsSeen[id] = true; pendingDealIds.push(id); }
+    });
+  });
+
+  const page = Math.max(1, Number(body.page) || 1);
+  const pageSize = Math.max(1, Number(body.pageSize) || 50);
+  const pageStart = (page - 1) * pageSize;
+  const pageItems = leads.slice(pageStart, pageStart + pageSize);
 
   const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
   const allPitches = sheetToObjects(pitchesSheet);
@@ -1992,12 +2102,12 @@ function adminGetBuyerLeads(body) {
     });
   });
 
-  const withPitches = leads.map(function (l) {
+  const withPitches = pageItems.map(function (l) {
     const copy = Object.assign({}, l);
     copy.openPitches = openPitchesByLead[l['BuyerLeadID']] || [];
     return copy;
   });
-  return { ok: true, leads: withPitches };
+  return { ok: true, leads: withPitches, totalCount: totalCount, pendingDealIds: pendingDealIds };
 }
 
 // A rep can edit one buyer lead's own data if: admin, they uploaded it
