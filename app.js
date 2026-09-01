@@ -188,6 +188,75 @@ async function doLogin() {
 document.getElementById("show-signup-link").addEventListener("click", function () {
   document.getElementById("login-form-card").hidden = true;
   document.getElementById("signup-form-card").hidden = false;
+  loadSignupCaptcha();
+});
+
+// A homegrown, no-dependency slider-puzzle CAPTCHA on the signup form --
+// see getSignupCaptcha/verifySignupCaptcha in Code.gs for what this is
+// (and isn't) meant to stop. The server picks targetX and signs it; the
+// piece canvas always shows the real background art from that exact
+// spot, so the puzzle only visually "completes" once the slider's value
+// matches targetX (within a few px tolerance, checked again server-side
+// on submit -- the client-side check is just for the on-screen feedback).
+let signupCaptcha = null;
+
+async function loadSignupCaptcha() {
+  const statusEl = document.getElementById("signup-captcha-status");
+  statusEl.textContent = "Loading puzzle…";
+  const res = await api("getSignupCaptcha", {});
+  if (!res.ok) { statusEl.textContent = "Could not load the puzzle — try reopening Sign Up."; return; }
+  signupCaptcha = res;
+  document.getElementById("signup-captcha-slider").max = res.trackWidth - 40;
+  document.getElementById("signup-captcha-slider").value = 0;
+  drawSignupCaptcha(0);
+  statusEl.textContent = "Drag the slider until the piece drops into place.";
+}
+
+function drawSignupCaptcha(sliderX) {
+  if (!signupCaptcha) return;
+  const w = signupCaptcha.trackWidth, h = 140, pieceW = 40;
+  const bgCanvas = document.getElementById("signup-captcha-canvas");
+  const pieceCanvas = document.getElementById("signup-captcha-piece");
+  bgCanvas.width = w;
+  const bgCtx = bgCanvas.getContext("2d");
+  const pieceCtx = pieceCanvas.getContext("2d");
+
+  // Deterministic per-challenge "art" so it looks the same across
+  // redraws of the same challenge (seeded off targetX+expiresAt) instead
+  // of jittering every slider move.
+  let seed = (signupCaptcha.targetX * 9301 + signupCaptcha.expiresAt) % 233280;
+  function rand() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+
+  bgCtx.fillStyle = "#eef2ee";
+  bgCtx.fillRect(0, 0, w, h);
+  for (let i = 0; i < 14; i++) {
+    bgCtx.fillStyle = "hsl(" + Math.floor(rand() * 360) + ", 45%, 75%)";
+    bgCtx.beginPath();
+    bgCtx.arc(rand() * w, rand() * h, 10 + rand() * 22, 0, Math.PI * 2);
+    bgCtx.fill();
+  }
+
+  // Piece canvas shows exactly the art that sits at the true target spot,
+  // cropped straight from the background -- this is what has to visually
+  // "click into" the outlined notch once dragged to the right spot.
+  pieceCtx.clearRect(0, 0, pieceW, h);
+  pieceCtx.drawImage(bgCanvas, signupCaptcha.targetX, 0, pieceW, h, 0, 0, pieceW, h);
+  pieceCanvas.style.left = sliderX + "px";
+
+  // Notch outline at the true target spot, and a dimmed cutout so it
+  // reads as "a piece is missing here" until the piece lands on it.
+  bgCtx.save();
+  bgCtx.globalAlpha = 0.35;
+  bgCtx.fillStyle = "#1b2a22";
+  bgCtx.fillRect(signupCaptcha.targetX, 0, pieceW, h);
+  bgCtx.restore();
+  bgCtx.strokeStyle = "#ffffff";
+  bgCtx.lineWidth = 2;
+  bgCtx.strokeRect(signupCaptcha.targetX + 1, 1, pieceW - 2, h - 2);
+}
+
+document.getElementById("signup-captcha-slider").addEventListener("input", function () {
+  drawSignupCaptcha(Number(this.value));
 });
 document.getElementById("show-login-link").addEventListener("click", function () {
   document.getElementById("signup-form-card").hidden = true;
@@ -243,13 +312,29 @@ document.getElementById("signup-btn").addEventListener("click", async function (
     errorEl.classList.add("show");
     return;
   }
+  if (!signupCaptcha) {
+    errorEl.textContent = "Puzzle didn't load — try reopening Sign Up.";
+    errorEl.classList.add("show");
+    return;
+  }
+  const sliderX = Number(document.getElementById("signup-captcha-slider").value);
+  if (Math.abs(sliderX - signupCaptcha.targetX) > signupCaptcha.tolerance) {
+    errorEl.textContent = "Line the puzzle piece up first.";
+    errorEl.classList.add("show");
+    return;
+  }
   if (btn.disabled) return;
   btn.disabled = true;
-  const signupRes = await api("publicSignup", { name: name, email: email, phone: phone, personType: personType, password: password });
+  const signupRes = await api("publicSignup", {
+    name: name, email: email, phone: phone, personType: personType, password: password,
+    captchaTargetX: signupCaptcha.targetX, captchaExpiresAt: signupCaptcha.expiresAt,
+    captchaToken: signupCaptcha.token, captchaSubmittedX: sliderX
+  });
   if (!signupRes.ok) {
     btn.disabled = false;
     errorEl.textContent = signupRes.error || "Could not create your account.";
     errorEl.classList.add("show");
+    loadSignupCaptcha();
     return;
   }
   // Active immediately -- log straight in with the same credentials
@@ -282,7 +367,7 @@ showView(getSession());
   if (res.phone) parts.push(esc(res.phone));
   if (res.email) parts.push('<a href="mailto:' + esc(res.email) + '">' + esc(res.email) + '</a>');
   if (parts.length === 0) return;
-  document.getElementById("join-contact-text").innerHTML = '<strong>Want to join and get deals?</strong> Contact ' + parts.join(" &middot; ");
+  document.getElementById("join-contact-text").innerHTML = '<strong>Need help after signing up?</strong> Contact ' + parts.join(" &middot; ");
   document.getElementById("join-contact-card").hidden = false;
 })();
 

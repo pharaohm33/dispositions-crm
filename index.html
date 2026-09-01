@@ -274,6 +274,15 @@
     <input type="password" id="signup-password" autocomplete="new-password">
     <label class="field-label">Confirm Password</label>
     <input type="password" id="signup-confirm" autocomplete="new-password">
+
+    <label class="field-label">Slide the piece to complete the puzzle</label>
+    <div id="signup-captcha-wrap" style="position:relative; width:280px; max-width:100%; user-select:none;">
+      <canvas id="signup-captcha-canvas" width="280" height="140" style="display:block; border-radius:8px; border:1px solid var(--border);"></canvas>
+      <canvas id="signup-captcha-piece" width="40" height="140" style="position:absolute; top:0; left:0; pointer-events:none;"></canvas>
+    </div>
+    <input type="range" id="signup-captcha-slider" min="0" max="240" value="0" style="width:280px; max-width:100%;">
+    <p class="small-muted" id="signup-captcha-status">Drag the slider until the piece drops into place.</p>
+
     <div class="error-text" id="signup-error"></div>
     <div class="nav-row" style="justify-content:space-between; align-items:center;">
       <button class="link-btn" type="button" id="show-login-link">Already have an account? Log In</button>
@@ -536,8 +545,8 @@
   <!-- Team tab -->
   <div id="tab-team" hidden>
     <div class="card">
-      <div class="section-title" style="margin-top:0;">"Want to Join?" Contact</div>
-      <p class="small-muted">Shown on the login page, before anyone signs in — for buyers or prospective team members asking how to get set up with deals. Independent of any real login, so you can point it at yourself, someone else, or swap it any time.</p>
+      <div class="section-title" style="margin-top:0;">"Need Help After Signing Up?" Contact</div>
+      <p class="small-muted">Shown on the login page, before anyone signs in — signing up itself is self-serve (there's a Sign Up button right there), so this is support for after that: password issues, questions about getting set up with deals, anything else. Independent of any real login, so you can point it at yourself, someone else, or swap it any time.</p>
       <div class="row3">
         <div><label class="field-label">Name</label><input type="text" id="join-contact-name-input"></div>
         <div><label class="field-label">Phone</label><input type="text" id="join-contact-phone-input"></div>
@@ -1043,7 +1052,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=50"></script>
-<script src="app.js?v=50"></script>
+<script src="config.js?v=51"></script>
+<script src="app.js?v=51"></script>
 </body>
 </html>

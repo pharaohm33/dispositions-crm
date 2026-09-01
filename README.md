@@ -31,15 +31,32 @@ backend (see [SETUP.md](SETUP.md)).
   the "build your own buyer list" card or its guide/SOP at all (see Buyer
   Leads below); **Wholesaler**, **Realtor**, and **Other** additionally get
   a "text us once you have an interested buyer" line on the Deals tab SOP.
+  The signup form also has a small **slider-puzzle CAPTCHA** — drag a piece
+  until it visually completes a puzzle before Sign Up will submit. It's a
+  homegrown, no-dependency check (no reCAPTCHA/hCaptcha account needed):
+  the server picks a random target position and signs it (HMAC + a 5-minute
+  expiry), the piece always shows the real art from that exact spot so
+  it only "clicks in" once the slider matches, and the position/token/
+  timing are all re-verified server-side on submit — a request that skips
+  calling for a challenge, invents its own answer, or replays an old one
+  gets rejected. This is explicitly **not** meant to stop a determined,
+  targeted attacker (the target position is necessarily visible in the
+  challenge response, since the page has to know it to draw the piece) —
+  it's meant to filter out the much more common case of a generic bot
+  blasting a plain POST at the signup endpoint with no idea it needs to
+  solve anything at all.
 - **Forgot password?** on the login screen doesn't reset anything itself —
-  there's no email-reset flow — it just surfaces the same **"Want to
-  Join?"** contact info admin's already set (Team tab) so the person knows
-  who to actually ask. That same contact is also who gets emailed for a
-  rep's **Request Address Access** (see Address disclosure below), and once
-  logged in, any non-admin session sees "Support: [phone]" in the header at
-  all times, on every tab — one designated support contact for all three,
-  not several things to keep in sync. Falls back to `ADMIN_NOTIFY_EMAIL` if
-  no join contact email is set.
+  there's no email-reset flow — it just surfaces the same **"Need Help
+  After Signing Up?"** contact info admin's already set (Team tab) so the
+  person knows who to actually ask. That same contact is also who gets
+  emailed for a rep's **Request Address Access** (see Address disclosure
+  below), and once logged in, any non-admin session sees "Support: [phone]"
+  in the header at all times, on every tab — one designated support
+  contact for all three, not several things to keep in sync. Falls back to
+  `ADMIN_NOTIFY_EMAIL` if no join contact email is set. This card is framed
+  around *after* signing up specifically — signing up itself is self-serve
+  (the Sign Up button right above it), so this isn't "how do I join," it's
+  "I'm signed up and something's wrong / I have a question."
 
 **Rep side** (after logging in):
 

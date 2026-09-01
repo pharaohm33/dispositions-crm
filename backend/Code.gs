@@ -193,6 +193,8 @@ function doPost(e) {
         return jsonOut(login(body));
       case 'publicSignup':
         return jsonOut(publicSignup(body));
+      case 'getSignupCaptcha':
+        return jsonOut(getSignupCaptcha());
       case 'getJoinContact':
         return jsonOut(getJoinContact());
 
@@ -551,7 +553,42 @@ function login(body) {
 // bulk-assigns them via a new deal's "assign to all/unassigned users"
 // option, or assigns them individually. Self-signup is deliberately never
 // IsAdmin.
+// A lightweight, homegrown slider-puzzle CAPTCHA on public signup -- not
+// meant to stop a determined, targeted attacker (the target position is
+// visible in the challenge response, since the frontend has to know it to
+// draw the puzzle piece), just to filter out the much more common case of
+// a generic bot blasting a plain POST at this endpoint with no idea it
+// needs to solve anything at all. targetX is chosen server-side and
+// signed (HMAC + expiry) so a request can't just invent its own
+// "correct" answer -- it has to have actually called getSignupCaptcha
+// first and echoed back exactly what that call returned.
+const CAPTCHA_TRACK_WIDTH = 280;
+const CAPTCHA_TOLERANCE = 14;
+const CAPTCHA_TTL_MS = 5 * 60 * 1000;
+
+function getSignupCaptcha() {
+  const targetX = 40 + Math.floor(Math.random() * (CAPTCHA_TRACK_WIDTH - 80));
+  const expiresAt = Date.now() + CAPTCHA_TTL_MS;
+  const secret = PropertiesService.getScriptProperties().getProperty('SESSION_SECRET');
+  const token = hmacHex(targetX + '|' + expiresAt, secret);
+  return { ok: true, targetX: targetX, expiresAt: expiresAt, token: token, trackWidth: CAPTCHA_TRACK_WIDTH, tolerance: CAPTCHA_TOLERANCE };
+}
+
+function verifySignupCaptcha(body) {
+  const targetX = Number(body.captchaTargetX);
+  const expiresAt = Number(body.captchaExpiresAt);
+  const submittedX = Number(body.captchaSubmittedX);
+  const token = body.captchaToken;
+  if (!token || isNaN(targetX) || isNaN(expiresAt) || isNaN(submittedX)) return false;
+  if (Date.now() > expiresAt) return false;
+  const secret = PropertiesService.getScriptProperties().getProperty('SESSION_SECRET');
+  const expectedToken = hmacHex(targetX + '|' + expiresAt, secret);
+  if (expectedToken !== token) return false;
+  return Math.abs(submittedX - targetX) <= CAPTCHA_TOLERANCE;
+}
+
 function publicSignup(body) {
+  if (!verifySignupCaptcha(body)) return { ok: false, error: "Please line up the puzzle piece to confirm you're not a bot, then try again." };
   const email = String(body.email || '').trim().toLowerCase();
   const name = String(body.name || '').trim();
   const password = String(body.password || '');
@@ -1296,7 +1333,7 @@ function requestAddressAccess(body, session) {
   if (!deal) return { ok: false, error: 'Deal not found.' };
 
   const supportEmail = getSupportEmail();
-  if (!supportEmail) return { ok: false, error: 'No support contact is set up yet — ask admin to set the "Want to Join?" contact email in the Team tab.' };
+  if (!supportEmail) return { ok: false, error: 'No support contact is set up yet — ask admin to set the "Need Help After Signing Up?" contact email in the Team tab.' };
 
   MailApp.sendEmail({
     to: supportEmail,
