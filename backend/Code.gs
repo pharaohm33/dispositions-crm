@@ -863,6 +863,7 @@ function applyAddressSecrecy(deal, session, grants) {
 function adminAddDeal(body) {
   const d = body.data || {};
   if (!d.address) return { ok: false, error: 'Address is required.' };
+  if (!d.price) return { ok: false, error: 'Asking Price is required.' };
   const sheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
   const dealId = Utilities.getUuid();
   const now = new Date().toISOString();
@@ -1002,6 +1003,10 @@ function adminUpdateDeal(body) {
   const match = deals.find(function (d) { return d['DealID'] === body.dealId; });
   if (!match) return { ok: false, error: 'Deal not found.' };
   const d = body.data || {};
+  // Every deal needs an Asking Price -- only blocks an explicit attempt to
+  // clear it (Price present in this save's payload but empty), not saves
+  // of other fields that don't touch Price at all.
+  if (d.Price !== undefined && !d.Price) return { ok: false, error: 'Asking Price is required.' };
   const editable = ['DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink'];
   editable.forEach(function (field) {
     if (d[field] === undefined) return;

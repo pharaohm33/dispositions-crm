@@ -348,7 +348,7 @@
     </div>
     <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
       <input type="text" id="rep-search-input" placeholder="Search deals by address, city, or asset type..." style="flex:1; min-width:220px;">
-      <select id="rep-deals-filter-status" style="flex:0 0 auto; min-width:160px;"><option value="">All Statuses</option></select>
+      <select id="rep-deals-filter-status" style="flex:0 0 auto; min-width:160px;"><option value="__active__">Active Only</option></select>
       <select id="rep-deals-filter-category" style="flex:0 0 auto; min-width:180px;"><option value="">All Asset Categories</option></select>
     </div>
     <div id="rep-deals-container"></div>
@@ -542,7 +542,7 @@
       <span class="small-muted" id="check-all-deals-live-result"></span>
     </div>
     <table class="crm-table">
-      <thead><tr><th>Deal Code</th><th>Address</th><th>Asset Type</th><th>Price</th><th>Status</th><th>Coverage</th><th>Access</th></tr></thead>
+      <thead><tr><th>Deal Code</th><th>Address</th><th>Asset Type</th><th>Asking Price</th><th>Status</th><th>Coverage</th><th>Access</th></tr></thead>
       <tbody id="admin-deals-tbody"></tbody>
     </table>
     <div id="admin-deals-empty" class="small-muted" style="padding:20px;" hidden>No deals yet.</div>
@@ -921,7 +921,7 @@
     <input type="text" id="deal-matchcities-input" placeholder="e.g. Tempe, Mesa, Scottsdale">
     <div class="row2">
       <div><label class="field-label">Asset Type</label><input type="text" id="deal-assettype-input" placeholder="e.g. SFR, Multifamily, Commercial"></div>
-      <div><label class="field-label">Price</label><input type="text" id="deal-price-input"></div>
+      <div><label class="field-label">Asking Price</label><input type="text" id="deal-price-input"></div>
     </div>
     <div class="row2">
       <div><label class="field-label">ARV <span class="small-muted">(after-repair value)</span></label><input type="text" id="deal-arv-input"></div>
@@ -1058,7 +1058,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=52"></script>
-<script src="app.js?v=52"></script>
+<script src="config.js?v=53"></script>
+<script src="app.js?v=53"></script>
 </body>
 </html>

@@ -80,6 +80,15 @@ backend (see [SETUP.md](SETUP.md)).
   since it's the same label used over on Buyer Leads / Pitches, which never
   shows the address — keeping the code visible in both places is what lets
   a rep actually match a buyer's pitch back to the right deal at a glance.
+  The Deals tab defaults its **Status** filter to **Active Only** — Dead
+  and Sold deals stay out of the way unless a rep deliberately switches it
+  to "All Statuses" or picks one of those closed statuses specifically, so
+  there's no need to scroll past deals that aren't workable anymore. An
+  **Asset Category** filter sits next to it. Each deal's card also shows
+  whichever of **Asking Price**, **ARV**, **Rehab Estimate**, and **As-Is
+  Value** are actually set on it, right in the list — only the ones with a
+  real value show up (no "ARV: —" filler for a field admin left blank), so
+  a rep can size up a deal's numbers without opening it.
   Once disclosed, the deal list shows the **full address** (street, city,
   state, zip) right on the card, not just a partial one — and the **County**
   underneath it, which is visible whether or not the address itself has been
@@ -91,7 +100,16 @@ backend (see [SETUP.md](SETUP.md)).
   Value** and computed **As-Is Equity** (As-Is Value − Price) for a deal
   whose selling point is being undervalued as-is rather than a rehab
   spread, so it doesn't need ARV/Rehab filled in at all to still show reps
-  the number that actually sells it.
+  the number that actually sells it. Price is labeled **Asking Price**
+  everywhere it's shown (deal detail, the deals table, both Add/Edit Deal
+  forms) — required on every deal, admin can't submit a new one without
+  it (and can't clear it back out on an existing one via Edit, either) —
+  since there's always supposed to be one. Price, ARV, Rehab Estimate, and
+  As-Is Value are all auto-formatted with a `$` and commas the moment
+  admin saves — type `500000`, `$500000`, or `500,000` and they all land
+  the same way as `$500,000`; anything already formatted (or not a plain
+  number at all, like a typed-out range) is left exactly as typed rather
+  than being mangled.
 - Right on the deal detail, **Match My Buyer Leads To This Deal** lets a
   rep self-serve the same auto-matching admin uses (same State, City equal
   to the deal's City or one of its Match Cities, compatible Asset Category)

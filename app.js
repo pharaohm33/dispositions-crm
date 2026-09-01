@@ -425,10 +425,21 @@ document.getElementById("rep-search-input").addEventListener("input", renderRepD
 document.getElementById("rep-deals-filter-status").addEventListener("change", renderRepDeals);
 document.getElementById("rep-deals-filter-category").addEventListener("change", renderRepDeals);
 
+// Defaults reps to only ever seeing active deals -- nobody wants to
+// scroll past Dead (or Sold) deals just to find what's actually workable.
+// "Active Only" is a synthetic filter value (not a real Status), handled
+// specially in renderRepDeals; a rep can still explicitly pick "All
+// Statuses" or a specific closed status from the same dropdown if they
+// ever need to look one up.
+const REP_DEALS_ACTIVE_FILTER_VALUE = "__active__";
+
 function populateRepDealsFilters() {
   const statusSelect = document.getElementById("rep-deals-filter-status");
-  statusSelect.innerHTML = '<option value="">All Statuses</option>' +
+  const prevValue = statusSelect.value || REP_DEALS_ACTIVE_FILTER_VALUE;
+  statusSelect.innerHTML = '<option value="' + REP_DEALS_ACTIVE_FILTER_VALUE + '">Active Only</option>' +
+    '<option value="">All Statuses</option>' +
     statusOptionsCache.map(function (s) { return '<option value="' + esc(s) + '">' + esc(s) + '</option>'; }).join("");
+  statusSelect.value = prevValue;
   const categorySelect = document.getElementById("rep-deals-filter-category");
   categorySelect.innerHTML = '<option value="">All Asset Categories</option>' +
     assetCategoryOptionsCache.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join("");
@@ -456,7 +467,8 @@ function renderRepDeals() {
   const empty = document.getElementById("rep-deals-empty");
   const filtered = repDeals.filter(function (d) {
     if (q && ![d.DealCode, d.City, d.State, d.County, d.AssetType].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; })) return false;
-    if (statusFilter && d.Status !== statusFilter) return false;
+    if (statusFilter === REP_DEALS_ACTIVE_FILTER_VALUE) { if (d.Status === "Dead" || d.Status === "Sold") return false; }
+    else if (statusFilter && d.Status !== statusFilter) return false;
     if (categoryFilter && String(d.AssetCategory || "").trim().toLowerCase() !== categoryFilter) return false;
     return true;
   });
@@ -494,10 +506,20 @@ function renderRepDeals() {
     // disclosed (only the exact street address is ever gated) -- shown here
     // too so it's not something only the detail panel reveals.
     const countyLine = d.County ? '<div class="small-muted">' + esc(d.County) + ' County</div>' : "";
+    // Only the figures actually set on this deal show up here at all --
+    // no "ARV: —" filler for a field admin never filled in — so a rep can
+    // size up a deal's numbers right from the list without opening it.
+    const financialsLine = [
+      d.Price ? "Asking Price: " + esc(d.Price) : "",
+      d.ARV ? "ARV: " + esc(d.ARV) : "",
+      d.RehabEstimate ? "Rehab: " + esc(d.RehabEstimate) : "",
+      d.AsIsValue ? "As-Is Value: " + esc(d.AsIsValue) : ""
+    ].filter(Boolean).join(" &middot; ");
     return '<div class="deal-card" data-deal-id="' + esc(d.DealID) + '">' +
       '<div class="addr">' + codeTag + heading + '</div>' +
       countyLine +
-      '<div class="meta">' + esc(d.AssetType || "") + (d.Price ? " &middot; " + esc(d.Price) : "") +
+      (financialsLine ? '<div class="small-muted" style="margin-top:2px;">' + financialsLine + '</div>' : "") +
+      '<div class="meta">' + esc(d.AssetType || "") +
       ' <span class="status-pill ' + statusClass(d.Status) + '">' + esc(d.Status || "") + '</span>' +
       (d.addressGranted ? ' <span class="status-pill status-active-match">Address disclosed</span>' : "") + '</div>' +
       '</div>';
@@ -546,7 +568,7 @@ async function openRepDealDetail(dealId) {
     '<div class="banner info">' +
       '<span class="status-pill ' + statusClass(deal.Status) + '">' + esc(deal.Status || "") + '</span>' +
       (deal.AssetType ? '<div style="margin-top:8px;"><strong>Asset Type:</strong> ' + esc(deal.AssetType) + '</div>' : "") +
-      (deal.Price ? '<div><strong>Price:</strong> ' + esc(deal.Price) + '</div>' : "") +
+      (deal.Price ? '<div><strong>Asking Price:</strong> ' + esc(deal.Price) + '</div>' : "") +
       (deal.ARV ? '<div><strong>ARV:</strong> ' + esc(deal.ARV) + '</div>' : "") +
       (deal.RehabEstimate ? '<div><strong>Rehab Estimate:</strong> ' + esc(deal.RehabEstimate) + '</div>' : "") +
       (deal.ARV || deal.RehabEstimate ? '<div><strong>Gross Margin:</strong> ' + formatGrossMargin(deal.GrossMargin) + '</div>' : "") +
@@ -986,7 +1008,7 @@ function renderPitchDealInfo(deal) {
     '<div class="banner info">' +
       (deal.Address ? '<div><strong>Address:</strong> ' + esc(deal.Address) + '</div>' : "") +
       (deal.AssetType ? '<div style="margin-top:8px;"><strong>Asset Type:</strong> ' + esc(deal.AssetType) + '</div>' : "") +
-      (deal.Price ? '<div><strong>Price:</strong> ' + esc(deal.Price) + '</div>' : "") +
+      (deal.Price ? '<div><strong>Asking Price:</strong> ' + esc(deal.Price) + '</div>' : "") +
       (deal.ARV ? '<div><strong>ARV:</strong> ' + esc(deal.ARV) + '</div>' : "") +
       (deal.RehabEstimate ? '<div><strong>Rehab Estimate:</strong> ' + esc(deal.RehabEstimate) + '</div>' : "") +
       (deal.ARV || deal.RehabEstimate ? '<div><strong>Gross Margin:</strong> ' + formatGrossMargin(deal.GrossMargin) + '</div>' : "") +
@@ -1802,10 +1824,16 @@ document.getElementById("deal-modal-cancel").addEventListener("click", function 
 document.getElementById("deal-modal-save").addEventListener("click", async function () {
   const btn = this;
   const address = document.getElementById("deal-address-input").value.trim();
+  const price = document.getElementById("deal-price-input").value.trim();
   const errorEl = document.getElementById("deal-modal-error");
   errorEl.classList.remove("show");
   if (!address) {
     errorEl.textContent = "Address is required.";
+    errorEl.classList.add("show");
+    return;
+  }
+  if (!price) {
+    errorEl.textContent = "Asking Price is required.";
     errorEl.classList.add("show");
     return;
   }
@@ -1821,10 +1849,10 @@ document.getElementById("deal-modal-save").addEventListener("click", async funct
     matchCities: document.getElementById("deal-matchcities-input").value.trim(),
     assetCategory: document.getElementById("deal-assetcategory-input").value,
     assetType: document.getElementById("deal-assettype-input").value.trim(),
-    price: document.getElementById("deal-price-input").value.trim(),
-    arv: document.getElementById("deal-arv-input").value.trim(),
-    rehabEstimate: document.getElementById("deal-rehab-input").value.trim(),
-    asIsValue: document.getElementById("deal-asisvalue-input").value.trim(),
+    price: formatAdminMoney(document.getElementById("deal-price-input").value.trim()),
+    arv: formatAdminMoney(document.getElementById("deal-arv-input").value.trim()),
+    rehabEstimate: formatAdminMoney(document.getElementById("deal-rehab-input").value.trim()),
+    asIsValue: formatAdminMoney(document.getElementById("deal-asisvalue-input").value.trim()),
     status: document.getElementById("deal-status-input").value,
     description: document.getElementById("deal-description-input").value.trim(),
     generalDriveLink: document.getElementById("deal-general-drive-input").value.trim(),
@@ -1952,7 +1980,7 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     '<div class="row3">' +
       '<div><label class="field-label">ARV <span class="small-muted">(after-repair value)</span></label><input type="text" id="deal-arv-edit" value="' + esc(deal.ARV || "") + '"></div>' +
       '<div><label class="field-label">Rehab Estimate</label><input type="text" id="deal-rehab-edit" value="' + esc(deal.RehabEstimate || "") + '"></div>' +
-      '<div><label class="field-label">Price</label><input type="text" id="deal-price-edit" value="' + esc(deal.Price || "") + '"></div>' +
+      '<div><label class="field-label">Asking Price</label><input type="text" id="deal-price-edit" value="' + esc(deal.Price || "") + '"></div>' +
     '</div>' +
     '<label class="field-label">As-Is Value <span class="small-muted">(optional — current value with no repairs done; the selling point for a deal that\'s undervalued as-is rather than a rehab spread)</span></label>' +
     '<input type="text" id="deal-asisvalue-edit" value="' + esc(deal.AsIsValue || "") + '">' +
@@ -2128,10 +2156,10 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     await api("adminUpdateDeal", {
       dealId: deal.DealID,
       data: {
-        ARV: document.getElementById("deal-arv-edit").value.trim(),
-        RehabEstimate: document.getElementById("deal-rehab-edit").value.trim(),
-        Price: document.getElementById("deal-price-edit").value.trim(),
-        AsIsValue: document.getElementById("deal-asisvalue-edit").value.trim()
+        ARV: formatAdminMoney(document.getElementById("deal-arv-edit").value.trim()),
+        RehabEstimate: formatAdminMoney(document.getElementById("deal-rehab-edit").value.trim()),
+        Price: formatAdminMoney(document.getElementById("deal-price-edit").value.trim()),
+        AsIsValue: formatAdminMoney(document.getElementById("deal-asisvalue-edit").value.trim())
       }
     });
     await loadAdminDeals();
