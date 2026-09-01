@@ -82,6 +82,32 @@ function formatAsIsEquity(value) {
   return formatComputedMargin(value, "As-Is Value and Price");
 }
 
+// Plain-text version of the same "general deal info" a rep already sees
+// in the deal's info banner -- same fields, same order, same "only show
+// what's actually set" rule -- reformatted for pasting into a text/email
+// to a buyer instead of rendering as HTML. &mdash; -> a real em dash since
+// this is going into plain text, not innerHTML.
+// Cuts to the nearest whole word under maxLen rather than mid-word, so a
+// shortened description doesn't end on half a chopped-off word right
+// before the "...".
+function truncateText(text, maxLen) {
+  if (text.length <= maxLen) return text;
+  return text.slice(0, maxLen).replace(/\s+\S*$/, "") + "...";
+}
+
+function buildBuyerShareText(deal, shortenDescription) {
+  const lines = [];
+  if (deal.Price) lines.push("Asking Price: " + formatAdminMoney(deal.Price));
+  if (deal.ARV) lines.push("ARV: " + formatAdminMoney(deal.ARV));
+  if (deal.RehabEstimate) lines.push("Rehab Estimate: " + formatAdminMoney(deal.RehabEstimate));
+  if (deal.ARV || deal.RehabEstimate) lines.push("Gross Margin: " + formatGrossMargin(deal.GrossMargin).replace(/&mdash;/g, "—"));
+  if (deal.AsIsValue) lines.push("As-Is Value: " + formatAdminMoney(deal.AsIsValue));
+  if (deal.AsIsValue) lines.push("As-Is Equity: " + formatAsIsEquity(deal.AsIsEquity).replace(/&mdash;/g, "—"));
+  if (deal.Description) lines.push(shortenDescription ? truncateText(deal.Description, 220) : deal.Description);
+  if (deal.GeneralDriveLink) lines.push("Deal Link with pictures: " + deal.GeneralDriveLink);
+  return lines.join("\n");
+}
+
 function formatDate(iso) {
   if (!iso) return "";
   const d = new Date(iso);
@@ -584,6 +610,15 @@ async function openRepDealDetail(dealId) {
       (deal.GeneralDriveLink ? '<div style="margin-top:8px;"><a href="' + esc(deal.GeneralDriveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
       (!deal.Address ? '<div style="margin-top:10px;"><button class="btn secondary small" id="request-address-btn" data-deal-id="' + esc(deal.DealID) + '">Request Address Access</button>' +
         '<div class="small-muted" style="margin-top:6px;">Pitch off the general deal info first — only use this once a buyer has responded, is genuinely interested, and specifically asks you for the address. This just emails admin to ask; it does not grant it.</div></div>' : "") +
+      '<div style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.08);">' +
+        (deal.Description && deal.Description.length > 220
+          ? '<label class="checkbox-row" style="margin:0 0 6px;"><input type="checkbox" id="copy-buyer-info-shorten" checked> Shorten the long description (adds "...")</label>'
+          : "") +
+        '<div class="nav-row" style="justify-content:flex-start;">' +
+          '<button class="btn secondary small" id="copy-buyer-info-btn">Copy Info To Send Buyer</button>' +
+        '</div>' +
+        '<p class="small-muted" style="margin-top:6px;"><strong>The moment a buyer you send this to says they\'re interested, contact admin immediately</strong> so we can get them the address — don\'t wait on it, and don\'t send the address yourself.</p>' +
+      '</div>' +
     '</div>' +
 
     '<div class="section-title">Match My Buyer Leads To This Deal</div>' +
@@ -599,7 +634,7 @@ async function openRepDealDetail(dealId) {
     '<div id="give-myself-result" class="small-muted"></div>' +
 
     '<div class="section-title">Step 1 &middot; Interested Buyers</div>' +
-    '<p class="small-muted">Log a buyer here as soon as they show interest — this emails admin immediately. Keep pasting conversation updates into their notes below as things progress, and mark the match Negotiating/Closing/Dead as it plays out.</p>' +
+    '<p class="small-muted">Log a buyer here as soon as they show interest — this emails admin immediately. Keep pasting conversation updates into their notes below as things progress, and mark the match Negotiating/Closing/Dead as it plays out. Follow up with everyone who\'s asked for more info every 1&ndash;3 days, noted each time so it\'s clear when they were last touched.</p>' +
     '<label class="field-label">Buyer name</label>' +
     '<input type="text" id="buyer-name-input">' +
     '<label class="field-label">Contact (optional)</label>' +
@@ -631,6 +666,17 @@ async function openRepDealDetail(dealId) {
   wireBuyerMatchListHandlers(document.getElementById("buyer-list"), function () { return refreshBuyerMatchList(dealId, "buyer-list"); });
   wireRequestAddressButton();
   if (visibleCities.length > 0) renderCityCheckboxList("give-myself-cities", visibleCities);
+
+  document.getElementById("copy-buyer-info-btn").addEventListener("click", async function () {
+    const shortenCheckbox = document.getElementById("copy-buyer-info-shorten");
+    const text = buildBuyerShareText(deal, !shortenCheckbox || shortenCheckbox.checked);
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast("Copied — paste it into a text or email.");
+    } catch (err) {
+      showToast("Could not copy — try selecting the text manually.", true);
+    }
+  });
 
   document.getElementById("give-myself-btn").addEventListener("click", async function () {
     const btn = this;
@@ -1419,28 +1465,49 @@ function renderCityCheckboxList(containerId, cities) {
   sorted.forEach(function (c) {
     const group = c.state || "Other";
     if (group !== lastGroup) {
-      // "Full State" -- a shortcut to checking every city under this one
-      // state at once, for calling everyone in that state rather than
-      // hand-picking cities one at a time (handy when a list wasn't
-      // uploaded in any particular city order to begin with).
+      // Collapsed by default -- with several states' worth of cities in
+      // one list, showing every city under every state at once is exactly
+      // the "super long list to scroll through" this is meant to avoid.
+      // Clicking the state name (anywhere except the Full State button)
+      // expands or collapses just that state's cities.
       parts.push(
-        '<div class="deal-checkbox-group-label" style="display:flex; justify-content:space-between; align-items:center;">' +
-          '<span>' + esc(group) + '</span>' +
+        '<div class="deal-checkbox-group-label city-group-header" data-group="' + esc(group) + '" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">' +
+          '<span><span class="city-group-arrow">&#9656;</span> ' + esc(group) + '</span>' +
           '<button type="button" class="link-btn city-fullstate-btn" data-state="' + esc(group) + '" style="font-size:11px; text-transform:none; letter-spacing:normal; font-weight:600;">Full State</button>' +
         '</div>'
       );
       lastGroup = group;
     }
     parts.push(
-      '<label class="checkbox-row"><input type="checkbox" class="city-checkbox-item" value="' + esc(c.city) + '" data-state="' + esc(c.state || "") + '"> ' +
+      '<label class="checkbox-row city-group-item" data-group="' + esc(group) + '" style="display:none;"><input type="checkbox" class="city-checkbox-item" value="' + esc(c.city) + '" data-state="' + esc(c.state || "") + '"> ' +
       esc(c.city) + '</label>'
     );
   });
   container.innerHTML = parts.length > 0 ? parts.join("") : '<p class="deal-checkbox-empty">No cities available yet.</p>';
 
+  function expandGroup(group) {
+    Array.from(container.querySelectorAll('.city-group-item[data-group="' + CSS.escape(group) + '"]')).forEach(function (item) { item.style.display = ""; });
+    const arrow = container.querySelector('.city-group-header[data-group="' + CSS.escape(group) + '"] .city-group-arrow');
+    if (arrow) arrow.innerHTML = "&#9662;";
+  }
+
+  Array.from(container.querySelectorAll(".city-group-header")).forEach(function (header) {
+    header.addEventListener("click", function (e) {
+      if (e.target.closest(".city-fullstate-btn")) return; // Full State has its own handler below
+      const group = header.getAttribute("data-group");
+      const items = Array.from(container.querySelectorAll('.city-group-item[data-group="' + CSS.escape(group) + '"]'));
+      const arrow = header.querySelector(".city-group-arrow");
+      const isCollapsed = items.length > 0 && items[0].style.display === "none";
+      items.forEach(function (item) { item.style.display = isCollapsed ? "" : "none"; });
+      if (arrow) arrow.innerHTML = isCollapsed ? "&#9662;" : "&#9656;";
+    });
+  });
+
   Array.from(container.querySelectorAll(".city-fullstate-btn")).forEach(function (btn) {
-    btn.addEventListener("click", function () {
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
       const state = btn.getAttribute("data-state");
+      expandGroup(state); // show the result of this click instead of hiding it behind a collapsed group
       const stateCheckboxes = Array.from(container.querySelectorAll('.city-checkbox-item[data-state="' + CSS.escape(state) + '"]'));
       // A second click on the same state's button is a toggle, not just an
       // "always check" -- if every city in this state is already checked

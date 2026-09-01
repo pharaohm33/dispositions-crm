@@ -138,7 +138,11 @@ backend (see [SETUP.md](SETUP.md)).
   tedious), click it again to uncheck the whole state back off. Only
   cities the rep can actually see are ever offered here to begin with —
   their own uploads plus admin's shared pool, never another rep's private
-  list.
+  list. Each state's cities are **collapsed by default** — click the state
+  name to expand or collapse just that one, so a rep with cities spread
+  across several states isn't stuck scrolling one long flat list to find
+  the ones they actually want; clicking Full State auto-expands that
+  state so the result is visible right away.
 - Each deal shows the standing SOP:
   1. **Call buyers from the lead list** — the main way to work a deal, and
      what the banner leads with. Match yourself to buyers on the deal (or
@@ -153,6 +157,20 @@ backend (see [SETUP.md](SETUP.md)).
      couldn't agree) as it plays out — an easy-to-follow, deal-by-deal picture
      of who's actually closing. This section sits first on a deal's detail
      page too (labeled **Step 1**), right after the buyer-matching tools.
+     **Follow up with everyone who's asked for more info every 1–3 days**,
+     noting each touch so it's clear when someone was last contacted. A
+     **Copy Info To Send Buyer** button sits right in the deal's info
+     banner — one click copies the same Asking Price / ARV / Rehab
+     Estimate / Gross Margin / As-Is Value / As-Is Equity / Description
+     already shown there (only whichever fields are actually set, same
+     rule as the banner itself) plus the Drive folder link, formatted to
+     paste straight into a text or email. A long description gets a
+     **"Shorten the long description"** checkbox (only appears past ~220
+     characters) that trims it to a clean word boundary plus "..." — left
+     checked by default for a quick text, uncheck it to copy the full
+     description instead. The moment a buyer someone sends this to says
+     they're interested, the rep is told right there to contact admin
+     immediately for the address — never send it themselves.
   3. **Facebook posting is explicitly optional and secondary**, not a
      first-resort — the banner and the deal detail page (labeled just
      **"Optional"**, no step number, and using the muted secondary button
