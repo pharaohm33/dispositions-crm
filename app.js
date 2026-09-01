@@ -826,11 +826,17 @@ let myPitchesCurrentPage = 1;
 let markedPitchIds = new Set();
 
 async function loadMyPitches() {
-  const res = await api("getMyPitches", {});
-  if (!res.ok) return;
-  myPitches = res.pitches;
-  populateMyPitchesDealFilter();
-  renderMyPitches();
+  const loadingBanner = document.getElementById("rep-buyerleads-loading-banner");
+  loadingBanner.hidden = false;
+  try {
+    const res = await api("getMyPitches", {});
+    if (!res.ok) return;
+    myPitches = res.pitches;
+    populateMyPitchesDealFilter();
+    renderMyPitches();
+  } finally {
+    loadingBanner.hidden = true;
+  }
 }
 
 // Rebuilds the Deal filter's options from whatever deals this rep actually
