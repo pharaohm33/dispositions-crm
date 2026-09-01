@@ -1014,6 +1014,10 @@
     <input type="text" id="area-zip-input">
     <p class="small-muted">Leave City/States/Zip blank to not filter by it. Used by Auto-Feed to keep this person working the same area(s).</p>
 
+    <label class="field-label">Target Market <span class="small-muted">(states, comma separated, e.g. AZ, NM — optional)</span></label>
+    <input type="text" id="area-targetmarket-input">
+    <p class="small-muted">Separate from the buyer-lead area above — this is which state(s) this person focuses on for <strong>deals</strong>. Purely informational: it doesn't grant or restrict anything by itself, but a deal's detail page uses it to suggest who to hand-assign (and optionally lock) that deal to once you see them doing well in a market. Leave blank if not set yet.</p>
+
     <label class="field-label">Deals They're Specifically Told To Work On <span class="small-muted">(by category)</span></label>
     <p class="small-muted">Check a category and this person automatically gets every deal in it — current ones right away, and any new one added later, no need to hand it to them one at a time.</p>
     <div class="chip-list" id="area-categoryaccess-list"></div>
@@ -1030,7 +1034,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=48"></script>
-<script src="app.js?v=48"></script>
+<script src="config.js?v=49"></script>
+<script src="app.js?v=49"></script>
 </body>
 </html>

@@ -59,7 +59,7 @@ const FOLLOWUP_HOURS = 24;
 const MATCH_STATUSES = ['Active Match', 'Negotiating', 'Closing', 'Dead Match'];
 const DEFAULT_ASSET_CATEGORIES = ['Single Family', 'Condominium / Townhouse', 'Multifamily (1-4 Units)', 'Multifamily (4+ Units)', 'Fix and Flip', 'Residential Vacant Land', 'Commercial'];
 
-const REP_COLUMNS = ['Username', 'Name', 'Phone', 'Email', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'LastActive', 'PreferredCity', 'PreferredState', 'PreferredZip', 'PersonType', 'CategoryAccess', 'BulkAssignOverride'];
+const REP_COLUMNS = ['Username', 'Name', 'Phone', 'Email', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'LastActive', 'PreferredCity', 'PreferredState', 'PreferredZip', 'PersonType', 'CategoryAccess', 'BulkAssignOverride', 'TargetMarket'];
 
 // Self-identified at signup -- informational only (admin visibility/
 // filtering in the Team tab), doesn't gate any functionality. Not
@@ -82,7 +82,7 @@ const PERSON_TYPES = ['Buyer', 'Wholesaler', 'Realtor', 'Other'];
 // buyer<->deal auto-matching -- see buyerMatchesDeal. AssetType stays a
 // free-text description field ("SFR - 3bd/2ba") separate from the
 // structured AssetCategory used for matching.
-const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt'];
+const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt', 'Locked'];
 // Source distinguishes a deliberate, one-deal-at-a-time grant ('manual' --
 // the Access section's "Add Access" dropdown, or "Assign Myself") from one
 // written by the bulk-assign mechanism ('bulk' -- see applyDealAssignMode).
@@ -263,6 +263,10 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminUnassignRep));
       case 'adminBulkAssignDeal':
         return jsonOut(withAdminSession(body, adminBulkAssignDeal));
+      case 'adminSetDealLocked':
+        return jsonOut(withAdminSession(body, adminSetDealLocked));
+      case 'adminFindRepsByTargetMarket':
+        return jsonOut(withAdminSession(body, adminFindRepsByTargetMarket));
       case 'adminGetAssignments':
         return jsonOut(withAdminSession(body, adminGetAssignments));
       case 'adminGrantAddressAccess':
@@ -903,8 +907,51 @@ function adminBulkAssignDeal(body) {
   const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
   const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === body.dealId; });
   if (!deal) return { ok: false, error: 'Deal not found.' };
+  // A locked deal is deliberately walled off from bulk sweeps -- whoever's
+  // already on it keeps working it, but "All Users" / "All Users With No
+  // Assigned Deals" must not pull anyone new in. Add Access (adminAssignRep)
+  // is untouched by this -- that's the explicit, one-by-one override admin
+  // can still use on a locked deal on purpose.
+  if (deal['Locked'] === true || deal['Locked'] === 'TRUE') {
+    return { ok: false, error: 'This deal is locked -- use Add Access to add someone individually, or unlock it first to bulk-assign.' };
+  }
   const assignedCount = applyDealAssignMode(body.dealId, deal['AssetCategory'], body.assignMode, new Date().toISOString());
   return { ok: true, assignedCount: assignedCount };
+}
+
+function adminSetDealLocked(body) {
+  if (!body.dealId) return { ok: false, error: 'Missing dealId.' };
+  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === body.dealId; });
+  if (!deal) return { ok: false, error: 'Deal not found.' };
+  dealsSheet.getRange(deal._row, getColumnIndex(dealsSheet, 'Locked')).setValue(!!body.locked);
+  return { ok: true };
+}
+
+// Suggests which reps to hand-assign a deal to based on their stated
+// Target Market (see adminSetRepPreferredArea) -- purely a matching aid
+// for admin, never automatic on its own. Matches the deal's State against
+// each rep's TargetMarket text (comma-separated, same convention as
+// PreferredState/CategoryAccess), case/whitespace-insensitive. A rep with
+// no TargetMarket set never matches anything, so a deal in a market
+// nobody's claimed just comes back with no suggestions -- exactly the
+// "stays open to everyone, nothing gets locked" default.
+function adminFindRepsByTargetMarket(body) {
+  if (!body.dealId) return { ok: false, error: 'Missing dealId.' };
+  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === body.dealId; });
+  if (!deal) return { ok: false, error: 'Deal not found.' };
+  const dealState = normalizeText(deal['State']);
+  if (!dealState) return { ok: true, matches: [] };
+
+  const repsSheet = getSheet(REPS_SHEET, REP_COLUMNS);
+  const matches = sheetToObjects(repsSheet).filter(function (r) {
+    const active = !(r['Active'] === false || r['Active'] === 'FALSE');
+    if (!active || (r['IsAdmin'] === true || r['IsAdmin'] === 'TRUE')) return false;
+    return splitCommaList(r['TargetMarket']).map(normalizeText).indexOf(dealState) !== -1;
+  }).map(function (r) { return { username: r['Username'], name: r['Name'], targetMarket: r['TargetMarket'] || '' }; });
+
+  return { ok: true, matches: matches };
 }
 
 function adminUpdateDeal(body) {
@@ -1023,7 +1070,8 @@ function adminGetReps(body) {
       dealsAssignedCount: dealsAssignedCount,
       preferredCity: r['PreferredCity'] || '', preferredState: r['PreferredState'] || '', preferredZip: r['PreferredZip'] || '',
       personType: r['PersonType'] || '', categoryAccess: r['CategoryAccess'] || '',
-      bulkAssignOverride: r['BulkAssignOverride'] === true || r['BulkAssignOverride'] === 'TRUE'
+      bulkAssignOverride: r['BulkAssignOverride'] === true || r['BulkAssignOverride'] === 'TRUE',
+      targetMarket: r['TargetMarket'] || ''
     };
   });
   return { ok: true, reps: reps };
@@ -2712,6 +2760,15 @@ function adminSetRepPreferredArea(body) {
   sheet.getRange(match._row, getColumnIndex(sheet, 'PreferredCity')).setValue(body.city || '');
   sheet.getRange(match._row, getColumnIndex(sheet, 'PreferredState')).setValue(body.state || '');
   sheet.getRange(match._row, getColumnIndex(sheet, 'PreferredZip')).setValue(body.zip || '');
+  if (body.targetMarket !== undefined) {
+    // Purely informational/matching metadata -- distinct from
+    // PreferredCity/State/Zip (which is about where a rep wants BUYER
+    // LEADS from). Target Market is which state(s) a rep focuses on for
+    // DEALS, used by adminFindRepsByTargetMarket to suggest who to
+    // hand-assign+lock a deal to; setting it never grants or restricts
+    // deal access on its own.
+    sheet.getRange(match._row, getColumnIndex(sheet, 'TargetMarket')).setValue(body.targetMarket || '');
+  }
   if (body.personType !== undefined) {
     // Blank is allowed here (admin clearing/not setting it for an
     // internally-added rep) even though public signup itself requires a

@@ -269,7 +269,32 @@ backend (see [SETUP.md](SETUP.md)).
   deal's own detail page also lists, read-only, who has access to it via
   category, pointing back to the Team tab to change it. All-access reps
   and admin are skipped either way, since they already see every deal
-  without needing any of this. Add deals, change a deal's
+  without needing any of this. A deal's detail page also has a **Lock
+  This Deal** toggle, entirely separate from Bulk Assign Override: when
+  on, "Tell These Reps To Work This Deal" (both bulk-assign options) is
+  disabled outright for that one deal — whoever's already on it keeps
+  working it, but nobody new gets swept in, whether via "All Users,"
+  "All Users With No Assigned Deals," or any future automated batch.
+  **Add Access still works on a locked deal** — that's the deliberate,
+  one-by-one override — only the bulk sweep itself is blocked. Unlocking
+  is always a manual click, never automatic or time-based. A locked
+  deal shows an orange **Locked** badge both on the deals table and on
+  its own detail page, so it's obvious at a glance. Pairs with a new
+  **Target Market** field on each rep (Team tab → Edit Details, separate
+  from the buyer-lead "Preferred Area" fields above it — Target Market
+  is about which state(s) a rep focuses on for *deals*, not buyer leads)
+  — purely informational on its own, it grants nothing by itself. A
+  deal's detail page has an **Auto-Assign By Target Market** button that
+  looks up which active reps have that deal's state in their Target
+  Market and lists them for you to pick from, with a checkbox to lock
+  the deal to whoever you assign right there in the same step. If no
+  rep has claimed that state yet, nothing comes back and the deal just
+  stays open to everyone as usual — this is meant for the specific,
+  deliberate case of "I've seen this person do well in this market,
+  hand them this deal to focus on," not a first-resort or something
+  that runs on its own; other deals in that same market can stay
+  unlocked and shared if there's more volume than one rep needs. Add
+  deals, change a deal's
   status (Active, Sold, Dead, Under Contract, On Hold, or whatever
   categories you've defined), edit the **Address / City / State / Zip** at
   any time after creation (e.g. a typo, or details that firm up after the

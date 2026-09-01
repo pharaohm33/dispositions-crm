@@ -1613,7 +1613,7 @@ function renderAdminDeals() {
   empty.hidden = filtered.length > 0;
   tbody.innerHTML = filtered.map(function (d) {
     return '<tr class="clickable" data-deal-id="' + esc(d.DealID) + '">' +
-      '<td>' + (d.DealCode ? esc(d.DealCode) : "&mdash;") + '</td>' +
+      '<td>' + (d.DealCode ? esc(d.DealCode) : "&mdash;") + ((d.Locked === true || d.Locked === "TRUE") ? ' <span class="status-pill status-dead-match" title="Bulk sweeps skip this deal">Locked</span>' : "") + '</td>' +
       '<td>' + esc(d.Address) + (d.City ? ", " + esc(d.City) : "") + '</td>' +
       '<td>' + esc(d.AssetType || "") + '</td>' +
       '<td>' + esc(d.Price || "") + '</td>' +
@@ -1746,6 +1746,7 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
   // Team tab, not per-deal. Excluded from the "Add Access" dropdown below
   // since they already have it, and folded into who's eligible for an
   // address grant, same as anyone directly assigned.
+  const isLocked = deal.Locked === true || deal.Locked === "TRUE";
   const dealCategoryNorm = String(deal.AssetCategory || "").trim().toLowerCase();
   const categoryAccessReps = dealCategoryNorm
     ? allReps.filter(function (r) {
@@ -1851,15 +1852,30 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
       : "") +
 
     '<div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border);">' +
-      '<div style="font-weight:600; margin-bottom:6px;">Tell These Reps To Work This Deal</div>' +
-      '<select id="deal-detail-bulk-assignmode-select">' +
+      '<div style="font-weight:600; margin-bottom:6px;">Tell These Reps To Work This Deal' + (isLocked ? ' <span class="status-pill status-dead-match" title="Locked deals skip this — use Add Access above, or unlock it below">Locked</span>' : '') + '</div>' +
+      '<select id="deal-detail-bulk-assignmode-select"' + (isLocked ? ' disabled' : '') + '>' +
         '<option value="all">All Users</option>' +
         '<option value="unassigned">All Users With No Assigned Deals Right Now</option>' +
       '</select>' +
-      '<p class="small-muted">"No assigned deals right now" only counts deals given to a rep one-by-one (via Add Access or Assign Myself above) — deals a rep received from a previous batch like this one, or via standing category access, don\'t disqualify them. Give someone the "Bulk Override" toggle on the Team tab to always sweep them into these batches regardless.</p>' +
+      '<p class="small-muted">"No assigned deals right now" only counts deals given to a rep one-by-one (via Add Access or Assign Myself above) — deals a rep received from a previous batch like this one, or via standing category access, don\'t disqualify them. Give someone the "Bulk Override" toggle on the Team tab to always sweep them into these batches regardless.' +
+        (isLocked ? ' <strong>This deal is locked, so this is disabled</strong> — unlock it below, or use Add Access above to add someone individually without unlocking.' : '') + '</p>' +
       '<div class="nav-row" style="justify-content:flex-start;">' +
-        '<button class="btn secondary small" id="deal-detail-bulk-assign-btn">Assign Now</button>' +
+        '<button class="btn secondary small" id="deal-detail-bulk-assign-btn"' + (isLocked ? ' disabled' : '') + '>Assign Now</button>' +
       '</div>' +
+    '</div>' +
+
+    '<div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border);">' +
+      '<div style="font-weight:600; margin-bottom:6px;">Lock This Deal</div>' +
+      '<p class="small-muted">Locking keeps this deal off-limits to the bulk sweep above — whoever\'s already assigned keeps working it, and you can still add someone individually with Add Access. Unlocking is always manual, never automatic.</p>' +
+      '<button class="btn ' + (isLocked ? "secondary" : "danger") + ' small" id="deal-detail-lock-btn">' + (isLocked ? "Unlock This Deal" : "Lock This Deal") + '</button>' +
+    '</div>' +
+
+    '<div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border);">' +
+      '<div style="font-weight:600; margin-bottom:6px;">Auto-Assign By Target Market</div>' +
+      '<p class="small-muted">Finds active reps whose Target Market (set on the Team tab\'s Edit Details) includes this deal\'s state (' + esc(deal.State || "—") + ') — a matching aid, not automatic on its own. If nobody\'s claimed this market yet, nothing comes back and the deal stays open to everyone as usual.</p>' +
+      '<button class="btn secondary small" id="deal-detail-find-targetmarket-btn">Find Matching Reps</button>' +
+      '<label class="checkbox-row" style="margin-top:8px;"><input type="checkbox" id="deal-detail-targetmarket-lock-checkbox"> Also lock this deal once I assign someone below</label>' +
+      '<div id="deal-detail-targetmarket-results" style="margin-top:8px;"></div>' +
     '</div>' +
 
     '<div class="section-title">Address Access</div>' +
@@ -2048,6 +2064,53 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     showToast("Assigned to " + res.assignedCount + " rep(s).");
   });
 
+  document.getElementById("deal-detail-lock-btn").addEventListener("click", async function () {
+    const btn = this;
+    btn.disabled = true;
+    const res = await api("adminSetDealLocked", { dealId: deal.DealID, locked: !isLocked });
+    btn.disabled = false;
+    if (!res.ok) { showToast(res.error || "Could not update lock.", true); return; }
+    openAdminDealDetail(deal.DealID);
+    showToast(isLocked ? "Deal unlocked." : "Deal locked — bulk sweeps will skip it.");
+  });
+
+  document.getElementById("deal-detail-find-targetmarket-btn").addEventListener("click", async function () {
+    const btn = this;
+    const resultsEl = document.getElementById("deal-detail-targetmarket-results");
+    btn.disabled = true;
+    resultsEl.innerHTML = '<p class="small-muted">Searching…</p>';
+    const res = await api("adminFindRepsByTargetMarket", { dealId: deal.DealID });
+    btn.disabled = false;
+    if (!res.ok) { resultsEl.innerHTML = ""; showToast(res.error || "Could not search reps.", true); return; }
+    if (res.matches.length === 0) {
+      resultsEl.innerHTML = '<p class="small-muted">No active rep has "' + esc(deal.State || "") + '" set as a Target Market yet.</p>';
+      return;
+    }
+    resultsEl.innerHTML = res.matches.map(function (m) {
+      return '<div class="item-row" style="display:flex; justify-content:space-between; align-items:center; gap:8px;">' +
+        '<span>' + esc(m.name) + ' (' + esc(m.username) + ') — Target Market: ' + esc(m.targetMarket) + '</span>' +
+        '<button class="btn secondary small targetmarket-assign-btn" data-username="' + esc(m.username) + '">Assign</button>' +
+        '</div>';
+    }).join("");
+    Array.from(resultsEl.querySelectorAll(".targetmarket-assign-btn")).forEach(function (assignBtn) {
+      assignBtn.addEventListener("click", async function () {
+        assignBtn.disabled = true;
+        const username = assignBtn.getAttribute("data-username");
+        const assignRes = await api("adminAssignRep", { dealId: deal.DealID, username: username });
+        if (!assignRes.ok) {
+          assignBtn.disabled = false;
+          showToast(assignRes.error || "Could not assign.", true);
+          return;
+        }
+        if (document.getElementById("deal-detail-targetmarket-lock-checkbox").checked) {
+          await api("adminSetDealLocked", { dealId: deal.DealID, locked: true });
+        }
+        openAdminDealDetail(deal.DealID);
+        showToast("Assigned " + username + (document.getElementById("deal-detail-targetmarket-lock-checkbox").checked ? " and locked the deal." : "."));
+      });
+    });
+  });
+
   Array.from(panel.querySelectorAll(".revoke-address-btn")).forEach(function (btn) {
     btn.addEventListener("click", async function () {
       btn.disabled = true;
@@ -2172,7 +2235,7 @@ function renderReps() {
       '<td class="small-muted">' + [r.preferredCity, r.preferredState, r.preferredZip].filter(Boolean).join(", ") + '</td>' +
       '<td style="white-space:nowrap;">' +
         '<button class="btn secondary small reset-pw-btn" data-username="' + esc(r.username) + '" data-name="' + esc(r.name) + '">Reset Password</button> ' +
-        '<button class="btn secondary small area-btn" data-username="' + esc(r.username) + '" data-name="' + esc(r.name) + '" data-phone="' + esc(r.phone) + '" data-email="' + esc(r.email) + '" data-city="' + esc(r.preferredCity) + '" data-state="' + esc(r.preferredState) + '" data-zip="' + esc(r.preferredZip) + '" data-persontype="' + esc(r.personType || "") + '" data-categoryaccess="' + esc(r.categoryAccess || "") + '">Edit Details</button>' +
+        '<button class="btn secondary small area-btn" data-username="' + esc(r.username) + '" data-name="' + esc(r.name) + '" data-phone="' + esc(r.phone) + '" data-email="' + esc(r.email) + '" data-city="' + esc(r.preferredCity) + '" data-state="' + esc(r.preferredState) + '" data-zip="' + esc(r.preferredZip) + '" data-persontype="' + esc(r.personType || "") + '" data-categoryaccess="' + esc(r.categoryAccess || "") + '" data-targetmarket="' + esc(r.targetMarket || "") + '">Edit Details</button>' +
       '</td>' +
       '</tr>';
   }).join("");
@@ -2196,12 +2259,12 @@ function renderReps() {
     btn.addEventListener("click", function () {
       openAreaModal(btn.getAttribute("data-username"), btn.getAttribute("data-name"), btn.getAttribute("data-phone"), btn.getAttribute("data-email"),
         btn.getAttribute("data-city"), btn.getAttribute("data-state"), btn.getAttribute("data-zip"), btn.getAttribute("data-persontype"),
-        btn.getAttribute("data-categoryaccess"));
+        btn.getAttribute("data-categoryaccess"), btn.getAttribute("data-targetmarket"));
     });
   });
 }
 
-function openAreaModal(username, name, phone, email, city, state, zip, personType, categoryAccess) {
+function openAreaModal(username, name, phone, email, city, state, zip, personType, categoryAccess, targetMarket) {
   document.getElementById("area-modal-who").textContent = name + " (" + username + ")";
   document.getElementById("area-phone-input").value = phone || "";
   document.getElementById("area-email-input").value = email || "";
@@ -2209,6 +2272,7 @@ function openAreaModal(username, name, phone, email, city, state, zip, personTyp
   document.getElementById("area-state-input").value = state || "";
   document.getElementById("area-zip-input").value = zip || "";
   document.getElementById("area-persontype-input").value = personType || "";
+  document.getElementById("area-targetmarket-input").value = targetMarket || "";
   const checkedCategories = String(categoryAccess || "").split(",").map(function (c) { return c.trim().toLowerCase(); }).filter(Boolean);
   document.getElementById("area-categoryaccess-list").innerHTML = assetCategoryOptionsCache.map(function (c) {
     const checked = checkedCategories.indexOf(c.toLowerCase()) !== -1 ? " checked" : "";
@@ -2235,7 +2299,8 @@ document.getElementById("area-modal-save").addEventListener("click", async funct
     state: document.getElementById("area-state-input").value.trim(),
     zip: document.getElementById("area-zip-input").value.trim(),
     personType: document.getElementById("area-persontype-input").value,
-    categoryAccess: Array.from(document.querySelectorAll(".area-categoryaccess-checkbox:checked")).map(function (cb) { return cb.value; })
+    categoryAccess: Array.from(document.querySelectorAll(".area-categoryaccess-checkbox:checked")).map(function (cb) { return cb.value; }),
+    targetMarket: document.getElementById("area-targetmarket-input").value.trim()
   });
   btn.disabled = false;
   document.getElementById("area-modal").hidden = true;
