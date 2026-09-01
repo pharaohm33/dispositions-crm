@@ -2462,14 +2462,28 @@ function renderAdminFbList(requests) {
 /* ---------- Team tab ---------- */
 
 async function loadReps() {
-  const [repsRes, joinRes] = await Promise.all([api("adminGetReps", {}), api("getJoinContact", {})]);
+  const [repsRes, joinRes, autoApproveRes] = await Promise.all([
+    api("adminGetReps", {}), api("getJoinContact", {}), api("adminGetAutoApproveSettings", {})
+  ]);
   if (repsRes.ok) { adminReps = repsRes.reps; renderReps(); }
   if (joinRes.ok) {
     document.getElementById("join-contact-name-input").value = joinRes.name || "";
     document.getElementById("join-contact-phone-input").value = joinRes.phone || "";
     document.getElementById("join-contact-email-input").value = joinRes.email || "";
   }
+  if (autoApproveRes.ok) {
+    document.getElementById("autoapprove-enabled-input").checked = autoApproveRes.enabled;
+  }
 }
+
+document.getElementById("autoapprove-save-btn").addEventListener("click", async function () {
+  const btn = this;
+  btn.disabled = true;
+  const res = await api("adminSetAutoApprove", { enabled: document.getElementById("autoapprove-enabled-input").checked });
+  btn.disabled = false;
+  if (!res.ok) { showToast(res.error || "Could not save.", true); return; }
+  showToast("Saved.");
+});
 
 document.getElementById("join-contact-save-btn").addEventListener("click", async function () {
   const btn = this;

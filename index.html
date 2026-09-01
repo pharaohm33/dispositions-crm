@@ -585,6 +585,12 @@
         <button class="btn secondary small" id="give-open-pool-btn">Give Unassigned Reps The Open Pool</button>
       </div>
       <div id="give-open-pool-result" class="small-muted" style="margin-top:6px;"></div>
+      <hr style="margin:14px 0; border:none; border-top:1px solid var(--border);">
+      <label class="checkbox-row"><input type="checkbox" id="autoapprove-enabled-input"> Auto-Approve New Signups</label>
+      <p class="small-muted">When on, this same open-pool sweep runs automatically the instant someone signs up — they see active deals right away with no admin action needed, instead of waiting on you to notice the signup notification (which can get missed, e.g. around a backend update) and run the button above by hand. Same rules apply either way — Locked deals stay reserved, and a rep hand-picked for something specific elsewhere still doesn't get swept into everything.</p>
+      <div class="nav-row" style="justify-content:flex-end;">
+        <button class="btn secondary small" id="autoapprove-save-btn">Save</button>
+      </div>
     </div>
 
     <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
@@ -1082,7 +1088,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=58"></script>
-<script src="app.js?v=58"></script>
+<script src="config.js?v=59"></script>
+<script src="app.js?v=59"></script>
 </body>
 </html>

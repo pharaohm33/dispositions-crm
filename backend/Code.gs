@@ -335,6 +335,10 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminGetAutoFeedSettings));
       case 'adminSetAutoFeed':
         return jsonOut(withAdminSession(body, adminSetAutoFeed));
+      case 'adminGetAutoApproveSettings':
+        return jsonOut(withAdminSession(body, adminGetAutoApproveSettings));
+      case 'adminSetAutoApprove':
+        return jsonOut(withAdminSession(body, adminSetAutoApprove));
       case 'adminRunAutoFeedNow':
         return jsonOut(withAdminSession(body, adminRunAutoFeedNow));
       case 'adminAddStatusOption':
@@ -616,14 +620,32 @@ function publicSignup(body) {
     'PreferredCity': '', 'PreferredState': '', 'PreferredZip': '', 'PersonType': personType
   });
 
+  // Opt-in (Team tab setting) -- when on, a fresh signup is immediately
+  // swept into the same "open pool" the admin's manual "Give New Reps
+  // Access To The Open Pool" button runs: every active, unlocked deal,
+  // same eligibility rule (only a manual grant disqualifies someone,
+  // which a brand-new account can't have yet). Reuses that exact
+  // function rather than a separate single-rep code path -- it's already
+  // safe to call repeatedly (see its own dedup fix), and running the full
+  // sweep here also mops up any other rep who was still sitting
+  // unassigned for some other reason, not just this new signup.
+  const autoApprove = PropertiesService.getScriptProperties().getProperty('AUTO_APPROVE_NEW_SIGNUPS') === 'TRUE';
+  let openPoolResult = null;
+  if (autoApprove) {
+    openPoolResult = adminGiveUnassignedRepsOpenPool({});
+  }
+
   const supportEmail = getSupportEmail();
   if (supportEmail) {
     MailApp.sendEmail({
       to: supportEmail,
       subject: 'SendMyBuyer — new account signed up (' + personType + ')',
       body: name + ' (' + email + ') just created their own account as a ' + personType + ' and is active immediately.\n\n' +
-        'They have no deals assigned yet — add them individually from a deal\'s Access section, or use ' +
-        '"Assign to all users" / "Assign to all users with no assigned deals" the next time you upload a deal.'
+        (autoApprove
+          ? 'Auto-Approve New Signups is on, so they were just automatically given access to every open (unlocked, no-manual-assignment-required) deal.\n\n'
+          : 'They have no deals assigned yet — add them individually from a deal\'s Access section, use ' +
+            '"Assign to all users" / "Assign to all users with no assigned deals" the next time you upload a deal, ' +
+            'or run "Give New Reps Access To The Open Pool" on the Team tab.\n\n')
     });
   }
 
@@ -3020,6 +3042,21 @@ function adminSetAutoFeed(body) {
 
 function adminRunAutoFeedNow(body) {
   return autoFeedCheck();
+}
+
+// When on, publicSignup automatically sweeps every fresh signup (and any
+// other still-unassigned rep) into the open pool the moment they create
+// their account -- see the Auto-Approve block inside publicSignup. Off by
+// default, same convention as Auto-Feed.
+function adminGetAutoApproveSettings(body) {
+  const props = PropertiesService.getScriptProperties();
+  return { ok: true, enabled: props.getProperty('AUTO_APPROVE_NEW_SIGNUPS') === 'TRUE' };
+}
+
+function adminSetAutoApprove(body) {
+  const props = PropertiesService.getScriptProperties();
+  props.setProperty('AUTO_APPROVE_NEW_SIGNUPS', body.enabled ? 'TRUE' : 'FALSE');
+  return { ok: true };
 }
 
 function repMatchesArea(rep, deal) {

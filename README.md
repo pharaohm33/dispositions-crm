@@ -356,7 +356,17 @@ backend (see [SETUP.md](SETUP.md)).
   rule the single-deal version already uses. Safe to click again any time
   a new rep signs up — reps and deals already swept in from a previous
   click aren't re-added or duplicated, it only ever adds what's actually
-  missing. Add deals, change a deal's
+  missing. An **Auto-Approve New Signups** toggle right below that button
+  runs this same open-pool sweep automatically the instant someone signs
+  up, rather than admin needing to notice the new-signup notification
+  email and run it by hand — useful since that email can occasionally not
+  make it through (e.g. around a backend redeploy). Off by default; when
+  on, publicSignup itself calls the sweep synchronously before the
+  account creation response even returns, so a fresh signup can see
+  active deals immediately with zero admin involvement. Same rules as the
+  manual button either way — Locked deals stay reserved, and a rep
+  hand-picked for something specific elsewhere still doesn't get swept
+  into everything else. Add deals, change a deal's
   status (Active, Sold, Dead, Under Contract, On Hold, or whatever
   categories you've defined), edit the **Address / City / State / Zip** at
   any time after creation (e.g. a typo, or details that firm up after the
