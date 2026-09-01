@@ -379,45 +379,51 @@ let repDeals = [];
 let statusOptionsCache = [];
 
 async function initRepView() {
-  // These three are independent -- fire them together instead of waiting
-  // on each round trip in turn, since each Apps Script call is its own
-  // (fairly slow) network hop.
-  const [statusRes, catRes, res] = await Promise.all([
-    api("getStatusOptions", {}),
-    api("getAssetCategoryOptions", {}),
-    api("getDeals", {})
-  ]);
-  if (statusRes.ok) statusOptionsCache = statusRes.statuses;
-  if (catRes.ok) assetCategoryOptionsCache = catRes.categories;
-  if (!res.ok) {
-    setSession(null);
-    showView(null);
-    return;
-  }
-  repDeals = res.deals;
-  populateRepDealsFilters();
-  renderRepDeals();
-  renderRepCsvDealOptions();
-  renderMyBuyerListDealSelect();
+  const loadingBanner = document.getElementById("rep-loading-banner");
+  loadingBanner.hidden = false;
+  try {
+    // These three are independent -- fire them together instead of waiting
+    // on each round trip in turn, since each Apps Script call is its own
+    // (fairly slow) network hop.
+    const [statusRes, catRes, res] = await Promise.all([
+      api("getStatusOptions", {}),
+      api("getAssetCategoryOptions", {}),
+      api("getDeals", {})
+    ]);
+    if (statusRes.ok) statusOptionsCache = statusRes.statuses;
+    if (catRes.ok) assetCategoryOptionsCache = catRes.categories;
+    if (!res.ok) {
+      setSession(null);
+      showView(null);
+      return;
+    }
+    repDeals = res.deals;
+    populateRepDealsFilters();
+    renderRepDeals();
+    renderRepCsvDealOptions();
+    renderMyBuyerListDealSelect();
 
-  const session = getSession() || {};
-  // A Buyer signup isn't out hunting for buyers themselves -- skip the
-  // whole "build your own list" card and guide for them. Everyone else
-  // (blank/Wholesaler/Realtor/Other) gets it.
-  const buildsOwnList = session.personType !== "Buyer";
-  document.getElementById("rep-buyerlist-card").hidden = !buildsOwnList;
-  document.getElementById("rep-mybuyerlist-card").hidden = !buildsOwnList;
-  if (buildsOwnList) loadMyBuyerLeads();
-  // The text-in SOP is specifically for the three self-identified outside
-  // contributor types, not a traditional admin-added rep (blank) or a
-  // Buyer -- and only shows once there's an actual phone number to text.
-  const textSopApplies = ["Wholesaler", "Realtor", "Other"].indexOf(session.personType) !== -1;
-  const textSopRow = document.getElementById("rep-text-sop-row");
-  if (textSopApplies && joinContactCache && joinContactCache.phone) {
-    document.getElementById("rep-text-sop-phone").textContent = joinContactCache.phone;
-    textSopRow.hidden = false;
-  } else {
-    textSopRow.hidden = true;
+    const session = getSession() || {};
+    // A Buyer signup isn't out hunting for buyers themselves -- skip the
+    // whole "build your own list" card and guide for them. Everyone else
+    // (blank/Wholesaler/Realtor/Other) gets it.
+    const buildsOwnList = session.personType !== "Buyer";
+    document.getElementById("rep-buyerlist-card").hidden = !buildsOwnList;
+    document.getElementById("rep-mybuyerlist-card").hidden = !buildsOwnList;
+    if (buildsOwnList) loadMyBuyerLeads();
+    // The text-in SOP is specifically for the three self-identified outside
+    // contributor types, not a traditional admin-added rep (blank) or a
+    // Buyer -- and only shows once there's an actual phone number to text.
+    const textSopApplies = ["Wholesaler", "Realtor", "Other"].indexOf(session.personType) !== -1;
+    const textSopRow = document.getElementById("rep-text-sop-row");
+    if (textSopApplies && joinContactCache && joinContactCache.phone) {
+      document.getElementById("rep-text-sop-phone").textContent = joinContactCache.phone;
+      textSopRow.hidden = false;
+    } else {
+      textSopRow.hidden = true;
+    }
+  } finally {
+    loadingBanner.hidden = true;
   }
 }
 
