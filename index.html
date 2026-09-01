@@ -133,6 +133,12 @@
   .row-marker-btn:hover { background: var(--surface-muted); }
   .row-marker-btn.active { color: var(--accent); font-size: 20px; }
 
+  .deal-checkbox-list { max-height: 220px; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; }
+  .deal-checkbox-list .deal-checkbox-group-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 10px 0 4px; }
+  .deal-checkbox-list .deal-checkbox-group-label:first-child { margin-top: 0; }
+  .deal-checkbox-list label.checkbox-row { display: block; margin: 0 0 4px; }
+  .deal-checkbox-list .deal-checkbox-empty { color: var(--muted); font-size: 13px; }
+
   .status-pill { padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; white-space: nowrap; }
   .status-active { background: var(--accent-light); color: #145039; }
   .status-sold { background: #e6e9ef; color: #33415c; }
@@ -413,8 +419,8 @@
         </div>
 
         <div class="section-title">Which Deal(s) Is This List For? <span class="small-muted">(optional)</span></div>
-        <p class="small-muted">If this batch is buyers you pulled specifically for one or more of your deals — e.g. several North Carolina land deals a buyer could take any of — tag it here so admin can see it's earmarked for those. Hold Ctrl (Windows) or Cmd (Mac) to select more than one, or leave nothing selected. This doesn't give anyone a pitch by itself — it's just a label on your list.</p>
-        <select id="rep-csv-dealid-input" multiple size="4"></select>
+        <p class="small-muted">If this batch is buyers you pulled specifically for one or more of your deals — e.g. several North Carolina land deals a buyer could take any of — check them here so admin can see it's earmarked for those. Grouped and sorted by state so you can quickly skip past ones that don't apply. Leave nothing checked if this list isn't for any specific deal. This doesn't give anyone a pitch by itself — it's just a label on your list.</p>
+        <div id="rep-csv-dealid-input" class="deal-checkbox-list"></div>
 
         <div class="error-text" id="rep-csv-import-error"></div>
         <div class="nav-row" style="justify-content:flex-end;">
@@ -422,6 +428,19 @@
         </div>
         <div id="rep-csv-import-result" class="small-muted"></div>
       </div>
+    </div>
+
+    <div class="card" id="rep-mybuyerlist-card" hidden>
+      <div class="section-title" style="margin-top:0;">My Buyer List</div>
+      <p class="small-muted">Everyone you've personally uploaded above — private to you, and yours to browse, tag Do Not Contact, or leave notes on any time, whether or not it's been matched to a deal yet.</p>
+      <input type="text" id="rep-mybuyerlist-search" placeholder="Search by buyer name, phone, or city...">
+      <div style="overflow-x:auto; margin-top:10px;">
+        <table class="crm-table" id="rep-mybuyerlist-table">
+          <thead><tr><th>Buyer / LLC</th><th>Phone</th><th>City, State</th><th>Asset Categories</th><th>Tagged Deal(s)</th><th>Notes</th><th>DNC</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="small-muted" id="rep-mybuyerlist-empty" hidden>You haven't uploaded any buyers yet — use the form above.</p>
     </div>
 
     <div class="card">
@@ -601,8 +620,8 @@
         <p class="small-muted" id="csv-preview-note"></p>
 
         <div class="section-title">Which Deal(s) Is This List For? <span class="small-muted">(optional)</span></div>
-        <p class="small-muted">Tag this batch as earmarked for one or more deals — e.g. several North Carolina land deals a buyer could take any of. Hold Ctrl (Windows) or Cmd (Mac) to select more than one, or leave nothing selected. This doesn't give anyone a pitch by itself — it's just a label, shown on the table below and filterable via "Pending Deal Tag."</p>
-        <select id="csv-dealid-input" multiple size="4"></select>
+        <p class="small-muted">Tag this batch as earmarked for one or more deals — e.g. several North Carolina land deals a buyer could take any of. Grouped and sorted by state so you can quickly skip past ones that don't apply. Leave nothing checked if this list isn't for any specific deal. This doesn't give anyone a pitch by itself — it's just a label, shown on the table below and filterable via "Pending Deal Tag."</p>
+        <div id="csv-dealid-input" class="deal-checkbox-list"></div>
 
         <div class="error-text" id="csv-import-error"></div>
         <div class="nav-row" style="justify-content:flex-end;">
@@ -617,7 +636,7 @@
       <p class="small-muted">Paste rows copied from Excel/Sheets/CSV: <strong>Name (or LLC), Phone, Phone Type (Mobile/Landline), City, State, Zip, Email, County</strong> — comma or tab separated, one buyer per line. Email and County are both optional and must come last, in that order (leave either blank or off entirely if you don't have it). A header row is detected and skipped automatically. Use the CSV upload above if you need Phone 2/3 or Asset Categories too.</p>
       <textarea id="buyerleads-import-text" style="min-height:120px;" placeholder="Jane Doe LLC, 555-123-4567, Mobile, Phoenix, AZ, 85001, jane@example.com"></textarea>
       <div class="section-title">Which Deal(s) Is This List For? <span class="small-muted">(optional)</span></div>
-      <select id="buyerleads-import-dealid-input" multiple size="4"></select>
+      <div id="buyerleads-import-dealid-input" class="deal-checkbox-list"></div>
       <div class="error-text" id="buyerleads-import-error"></div>
       <div class="nav-row" style="justify-content:flex-end;">
         <button class="btn primary" id="buyerleads-import-btn">Import</button>
@@ -977,7 +996,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=41"></script>
-<script src="app.js?v=41"></script>
+<script src="config.js?v=42"></script>
+<script src="app.js?v=42"></script>
 </body>
 </html>

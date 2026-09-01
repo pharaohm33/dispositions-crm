@@ -329,26 +329,44 @@ backend (see [SETUP.md](SETUP.md)).
   For This Batch** min/max box on the import screen instead — enter the
   range you filtered on (or just a minimum) once and it's applied to every
   buyer in that upload, e.g. "$500,000 – $1,000,000" or "$500,000+". A
-  **Which Deal(s) Is This List For?** multi-select (optional, nothing
-  selected by default) lets a rep tag the whole batch as pulled for one or
+  **Which Deal(s) Is This List For?** checkbox list (optional, nothing
+  checked by default) lets a rep tag the whole batch as pulled for one or
   more of their own deals at once — e.g. a buyer list built for land could
-  match several North Carolina land deals, not just one. Ctrl/Cmd-click to
-  pick more than one. Only deals the rep can actually see are offered, same
-  list as their Deals tab, and it's re-checked on the backend so the
-  dropdown can't be used to name a deal outside their access. It's purely a
-  label (the same `PendingDealID` tag admin uses to earmark leads for a
-  deal without creating a pitch, stored comma-separated so a lead can be
-  earmarked for more than one deal) — it doesn't hand the buyer to anyone
-  or create a pitch by itself, it just shows up on admin's Buyer Leads
-  table (comma-listed if more than one) so admin can see which deal(s) a
-  rep's private upload was meant for, and is filterable there via "Pending
-  Deal Tag." Admin's own two import screens (CSV file and paste-rows, in
-  the admin Buyer Leads tab) offer this same multi-select, over every deal
+  match several North Carolina land deals, not just one. Grouped and
+  sorted by State so a long deal list is easy to scan and skip past
+  whichever ones don't apply, rather than one flat list in whatever order
+  deals happened to be added — click any number of individual deals, no
+  Ctrl/Cmd needed. Only deals the rep can actually see are offered, same
+  list as their Deals tab, and it's re-checked on the backend so it can't
+  be used to name a deal outside their access. It's purely a label (the
+  same `PendingDealID` tag admin uses to earmark leads for a deal without
+  creating a pitch, stored comma-separated so a lead can be earmarked for
+  more than one deal) — it doesn't hand the buyer to anyone or create a
+  pitch by itself, it just shows up on admin's Buyer Leads table
+  (comma-listed if more than one) so admin can see which deal(s) a rep's
+  private upload was meant for, and is filterable there via "Pending Deal
+  Tag." Admin's own two import screens (CSV file and paste-rows, in the
+  admin Buyer Leads tab) offer this same checkbox list, over every deal
   rather than just admin's own, since admin isn't access-restricted the
-  way a rep is. If a lead tagged for a deal is later actually given to a
+  way a rep is. **A Dead or Sold deal is never offered here or matched to
+  any buyer at all** — buyer-matching (auto-feed, a rep's own "Match My
+  Buyer Leads To This Deal," and admin's manual bulk-give) is blocked
+  outright for a deal in either status, so nobody can accidentally get
+  fed leads for a deal that's no longer sellable. If a lead tagged for a deal is later actually given to a
   rep as a real pitch for that same deal (see **Give Buyer Leads** /
   **Give / Tag Selected** below), just that one deal drops off its pending
-  list — any other deal it's still earmarked for is left alone. Also
+  list — any other deal it's still earmarked for is left alone. A **My
+  Buyer List** card right below the upload form shows a rep everyone
+  they've personally uploaded — searchable by name/phone/city, with each
+  buyer's tagged deal(s), a Notes field, and a Do Not Contact checkbox,
+  editable right there regardless of whether that buyer has ever actually
+  been matched to a deal yet. Previously a rep's own upload had nowhere to
+  go afterward — the leads existed in the system but a rep could neither
+  see nor touch any of it (not even mark a duplicate Do Not Contact)
+  unless/until it happened to get matched to a deal and become a real
+  pitch; a rep can now always view and edit anything they uploaded
+  themselves, the same as admin can, on top of the existing "have an open
+  pitch on this buyer" permission. Also
   picks up an "Ownership Length (Months)" column (stored as a plain number
   so it stays filterable, shown as "19 yrs" wherever it's displayed) and a
   "Property URL" column (saved as-is, not shown in the preview table since

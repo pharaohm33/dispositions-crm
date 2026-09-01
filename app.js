@@ -317,7 +317,10 @@ async function initRepView() {
   // A Buyer signup isn't out hunting for buyers themselves -- skip the
   // whole "build your own list" card and guide for them. Everyone else
   // (blank/Wholesaler/Realtor/Other) gets it.
-  document.getElementById("rep-buyerlist-card").hidden = session.personType === "Buyer";
+  const buildsOwnList = session.personType !== "Buyer";
+  document.getElementById("rep-buyerlist-card").hidden = !buildsOwnList;
+  document.getElementById("rep-mybuyerlist-card").hidden = !buildsOwnList;
+  if (buildsOwnList) loadMyBuyerLeads();
   // The text-in SOP is specifically for the three self-identified outside
   // contributor types, not a traditional admin-added rep (blank) or a
   // Buyer -- and only shows once there's an actual phone number to text.
@@ -1210,26 +1213,56 @@ function repMappedCsvRows() {
     });
 }
 
-// Values of every currently-selected <option> in a multi-select.
-function selectedOptionValues(select) {
-  return Array.from(select.selectedOptions || []).map(function (o) { return o.value; });
+// A "which deal(s) is this for" picker used on all three buyer-list
+// import screens (rep's own upload, admin's CSV upload, admin's
+// paste-rows) -- checkboxes rather than a native multi-select so picking
+// (or skipping) individual deals never needs Ctrl/Cmd-click, and grouped
+// by State (sorted, blank last) so a long deal list is actually
+// navigable instead of whatever order deals happened to be added in.
+function renderDealCheckboxList(containerId, deals, labelFn) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const current = checkedDealCheckboxIds(containerId);
+  const sorted = deals.slice().sort(function (a, b) {
+    return String(a.State || "￿").localeCompare(String(b.State || "￿")) ||
+      String(a.City || "").localeCompare(String(b.City || ""));
+  });
+  let lastGroup = null;
+  const parts = [];
+  sorted.forEach(function (d) {
+    const group = d.State || "Other";
+    if (group !== lastGroup) {
+      parts.push('<div class="deal-checkbox-group-label">' + esc(group) + '</div>');
+      lastGroup = group;
+    }
+    parts.push(
+      '<label class="checkbox-row"><input type="checkbox" class="deal-checkbox-item" value="' + esc(d.DealID) + '"' +
+      (current.indexOf(d.DealID) !== -1 ? " checked" : "") + '> ' + esc(labelFn(d)) + '</label>'
+    );
+  });
+  container.innerHTML = parts.length > 0 ? parts.join("") : '<p class="deal-checkbox-empty">No deals available.</p>';
+}
+
+function checkedDealCheckboxIds(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return [];
+  return Array.from(container.querySelectorAll(".deal-checkbox-item:checked")).map(function (cb) { return cb.value; });
+}
+
+function clearDealCheckboxList(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  Array.from(container.querySelectorAll(".deal-checkbox-item")).forEach(function (cb) { cb.checked = false; });
 }
 
 // Lets a rep tag an uploaded buyer list with one or more of their own
 // deals (purely a label -- see importBuyerLeads' PendingDealID handling).
-// A buyer list often matches more than one deal at once (e.g. several NC
-// land deals a buyer could take any of), so this is a multi-select. Only
-// offers deals this rep can actually see, same list as their Deals tab,
-// so it can't be used to name a deal they don't have access to.
+// Only offers deals this rep can actually see, same list as their Deals
+// tab, so it can't be used to name a deal they don't have access to.
 function renderRepCsvDealOptions() {
-  const select = document.getElementById("rep-csv-dealid-input");
-  if (!select) return;
-  const current = selectedOptionValues(select);
-  select.innerHTML = repDeals.map(function (d) {
-    const label = (d.DealCode ? d.DealCode + " — " : "") + [d.City, d.State].filter(Boolean).join(", ") + (d.AssetType ? " (" + d.AssetType + ")" : "");
-    return '<option value="' + esc(d.DealID) + '">' + esc(label) + '</option>';
-  }).join("");
-  Array.from(select.options).forEach(function (o) { o.selected = current.indexOf(o.value) !== -1; });
+  renderDealCheckboxList("rep-csv-dealid-input", repDeals, function (d) {
+    return (d.DealCode ? d.DealCode + " — " : "") + [d.City, d.State].filter(Boolean).join(", ") + (d.AssetType ? " (" + d.AssetType + ")" : "");
+  });
 }
 
 function renderRepCsvPreview() {
@@ -1264,7 +1297,7 @@ document.getElementById("rep-csv-import-btn").addEventListener("click", async fu
   }
   if (btn.disabled) return;
   btn.disabled = true;
-  const dealIds = selectedOptionValues(document.getElementById("rep-csv-dealid-input"));
+  const dealIds = checkedDealCheckboxIds("rep-csv-dealid-input");
   const res = await api("importBuyerLeads", { rows: rows, dealIds: dealIds });
   btn.disabled = false;
   if (!res.ok) {
@@ -1278,9 +1311,72 @@ document.getElementById("rep-csv-import-btn").addEventListener("click", async fu
   document.getElementById("rep-csv-file-input").value = "";
   repCsvRows = []; repCsvHeaders = [];
   document.getElementById("rep-csv-preview-section").hidden = true;
-  Array.from(document.getElementById("rep-csv-dealid-input").options).forEach(function (o) { o.selected = false; });
+  clearDealCheckboxList("rep-csv-dealid-input");
   showToast("Imported " + res.imported + " buyer(s).");
+  loadMyBuyerLeads();
 });
+
+/* ---------- My Buyer List (rep's own uploaded leads) ---------- */
+
+let repMyBuyerLeads = [];
+
+async function loadMyBuyerLeads() {
+  const res = await api("getMyBuyerLeads", {});
+  if (!res.ok) return;
+  repMyBuyerLeads = res.leads;
+  renderMyBuyerLeadsList();
+}
+
+// repDeals only ever holds deals this rep can see, which is exactly the
+// set a rep could have picked from the "Which Deal(s)" multi-select on
+// import, so any tag here is guaranteed to resolve -- falls back to the
+// raw id only if a deal was later removed from their access entirely.
+function repDealLabelFor(dealId) {
+  const deal = repDeals.find(function (d) { return d.DealID === dealId; });
+  if (!deal) return dealId;
+  return (deal.DealCode ? deal.DealCode + " — " : "") + [deal.City, deal.State].filter(Boolean).join(", ");
+}
+
+function renderMyBuyerLeadsList() {
+  const q = document.getElementById("rep-mybuyerlist-search").value.trim().toLowerCase();
+  const filtered = repMyBuyerLeads.filter(function (l) {
+    if (!q) return true;
+    return [l.BuyerName, l.Phone, l.City, l.State].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; });
+  });
+  document.getElementById("rep-mybuyerlist-empty").hidden = repMyBuyerLeads.length > 0;
+  document.querySelector("#rep-mybuyerlist-table").hidden = repMyBuyerLeads.length === 0;
+  const tbody = document.querySelector("#rep-mybuyerlist-table tbody");
+  tbody.innerHTML = filtered.map(function (l) {
+    const isDnc = !!(l.DoNotContact === true || l.DoNotContact === "TRUE");
+    const dealTags = String(l.PendingDealID || "").split(",").map(function (v) { return v.trim(); }).filter(Boolean);
+    return '<tr>' +
+      '<td>' + esc(l.BuyerName) + '</td>' +
+      '<td>' + esc(l.Phone) + '</td>' +
+      '<td>' + [l.City, l.State].filter(Boolean).join(", ") + '</td>' +
+      '<td class="small-muted">' + esc(l.AssetCategories || "") + '</td>' +
+      '<td class="small-muted">' + (dealTags.length > 0 ? esc(dealTags.map(repDealLabelFor).join(", ")) : "&mdash;") + '</td>' +
+      '<td><input type="text" class="mybuyerlist-notes-input" data-lead-id="' + esc(l.BuyerLeadID) + '" value="' + esc(l.GeneralNotes || "") + '" placeholder="Add a note..." style="width:100%;"></td>' +
+      '<td><label class="toggle-row"><input type="checkbox" class="mybuyerlist-dnc-toggle" data-lead-id="' + esc(l.BuyerLeadID) + '"' + (isDnc ? " checked" : "") + '></label></td>' +
+      '</tr>';
+  }).join("");
+
+  Array.from(tbody.querySelectorAll(".mybuyerlist-notes-input")).forEach(function (input) {
+    input.addEventListener("change", async function () {
+      await api("updateBuyerLeadNotes", { buyerLeadId: input.getAttribute("data-lead-id"), notes: input.value.trim() });
+      showToast("Note saved.");
+    });
+  });
+  Array.from(tbody.querySelectorAll(".mybuyerlist-dnc-toggle")).forEach(function (cb) {
+    cb.addEventListener("change", async function () {
+      await api("updateBuyerLeadDoNotContact", { buyerLeadId: cb.getAttribute("data-lead-id"), doNotContact: cb.checked });
+      const lead = repMyBuyerLeads.find(function (l) { return l.BuyerLeadID === cb.getAttribute("data-lead-id"); });
+      if (lead) lead.DoNotContact = cb.checked;
+      showToast(cb.checked ? "Marked Do Not Contact." : "Do Not Contact removed.");
+    });
+  });
+}
+
+document.getElementById("rep-mybuyerlist-search").addEventListener("input", renderMyBuyerLeadsList);
 
 /* ============================================================
    ADMIN VIEW
@@ -2181,12 +2277,14 @@ async function populateBulkGiveSelects() {
     }).join("");
     document.getElementById("bulk-give-deal-select").innerHTML = dealOptions;
     document.getElementById("give-selected-deal-select").innerHTML = dealOptions;
-    // Multi-select deal tags on the two import screens (see importBuyerLeads'
-    // PendingDealID handling) -- admin isn't restricted to their own deals
-    // the way a rep is, so this offers every non-closed deal.
+    // Deal-tag checkbox lists on the two import screens (see
+    // importBuyerLeads' PendingDealID handling) -- admin isn't restricted
+    // to their own deals the way a rep is, so this offers every non-closed
+    // deal, grouped by state.
     ["csv-dealid-input", "buyerleads-import-dealid-input"].forEach(function (id) {
-      const select = document.getElementById(id);
-      if (select) select.innerHTML = dealOptions;
+      renderDealCheckboxList(id, buyerLeadsActiveDeals, function (d) {
+        return d.DealCode ? d.DealCode + " — " + d.Address : d.Address;
+      });
     });
   }
 }
@@ -2655,7 +2753,7 @@ document.getElementById("csv-import-btn").addEventListener("click", async functi
   }
   if (btn.disabled) return;
   btn.disabled = true;
-  const dealIds = selectedOptionValues(document.getElementById("csv-dealid-input"));
+  const dealIds = checkedDealCheckboxIds("csv-dealid-input");
   const res = await api("importBuyerLeads", { rows: rows, dealIds: dealIds });
   btn.disabled = false;
   if (!res.ok) {
@@ -2669,7 +2767,7 @@ document.getElementById("csv-import-btn").addEventListener("click", async functi
     (res.pendingMerges && res.pendingMerges.length > 0 ? " " + res.pendingMerges.length + " duplicate(s) below have new data — review them." : "");
   document.getElementById("csv-file-input").value = "";
   csvRows = []; csvHeaders = [];
-  Array.from(document.getElementById("csv-dealid-input").options).forEach(function (o) { o.selected = false; });
+  clearDealCheckboxList("csv-dealid-input");
   markLastImportedBuyerLeads(res.importedIds, res.imported, res.importedAt);
   renderMergeReview(res.pendingMerges);
   await loadBuyerLeadsAdmin();
@@ -2690,7 +2788,7 @@ document.getElementById("buyerleads-import-btn").addEventListener("click", async
   }
   if (btn.disabled) return;
   btn.disabled = true;
-  const dealIds = selectedOptionValues(document.getElementById("buyerleads-import-dealid-input"));
+  const dealIds = checkedDealCheckboxIds("buyerleads-import-dealid-input");
   const res = await api("importBuyerLeads", { pasteText: text, dealIds: dealIds });
   btn.disabled = false;
   if (!res.ok) {
@@ -2703,7 +2801,7 @@ document.getElementById("buyerleads-import-btn").addEventListener("click", async
     (res.skippedDuplicates ? " Skipped " + res.skippedDuplicates + " duplicate(s) with nothing new to add." : "") +
     (res.pendingMerges && res.pendingMerges.length > 0 ? " " + res.pendingMerges.length + " duplicate(s) below have new data — review them." : "");
   document.getElementById("buyerleads-import-text").value = "";
-  Array.from(document.getElementById("buyerleads-import-dealid-input").options).forEach(function (o) { o.selected = false; });
+  clearDealCheckboxList("buyerleads-import-dealid-input");
   markLastImportedBuyerLeads(res.importedIds, res.imported, res.importedAt);
   renderMergeReview(res.pendingMerges);
   await loadBuyerLeadsAdmin();

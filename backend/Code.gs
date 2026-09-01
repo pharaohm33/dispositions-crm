@@ -227,6 +227,8 @@ function doPost(e) {
         return jsonOut(withSession(body, requestAddressAccess));
       case 'importBuyerLeads':
         return jsonOut(withSession(body, importBuyerLeads));
+      case 'getMyBuyerLeads':
+        return jsonOut(withSession(body, getMyBuyerLeads));
       case 'giveMyBuyerLeads':
         return jsonOut(withSession(body, giveMyBuyerLeads));
       case 'updateBuyerLeadNotes':
@@ -1481,6 +1483,15 @@ function splitCommaList(s) {
 // Any dimension the deal (or buyer, for price) hasn't set is simply not
 // filtered on.
 function buyerMatchesDeal(lead, deal) {
+  // A Dead or Sold deal is never matchable to anyone -- there's nothing
+  // left to sell, so no buyer lead should ever be offered for it, whether
+  // that's auto-feed (which already filters to active deals before it
+  // gets here), a rep's own "Match My Buyer Leads To This Deal", or
+  // admin's manual bulk-give. Checked here, not at each call site, so
+  // every current and future caller of this shared predicate gets it for
+  // free.
+  if (!dealIsActive(deal)) return false;
+
   const dealState = normalizeText(deal['State']);
   if (dealState && normalizeText(lead['State']) !== dealState) return false;
 
@@ -1856,6 +1867,28 @@ function importBuyerLeads(body, session) {
   };
 }
 
+// A rep's own view of the private buyer list they've uploaded (see
+// importBuyerLeads) -- previously there was nowhere in the UI a rep could
+// actually see this after uploading it (only admin's Buyer Leads table
+// showed UploadedBy), so from the rep's side an upload just vanished with
+// no way to browse, edit, or mark Do Not Contact on any of it unless/until
+// it happened to get matched to a deal and turn into a pitch. Scoped to
+// exactly what this rep uploaded -- not the shared pool, not another
+// rep's private list. PropertyURL is admin-only, same as everywhere else
+// a lead is shown to a rep.
+function getMyBuyerLeads(body, session) {
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const leads = sheetToObjects(sheet).filter(function (l) {
+    return String(l['UploadedBy'] || '').trim().toLowerCase() === session.u;
+  });
+  const stripped = leads.map(function (l) {
+    const copy = Object.assign({}, l);
+    delete copy.PropertyURL;
+    return copy;
+  });
+  return { ok: true, leads: stripped };
+}
+
 // Joins every pitch to its contacts and computes each one's live status,
 // tagging whether its deal is still active. dealsById must be a map of
 // DealID -> deal object (caller builds this once and reuses it).
@@ -1925,19 +1958,28 @@ function adminGetBuyerLeads(body) {
   return { ok: true, leads: withPitches };
 }
 
+// A rep can edit one buyer lead's own data if: admin, they uploaded it
+// themselves (it's their own private data -- no pitch should be required
+// to, say, mark a duplicate DNC or jot a note before it's ever been
+// matched to a deal), or they currently have an open pitch on it (the
+// existing "I'm actively working this buyer" case). Centralized so
+// updateBuyerLeadNotes/DoNotContact/Profile stay in sync on what counts.
+function canEditBuyerLead(session, lead) {
+  if (session.a) return true;
+  if (String(lead['UploadedBy'] || '').trim().toLowerCase() === session.u) return true;
+  const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+  return sheetToObjects(pitchesSheet).some(function (p) {
+    return p['BuyerLeadID'] === lead['BuyerLeadID'] && String(p['Username'] || '').toLowerCase() === session.u;
+  });
+}
+
 function updateBuyerLeadNotes(body, session) {
   if (!body.buyerLeadId) return { ok: false, error: 'Missing buyerLeadId.' };
   const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
   const leads = sheetToObjects(sheet);
   const match = leads.find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
   if (!match) return { ok: false, error: 'Lead not found.' };
-  if (!session.a) {
-    const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
-    const ownsAPitch = sheetToObjects(pitchesSheet).some(function (p) {
-      return p['BuyerLeadID'] === body.buyerLeadId && String(p['Username'] || '').toLowerCase() === session.u;
-    });
-    if (!ownsAPitch) return { ok: false, error: 'You need an active pitch on this buyer to edit their notes.' };
-  }
+  if (!canEditBuyerLead(session, match)) return { ok: false, error: 'You need an active pitch on this buyer (or to have uploaded them yourself) to edit their notes.' };
   sheet.getRange(match._row, getColumnIndex(sheet, 'GeneralNotes')).setValue(body.notes || '');
   return { ok: true };
 }
@@ -1963,13 +2005,7 @@ function updateBuyerLeadProfile(body, session) {
   const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
   const match = sheetToObjects(sheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
   if (!match) return { ok: false, error: 'Lead not found.' };
-  if (!session.a) {
-    const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
-    const ownsAPitch = sheetToObjects(pitchesSheet).some(function (p) {
-      return p['BuyerLeadID'] === body.buyerLeadId && String(p['Username'] || '').toLowerCase() === session.u;
-    });
-    if (!ownsAPitch) return { ok: false, error: 'You need an active pitch on this buyer to edit their info.' };
-  }
+  if (!canEditBuyerLead(session, match)) return { ok: false, error: 'You need an active pitch on this buyer (or to have uploaded them yourself) to edit their info.' };
   Object.keys(BUYER_LEAD_PROFILE_FIELDS).forEach(function (key) {
     if (ADMIN_ONLY_PROFILE_FIELDS.indexOf(key) !== -1 && !session.a) return;
     if (body[key] !== undefined) sheet.getRange(match._row, getColumnIndex(sheet, BUYER_LEAD_PROFILE_FIELDS[key])).setValue(body[key] || '');
@@ -2029,13 +2065,7 @@ function updateBuyerLeadDoNotContact(body, session) {
   const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
   const match = sheetToObjects(sheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
   if (!match) return { ok: false, error: 'Lead not found.' };
-  if (!session.a) {
-    const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
-    const ownsAPitch = sheetToObjects(pitchesSheet).some(function (p) {
-      return p['BuyerLeadID'] === body.buyerLeadId && String(p['Username'] || '').toLowerCase() === session.u;
-    });
-    if (!ownsAPitch) return { ok: false, error: 'You need an active pitch on this buyer to change this.' };
-  }
+  if (!canEditBuyerLead(session, match)) return { ok: false, error: 'You need an active pitch on this buyer (or to have uploaded them yourself) to change this.' };
   sheet.getRange(match._row, getColumnIndex(sheet, 'DoNotContact')).setValue(!!body.doNotContact);
   return { ok: true };
 }
