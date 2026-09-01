@@ -510,10 +510,10 @@ function renderRepDeals() {
     // no "ARV: —" filler for a field admin never filled in — so a rep can
     // size up a deal's numbers right from the list without opening it.
     const financialsLine = [
-      d.Price ? "Asking Price: " + esc(d.Price) : "",
-      d.ARV ? "ARV: " + esc(d.ARV) : "",
-      d.RehabEstimate ? "Rehab: " + esc(d.RehabEstimate) : "",
-      d.AsIsValue ? "As-Is Value: " + esc(d.AsIsValue) : ""
+      d.Price ? "Asking Price: " + esc(formatAdminMoney(d.Price)) : "",
+      d.ARV ? "ARV: " + esc(formatAdminMoney(d.ARV)) : "",
+      d.RehabEstimate ? "Rehab: " + esc(formatAdminMoney(d.RehabEstimate)) : "",
+      d.AsIsValue ? "As-Is Value: " + esc(formatAdminMoney(d.AsIsValue)) : ""
     ].filter(Boolean).join(" &middot; ");
     return '<div class="deal-card" data-deal-id="' + esc(d.DealID) + '">' +
       '<div class="addr">' + codeTag + heading + '</div>' +
@@ -568,11 +568,11 @@ async function openRepDealDetail(dealId) {
     '<div class="banner info">' +
       '<span class="status-pill ' + statusClass(deal.Status) + '">' + esc(deal.Status || "") + '</span>' +
       (deal.AssetType ? '<div style="margin-top:8px;"><strong>Asset Type:</strong> ' + esc(deal.AssetType) + '</div>' : "") +
-      (deal.Price ? '<div><strong>Asking Price:</strong> ' + esc(deal.Price) + '</div>' : "") +
-      (deal.ARV ? '<div><strong>ARV:</strong> ' + esc(deal.ARV) + '</div>' : "") +
-      (deal.RehabEstimate ? '<div><strong>Rehab Estimate:</strong> ' + esc(deal.RehabEstimate) + '</div>' : "") +
+      (deal.Price ? '<div><strong>Asking Price:</strong> ' + esc(formatAdminMoney(deal.Price)) + '</div>' : "") +
+      (deal.ARV ? '<div><strong>ARV:</strong> ' + esc(formatAdminMoney(deal.ARV)) + '</div>' : "") +
+      (deal.RehabEstimate ? '<div><strong>Rehab Estimate:</strong> ' + esc(formatAdminMoney(deal.RehabEstimate)) + '</div>' : "") +
       (deal.ARV || deal.RehabEstimate ? '<div><strong>Gross Margin:</strong> ' + formatGrossMargin(deal.GrossMargin) + '</div>' : "") +
-      (deal.AsIsValue ? '<div><strong>As-Is Value:</strong> ' + esc(deal.AsIsValue) + '</div>' : "") +
+      (deal.AsIsValue ? '<div><strong>As-Is Value:</strong> ' + esc(formatAdminMoney(deal.AsIsValue)) + '</div>' : "") +
       (deal.AsIsValue ? '<div><strong>As-Is Equity:</strong> ' + formatAsIsEquity(deal.AsIsEquity) + '</div>' : "") +
       (deal.Description ? '<div style="margin-top:8px;">' + esc(deal.Description) + '</div>' : "") +
       (deal.GeneralDriveLink ? '<div style="margin-top:8px;"><a href="' + esc(deal.GeneralDriveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
@@ -1008,11 +1008,11 @@ function renderPitchDealInfo(deal) {
     '<div class="banner info">' +
       (deal.Address ? '<div><strong>Address:</strong> ' + esc(deal.Address) + '</div>' : "") +
       (deal.AssetType ? '<div style="margin-top:8px;"><strong>Asset Type:</strong> ' + esc(deal.AssetType) + '</div>' : "") +
-      (deal.Price ? '<div><strong>Asking Price:</strong> ' + esc(deal.Price) + '</div>' : "") +
-      (deal.ARV ? '<div><strong>ARV:</strong> ' + esc(deal.ARV) + '</div>' : "") +
-      (deal.RehabEstimate ? '<div><strong>Rehab Estimate:</strong> ' + esc(deal.RehabEstimate) + '</div>' : "") +
+      (deal.Price ? '<div><strong>Asking Price:</strong> ' + esc(formatAdminMoney(deal.Price)) + '</div>' : "") +
+      (deal.ARV ? '<div><strong>ARV:</strong> ' + esc(formatAdminMoney(deal.ARV)) + '</div>' : "") +
+      (deal.RehabEstimate ? '<div><strong>Rehab Estimate:</strong> ' + esc(formatAdminMoney(deal.RehabEstimate)) + '</div>' : "") +
       (deal.ARV || deal.RehabEstimate ? '<div><strong>Gross Margin:</strong> ' + formatGrossMargin(deal.GrossMargin) + '</div>' : "") +
-      (deal.AsIsValue ? '<div><strong>As-Is Value:</strong> ' + esc(deal.AsIsValue) + '</div>' : "") +
+      (deal.AsIsValue ? '<div><strong>As-Is Value:</strong> ' + esc(formatAdminMoney(deal.AsIsValue)) + '</div>' : "") +
       (deal.AsIsValue ? '<div><strong>As-Is Equity:</strong> ' + formatAsIsEquity(deal.AsIsEquity) + '</div>' : "") +
       (deal.GeneralDriveLink ? '<div style="margin-top:8px;"><strong>Deal Documents:</strong> <a href="' + esc(deal.GeneralDriveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
       (!deal.Address ? '<div style="margin-top:10px;"><button class="btn secondary small" id="request-address-btn" data-deal-id="' + esc(deal.DealID) + '">Request Address Access</button>' +
@@ -1758,7 +1758,7 @@ function renderAdminDeals() {
       '<td>' + (d.DealCode ? esc(d.DealCode) : "&mdash;") + ((d.Locked === true || d.Locked === "TRUE") ? ' <span class="status-pill status-dead-match" title="Bulk sweeps skip this deal">Locked</span>' : "") + '</td>' +
       '<td>' + esc(d.Address) + (d.City ? ", " + esc(d.City) : "") + '</td>' +
       '<td>' + esc(d.AssetType || "") + '</td>' +
-      '<td>' + esc(d.Price || "") + '</td>' +
+      '<td>' + esc(d.Price ? formatAdminMoney(d.Price) : "") + '</td>' +
       '<td><span class="status-pill ' + statusClass(d.Status) + '">' + esc(d.Status || "") + '</span></td>' +
       '<td>' + (d.repsWithAccessCount === undefined ? "&mdash;" :
         d.currentAdminHasAccess ? "Admin" + (d.repsWithAccessCount > 0 ? " + " + d.repsWithAccessCount : "") :
