@@ -2259,18 +2259,24 @@ function giveMyBuyerLeads(body, session) {
     });
 
     // A rep can override the deal's own City/Match Cities/Asset Category
-    // matching by hand-picking one or more cities from their own visible
-    // buyer pool (see getVisibleBuyerCities) -- useful to build a cold-call
-    // list for a deal that covers a wider area than what's formally set on
-    // it. Same idea as admin's city/state/zip override on the bulk-give
-    // tool, just city-only and rep-facing. Empty/absent cities means the
+    // matching by hand-picking one or more (city, state) pairs from their
+    // own visible buyer pool (see getVisibleBuyerCities) -- useful to
+    // build a cold-call list for a deal that covers a wider area than
+    // what's formally set on it. Same idea as admin's city/state/zip
+    // override on the bulk-give tool, just rep-facing and multi-city.
+    // Matched as city+state pairs, not city alone -- two different states
+    // can share a city name (a "Springfield, IL" vs a "Springfield, OH"),
+    // so a bare city-name match could silently pull leads from the wrong
+    // state into someone's call list. Empty/absent cities means the
     // normal buyerMatchesDeal matching applies, same as before.
-    const cityOverride = (body.cities || []).map(normalizeText).filter(Boolean);
+    const cityOverride = (body.cities || [])
+      .filter(function (c) { return c && c.city; })
+      .map(function (c) { return normalizeText(c.city) + '|' + normalizeText(c.state); });
 
     const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
     const pool = sheetToObjects(leadsSheet).filter(function (l) {
       if (alreadyPitchedByMeForThisDeal[l['BuyerLeadID']] || l['DoNotContact'] === true || l['DoNotContact'] === 'TRUE' || !leadVisibleToUsername(l, username)) return false;
-      if (cityOverride.length > 0) return cityOverride.indexOf(normalizeText(l['City'])) !== -1;
+      if (cityOverride.length > 0) return cityOverride.indexOf(normalizeText(l['City']) + '|' + normalizeText(l['State'])) !== -1;
       return buyerMatchesDeal(l, deal);
     });
 

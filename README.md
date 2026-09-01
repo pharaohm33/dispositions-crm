@@ -89,9 +89,13 @@ backend (see [SETUP.md](SETUP.md)).
   whatever leads that rep can see) to build a cold-call list that bypasses
   the deal's own State/City/Asset Category matching entirely — useful when
   a deal's buyer pool should be wider than what's formally set on it, or a
-  rep wants to work a particular area on purpose. Leaving every city
-  unchecked falls back to the normal matching, same as before. A Dead or
-  Sold deal blocks this (and the normal matching above) either way — see
+  rep wants to work a particular area on purpose. Matched as city+state
+  together, not city name alone — two states can share a city name (a
+  "Springfield, IL" and a "Springfield, OH"), so each checkbox is really a
+  specific city-in-a-specific-state, never just a bare name that could
+  silently pull in the wrong state's list. Leaving every city unchecked
+  falls back to the normal matching, same as before. A Dead or Sold deal
+  blocks this (and the normal matching above) either way — see
   the buyer-matching note earlier in this section.
 - Each deal shows the standing SOP:
   1. Contact buyers from the lead list, or submit a Facebook post here for

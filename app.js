@@ -1264,12 +1264,13 @@ function clearDealCheckboxList(containerId) {
 }
 
 // Same grouped-by-state checkbox list as renderDealCheckboxList, but for
-// picking one or more raw city names (used for the "cold call these
+// picking one or more (city, state) pairs (used for the "cold call these
 // cities instead" override on Match My Buyer Leads To This Deal) rather
-// than deal ids -- cities have no id of their own, so the checkbox value
-// is just the city name and duplicates across states are grouped/labeled
-// separately (a "Springfield, IL" and "Springfield, OH" both show up,
-// under their own state headers).
+// than deal ids. Each checkbox carries its state in data-state, and
+// checkedCityCheckboxValues reads city+state back out as a pair -- two
+// different states can have a same-named city (a "Springfield, IL" and a
+// "Springfield, OH"), so matching on city name alone would silently pull
+// the wrong one in; grouping by state visually is not enough by itself.
 function renderCityCheckboxList(containerId, cities) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -1285,7 +1286,10 @@ function renderCityCheckboxList(containerId, cities) {
       parts.push('<div class="deal-checkbox-group-label">' + esc(group) + '</div>');
       lastGroup = group;
     }
-    parts.push('<label class="checkbox-row"><input type="checkbox" class="city-checkbox-item" value="' + esc(c.city) + '"> ' + esc(c.city) + '</label>');
+    parts.push(
+      '<label class="checkbox-row"><input type="checkbox" class="city-checkbox-item" value="' + esc(c.city) + '" data-state="' + esc(c.state || "") + '"> ' +
+      esc(c.city) + '</label>'
+    );
   });
   container.innerHTML = parts.length > 0 ? parts.join("") : '<p class="deal-checkbox-empty">No cities available yet.</p>';
 }
@@ -1293,7 +1297,9 @@ function renderCityCheckboxList(containerId, cities) {
 function checkedCityCheckboxValues(containerId) {
   const container = document.getElementById(containerId);
   if (!container) return [];
-  return Array.from(container.querySelectorAll(".city-checkbox-item:checked")).map(function (cb) { return cb.value; });
+  return Array.from(container.querySelectorAll(".city-checkbox-item:checked")).map(function (cb) {
+    return { city: cb.value, state: cb.getAttribute("data-state") || "" };
+  });
 }
 
 // Lets a rep tag an uploaded buyer list with one or more of their own
