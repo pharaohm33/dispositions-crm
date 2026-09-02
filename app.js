@@ -110,6 +110,35 @@ function dealTypeTagsHtml(dealTypesStr) {
   }).join("");
 }
 
+// Buyer-level status badges (Responsive / VIP / Top VIP Closed) -- shown to
+// both reps and admin everywhere a buyer lead shows up. Accepts either a
+// raw BuyerLeads row (admin/rep's own uploads, IsResponsive/IsVip/
+// HasClosedDeal as sheet booleans) or a getMyPitches pitch object (already
+// normalized to isResponsive/isVip/hasClosedDeal) via the isPitch flag.
+// Closed always implies VIP (see updateBuyerLeadClosedStatus), so a closed
+// buyer only ever shows "Top VIP Closed," never a separate "VIP" pill too.
+function buyerStatusTagsHtml(obj, isPitch) {
+  if (!obj) return "";
+  const responsive = isPitch ? obj.isResponsive : (obj.IsResponsive === true || obj.IsResponsive === "TRUE");
+  const vip = isPitch ? obj.isVip : (obj.IsVip === true || obj.IsVip === "TRUE");
+  const closed = isPitch ? obj.hasClosedDeal : (obj.HasClosedDeal === true || obj.HasClosedDeal === "TRUE");
+  const tags = [];
+  if (closed) tags.push('<span class="status-pill status-vip-closed">Top VIP Closed</span>');
+  else if (vip) tags.push('<span class="status-pill status-vip">VIP</span>');
+  if (responsive) tags.push('<span class="status-pill status-responded">Responsive</span>');
+  return tags.join(" ");
+}
+
+// Admin-only "who brought this buyer in" tag -- never rendered in any
+// rep-facing view (My Buyer List, My Pitches), even for a rep's own
+// uploads, per the explicit design: reps see the status tags above but
+// never the uploader tag, for themselves or anyone else. Only admin sees
+// this, so admin knows exactly who to pay/credit for the relationship.
+function uploaderTagHtml(uploadedBy) {
+  if (!uploadedBy) return "";
+  return '<span class="status-pill status-uploaded-by">Uploaded by ' + esc(uploadedBy) + '</span>';
+}
+
 // A visible confirmation that a click actually registered -- separate from
 // (and in addition to) any inline result text, since a small line of text
 // under a button is easy to miss and is exactly what leads to a second,
@@ -1145,7 +1174,8 @@ function renderMyPitches() {
       : '<span class="status-pill status-fully-worked">Deal ' + esc((p.dealStatus || "closed").toLowerCase()) + '</span>';
     const isMarked = markedPitchIds.has(p.PitchID);
     return '<tr class="clickable' + (isMarked ? " row-marked" : "") + '" data-pitch-id="' + esc(p.PitchID) + '">' +
-      '<td><button type="button" class="row-marker-btn' + (isMarked ? " active" : "") + '" data-marker-pitch-id="' + esc(p.PitchID) + '" title="Mark this row so you don\'t lose your place while scrolling">' + (isMarked ? "&#9654;" : "&#9675;") + '</button>' + esc(p.buyerName) + '</td>' +
+      '<td><button type="button" class="row-marker-btn' + (isMarked ? " active" : "") + '" data-marker-pitch-id="' + esc(p.PitchID) + '" title="Mark this row so you don\'t lose your place while scrolling">' + (isMarked ? "&#9654;" : "&#9675;") + '</button>' + esc(p.buyerName) +
+        (buyerStatusTagsHtml(p, true) ? '<div style="margin-top:2px;">' + buyerStatusTagsHtml(p, true) + '</div>' : "") + '</td>' +
       '<td>' + esc(p.phone) + (typeHint ? '<div class="small-muted">' + esc(typeHint) + '</div>' : "") + '</td>' +
       '<td>' + esc(p.dealCode || "Deal") + '</td>' +
       '<td>' + [p.city, p.state].filter(Boolean).join(", ") + '</td>' +
@@ -1300,6 +1330,7 @@ async function openPitchDetail(pitchId) {
       (pitch.city ? ' &middot; ' + esc(pitch.city) + (pitch.state ? ", " + esc(pitch.state) : "") : "") + '</p></div>' +
       '<button class="link-btn" id="close-detail-btn">Close</button>' +
     '</div>' +
+    (buyerStatusTagsHtml(pitch, true) ? '<div style="margin-bottom:8px;">' + buyerStatusTagsHtml(pitch, true) + '</div>' : "") +
     dncBanner +
     (pitch.doNotContact ? "" : hoursBanner) +
     '<div class="banner info">' +
@@ -1355,6 +1386,10 @@ async function openPitchDetail(pitchId) {
     '<div class="section-title">Contact History</div>' +
     '<div id="contact-history-list">' + renderContactHistory(contacts) + '</div>' +
 
+    '<div class="section-title">VIP Buyer</div>' +
+    '<p class="small-muted">Flag this buyer as VIP once they seem like a serious buyer — responsive when you send them deals, and/or they\'ve shared real investment criteria. Admin will follow up with them directly.</p>' +
+    '<button class="btn ' + (pitch.isVip ? "secondary" : "primary") + ' small" id="vip-toggle-btn">' + (pitch.isVip ? "Remove VIP Flag" : "Mark as VIP") + '</button>' +
+
     '<div class="section-title">Do Not Contact</div>' +
     '<p class="small-muted">If this buyer has asked not to be contacted again, mark it here — it stops any further calls or texts from being logged for them, on any number, and admin won\'t be able to pitch them a new deal.</p>' +
     '<button class="btn ' + (pitch.doNotContact ? "secondary" : "danger") + ' small" id="dnc-toggle-btn">' + (pitch.doNotContact ? "Allow Contact Again" : "Mark Do Not Contact") + '</button>';
@@ -1382,6 +1417,14 @@ async function openPitchDetail(pitchId) {
     await loadMyPitches();
     openPitchDetail(pitchId);
     showToast(willBeDnc ? "Marked Do Not Contact." : "Contact allowed again.");
+  });
+
+  document.getElementById("vip-toggle-btn").addEventListener("click", async function () {
+    const willBeVip = !pitch.isVip;
+    await api("updateBuyerLeadVipStatus", { buyerLeadId: pitch.BuyerLeadID, isVip: willBeVip });
+    await loadMyPitches();
+    openPitchDetail(pitchId);
+    showToast(willBeVip ? "Marked as VIP." : "VIP flag removed.");
   });
 
   wireRequestAddressButton();
@@ -1816,7 +1859,7 @@ function renderMyBuyerLeadsList() {
     const checked = repMyBuyerLeadsSelectedIds.has(l.BuyerLeadID) ? " checked" : "";
     return '<tr>' +
       '<td><input type="checkbox" class="mybuyerlist-select-checkbox" data-lead-id="' + esc(l.BuyerLeadID) + '"' + checked + '></td>' +
-      '<td>' + esc(l.BuyerName) + '</td>' +
+      '<td>' + esc(l.BuyerName) + (buyerStatusTagsHtml(l, false) ? '<div style="margin-top:2px;">' + buyerStatusTagsHtml(l, false) + '</div>' : "") + '</td>' +
       '<td>' + esc(l.Phone) + '</td>' +
       '<td>' + [l.City, l.State].filter(Boolean).join(", ") + '</td>' +
       '<td class="small-muted">' + esc(l.AssetCategories || "") + '</td>' +
@@ -3729,6 +3772,7 @@ document.getElementById("buyerleads-filter-ownertype").addEventListener("change"
 document.getElementById("buyerleads-filter-minequity").addEventListener("input", buyerLeadsReloadDebounced);
 document.getElementById("buyerleads-filter-minheldyears").addEventListener("input", buyerLeadsReloadDebounced);
 document.getElementById("buyerleads-filter-hideduplicates").addEventListener("change", buyerLeadsReloadNow);
+document.getElementById("buyerleads-filter-tag").addEventListener("change", buyerLeadsReloadNow);
 
 // Reads every filter control into the shape adminGetBuyerLeads/
 // adminGetBuyerLeadIdsForFilters expect -- the single source of truth for
@@ -3749,6 +3793,7 @@ function currentBuyerLeadsFilters() {
     minEquity: document.getElementById("buyerleads-filter-minequity").value.trim(),
     minHeldYears: document.getElementById("buyerleads-filter-minheldyears").value.trim(),
     hideDuplicates: document.getElementById("buyerleads-filter-hideduplicates").checked,
+    tag: document.getElementById("buyerleads-filter-tag").value,
     onlyIds: lastUploadOnly && lastImportedBuyerLeadIds ? Array.from(lastImportedBuyerLeadIds) : undefined
   };
 }
@@ -3834,7 +3879,8 @@ function renderBuyerLeadsAdmin() {
       '<td><input type="checkbox" class="buyerlead-select-checkbox" data-lead-id="' + esc(l.BuyerLeadID) + '"' + checked + (isDnc ? " disabled" : "") + '></td>' +
       '<td>' + esc(l.BuyerName) + (isCompanyBuyerName(l.BuyerName) ? ' <span class="status-pill status-fully-worked">Co</span>' : "") +
         (l.DuplicateOfBuyerLeadID ? ' <span class="status-pill status-onhold" title="Same phone/email as an existing lead">Possible Dup</span>' : "") +
-        (isDnc ? ' <span class="status-pill status-dead-match">DNC</span>' : "") + '</td>' +
+        (isDnc ? ' <span class="status-pill status-dead-match">DNC</span>' : "") +
+        (buyerStatusTagsHtml(l, false) ? '<div style="margin-top:2px;">' + buyerStatusTagsHtml(l, false) + '</div>' : "") + '</td>' +
       '<td>' + esc(l.Phone) + '</td>' +
       '<td>' + esc(l.Email || "") + '</td>' +
       '<td>' + esc(l.PhoneType || "") + '</td>' +
@@ -3844,7 +3890,7 @@ function renderBuyerLeadsAdmin() {
       '<td class="small-muted">' + esc(notesPreview) + '</td>' +
       '<td class="small-muted">' + (pendingDealIdList(l).length > 0 ? esc(pendingDealIdList(l).map(dealLabelFor).join(", ")) : "&mdash;") + (dealTypeTagsHtml(l.DealTypes) ? '<div style="margin-top:4px;">' + dealTypeTagsHtml(l.DealTypes) + '</div>' : "") + '</td>' +
       '<td class="small-muted">' + (l.CreatedAt ? formatDate(l.CreatedAt) : "&mdash;") + '</td>' +
-      '<td class="small-muted">' + (l.UploadedBy ? esc(l.UploadedBy) : "&mdash;") + '</td>' +
+      '<td class="small-muted">' + (l.UploadedBy ? uploaderTagHtml(l.UploadedBy) : "&mdash;") + '</td>' +
       '<td>' + (l.openPitches.length || "&mdash;") + '</td>' +
       '<td style="white-space:nowrap;"><button class="btn secondary small view-buyer-btn" data-lead-id="' + esc(l.BuyerLeadID) + '">View / Give</button></td>' +
       '</tr>';
@@ -4184,6 +4230,7 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
       ([lead.City, lead.State, lead.Zip].filter(Boolean).length ? ' &middot; ' + [lead.City, lead.State, lead.Zip].filter(Boolean).join(", ") : "") + '</p></div>' +
       '<button class="link-btn" id="close-detail-btn">Close</button>' +
     '</div>' +
+    '<div style="margin-bottom:8px;">' + buyerStatusTagsHtml(lead, false) + (lead.UploadedBy ? ' ' + uploaderTagHtml(lead.UploadedBy) : "") + '</div>' +
 
     (isDnc ? '<div class="banner danger"><strong>Do Not Contact.</strong> No rep can log a new call/text for this buyer, and they can\'t be given a new pitch.</div>' : "") +
 
@@ -4209,6 +4256,14 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
 
     '<div class="section-title">Pitches</div>' +
     '<div id="pitches-list">' + renderAdminPitchesList(pitches) + '</div>' +
+
+    '<div class="section-title">VIP Buyer</div>' +
+    '<p class="small-muted">Flag once this buyer seems like a serious buyer — responsive when sent deals, and/or they\'ve shared real investment criteria. "Responsive" itself is tracked automatically the moment any rep logs a response on any pitch.</p>' +
+    '<button class="btn ' + (lead.IsVip === true || lead.IsVip === "TRUE" ? "secondary" : "primary") + ' small" id="admin-vip-toggle-btn">' + (lead.IsVip === true || lead.IsVip === "TRUE" ? "Remove VIP Flag" : "Mark as VIP") + '</button>' +
+
+    '<div class="section-title">Closed Deal</div>' +
+    '<p class="small-muted">Mark once this buyer has actually closed a deal — always implies VIP too, shown as "Top VIP Closed" everywhere this buyer appears, so whoever brought them in gets reached out to first for future deals.</p>' +
+    '<button class="btn ' + (lead.HasClosedDeal === true || lead.HasClosedDeal === "TRUE" ? "secondary" : "primary") + ' small" id="admin-closed-toggle-btn">' + (lead.HasClosedDeal === true || lead.HasClosedDeal === "TRUE" ? "Remove Closed Flag" : "Mark as Closed") + '</button>' +
 
     '<div class="section-title">Do Not Contact</div>' +
     '<p class="small-muted">Blocks any rep from logging a new call/text against this buyer and stops them from being given a new pitch. Existing pitch history is kept.</p>' +
@@ -4239,6 +4294,28 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
     await loadBuyerLeadsAdmin();
     openAdminBuyerLeadDetail(buyerLeadId);
     showToast(willBeDnc ? "Marked Do Not Contact." : "Contact allowed again.");
+  });
+
+  document.getElementById("admin-vip-toggle-btn").addEventListener("click", async function () {
+    const btn = this;
+    if (btn.disabled) return;
+    btn.disabled = true;
+    const willBeVip = !(lead.IsVip === true || lead.IsVip === "TRUE");
+    await api("updateBuyerLeadVipStatus", { buyerLeadId: buyerLeadId, isVip: willBeVip });
+    await loadBuyerLeadsAdmin();
+    openAdminBuyerLeadDetail(buyerLeadId);
+    showToast(willBeVip ? "Marked as VIP." : "VIP flag removed.");
+  });
+
+  document.getElementById("admin-closed-toggle-btn").addEventListener("click", async function () {
+    const btn = this;
+    if (btn.disabled) return;
+    btn.disabled = true;
+    const willBeClosed = !(lead.HasClosedDeal === true || lead.HasClosedDeal === "TRUE");
+    await api("updateBuyerLeadClosedStatus", { buyerLeadId: buyerLeadId, hasClosedDeal: willBeClosed });
+    await loadBuyerLeadsAdmin();
+    openAdminBuyerLeadDetail(buyerLeadId);
+    showToast(willBeClosed ? "Marked as Closed — tagged Top VIP Closed." : "Closed flag removed.");
   });
 
   const giveBtn = document.getElementById("give-new-pitch-btn");

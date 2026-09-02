@@ -161,6 +161,9 @@
   .status-closing { background: var(--accent-light); color: #145039; font-weight: 700; }
   .status-dead-match { background: var(--danger-light); color: #7d2820; }
   .status-do-not-contact { background: var(--danger-light); color: #7d2820; }
+  .status-vip { background: #fdeccb; color: #8a5a00; font-weight: 700; }
+  .status-vip-closed { background: #f4d35e; color: #4a3200; font-weight: 700; }
+  .status-uploaded-by { background: var(--surface-muted); color: var(--muted); font-weight: 400; }
 
   .deal-card {
     background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px;
@@ -824,6 +827,12 @@
         </select>
         <label class="small-muted" style="display:flex; align-items:center; gap:4px;">Min Equity % <input type="number" id="buyerleads-filter-minequity" min="0" max="100" style="width:70px;"></label>
         <label class="small-muted" style="display:flex; align-items:center; gap:4px;">Held N+ Years <input type="number" id="buyerleads-filter-minheldyears" min="0" style="width:70px;"></label>
+        <select id="buyerleads-filter-tag" style="flex:0 0 auto; min-width:170px;">
+          <option value="">Any Tag</option>
+          <option value="vip">VIP Only</option>
+          <option value="closed">Top VIP Closed Only</option>
+          <option value="responsive">Responsive Only</option>
+        </select>
         <label class="checkbox-row" style="margin:0;"><input type="checkbox" id="buyerleads-filter-hideduplicates"> Hide Possible Duplicates</label>
       </div>
       <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
@@ -1166,7 +1175,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=61"></script>
-<script src="app.js?v=61"></script>
+<script src="config.js?v=62"></script>
+<script src="app.js?v=62"></script>
 </body>
 </html>

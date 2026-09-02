@@ -148,7 +148,7 @@ const FB_COLUMNS = ['RequestID', 'DealID', 'Username', 'PostText', 'TargetGroups
 // what the buyer has told us they want to spend, if known; like
 // AssetCategories, a buyer with neither set is treated as open to any
 // price for matching purposes.
-const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'OwnershipLengthMonths', 'PropertyURL', 'PriceRangeMin', 'PriceRangeMax', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'PendingDealID', 'CreatedAt', 'UploadedBy', 'DuplicateOfBuyerLeadID', 'DealTypes'];
+const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'OwnershipLengthMonths', 'PropertyURL', 'PriceRangeMin', 'PriceRangeMax', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'PendingDealID', 'CreatedAt', 'UploadedBy', 'DuplicateOfBuyerLeadID', 'DealTypes', 'IsResponsive', 'IsVip', 'HasClosedDeal'];
 
 // A Pitch is "give this buyer lead to this rep, to work against this one
 // specific deal." This is the only thing that creates an actionable item in
@@ -256,6 +256,10 @@ function doPost(e) {
         return jsonOut(withSession(body, updateBuyerLeadNotes));
       case 'updateBuyerLeadDoNotContact':
         return jsonOut(withSession(body, updateBuyerLeadDoNotContact));
+      case 'updateBuyerLeadVipStatus':
+        return jsonOut(withSession(body, updateBuyerLeadVipStatus));
+      case 'updateBuyerLeadClosedStatus':
+        return jsonOut(withSession(body, updateBuyerLeadClosedStatus));
 
       // ---- admin only ----
       case 'adminAddDeal':
@@ -2322,6 +2326,7 @@ function applyBuyerLeadFilters(leads, f) {
   const minEquity = (f.minEquity === undefined || f.minEquity === null || f.minEquity === '') ? null : Number(f.minEquity);
   const minHeldMonths = (f.minHeldYears === undefined || f.minHeldYears === null || f.minHeldYears === '') ? null : Number(f.minHeldYears) * 12;
   const hideDuplicates = !!f.hideDuplicates;
+  const tag = f.tag || '';
   // "Show only leads from the last upload" -- the frontend tracks which
   // ids came back from its most recent import call (browser-session state,
   // never stored server-side) and passes them here as an explicit allow
@@ -2351,6 +2356,9 @@ function applyBuyerLeadFilters(leads, f) {
       const months = Number(l['OwnershipLengthMonths']);
       if (!l['OwnershipLengthMonths'] || isNaN(months) || months < minHeldMonths) return false;
     }
+    if (tag === 'vip' && l['IsVip'] !== true && l['IsVip'] !== 'TRUE') return false;
+    if (tag === 'closed' && l['HasClosedDeal'] !== true && l['HasClosedDeal'] !== 'TRUE') return false;
+    if (tag === 'responsive' && l['IsResponsive'] !== true && l['IsResponsive'] !== 'TRUE') return false;
     return true;
   });
 }
@@ -2538,6 +2546,39 @@ function updateBuyerLeadDoNotContact(body, session) {
   if (!match) return { ok: false, error: 'Lead not found.' };
   if (!canEditBuyerLead(session, match)) return { ok: false, error: 'You need an active pitch on this buyer (or to have uploaded them yourself) to change this.' };
   sheet.getRange(match._row, getColumnIndex(sheet, 'DoNotContact')).setValue(!!body.doNotContact);
+  return { ok: true };
+}
+
+// Same permission as Do Not Contact -- admin, or whichever rep uploaded
+// this buyer or has an active pitch on them, can flag them VIP once they
+// seem like a serious buyer (responsive, or they've shared real investment
+// criteria). Shown as a tag everywhere this buyer appears; see
+// dealTypeTagsHtml-style badge rendering on the frontend (buyerTagsHtml).
+function updateBuyerLeadVipStatus(body, session) {
+  if (!body.buyerLeadId) return { ok: false, error: 'Missing buyerLeadId.' };
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const match = sheetToObjects(sheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
+  if (!match) return { ok: false, error: 'Lead not found.' };
+  if (!canEditBuyerLead(session, match)) return { ok: false, error: 'You need an active pitch on this buyer (or to have uploaded them yourself) to change this.' };
+  sheet.getRange(match._row, getColumnIndex(sheet, 'IsVip')).setValue(!!body.isVip);
+  return { ok: true };
+}
+
+// Admin-only -- marking a buyer as having actually closed a deal is a real
+// business event (that's who admin needs to keep the relationship with so
+// everyone on that deal gets paid), not something to leave to a rep's
+// personal judgment call the way VIP is. Closing always implies VIP too --
+// a closed buyer is definitionally a serious one, tagged "Top VIP Closed"
+// on the frontend once both are true.
+function updateBuyerLeadClosedStatus(body, session) {
+  if (!session.a) return { ok: false, error: 'Only admin can mark a buyer as closed.' };
+  if (!body.buyerLeadId) return { ok: false, error: 'Missing buyerLeadId.' };
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const match = sheetToObjects(sheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
+  if (!match) return { ok: false, error: 'Lead not found.' };
+  const hasClosedDeal = !!body.hasClosedDeal;
+  sheet.getRange(match._row, getColumnIndex(sheet, 'HasClosedDeal')).setValue(hasClosedDeal);
+  if (hasClosedDeal) sheet.getRange(match._row, getColumnIndex(sheet, 'IsVip')).setValue(true);
   return { ok: true };
 }
 
@@ -3342,6 +3383,12 @@ function getMyPitches(body, session) {
     // opening each one -- same as it already is for admin's table.
     p.portfolioValue = lead ? lead['PortfolioValue'] : '';
     p.doNotContact = !!(lead && (lead['DoNotContact'] === true || lead['DoNotContact'] === 'TRUE'));
+    // Buyer-level status tags -- visible to every rep (unlike UploadedBy,
+    // which is deliberately never copied onto this whitelist at all, see
+    // file header comment on rep-facing secrecy).
+    p.isResponsive = !!(lead && (lead['IsResponsive'] === true || lead['IsResponsive'] === 'TRUE'));
+    p.isVip = !!(lead && (lead['IsVip'] === true || lead['IsVip'] === 'TRUE'));
+    p.hasClosedDeal = !!(lead && (lead['HasClosedDeal'] === true || lead['HasClosedDeal'] === 'TRUE'));
     p.hasResponded = allContacts.some(function (c) { return c['PitchID'] === p['PitchID'] && (c['Responded'] === true || c['Responded'] === 'TRUE'); });
     p.callingHours = lead ? callingHoursInfo(lead['State']) : null;
     // Everything editable via updateBuyerLeadProfile, in the same shape as a
@@ -3438,5 +3485,12 @@ function addPitchContact(body, session) {
     'VoicemailLeft': body.method === 'Skipped' ? false : !!body.voicemailLeft,
     'ARVPercent': body.arvPercent || '', 'AsIsPercent': body.asIsPercent || '', 'Notes': body.notes || ''
   });
+  // A real response to any outreach -- from any rep, on any deal -- earns
+  // this buyer the "Responsive" tag for good (see BUYER_LEAD_COLUMNS'
+  // IsResponsive); never auto-cleared, since a later non-response on a
+  // different pitch doesn't make them less worth prioritizing.
+  if (body.method !== 'Skipped' && body.responded && lead) {
+    leadsSheet.getRange(lead._row, getColumnIndex(leadsSheet, 'IsResponsive')).setValue(true);
+  }
   return { ok: true, contactId: contactId };
 }

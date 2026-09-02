@@ -76,6 +76,30 @@ backend (see [SETUP.md](SETUP.md)).
   rows — all three), tagging the whole uploaded batch at once the same way
   "Which Deal(s) Is This List For?" does, and shown as badges on that
   lead's row in both the rep's own list and the admin Buyer Leads table.
+- Every buyer lead (the cold-call list, not the Buy Box) carries three
+  status tags, shown as badges everywhere that buyer shows up — the admin
+  Buyer Leads table, a buyer's own admin detail page, a rep's My Buyer
+  List, and a rep's My Pitches / pitch detail:
+  - **Responsive** — set automatically, for good, the moment any rep logs
+    "Buyer responded during this contact" on any pitch for that buyer, on
+    any deal. Never needs a manual click and never auto-clears.
+  - **VIP** — a manual flag for "this one seems like a serious buyer"
+    (responsive when sent deals, and/or they've shared real investment
+    criteria). Either admin or any rep with an active pitch on that buyer
+    (or who uploaded them) can toggle it, same permission model as Do Not
+    Contact — a "Mark as VIP" button on the rep's pitch detail, and on the
+    buyer's admin detail page.
+  - **Top VIP Closed** — admin-only, marked once a buyer has actually
+    closed a deal. Always implies VIP too (a closed buyer only ever shows
+    "Top VIP Closed," never a separate "VIP" pill alongside it), and is
+    meant to flag who to keep the relationship with personally.
+  The admin Buyer Leads table also has a filterable **Tag** dropdown (VIP
+  Only / Top VIP Closed Only / Responsive Only) to pull up a literal "VIP
+  buyers list." Separately, admin (and only admin — this is deliberately
+  never sent to any rep-facing screen, not even a rep's own uploads) sees
+  an **"Uploaded by [rep]"** tag on every buyer lead that has one, so admin
+  knows exactly which rep to loop in when reaching out to a VIP/responsive
+  buyer, so that rep gets credit and everyone gets paid on it.
   The signup form also has a small **slider-puzzle CAPTCHA** — drag a piece
   until it visually completes a puzzle before Sign Up will submit. It's a
   homegrown, no-dependency check (no reCAPTCHA/hCaptcha account needed):
