@@ -99,7 +99,19 @@ backend (see [SETUP.md](SETUP.md)).
   never sent to any rep-facing screen, not even a rep's own uploads) sees
   an **"Uploaded by [rep]"** tag on every buyer lead that has one, so admin
   knows exactly which rep to loop in when reaching out to a VIP/responsive
-  buyer, so that rep gets credit and everyone gets paid on it.
+  buyer, so that rep gets credit and everyone gets paid on it. Admin also
+  sees a **"First response: [rep]"** tag — separate from Uploaded By,
+  since a different rep can be the one who actually gets the buyer to
+  respond — recorded automatically (never overwritten) the first time any
+  rep logs a real response on any pitch for that buyer. Both admin-only
+  tags, plus the VIP/Responsive/Top VIP Closed badges and each buyer's
+  Deal Type tags, show together on the admin-wide **Pitches ("all buyer
+  matches") tab** — every buyer↔deal pairing across the whole team in one
+  place, not just inside one buyer's own pitch history.
+  Every list of buyer leads/pitches (admin Buyer Leads, admin Pitches, a
+  rep's My Pitches, a rep's My Buyer List) has a **Show N at a time**
+  selector (10/25/50/100) alongside its own pagination controls, and
+  defaults to sorting by most recent activity first.
   The signup form also has a small **slider-puzzle CAPTCHA** — drag a piece
   until it visually completes a puzzle before Sign Up will submit. It's a
   homegrown, no-dependency check (no reCAPTCHA/hCaptcha account needed):

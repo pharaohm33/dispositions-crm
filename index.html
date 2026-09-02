@@ -504,6 +504,12 @@
       <p class="small-muted">Everyone you've personally uploaded above — private to you, and yours to browse, tag Do Not Contact, or leave notes on any time, whether or not it's been matched to a deal yet. You can only delete buyers you uploaded yourself, never anything admin uploaded.</p>
       <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
         <input type="text" id="rep-mybuyerlist-search" placeholder="Search by buyer name, phone, or city..." style="flex:1; min-width:220px;">
+        <select id="rep-mybuyerlist-page-size" style="flex:0 0 auto; min-width:150px;">
+          <option value="10">Show 10 at a time</option>
+          <option value="25">Show 25 at a time</option>
+          <option value="50" selected>Show 50 at a time</option>
+          <option value="100">Show 100 at a time</option>
+        </select>
         <button class="btn secondary small" id="rep-mybuyerlist-select-all-btn">Select All</button>
         <button class="btn secondary small" id="rep-mybuyerlist-clear-selection-btn">Clear Selection</button>
         <button class="btn danger small" id="rep-mybuyerlist-delete-btn">Delete Selected</button>
@@ -521,6 +527,11 @@
         </table>
       </div>
       <p class="small-muted" id="rep-mybuyerlist-empty" hidden>You haven't uploaded any buyers yet — use the form above.</p>
+      <div class="nav-row" style="justify-content:center; gap:16px; margin-top:12px;">
+        <button class="btn secondary small" id="rep-mybuyerlist-prev-page-btn">&larr; Previous</button>
+        <span class="small-muted" id="rep-mybuyerlist-page-indicator"></span>
+        <button class="btn secondary small" id="rep-mybuyerlist-next-page-btn">Next &rarr;</button>
+      </div>
     </div>
 
     <div class="card">
@@ -537,10 +548,16 @@
           <option value="Fully Worked">Fully Worked</option>
         </select>
         <select id="mypitches-sort" style="flex:0 0 auto; min-width:190px;">
+          <option value="newest" selected>Sort: Most Recent Activity First</option>
           <option value="priority">Sort: Needs Attention First</option>
           <option value="deal">Sort: By Deal</option>
-          <option value="newest">Sort: Newest Given First</option>
           <option value="oldest">Sort: Oldest Given First</option>
+        </select>
+        <select id="mypitches-page-size" style="flex:0 0 auto; min-width:150px;">
+          <option value="10">Show 10 at a time</option>
+          <option value="25">Show 25 at a time</option>
+          <option value="50" selected>Show 50 at a time</option>
+          <option value="100">Show 100 at a time</option>
         </select>
       </div>
     </div>
@@ -814,9 +831,15 @@
         <input type="text" id="buyerleads-filter-exclude-cities" placeholder="Exclude cities (comma separated)" style="flex:0 0 auto; min-width:220px;">
         <select id="buyerleads-filter-pendingdeal" style="flex:0 0 auto; min-width:200px;"><option value="">Any Pending Deal Tag</option></select>
         <select id="buyerleads-sort" style="flex:0 0 auto; min-width:190px;">
-          <option value="">Sort: Default</option>
-          <option value="newest">Sort: Newest Uploaded First</option>
+          <option value="newest" selected>Sort: Most Recent Activity First</option>
           <option value="oldest">Sort: Oldest Uploaded First</option>
+          <option value="">Sort: Default</option>
+        </select>
+        <select id="buyerleads-page-size" style="flex:0 0 auto; min-width:150px;">
+          <option value="10">Show 10 at a time</option>
+          <option value="25">Show 25 at a time</option>
+          <option value="50" selected>Show 50 at a time</option>
+          <option value="100">Show 100 at a time</option>
         </select>
       </div>
       <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; align-items:center;">
@@ -924,6 +947,12 @@
         <input type="text" id="pitches-search" placeholder="Search by buyer name, phone, or deal code/address..." style="flex:1; min-width:240px;">
         <select id="pitches-filter-rep" style="flex:0 0 auto; min-width:180px;"><option value="">All Team Members</option></select>
         <select id="pitches-filter-deal" style="flex:0 0 auto; min-width:180px;"><option value="">All Deals</option></select>
+        <select id="pitches-page-size" style="flex:0 0 auto; min-width:150px;">
+          <option value="10">Show 10 at a time</option>
+          <option value="25">Show 25 at a time</option>
+          <option value="50" selected>Show 50 at a time</option>
+          <option value="100">Show 100 at a time</option>
+        </select>
       </div>
       <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:12px;">
         <button class="btn secondary small" id="pitches-select-all-btn">Select All (Filtered)</button>
@@ -944,6 +973,11 @@
       <tbody id="pitches-tbody"></tbody>
     </table>
     <div id="pitches-empty" class="small-muted" style="padding:20px;" hidden>No pitches given yet.</div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+      <button class="btn secondary small" id="pitches-prev-page-btn">&larr; Prev</button>
+      <span class="small-muted" id="pitches-page-indicator"></span>
+      <button class="btn secondary small" id="pitches-next-page-btn">Next &rarr;</button>
+    </div>
   </div>
 
   <!-- Status categories tab -->
@@ -1175,7 +1209,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=63"></script>
-<script src="app.js?v=63"></script>
+<script src="config.js?v=64"></script>
+<script src="app.js?v=64"></script>
 </body>
 </html>

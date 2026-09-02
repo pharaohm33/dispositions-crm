@@ -139,6 +139,16 @@ function uploaderTagHtml(uploadedBy) {
   return '<span class="status-pill status-uploaded-by">Uploaded by ' + esc(uploadedBy) + '</span>';
 }
 
+// Same admin-only visibility as uploaderTagHtml -- who got the FIRST real
+// response out of this buyer (see addPitchContact's FirstResponsiveBy),
+// distinct from "given to" on any one pitch since a buyer can have
+// multiple pitches/reps across different deals over time, and this is
+// specifically who actually earned the "Responsive" tag.
+function firstResponsiveTagHtml(username) {
+  if (!username) return "";
+  return '<span class="status-pill status-uploaded-by">First response: ' + esc(username) + '</span>';
+}
+
 // A visible confirmation that a click actually registered -- separate from
 // (and in addition to) any inline result text, since a small line of text
 // under a button is easy to miss and is exactly what leads to a second,
@@ -1076,8 +1086,10 @@ function switchRepTab(tab) {
 }
 
 const LEAD_STATUS_PRIORITY = ["Follow-Up Due", "Follow-Up In Progress", "Awaiting Response", "Not Contacted", "Responded", "Fully Worked"];
-const MY_PITCHES_PAGE_SIZE = 50;
 let myPitchesCurrentPage = 1;
+function myPitchesPageSize() {
+  return Number(document.getElementById("mypitches-page-size").value) || 50;
+}
 // Purely a local "don't lose my place" bookmark while scrolling through a
 // long list and cross-checking a deal open elsewhere -- not saved to the
 // backend or tied to anything about the pitch itself, so it's fine that it
@@ -1156,10 +1168,11 @@ function renderMyPitches() {
   const filtered = getFilteredSortedMyPitches();
   empty.hidden = filtered.length > 0;
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / MY_PITCHES_PAGE_SIZE));
+  const pageSize = myPitchesPageSize();
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   if (myPitchesCurrentPage > totalPages) myPitchesCurrentPage = totalPages;
-  const pageStart = (myPitchesCurrentPage - 1) * MY_PITCHES_PAGE_SIZE;
-  const pageItems = filtered.slice(pageStart, pageStart + MY_PITCHES_PAGE_SIZE);
+  const pageStart = (myPitchesCurrentPage - 1) * pageSize;
+  const pageItems = filtered.slice(pageStart, pageStart + pageSize);
 
   document.getElementById("mypitches-page-indicator").textContent =
     filtered.length === 0 ? "No results" :
@@ -1201,6 +1214,7 @@ document.getElementById("mypitches-search").addEventListener("input", function (
 document.getElementById("mypitches-filter-deal").addEventListener("change", function () { myPitchesCurrentPage = 1; renderMyPitches(); });
 document.getElementById("mypitches-filter-status").addEventListener("change", function () { myPitchesCurrentPage = 1; renderMyPitches(); });
 document.getElementById("mypitches-sort").addEventListener("change", function () { myPitchesCurrentPage = 1; renderMyPitches(); });
+document.getElementById("mypitches-page-size").addEventListener("change", function () { myPitchesCurrentPage = 1; renderMyPitches(); });
 document.getElementById("mypitches-prev-page-btn").addEventListener("click", function () {
   if (myPitchesCurrentPage > 1) { myPitchesCurrentPage--; renderMyPitches(); }
 });
@@ -1844,16 +1858,37 @@ function repDealLabelFor(dealId) {
   return (deal.DealCode ? deal.DealCode + " — " : "") + [deal.City, deal.State].filter(Boolean).join(", ");
 }
 
+let repMyBuyerLeadsCurrentPage = 1;
+function repMyBuyerLeadsPageSize() {
+  return Number(document.getElementById("rep-mybuyerlist-page-size").value) || 50;
+}
+
 function renderMyBuyerLeadsList() {
   const q = document.getElementById("rep-mybuyerlist-search").value.trim().toLowerCase();
   const filtered = repMyBuyerLeads.filter(function (l) {
     if (!q) return true;
     return [l.BuyerName, l.Phone, l.City, l.State].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; });
   });
+  // Most recent activity first by default -- newest uploaded leads lead,
+  // same convention as the admin Buyer Leads table.
+  filtered.sort(function (a, b) { return new Date(b.CreatedAt || 0) - new Date(a.CreatedAt || 0); });
+
   document.getElementById("rep-mybuyerlist-empty").hidden = repMyBuyerLeads.length > 0;
   document.querySelector("#rep-mybuyerlist-table").hidden = repMyBuyerLeads.length === 0;
+
+  const pageSize = repMyBuyerLeadsPageSize();
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  if (repMyBuyerLeadsCurrentPage > totalPages) repMyBuyerLeadsCurrentPage = totalPages;
+  const pageStart = (repMyBuyerLeadsCurrentPage - 1) * pageSize;
+  const pageItems = filtered.slice(pageStart, pageStart + pageSize);
+  document.getElementById("rep-mybuyerlist-page-indicator").textContent =
+    filtered.length === 0 ? "No results" :
+    "Page " + repMyBuyerLeadsCurrentPage + " of " + totalPages + " (" + filtered.length + " total)";
+  document.getElementById("rep-mybuyerlist-prev-page-btn").disabled = repMyBuyerLeadsCurrentPage <= 1;
+  document.getElementById("rep-mybuyerlist-next-page-btn").disabled = repMyBuyerLeadsCurrentPage >= totalPages;
+
   const tbody = document.querySelector("#rep-mybuyerlist-table tbody");
-  tbody.innerHTML = filtered.map(function (l) {
+  tbody.innerHTML = pageItems.map(function (l) {
     const isDnc = !!(l.DoNotContact === true || l.DoNotContact === "TRUE");
     const dealTags = String(l.PendingDealID || "").split(",").map(function (v) { return v.trim(); }).filter(Boolean);
     const checked = repMyBuyerLeadsSelectedIds.has(l.BuyerLeadID) ? " checked" : "";
@@ -1892,7 +1927,14 @@ function renderMyBuyerLeadsList() {
   });
 }
 
-document.getElementById("rep-mybuyerlist-search").addEventListener("input", renderMyBuyerLeadsList);
+document.getElementById("rep-mybuyerlist-search").addEventListener("input", function () { repMyBuyerLeadsCurrentPage = 1; renderMyBuyerLeadsList(); });
+document.getElementById("rep-mybuyerlist-page-size").addEventListener("change", function () { repMyBuyerLeadsCurrentPage = 1; renderMyBuyerLeadsList(); });
+document.getElementById("rep-mybuyerlist-prev-page-btn").addEventListener("click", function () {
+  if (repMyBuyerLeadsCurrentPage > 1) { repMyBuyerLeadsCurrentPage--; renderMyBuyerLeadsList(); }
+});
+document.getElementById("rep-mybuyerlist-next-page-btn").addEventListener("click", function () {
+  repMyBuyerLeadsCurrentPage++; renderMyBuyerLeadsList();
+});
 
 document.getElementById("rep-mybuyerlist-select-all-btn").addEventListener("click", function () {
   repMyBuyerLeadsSelectedIds = new Set(repMyBuyerLeads.map(function (l) { return l.BuyerLeadID; }));
@@ -3773,6 +3815,7 @@ document.getElementById("buyerleads-filter-minequity").addEventListener("input",
 document.getElementById("buyerleads-filter-minheldyears").addEventListener("input", buyerLeadsReloadDebounced);
 document.getElementById("buyerleads-filter-hideduplicates").addEventListener("change", buyerLeadsReloadNow);
 document.getElementById("buyerleads-filter-tag").addEventListener("change", buyerLeadsReloadNow);
+document.getElementById("buyerleads-page-size").addEventListener("change", buyerLeadsReloadNow);
 
 // Reads every filter control into the shape adminGetBuyerLeads/
 // adminGetBuyerLeadIdsForFilters expect -- the single source of truth for
@@ -3798,10 +3841,13 @@ function currentBuyerLeadsFilters() {
   };
 }
 
-const BUYER_LEADS_PAGE_SIZE = 50;
 let buyerLeadsCurrentPage = 1;
 let buyerLeadsTotalCount = 0;
 let buyerLeadsSelectedIds = new Set();
+
+function buyerLeadsPageSize() {
+  return Number(document.getElementById("buyerleads-page-size").value) || 50;
+}
 
 // A skip-trace/company-owned property is often held by a more active,
 // sophisticated investor than an individual owner -- useful to filter on
@@ -3842,7 +3888,7 @@ async function loadBuyerLeadsAdmin() {
     filters: currentBuyerLeadsFilters(),
     sort: document.getElementById("buyerleads-sort").value,
     page: buyerLeadsCurrentPage,
-    pageSize: BUYER_LEADS_PAGE_SIZE
+    pageSize: buyerLeadsPageSize()
   });
   if (!res.ok) { tbody.innerHTML = ''; showToast(res.error || "Could not load buyer leads.", true); return; }
   adminBuyerLeads = res.leads;
@@ -3864,7 +3910,7 @@ function renderBuyerLeadsAdmin() {
   const empty = document.getElementById("buyerleads-admin-empty");
   empty.hidden = buyerLeadsTotalCount > 0;
 
-  const totalPages = Math.max(1, Math.ceil(buyerLeadsTotalCount / BUYER_LEADS_PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(buyerLeadsTotalCount / buyerLeadsPageSize()));
   document.getElementById("buyerleads-page-indicator").textContent =
     buyerLeadsTotalCount === 0 ? "No results" :
     "Page " + buyerLeadsCurrentPage + " of " + totalPages + " (" + buyerLeadsTotalCount + " total)";
@@ -3890,7 +3936,8 @@ function renderBuyerLeadsAdmin() {
       '<td class="small-muted">' + esc(notesPreview) + '</td>' +
       '<td class="small-muted">' + (pendingDealIdList(l).length > 0 ? esc(pendingDealIdList(l).map(dealLabelFor).join(", ")) : "&mdash;") + (dealTypeTagsHtml(l.DealTypes) ? '<div style="margin-top:4px;">' + dealTypeTagsHtml(l.DealTypes) + '</div>' : "") + '</td>' +
       '<td class="small-muted">' + (l.CreatedAt ? formatDate(l.CreatedAt) : "&mdash;") + '</td>' +
-      '<td class="small-muted">' + (l.UploadedBy ? uploaderTagHtml(l.UploadedBy) : "&mdash;") + '</td>' +
+      '<td class="small-muted">' + (l.UploadedBy ? uploaderTagHtml(l.UploadedBy) : "&mdash;") +
+        (l.FirstResponsiveBy ? '<div style="margin-top:2px;">' + firstResponsiveTagHtml(l.FirstResponsiveBy) + '</div>' : "") + '</td>' +
       '<td>' + (l.openPitches.length || "&mdash;") + '</td>' +
       '<td style="white-space:nowrap;"><button class="btn secondary small view-buyer-btn" data-lead-id="' + esc(l.BuyerLeadID) + '">View / Give</button></td>' +
       '</tr>';
@@ -4230,7 +4277,7 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
       ([lead.City, lead.State, lead.Zip].filter(Boolean).length ? ' &middot; ' + [lead.City, lead.State, lead.Zip].filter(Boolean).join(", ") : "") + '</p></div>' +
       '<button class="link-btn" id="close-detail-btn">Close</button>' +
     '</div>' +
-    '<div style="margin-bottom:8px;">' + buyerStatusTagsHtml(lead, false) + (lead.UploadedBy ? ' ' + uploaderTagHtml(lead.UploadedBy) : "") + '</div>' +
+    '<div style="margin-bottom:8px;">' + buyerStatusTagsHtml(lead, false) + (lead.UploadedBy ? ' ' + uploaderTagHtml(lead.UploadedBy) : "") + (lead.FirstResponsiveBy ? ' ' + firstResponsiveTagHtml(lead.FirstResponsiveBy) : "") + '</div>' +
 
     (isDnc ? '<div class="banner danger"><strong>Do Not Contact.</strong> No rep can log a new call/text for this buyer, and they can\'t be given a new pitch.</div>' : "") +
 
@@ -4408,6 +4455,7 @@ let adminAllPitches = [];
 let adminPitchesSelectedIds = new Set();
 let pitchesFilterRepsCache = [];
 let pitchesFilterDealsCache = [];
+let pitchesCurrentPage = 1;
 
 async function initAdminPitchesTab() {
   const [repsRes, dealsRes] = await Promise.all([api("adminGetReps", {}), api("getDeals", {})]);
@@ -4435,12 +4483,20 @@ function getFilteredAdminPitches() {
   const q = document.getElementById("pitches-search").value.trim().toLowerCase();
   const rep = document.getElementById("pitches-filter-rep").value;
   const dealId = document.getElementById("pitches-filter-deal").value;
-  return adminAllPitches.filter(function (p) {
+  const filtered = adminAllPitches.filter(function (p) {
     if (rep && p.Username !== rep) return false;
     if (dealId && p.DealID !== dealId) return false;
     if (q && ![p.buyerName, p.buyerPhone, p.dealCode, p.dealAddress].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; })) return false;
     return true;
   });
+  // Most recent activity first, by default -- most recently given pitch
+  // (the only recency timestamp this list has) leads.
+  filtered.sort(function (a, b) { return new Date(b.GivenAt || 0) - new Date(a.GivenAt || 0); });
+  return filtered;
+}
+
+function adminPitchesPageSize() {
+  return Number(document.getElementById("pitches-page-size").value) || 50;
 }
 
 function repNameFor(username) {
@@ -4454,11 +4510,26 @@ function renderAdminPitchesTable() {
   const filtered = getFilteredAdminPitches();
   empty.hidden = filtered.length > 0;
 
-  tbody.innerHTML = filtered.slice().reverse().map(function (p) {
+  const pageSize = adminPitchesPageSize();
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  if (pitchesCurrentPage > totalPages) pitchesCurrentPage = totalPages;
+  const pageStart = (pitchesCurrentPage - 1) * pageSize;
+  const pageItems = filtered.slice(pageStart, pageStart + pageSize);
+  document.getElementById("pitches-page-indicator").textContent =
+    filtered.length === 0 ? "No results" :
+    "Page " + pitchesCurrentPage + " of " + totalPages + " (" + filtered.length + " total)";
+  document.getElementById("pitches-prev-page-btn").disabled = pitchesCurrentPage <= 1;
+  document.getElementById("pitches-next-page-btn").disabled = pitchesCurrentPage >= totalPages;
+
+  tbody.innerHTML = pageItems.map(function (p) {
     const checked = adminPitchesSelectedIds.has(p.PitchID) ? " checked" : "";
+    const tags = buyerStatusTagsHtml(p, true);
+    const adminTags = (p.uploadedBy ? uploaderTagHtml(p.uploadedBy) : "") + (p.firstResponsiveBy ? " " + firstResponsiveTagHtml(p.firstResponsiveBy) : "");
     return '<tr>' +
       '<td><input type="checkbox" class="pitch-select-checkbox" data-pitch-id="' + esc(p.PitchID) + '"' + checked + '></td>' +
-      '<td>' + esc(p.buyerName) + '</td>' +
+      '<td>' + esc(p.buyerName) +
+        (tags ? '<div style="margin-top:2px;">' + tags + '</div>' : "") +
+        (adminTags ? '<div style="margin-top:2px;">' + adminTags + '</div>' : "") + '</td>' +
       '<td>' + esc(p.buyerPhone || "") + '</td>' +
       '<td>' + (p.dealCode ? esc(p.dealCode) + " — " : "") + esc(p.dealAddress) + '</td>' +
       '<td>' + esc(repNameFor(p.Username)) + '</td>' +
@@ -4513,9 +4584,16 @@ function updatePitchesSelectionUI() {
   document.getElementById("pitches-selection-count").textContent = adminPitchesSelectedIds.size + " selected";
 }
 
-document.getElementById("pitches-search").addEventListener("input", renderAdminPitchesTable);
-document.getElementById("pitches-filter-rep").addEventListener("change", renderAdminPitchesTable);
-document.getElementById("pitches-filter-deal").addEventListener("change", renderAdminPitchesTable);
+document.getElementById("pitches-search").addEventListener("input", function () { pitchesCurrentPage = 1; renderAdminPitchesTable(); });
+document.getElementById("pitches-filter-rep").addEventListener("change", function () { pitchesCurrentPage = 1; renderAdminPitchesTable(); });
+document.getElementById("pitches-filter-deal").addEventListener("change", function () { pitchesCurrentPage = 1; renderAdminPitchesTable(); });
+document.getElementById("pitches-page-size").addEventListener("change", function () { pitchesCurrentPage = 1; renderAdminPitchesTable(); });
+document.getElementById("pitches-prev-page-btn").addEventListener("click", function () {
+  if (pitchesCurrentPage > 1) { pitchesCurrentPage--; renderAdminPitchesTable(); }
+});
+document.getElementById("pitches-next-page-btn").addEventListener("click", function () {
+  pitchesCurrentPage++; renderAdminPitchesTable();
+});
 
 document.getElementById("pitches-select-all-btn").addEventListener("click", function () {
   getFilteredAdminPitches().forEach(function (p) { adminPitchesSelectedIds.add(p.PitchID); });

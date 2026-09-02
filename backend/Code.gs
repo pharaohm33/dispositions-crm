@@ -148,7 +148,7 @@ const FB_COLUMNS = ['RequestID', 'DealID', 'Username', 'PostText', 'TargetGroups
 // what the buyer has told us they want to spend, if known; like
 // AssetCategories, a buyer with neither set is treated as open to any
 // price for matching purposes.
-const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'OwnershipLengthMonths', 'PropertyURL', 'PriceRangeMin', 'PriceRangeMax', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'PendingDealID', 'CreatedAt', 'UploadedBy', 'DuplicateOfBuyerLeadID', 'DealTypes', 'IsResponsive', 'IsVip', 'HasClosedDeal'];
+const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'OwnershipLengthMonths', 'PropertyURL', 'PriceRangeMin', 'PriceRangeMax', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'PendingDealID', 'CreatedAt', 'UploadedBy', 'DuplicateOfBuyerLeadID', 'DealTypes', 'IsResponsive', 'IsVip', 'HasClosedDeal', 'FirstResponsiveBy'];
 
 // A Pitch is "give this buyer lead to this rep, to work against this one
 // specific deal." This is the only thing that creates an actionable item in
@@ -3024,6 +3024,16 @@ function adminGetAllPitches(body) {
     p._doNotContact = !!(lead && (lead['DoNotContact'] === true || lead['DoNotContact'] === 'TRUE'));
     p.buyerName = lead ? lead['BuyerName'] : '(deleted buyer)';
     p.buyerPhone = lead ? lead['Phone'] : '';
+    // Buyer-level status tags, plus who found/first-heard-back-from this
+    // buyer -- this admin-only "all matches" table is the one place that
+    // spans every rep and every deal at once, so it's exactly where a
+    // clean uploaded-by/first-responsive-by record matters most.
+    p.isVip = !!(lead && (lead['IsVip'] === true || lead['IsVip'] === 'TRUE'));
+    p.isResponsive = !!(lead && (lead['IsResponsive'] === true || lead['IsResponsive'] === 'TRUE'));
+    p.hasClosedDeal = !!(lead && (lead['HasClosedDeal'] === true || lead['HasClosedDeal'] === 'TRUE'));
+    p.dealTypes = lead ? lead['DealTypes'] : '';
+    p.uploadedBy = lead ? lead['UploadedBy'] : '';
+    p.firstResponsiveBy = lead ? lead['FirstResponsiveBy'] : '';
   });
 
   const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
@@ -3488,9 +3498,18 @@ function addPitchContact(body, session) {
   // A real response to any outreach -- from any rep, on any deal -- earns
   // this buyer the "Responsive" tag for good (see BUYER_LEAD_COLUMNS'
   // IsResponsive); never auto-cleared, since a later non-response on a
-  // different pitch doesn't make them less worth prioritizing.
+  // different pitch doesn't make them less worth prioritizing. Whoever
+  // gets the FIRST response is recorded separately in FirstResponsiveBy
+  // (only ever set once -- a later rep getting a response on a different
+  // pitch doesn't overwrite who actually earned it) so admin has a clean
+  // record of exactly who to credit, alongside UploadedBy for who found
+  // the buyer in the first place.
   if (body.method !== 'Skipped' && body.responded && lead) {
+    const alreadyResponsive = lead['IsResponsive'] === true || lead['IsResponsive'] === 'TRUE';
     leadsSheet.getRange(lead._row, getColumnIndex(leadsSheet, 'IsResponsive')).setValue(true);
+    if (!alreadyResponsive) {
+      leadsSheet.getRange(lead._row, getColumnIndex(leadsSheet, 'FirstResponsiveBy')).setValue(session.u);
+    }
   }
   return { ok: true, contactId: contactId };
 }
