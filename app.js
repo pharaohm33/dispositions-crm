@@ -1387,7 +1387,7 @@ async function openPitchDetail(pitchId) {
     '<div id="contact-history-list">' + renderContactHistory(contacts) + '</div>' +
 
     '<div class="section-title">VIP Buyer</div>' +
-    '<p class="small-muted">Flag this buyer as VIP once they seem like a serious buyer — responsive when you send them deals, and/or they\'ve shared real investment criteria. Admin will follow up with them directly.</p>' +
+    '<p class="small-muted">Flag this buyer as VIP once they seem like a serious buyer — responsive when you send them deals, and/or they\'ve shared real investment criteria. You should follow up with them yourself and loop in admin to help close: if they don\'t come in at full asking price, work with admin on getting a serious offer instead (not every deal has room below asking, but it\'s always worth a try), and/or coordinate a time for them to visit the property if access needs it to be scheduled — e.g. a house with a lockbox, not vacant land.</p>' +
     '<button class="btn ' + (pitch.isVip ? "secondary" : "primary") + ' small" id="vip-toggle-btn">' + (pitch.isVip ? "Remove VIP Flag" : "Mark as VIP") + '</button>' +
 
     '<div class="section-title">Do Not Contact</div>' +
