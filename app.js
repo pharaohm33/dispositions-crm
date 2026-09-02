@@ -2024,6 +2024,57 @@ document.getElementById("rep-mybuyerlist-clear-selection-btn").addEventListener(
   renderMyBuyerLeadsList();
 });
 
+// Shared by both "Delete This Buyer" (the currently-open lead itself) and
+// "Delete This Duplicate" (a different lead found via Check For
+// Duplicates) on the admin buyer lead detail page -- one modal, one typed-
+// DELETE confirm, either target. reopenBuyerLeadId is which buyer detail
+// to refresh afterward: the one just deleted's own page closes instead
+// (it no longer exists), a duplicate's page reopens the original so its
+// duplicate list reflects the removal.
+let pendingAdminDeleteBuyerLeadIds = [];
+let pendingAdminDeleteReopenId = null;
+function openDeleteBuyerLeadModal(buyerLeadIds, name, reopenBuyerLeadId) {
+  pendingAdminDeleteBuyerLeadIds = buyerLeadIds;
+  pendingAdminDeleteReopenId = reopenBuyerLeadId;
+  const modal = document.getElementById("admin-delete-buyerlead-modal");
+  document.getElementById("admin-delete-buyerlead-warning").textContent =
+    "You're about to permanently delete " + (name ? '"' + name + '"' : "this buyer") + ".";
+  document.getElementById("admin-delete-buyerlead-confirm-input").value = "";
+  document.getElementById("admin-delete-buyerlead-error").textContent = "";
+  document.getElementById("admin-delete-buyerlead-confirm").disabled = true;
+  modal.hidden = false;
+}
+
+document.getElementById("admin-delete-buyerlead-cancel").addEventListener("click", function () {
+  document.getElementById("admin-delete-buyerlead-modal").hidden = true;
+});
+
+document.getElementById("admin-delete-buyerlead-confirm-input").addEventListener("input", function () {
+  document.getElementById("admin-delete-buyerlead-confirm").disabled = this.value.trim() !== "DELETE";
+});
+
+document.getElementById("admin-delete-buyerlead-confirm").addEventListener("click", async function () {
+  const btn = this;
+  if (document.getElementById("admin-delete-buyerlead-confirm-input").value.trim() !== "DELETE") return;
+  if (btn.disabled) return;
+  btn.disabled = true;
+  const res = await api("adminDeleteBuyerLeads", { buyerLeadIds: pendingAdminDeleteBuyerLeadIds });
+  btn.disabled = false;
+  if (!res.ok) {
+    document.getElementById("admin-delete-buyerlead-error").textContent = res.error || "Could not delete.";
+    showToast(res.error || "Could not delete.", true);
+    return;
+  }
+  document.getElementById("admin-delete-buyerlead-modal").hidden = true;
+  showToast("Deleted " + res.deletedCount + " buyer(s).");
+  await loadBuyerLeadsAdmin();
+  if (pendingAdminDeleteReopenId) {
+    openAdminBuyerLeadDetail(pendingAdminDeleteReopenId);
+  } else {
+    document.getElementById("detail-overlay").hidden = true;
+  }
+});
+
 document.getElementById("rep-mybuyerlist-delete-btn").addEventListener("click", function () {
   if (repMyBuyerLeadsSelectedIds.size === 0) {
     showToast("Select at least one buyer first.", true);
@@ -4465,7 +4516,16 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
 
     '<div class="section-title">Do Not Contact</div>' +
     '<p class="small-muted">Blocks any rep from logging a new call/text against this buyer and stops them from being given a new pitch. Existing pitch history is kept.</p>' +
-    '<button class="btn ' + (isDnc ? "secondary" : "danger") + ' small" id="admin-dnc-toggle-btn">' + (isDnc ? "Allow Contact Again" : "Mark Do Not Contact") + '</button>';
+    '<button class="btn ' + (isDnc ? "secondary" : "danger") + ' small" id="admin-dnc-toggle-btn">' + (isDnc ? "Allow Contact Again" : "Mark Do Not Contact") + '</button>' +
+
+    '<div class="section-title">Duplicates</div>' +
+    '<p class="small-muted">Checks the whole buyer database for other leads sharing this one\'s phone or email. Merge folds a duplicate\'s pitches, contact history, and tags into this buyer (nothing is lost) and removes the duplicate row; Delete just removes it outright.</p>' +
+    '<button class="btn secondary small" id="admin-check-duplicates-btn">Check For Duplicates</button>' +
+    '<div id="admin-duplicates-result" style="margin-top:8px;"></div>' +
+
+    '<div class="section-title">Delete This Buyer</div>' +
+    '<p class="small-muted">Permanently removes this buyer, including all pitch and contact history on them, from the database. Cannot be undone — use Merge above instead if there\'s any data on this record worth keeping.</p>' +
+    '<button class="btn danger small" id="admin-delete-buyerlead-btn">Delete This Buyer</button>';
 
   document.getElementById("close-detail-btn").addEventListener("click", function () { overlay.hidden = true; loadBuyerLeadsAdmin(); });
 
@@ -4537,6 +4597,56 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
     await loadBuyerLeadsAdmin();
     openAdminBuyerLeadDetail(buyerLeadId);
     showToast("Rep tags saved.");
+  });
+
+  document.getElementById("admin-check-duplicates-btn").addEventListener("click", async function () {
+    const btn = this;
+    const resultEl = document.getElementById("admin-duplicates-result");
+    if (btn.disabled) return;
+    btn.disabled = true;
+    btn.textContent = "Checking…";
+    const res = await api("adminFindDuplicateBuyerLeads", {});
+    btn.disabled = false;
+    btn.textContent = "Check For Duplicates";
+    if (!res.ok) { showToast(res.error || "Could not check for duplicates.", true); return; }
+    const group = res.groups.find(function (g) { return g.some(function (l) { return l.buyerLeadId === buyerLeadId; }); });
+    const others = group ? group.filter(function (l) { return l.buyerLeadId !== buyerLeadId; }) : [];
+    if (others.length === 0) {
+      resultEl.innerHTML = '<p class="small-muted">No duplicates found (same phone or email as another lead).</p>';
+      return;
+    }
+    resultEl.innerHTML = others.map(function (l) {
+      return '<div class="item-row">' +
+        '<strong>' + esc(l.buyerName || "(no name)") + '</strong>' +
+        (l.doNotContact ? ' <span class="status-pill status-dead-match">DNC</span>' : "") +
+        '<div class="small-muted">' + [l.phone, l.email].filter(Boolean).join(" &middot; ") +
+          ([l.city, l.state].filter(Boolean).length ? ' &middot; ' + [l.city, l.state].filter(Boolean).join(", ") : "") +
+          ' &middot; ' + l.pitchCount + ' pitch(es), ' + l.contactCount + ' contact(s) logged' +
+        '</div>' +
+        '<div class="nav-row" style="justify-content:flex-start; gap:8px; margin-top:6px;">' +
+          '<button class="btn primary small dup-merge-into-this-btn" data-dup-id="' + esc(l.buyerLeadId) + '">Merge Into This Buyer</button>' +
+          '<button class="btn danger small dup-delete-btn" data-dup-id="' + esc(l.buyerLeadId) + '" data-dup-name="' + esc(l.buyerName || "") + '">Delete This Duplicate</button>' +
+        '</div>' +
+        '</div>';
+    }).join("");
+    Array.from(resultEl.querySelectorAll(".dup-merge-into-this-btn")).forEach(function (mergeBtn) {
+      mergeBtn.addEventListener("click", async function () {
+        if (mergeBtn.disabled) return;
+        mergeBtn.disabled = true;
+        const mergeRes = await api("adminMergeBuyerLeads", { keepId: buyerLeadId, mergeIds: [mergeBtn.getAttribute("data-dup-id")] });
+        if (!mergeRes.ok) { mergeBtn.disabled = false; showToast(mergeRes.error || "Could not merge.", true); return; }
+        await loadBuyerLeadsAdmin();
+        openAdminBuyerLeadDetail(buyerLeadId);
+        showToast("Merged — pitches, contact history, and tags carried over.");
+      });
+    });
+    Array.from(resultEl.querySelectorAll(".dup-delete-btn")).forEach(function (delBtn) {
+      delBtn.addEventListener("click", function () { openDeleteBuyerLeadModal([delBtn.getAttribute("data-dup-id")], delBtn.getAttribute("data-dup-name"), buyerLeadId); });
+    });
+  });
+
+  document.getElementById("admin-delete-buyerlead-btn").addEventListener("click", function () {
+    openDeleteBuyerLeadModal([buyerLeadId], lead.BuyerName, null);
   });
 
   const giveBtn = document.getElementById("give-new-pitch-btn");

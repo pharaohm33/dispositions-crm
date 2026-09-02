@@ -1133,6 +1133,20 @@
   </div>
 </div>
 
+<div class="modal-backdrop" id="admin-delete-buyerlead-modal" hidden>
+  <div class="modal-box" style="max-width:420px;">
+    <h3>Delete Buyer?</h3>
+    <p class="banner danger" id="admin-delete-buyerlead-warning" style="margin-top:0;"></p>
+    <p class="small-muted">This permanently removes them, including all pitch and contact history, from the database — it cannot be undone. Type <strong>DELETE</strong> below to confirm.</p>
+    <input type="text" id="admin-delete-buyerlead-confirm-input" autocomplete="off" placeholder="Type DELETE to confirm">
+    <div class="error-text" id="admin-delete-buyerlead-error"></div>
+    <div class="nav-row">
+      <button class="btn secondary" id="admin-delete-buyerlead-cancel">Cancel</button>
+      <button class="btn danger" id="admin-delete-buyerlead-confirm" disabled>Delete</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-backdrop" id="delete-mybuyers-modal" hidden>
   <div class="modal-box" style="max-width:420px;">
     <h3>Delete Buyer(s)?</h3>
@@ -1225,7 +1239,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=66"></script>
-<script src="app.js?v=66"></script>
+<script src="config.js?v=67"></script>
+<script src="app.js?v=67"></script>
 </body>
 </html>

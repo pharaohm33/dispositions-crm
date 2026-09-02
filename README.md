@@ -145,6 +145,21 @@ backend (see [SETUP.md](SETUP.md)).
   any rep clicks "Request Address Access." Every auto-grant still lands as
   a normal AddressGrants row, so it shows up in — and can be revoked from
   — that deal's Address Access section exactly like a manual grant would.
+- A buyer lead's admin detail page has a **Duplicates** section — "Check
+  For Duplicates" scans the whole database for other leads sharing this
+  one's phone or email (same matching the existing "Scan for Duplicates"
+  tool on the Buyer Leads tab uses), right from wherever admin is already
+  looking at a buyer (a Pitches-tab match, a deal's own pitched-buyers
+  list, the buyer's own row) instead of only from that separate tool.
+  Each duplicate found offers **Merge Into This Buyer** (folds its
+  pitches, full contact history, and profile fields into the one being
+  viewed — now including VIP/Responsive/Unresponsive/Top VIP Closed tags,
+  Deal Types, and every rep tag, OR'd/unioned together rather than
+  dropped) or **Delete This Duplicate** outright. A plain **Delete This
+  Buyer** button is also available for a lead that's clearly bad data with
+  nothing worth merging. Both delete paths are admin-only, permanent, and
+  gated behind a typed-DELETE confirmation, same pattern as a rep deleting
+  their own uploaded buyers.
   Every list of buyer leads/pitches (admin Buyer Leads, admin Pitches, a
   rep's My Pitches, a rep's My Buyer List) has a **Show N at a time**
   selector (10/25/50/100) alongside its own pagination controls, and

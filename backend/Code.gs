@@ -318,6 +318,8 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminFindDuplicateBuyerLeads));
       case 'adminMergeBuyerLeads':
         return jsonOut(withAdminSession(body, adminMergeBuyerLeads));
+      case 'adminDeleteBuyerLeads':
+        return jsonOut(withAdminSession(body, adminDeleteBuyerLeads));
       case 'updateBuyerLeadProfile':
         return jsonOut(withSession(body, updateBuyerLeadProfile));
       case 'adminBulkUpdateBuyerLeads':
@@ -2045,7 +2047,7 @@ function adminMergeBuyerLeads(body) {
       }
     });
 
-    const fillableFields = ['Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'OwnershipLengthMonths', 'PropertyURL', 'PriceRangeMin', 'PriceRangeMax', 'DriveLink', 'GeneralNotes'];
+    const fillableFields = ['Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'OwnershipLengthMonths', 'PropertyURL', 'PriceRangeMin', 'PriceRangeMax', 'DriveLink', 'GeneralNotes', 'UploadedBy', 'FirstResponsiveBy'];
     fillableFields.forEach(function (f) {
       if (keepLead[f]) return;
       const donor = mergeLeads.find(function (l) { return l[f]; });
@@ -2057,9 +2059,74 @@ function adminMergeBuyerLeads(body) {
       leadsSheet.getRange(keepLead._row, getColumnIndex(leadsSheet, 'DoNotContact')).setValue(true);
     }
 
+    // Status tags -- OR'd across every merged lead, same "never lose real
+    // signal" logic as DoNotContact above: if any duplicate was VIP/
+    // Responsive/Unresponsive/Closed, the kept record should be too.
+    // Closed still forces VIP, same rule as updateBuyerLeadClosedStatus.
+    const allLeads = [keepLead].concat(mergeLeads);
+    const anyTrue = function (field) { return allLeads.some(function (l) { return l[field] === true || l[field] === 'TRUE'; }); };
+    if (anyTrue('IsVip') && keepLead['IsVip'] !== true && keepLead['IsVip'] !== 'TRUE') {
+      leadsSheet.getRange(keepLead._row, getColumnIndex(leadsSheet, 'IsVip')).setValue(true);
+    }
+    if (anyTrue('IsResponsive') && keepLead['IsResponsive'] !== true && keepLead['IsResponsive'] !== 'TRUE') {
+      leadsSheet.getRange(keepLead._row, getColumnIndex(leadsSheet, 'IsResponsive')).setValue(true);
+    }
+    if (anyTrue('IsUnresponsive') && keepLead['IsUnresponsive'] !== true && keepLead['IsUnresponsive'] !== 'TRUE') {
+      leadsSheet.getRange(keepLead._row, getColumnIndex(leadsSheet, 'IsUnresponsive')).setValue(true);
+    }
+    if (anyTrue('HasClosedDeal') && keepLead['HasClosedDeal'] !== true && keepLead['HasClosedDeal'] !== 'TRUE') {
+      leadsSheet.getRange(keepLead._row, getColumnIndex(leadsSheet, 'HasClosedDeal')).setValue(true);
+      leadsSheet.getRange(keepLead._row, getColumnIndex(leadsSheet, 'IsVip')).setValue(true);
+    }
+
+    // Multi-value tag fields -- union every merged lead's list into the
+    // kept record's, deduped, rather than a plain "first non-empty wins"
+    // backfill (that would silently drop a rep tag or Deal Type only the
+    // duplicate had).
+    const unionField = function (field) {
+      const values = [];
+      allLeads.forEach(function (l) {
+        splitCommaList(l[field]).forEach(function (v) { if (values.indexOf(v) === -1) values.push(v); });
+      });
+      leadsSheet.getRange(keepLead._row, getColumnIndex(leadsSheet, field)).setValue(values.join(', '));
+    };
+    unionField('AssignedReps');
+    unionField('DealTypes');
+
     mergeLeads.sort(function (a, b) { return b._row - a._row; }).forEach(function (l) { leadsSheet.deleteRow(l._row); });
 
     return { ok: true, mergedCount: mergeLeads.length };
+  });
+}
+
+// Admin-only, permanent -- for a lead that's clearly a duplicate with
+// nothing worth merging (or was uploaded by mistake), rather than forcing
+// every removal through the merge flow above. Same cleanup as a rep's own
+// deleteMyBuyerLeads (pitches + contacts go with it), just without the
+// "must be your own upload" restriction, since admin can remove anyone's.
+function adminDeleteBuyerLeads(body) {
+  if (!body.buyerLeadIds || body.buyerLeadIds.length === 0) return { ok: false, error: 'No leads selected.' };
+  const wanted = {};
+  body.buyerLeadIds.forEach(function (id) { wanted[id] = true; });
+
+  return withLock(function () {
+    const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+    const toDelete = sheetToObjects(sheet).filter(function (l) { return wanted[l['BuyerLeadID']]; });
+    if (toDelete.length === 0) return { ok: false, error: 'Lead(s) not found.' };
+    const deleteIds = {};
+    toDelete.forEach(function (l) { deleteIds[l['BuyerLeadID']] = true; });
+
+    const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+    const pitchRows = sheetToObjects(pitchesSheet).filter(function (p) { return deleteIds[p['BuyerLeadID']]; }).map(function (p) { return p._row; });
+    pitchRows.sort(function (a, b) { return b - a; }).forEach(function (row) { pitchesSheet.deleteRow(row); });
+
+    const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
+    const contactRows = sheetToObjects(contactsSheet).filter(function (c) { return deleteIds[c['BuyerLeadID']]; }).map(function (c) { return c._row; });
+    contactRows.sort(function (a, b) { return b - a; }).forEach(function (row) { contactsSheet.deleteRow(row); });
+
+    toDelete.sort(function (a, b) { return b._row - a._row; }).forEach(function (l) { sheet.deleteRow(l._row); });
+
+    return { ok: true, deletedCount: toDelete.length };
   });
 }
 
