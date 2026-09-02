@@ -342,8 +342,12 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminWithdrawPitch));
       case 'adminGetPitchesForBuyerLead':
         return jsonOut(withAdminSession(body, adminGetPitchesForBuyerLead));
+      case 'adminGetPitchesForDeal':
+        return jsonOut(withAdminSession(body, adminGetPitchesForDeal));
       case 'adminGetPitchContacts':
         return jsonOut(withAdminSession(body, adminGetPitchContacts));
+      case 'adminGetBuyerLeadContactLog':
+        return jsonOut(withAdminSession(body, adminGetBuyerLeadContactLog));
       case 'adminGetAllPitches':
         return jsonOut(withAdminSession(body, adminGetAllPitches));
       case 'adminBulkWithdrawPitches':
@@ -360,6 +364,10 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminGetAutoApproveSettings));
       case 'adminSetAutoApprove':
         return jsonOut(withAdminSession(body, adminSetAutoApprove));
+      case 'adminGetAutoDiscloseAddressSettings':
+        return jsonOut(withAdminSession(body, adminGetAutoDiscloseAddressSettings));
+      case 'adminSetAutoDiscloseAddress':
+        return jsonOut(withAdminSession(body, adminSetAutoDiscloseAddress));
       case 'adminRunAutoFeedNow':
         return jsonOut(withAdminSession(body, adminRunAutoFeedNow));
       case 'adminAddStatusOption':
@@ -1472,6 +1480,16 @@ function requestAddressAccess(body, session) {
   const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === body.dealId; });
   if (!deal) return { ok: false, error: 'Deal not found.' };
 
+  // "all_on_request" mode -- skip the manual-approval step entirely and
+  // grant this rep the address the instant they ask, instead of just
+  // emailing admin and waiting. Still recorded as a normal AddressGrants
+  // row, so it shows up (and can be revoked) in Address Access exactly
+  // like any manual grant would.
+  if (adminGetAutoDiscloseAddressSettings({}).mode === 'all_on_request') {
+    adminGrantAddressAccess({ dealId: body.dealId, username: session.u });
+    return { ok: true, autoGranted: true };
+  }
+
   const supportEmail = getSupportEmail();
   if (!supportEmail) return { ok: false, error: 'No support contact is set up yet — ask admin to set the "Need Help After Signing Up?" contact email in the Team tab.' };
 
@@ -1500,6 +1518,10 @@ function addInterestedBuyer(body, session) {
     'MatchStatus': 'Active Match', 'ARVPercent': body.arvPercent || '', 'AsIsPercent': body.asIsPercent || '',
     'AdminNote': '', 'CreatedAt': now, 'StatusUpdatedAt': now
   });
+
+  // See adminSetAutoDiscloseAddress -- a no-op unless admin has turned on
+  // "all_on_interest"/"trusted_on_interest" mode.
+  autoDiscloseAddressOnInterest(body.dealId);
 
   const adminEmail = PropertiesService.getScriptProperties().getProperty('ADMIN_NOTIFY_EMAIL');
   if (adminEmail) {
@@ -3045,6 +3067,46 @@ function adminGetPitchesForBuyerLead(body) {
   return { ok: true, pitches: pitchesWithStatus(pitches, allContacts, dealsById) };
 }
 
+// The buyer-lead side of a specific deal, for admin -- every buyer this
+// deal has actually been pitched to (via the calling-list/Pitches
+// workflow), each with its VIP/Responsive/Unresponsive/Closed tags, so
+// admin can open a deal and immediately see which buyers on it are worth
+// following up on, instead of having to go hunt through the whole-team
+// Pitches tab or each buyer's own page separately.
+function adminGetPitchesForDeal(body) {
+  if (!body.dealId) return { ok: false, error: 'Missing dealId.' };
+  const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+  const pitches = sheetToObjects(pitchesSheet).filter(function (p) { return p['DealID'] === body.dealId; });
+
+  const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const leadsById = {};
+  sheetToObjects(leadsSheet).forEach(function (l) { leadsById[l['BuyerLeadID']] = l; });
+
+  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const dealsById = {};
+  sheetToObjects(dealsSheet).forEach(function (d) { dealsById[d['DealID']] = d; });
+
+  pitches.forEach(function (p) {
+    const lead = leadsById[p['BuyerLeadID']];
+    p._phoneType = lead ? lead['PhoneType'] : '';
+    p._doNotContact = !!(lead && (lead['DoNotContact'] === true || lead['DoNotContact'] === 'TRUE'));
+    p.buyerName = lead ? lead['BuyerName'] : '(deleted buyer)';
+    p.buyerPhone = lead ? lead['Phone'] : '';
+    p.isVip = !!(lead && (lead['IsVip'] === true || lead['IsVip'] === 'TRUE'));
+    p.isResponsive = !!(lead && (lead['IsResponsive'] === true || lead['IsResponsive'] === 'TRUE'));
+    p.isUnresponsive = !!(lead && (lead['IsUnresponsive'] === true || lead['IsUnresponsive'] === 'TRUE'));
+    p.hasClosedDeal = !!(lead && (lead['HasClosedDeal'] === true || lead['HasClosedDeal'] === 'TRUE'));
+    p.uploadedBy = lead ? lead['UploadedBy'] : '';
+    p.firstResponsiveBy = lead ? lead['FirstResponsiveBy'] : '';
+    p.assignedReps = lead ? lead['AssignedReps'] : '';
+  });
+
+  const contactsSheet2 = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
+  const dealContacts = sheetToObjects(contactsSheet2).filter(function (c) { return c['DealID'] === body.dealId; });
+
+  return { ok: true, pitches: pitchesWithStatus(pitches, dealContacts, dealsById) };
+}
+
 // A single, whole-team view of every open pitch -- unlike
 // adminGetPitchesForBuyerLead (one buyer at a time, buried inside that
 // buyer's detail panel), this is the admin's one-stop place to see who has
@@ -3110,6 +3172,42 @@ function adminGetPitchContacts(body) {
   const sheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
   const contacts = sheetToObjects(sheet).filter(function (c) { return c['PitchID'] === body.pitchId; });
   return { ok: true, contacts: contacts };
+}
+
+// The full call/text log for one buyer lead across EVERY pitch/rep/deal at
+// once, not just one pitch at a time -- so admin can see "who's actually
+// contacted this person and when" in one place on the buyer's own page,
+// instead of opening each pitch's own History individually. Each entry is
+// enriched with the rep's name/phone/email (so admin can reach that rep
+// directly) and which deal the contact was for, newest first.
+function adminGetBuyerLeadContactLog(body) {
+  if (!body.buyerLeadId) return { ok: false, error: 'Missing buyerLeadId.' };
+  const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
+  const contacts = sheetToObjects(contactsSheet).filter(function (c) { return c['BuyerLeadID'] === body.buyerLeadId; });
+
+  const repsSheet = getSheet(REPS_SHEET, REP_COLUMNS);
+  const repsByUsername = {};
+  sheetToObjects(repsSheet).forEach(function (r) {
+    repsByUsername[String(r['Username'] || '').trim().toLowerCase()] = r;
+  });
+
+  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const dealsById = {};
+  sheetToObjects(dealsSheet).forEach(function (d) { dealsById[d['DealID']] = d; });
+
+  const enriched = contacts.map(function (c) {
+    const rep = repsByUsername[String(c['Username'] || '').trim().toLowerCase()];
+    const deal = dealsById[c['DealID']];
+    const copy = Object.assign({}, c);
+    copy.repName = rep ? rep['Name'] : c['Username'];
+    copy.repPhone = rep ? rep['Phone'] : '';
+    copy.repEmail = rep ? rep['Email'] : '';
+    copy.dealLabel = deal ? (deal['DealCode'] || deal['Address']) : '(deleted deal)';
+    return copy;
+  });
+  enriched.sort(function (a, b) { return new Date(b['ContactedAt'] || 0) - new Date(a['ContactedAt'] || 0); });
+
+  return { ok: true, contacts: enriched };
 }
 
 // Also doubles as the general "edit a rep's details" save -- phone plus
@@ -3271,6 +3369,65 @@ function adminSetAutoApprove(body) {
   const props = PropertiesService.getScriptProperties();
   props.setProperty('AUTO_APPROVE_NEW_SIGNUPS', body.enabled ? 'TRUE' : 'FALSE');
   return { ok: true };
+}
+
+// Same convention as Auto-Approve above -- off by default, one script
+// property, an admin-only get/set pair. Valid modes: 'off' (always a
+// manual grant, the original behavior), 'all_on_interest' (grant every
+// rep with access to the deal the moment addInterestedBuyer logs a buyer
+// on it), 'trusted_on_interest' (same trigger, but only reps who already
+// hold at least one address grant elsewhere -- a proxy for "admin has
+// trusted this rep with an address before"), and 'all_on_request' (skip
+// the manual-approval step entirely -- requestAddressAccess grants
+// instantly instead of just emailing admin).
+const AUTO_DISCLOSE_ADDRESS_MODES = ['off', 'all_on_interest', 'trusted_on_interest', 'all_on_request'];
+function adminGetAutoDiscloseAddressSettings(body) {
+  const props = PropertiesService.getScriptProperties();
+  const mode = props.getProperty('AUTO_DISCLOSE_ADDRESS_MODE') || 'off';
+  return { ok: true, mode: AUTO_DISCLOSE_ADDRESS_MODES.indexOf(mode) !== -1 ? mode : 'off' };
+}
+
+function adminSetAutoDiscloseAddress(body) {
+  const props = PropertiesService.getScriptProperties();
+  const mode = AUTO_DISCLOSE_ADDRESS_MODES.indexOf(body.mode) !== -1 ? body.mode : 'off';
+  props.setProperty('AUTO_DISCLOSE_ADDRESS_MODE', mode);
+  return { ok: true };
+}
+
+// Shared by addInterestedBuyer -- grants every eligible active, non-admin
+// rep an AddressGrants row for this deal, same effect as admin clicking
+// Grant in Address Access one at a time, just automatic. Reuses
+// canAccessDeal (built for a real login session) with a synthetic
+// {u, a: false, all} session per rep, rather than duplicating its
+// assignment/category logic here. Silently a no-op when the mode is
+// 'off' or 'all_on_request' (that one is handled inside
+// requestAddressAccess instead, since its trigger is a specific rep
+// asking, not "a buyer got marked interested").
+function autoDiscloseAddressOnInterest(dealId) {
+  const mode = adminGetAutoDiscloseAddressSettings({}).mode;
+  if (mode !== 'all_on_interest' && mode !== 'trusted_on_interest') return;
+
+  const repsSheet = getSheet(REPS_SHEET, REP_COLUMNS);
+  const reps = sheetToObjects(repsSheet).filter(function (r) {
+    return (r['Active'] === true || r['Active'] === 'TRUE') && r['IsAdmin'] !== true && r['IsAdmin'] !== 'TRUE';
+  });
+
+  const grantsSheet = getSheet(ADDRESS_GRANTS_SHEET, ADDRESS_GRANT_COLUMNS);
+  const existingGrants = sheetToObjects(grantsSheet);
+  const trustedUsernames = {};
+  if (mode === 'trusted_on_interest') {
+    existingGrants.forEach(function (g) { trustedUsernames[String(g['Username'] || '').trim().toLowerCase()] = true; });
+  }
+
+  reps.forEach(function (rep) {
+    const username = String(rep['Username'] || '').trim().toLowerCase();
+    if (mode === 'trusted_on_interest' && !trustedUsernames[username]) return;
+    const allAccess = rep['AllAccess'] === true || rep['AllAccess'] === 'TRUE';
+    if (!canAccessDeal({ u: username, a: false, all: allAccess }, dealId)) return;
+    const alreadyGranted = existingGrants.some(function (g) { return g['DealID'] === dealId && String(g['Username'] || '').trim().toLowerCase() === username; });
+    if (alreadyGranted) return;
+    appendRowByHeaders(grantsSheet, { 'DealID': dealId, 'Username': username, 'GrantedAt': new Date().toISOString() });
+  });
 }
 
 function repMatchesArea(rep, deal) {

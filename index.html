@@ -640,6 +640,20 @@
       </div>
     </div>
 
+    <div class="card">
+      <div class="section-title" style="margin-top:0;">Auto-Disclose Address</div>
+      <p class="small-muted">Normally a deal's exact address is only shared with a rep once you manually grant it (Address Access, on the deal's own page). Turn this on to skip that manual step in specific situations — grants still show up as normal in Address Access afterward, and can be revoked there like any other grant.</p>
+      <select id="autodisclose-mode-input">
+        <option value="off">Off — always grant manually (default)</option>
+        <option value="all_on_interest">Auto-grant to every rep with access to the deal, the moment any buyer is marked interested on it</option>
+        <option value="trusted_on_interest">Auto-grant only to "trusted" reps (already granted an address on at least one other deal), the moment any buyer is marked interested</option>
+        <option value="all_on_request">Auto-grant instantly to any rep who clicks "Request Address Access" — no admin approval step</option>
+      </select>
+      <div class="nav-row" style="justify-content:flex-end; margin-top:10px;">
+        <button class="btn secondary small" id="autodisclose-save-btn">Save</button>
+      </div>
+    </div>
+
     <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
       <button class="btn primary" id="add-rep-btn">+ Add Team Member</button>
     </div>
@@ -1211,7 +1225,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=65"></script>
-<script src="app.js?v=65"></script>
+<script src="config.js?v=66"></script>
+<script src="app.js?v=66"></script>
 </body>
 </html>

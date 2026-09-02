@@ -122,6 +122,29 @@ backend (see [SETUP.md](SETUP.md)).
   independent of the automatic Uploaded By/First Response tags. Tags stay
   until admin explicitly removes them. The admin Buyer Leads Tag filter
   also picks up "Unresponsive Only."
+  Every admin-only tag that names a rep (Uploaded By, First Response, Reps
+  Tagged On This Buyer, and "given to" on any pitch) now also shows that
+  rep's phone/email inline, so admin can reach them directly without a
+  detour through the Team tab. A buyer's admin detail page also has a
+  **Full Contact Log** — every call/text logged for that buyer across
+  every pitch, rep, and deal at once (rep contact info included), newest
+  first, instead of opening each pitch's own history separately. And a
+  deal's own admin detail page now has a **"Buyer Leads Pitched For This
+  Deal"** section — every buyer lead pitched for that specific deal, with
+  its VIP/Responsive/Unresponsive/Closed tags and rep info, click straight
+  through to that buyer's full page — so admin can open a deal and
+  immediately see which buyers on it are worth following up on, without a
+  detour through the whole-team Pitches tab.
+- **Auto-Disclose Address** (Team tab, off by default): normally a deal's
+  exact address only reaches a rep once admin manually grants it via
+  Address Access. Three optional auto-grant modes replace that manual
+  step in different situations: grant every rep with access to a deal the
+  moment any buyer is marked interested on it; grant only "trusted" reps
+  (already holding an address grant on at least one other deal) on that
+  same trigger; or skip approval entirely and grant instantly the moment
+  any rep clicks "Request Address Access." Every auto-grant still lands as
+  a normal AddressGrants row, so it shows up in — and can be revoked from
+  — that deal's Address Access section exactly like a manual grant would.
   Every list of buyer leads/pitches (admin Buyer Leads, admin Pitches, a
   rep's My Pitches, a rep's My Buyer List) has a **Show N at a time**
   selector (10/25/50/100) alongside its own pagination controls, and

@@ -142,9 +142,21 @@ function buyerStatusTagsHtml(obj, isPitch) {
 // uploads, per the explicit design: reps see the status tags above but
 // never the uploader tag, for themselves or anyone else. Only admin sees
 // this, so admin knows exactly who to pay/credit for the relationship.
+// adminReps (loaded once at admin login, see initAdminView) is the one
+// reliable place with every rep's Name/Phone/Email regardless of which
+// admin tab is currently active -- used to turn a bare username on any
+// admin-only tag into something admin can actually act on (call/text/
+// email that rep directly) without a detour through the Team tab first.
+function repContactSuffix(username) {
+  const rep = (typeof adminReps !== "undefined" ? adminReps : []).find(function (r) { return r.username === username; });
+  if (!rep) return "";
+  const bits = [rep.phone, rep.email].filter(Boolean);
+  return bits.length > 0 ? " (" + bits.map(esc).join(" · ") + ")" : "";
+}
+
 function uploaderTagHtml(uploadedBy) {
   if (!uploadedBy) return "";
-  return '<span class="status-pill status-uploaded-by">Uploaded by ' + esc(uploadedBy) + '</span>';
+  return '<span class="status-pill status-uploaded-by">Uploaded by ' + esc(uploadedBy) + repContactSuffix(uploadedBy) + '</span>';
 }
 
 // Same admin-only visibility as uploaderTagHtml -- who got the FIRST real
@@ -154,7 +166,7 @@ function uploaderTagHtml(uploadedBy) {
 // specifically who actually earned the "Responsive" tag.
 function firstResponsiveTagHtml(username) {
   if (!username) return "";
-  return '<span class="status-pill status-uploaded-by">First response: ' + esc(username) + '</span>';
+  return '<span class="status-pill status-uploaded-by">First response: ' + esc(username) + repContactSuffix(username) + '</span>';
 }
 
 // Admin-only, admin-curated list of every rep currently tagged onto this
@@ -167,7 +179,7 @@ function assignedRepsTagHtml(assignedReps) {
   const usernames = splitCommaList(assignedReps);
   if (usernames.length === 0) return "";
   return usernames.map(function (u) {
-    return '<span class="status-pill status-uploaded-by">Tagged: ' + esc(u) + '</span>';
+    return '<span class="status-pill status-uploaded-by">Tagged: ' + esc(u) + repContactSuffix(u) + '</span>';
   }).join(" ");
 }
 
@@ -1289,6 +1301,16 @@ function wireRequestAddressButton() {
     const res = await api("requestAddressAccess", { dealId: btn.getAttribute("data-deal-id") });
     btn.disabled = false;
     if (!res.ok) { showToast(res.error || "Could not send the request.", true); return; }
+    // Auto-Disclose Address is set to grant instantly on request (see
+    // admin's Team tab setting) -- close and reopen this panel so the
+    // just-granted address actually shows, instead of a stale "request
+    // sent" state that needs a manual refresh to catch up.
+    if (res.autoGranted) {
+      showToast("Address granted instantly.");
+      document.getElementById("detail-overlay").hidden = true;
+      await Promise.all([loadMyPitches(), initRepView()]);
+      return;
+    }
     showToast("Address requested — admin has been notified.");
   });
 }
@@ -1556,6 +1578,29 @@ function renderContactHistory(contacts) {
   return contacts.slice().reverse().map(function (c) {
     return '<div class="item-row">' +
       '<span class="ts">' + formatDate(c.ContactedAt) + ' &middot; ' + esc(c.Username) + ' &middot; ' + esc(c.Method) +
+      (c.PhoneSlot && c.PhoneSlot !== "Phone" ? ' (' + esc(c.PhoneSlot) + ')' : '') +
+      (c.Responded === true || c.Responded === "TRUE" ? ' &middot; <strong>Responded</strong>' : '') +
+      (c.VoicemailLeft === true || c.VoicemailLeft === "TRUE" ? ' &middot; Left voicemail' : '') + '</span>' +
+      (c.ARVPercent || c.AsIsPercent ? '<div class="small-muted" style="margin-top:4px;">' +
+        [c.ARVPercent ? esc(c.ARVPercent) + "% of ARV" : "", c.AsIsPercent ? esc(c.AsIsPercent) + "% of As-Is Value" : ""].filter(Boolean).join(" &middot; ") +
+        '</div>' : "") +
+      (c.Notes ? '<div style="margin-top:4px;">' + esc(c.Notes) + '</div>' : "") +
+      '</div>';
+  }).join("");
+}
+
+// Admin-only, whole-buyer version of renderContactHistory above -- spans
+// every pitch/rep/deal at once (see adminGetBuyerLeadContactLog) instead
+// of one pitch's own history, and names which rep and which deal each
+// entry was for since that's ambiguous once more than one rep has worked
+// this buyer. Already sorted newest-first by the backend.
+function renderAdminBuyerLeadContactLog(contacts) {
+  if (contacts.length === 0) return '<p class="small-muted">No contact logged yet.</p>';
+  return contacts.map(function (c) {
+    const repContact = [c.repPhone, c.repEmail].filter(Boolean).join(" · ");
+    return '<div class="item-row">' +
+      '<span class="ts">' + formatDate(c.ContactedAt) + ' &middot; ' + esc(c.repName) + (repContact ? ' (' + esc(repContact) + ')' : '') +
+        ' &middot; Re: ' + esc(c.dealLabel) + ' &middot; ' + esc(c.Method) +
       (c.PhoneSlot && c.PhoneSlot !== "Phone" ? ' (' + esc(c.PhoneSlot) + ')' : '') +
       (c.Responded === true || c.Responded === "TRUE" ? ' &middot; <strong>Responded</strong>' : '') +
       (c.VoicemailLeft === true || c.VoicemailLeft === "TRUE" ? ' &middot; Left voicemail' : '') + '</span>' +
@@ -2307,12 +2352,13 @@ async function openAdminDealDetail(dealId) {
   const panel = document.getElementById("detail-panel");
   overlay.hidden = false;
 
-  const [repsRes, assignRes, buyersRes, fbRes, grantsRes] = await Promise.all([
+  const [repsRes, assignRes, buyersRes, fbRes, grantsRes, dealPitchesRes] = await Promise.all([
     api("adminGetReps", {}),
     api("adminGetAssignments", { dealId: dealId }),
     api("getInterestedBuyers", { dealId: dealId }),
     api("adminGetFbRequests", { dealId: dealId }),
-    api("adminGetAddressGrants", { dealId: dealId })
+    api("adminGetAddressGrants", { dealId: dealId }),
+    api("adminGetPitchesForDeal", { dealId: dealId })
   ]);
   const activeReps = repsRes.ok ? repsRes.reps.filter(function (r) { return r.active && !r.isAdmin; }) : [];
   const allReps = activeReps.filter(function (r) { return !r.allAccess; });
@@ -2320,11 +2366,12 @@ async function openAdminDealDetail(dealId) {
   const buyers = buyersRes.ok ? buyersRes.buyers : [];
   const fbRequests = fbRes.ok ? fbRes.requests : [];
   const grantedUsernames = grantsRes.ok ? grantsRes.usernames : [];
+  const dealPitches = dealPitchesRes.ok ? dealPitchesRes.pitches : [];
 
-  renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbRequests, activeReps, grantedUsernames);
+  renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbRequests, activeReps, grantedUsernames, dealPitches);
 }
 
-function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbRequests, activeReps, grantedUsernames) {
+function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbRequests, activeReps, grantedUsernames, dealPitches) {
   const overlay = document.getElementById("detail-overlay");
   const panel = document.getElementById("detail-panel");
 
@@ -2488,6 +2535,31 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
               (r.phone ? ' &middot; ' + esc(r.phone) : "") + (r.email ? ' &middot; ' + esc(r.email) : "") +
               (dealTypeTagsHtml(r.buyBoxDealTypes) ? '<div style="margin-top:4px;">' + dealTypeTagsHtml(r.buyBoxDealTypes) + '</div>' : "") +
               (r.buyBoxNotes ? '<div class="small-muted" style="margin-top:2px;">' + esc(r.buyBoxNotes) + '</div>' : "") +
+              '</div>';
+          }).join("") +
+        '</div>' +
+      '</div>';
+    })() +
+
+    (function () {
+      // The calling-list side of "who's interested in this deal" -- every
+      // buyer lead actually pitched for it, with its VIP/Responsive/
+      // Unresponsive/Closed tags right here, so admin can spot a
+      // responsive or VIP buyer on THIS deal without a detour through the
+      // whole-team Pitches tab or opening each buyer separately. Each row
+      // opens straight into that buyer's own page (Contact Log, tags,
+      // rep info, everything).
+      if (dealPitches.length === 0) return "";
+      return '<div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border);">' +
+        '<div style="font-weight:600; margin-bottom:6px;">Buyer Leads Pitched For This Deal (' + dealPitches.length + ')</div>' +
+        '<p class="small-muted">From the calling list, not the Matching Buyers section above. Click any buyer to open their full page.</p>' +
+        '<div style="max-height:260px; overflow-y:auto; border:1px solid var(--border); border-radius:6px; padding:4px 10px;">' +
+          dealPitches.map(function (p) {
+            const tags = buyerStatusTagsHtml(p, true);
+            return '<div class="item-row clickable deal-pitch-row" data-buyer-lead-id="' + esc(p.BuyerLeadID) + '">' +
+              '<strong>' + esc(p.buyerName) + '</strong>' + (p.buyerPhone ? ' &middot; ' + esc(p.buyerPhone) : "") +
+              ' &middot; given to ' + esc(p.Username) + repContactSuffix(p.Username) +
+              (tags ? '<div style="margin-top:4px;">' + tags + '</div>' : "") +
               '</div>';
           }).join("") +
         '</div>' +
@@ -2755,6 +2827,10 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     });
   });
 
+  Array.from(panel.querySelectorAll(".deal-pitch-row")).forEach(function (row) {
+    row.addEventListener("click", function () { openAdminBuyerLeadDetail(row.getAttribute("data-buyer-lead-id")); });
+  });
+
   Array.from(panel.querySelectorAll(".revoke-address-btn")).forEach(function (btn) {
     btn.addEventListener("click", async function () {
       btn.disabled = true;
@@ -2837,8 +2913,8 @@ function renderAdminFbList(requests) {
 /* ---------- Team tab ---------- */
 
 async function loadReps() {
-  const [repsRes, joinRes, autoApproveRes] = await Promise.all([
-    api("adminGetReps", {}), api("getJoinContact", {}), api("adminGetAutoApproveSettings", {})
+  const [repsRes, joinRes, autoApproveRes, autoDiscloseRes] = await Promise.all([
+    api("adminGetReps", {}), api("getJoinContact", {}), api("adminGetAutoApproveSettings", {}), api("adminGetAutoDiscloseAddressSettings", {})
   ]);
   if (repsRes.ok) { adminReps = repsRes.reps; renderReps(); }
   if (joinRes.ok) {
@@ -2849,12 +2925,24 @@ async function loadReps() {
   if (autoApproveRes.ok) {
     document.getElementById("autoapprove-enabled-input").checked = autoApproveRes.enabled;
   }
+  if (autoDiscloseRes.ok) {
+    document.getElementById("autodisclose-mode-input").value = autoDiscloseRes.mode;
+  }
 }
 
 document.getElementById("autoapprove-save-btn").addEventListener("click", async function () {
   const btn = this;
   btn.disabled = true;
   const res = await api("adminSetAutoApprove", { enabled: document.getElementById("autoapprove-enabled-input").checked });
+  btn.disabled = false;
+  if (!res.ok) { showToast(res.error || "Could not save.", true); return; }
+  showToast("Saved.");
+});
+
+document.getElementById("autodisclose-save-btn").addEventListener("click", async function () {
+  const btn = this;
+  btn.disabled = true;
+  const res = await api("adminSetAutoDiscloseAddress", { mode: document.getElementById("autodisclose-mode-input").value });
   btn.disabled = false;
   if (!res.ok) { showToast(res.error || "Could not save.", true); return; }
   showToast("Saved.");
@@ -4282,7 +4370,15 @@ function wireBuyerProfileFieldsHandlers(prefix, buyerLeadId, onSaved) {
 }
 
 async function openAdminBuyerLeadDetail(buyerLeadId) {
-  const lead = adminBuyerLeads.find(function (l) { return l.BuyerLeadID === buyerLeadId; });
+  let lead = adminBuyerLeads.find(function (l) { return l.BuyerLeadID === buyerLeadId; });
+  // Opened from somewhere other than the Buyer Leads tab (e.g. a deal's
+  // own "Buyer Leads Pitched For This Deal" list) -- adminBuyerLeads may
+  // not have this lead loaded yet (it's paginated/filtered), so fetch it
+  // directly by id instead of failing silently.
+  if (!lead) {
+    const res = await api("adminGetBuyerLeads", { filters: { onlyIds: [buyerLeadId] }, page: 1, pageSize: 1 });
+    if (res.ok && res.leads.length > 0) lead = res.leads[0];
+  }
   if (!lead) return;
 
   const overlay = document.getElementById("detail-overlay");
@@ -4290,11 +4386,13 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
   overlay.hidden = false;
 
   const needsSelects = buyerLeadsActiveReps.length === 0 || buyerLeadsActiveDeals.length === 0;
-  const [pitchesRes] = await Promise.all([
+  const [pitchesRes, contactLogRes] = await Promise.all([
     api("adminGetPitchesForBuyerLead", { buyerLeadId: buyerLeadId }),
+    api("adminGetBuyerLeadContactLog", { buyerLeadId: buyerLeadId }),
     needsSelects ? populateBulkGiveSelects() : Promise.resolve()
   ]);
   const pitches = pitchesRes.ok ? pitchesRes.pitches : [];
+  const contactLog = contactLogRes.ok ? contactLogRes.contacts : [];
 
   // Every active deal is givable, even ones this buyer already has a pitch
   // on -- multiple reps can share a buyer+deal (e.g. two people covering
@@ -4338,6 +4436,12 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
 
     '<div class="section-title">Pitches</div>' +
     '<div id="pitches-list">' + renderAdminPitchesList(pitches) + '</div>' +
+
+    '<div class="section-title">Full Contact Log</div>' +
+    '<p class="small-muted">Every call/text logged for this buyer across every pitch, rep, and deal, newest first — so it\'s clear who actually contacted them and when, without opening each pitch\'s own history separately.</p>' +
+    '<div style="max-height:320px; overflow-y:auto; border:1px solid var(--border); border-radius:6px; padding:4px 10px;">' +
+      renderAdminBuyerLeadContactLog(contactLog) +
+    '</div>' +
 
     '<div class="section-title">VIP Buyer</div>' +
     '<p class="small-muted">Flag once this buyer seems like a serious buyer — responsive when sent deals, and/or they\'ve shared real investment criteria. "Responsive" itself is tracked automatically the moment any rep logs a response on any pitch.</p>' +
@@ -4462,7 +4566,7 @@ function renderAdminPitchesList(pitches) {
   if (pitches.length === 0) return '<p class="small-muted">No pitches given yet.</p>';
   return pitches.slice().reverse().map(function (p) {
     return '<div class="item-row">' +
-      '<span class="ts">' + formatDate(p.GivenAt) + ' &middot; given to ' + esc(p.Username) + '</span>' +
+      '<span class="ts">' + formatDate(p.GivenAt) + ' &middot; given to ' + esc(p.Username) + repContactSuffix(p.Username) + '</span>' +
       '<div style="margin-top:4px;"><strong>Re:</strong> ' + esc(p.dealAddress) + '</div>' +
       '<div style="margin-top:6px;">' +
         (p.dealStillActive
@@ -4602,7 +4706,7 @@ function renderAdminPitchesTable() {
         (adminTags ? '<div style="margin-top:2px;">' + adminTags + '</div>' : "") + '</td>' +
       '<td>' + esc(p.buyerPhone || "") + '</td>' +
       '<td>' + (p.dealCode ? esc(p.dealCode) + " — " : "") + esc(p.dealAddress) + '</td>' +
-      '<td>' + esc(repNameFor(p.Username)) + '</td>' +
+      '<td>' + esc(repNameFor(p.Username)) + repContactSuffix(p.Username) + '</td>' +
       '<td>' + (p.dealStillActive
         ? '<span class="status-pill ' + statusClass(p.status) + '">' + esc(p.status) + '</span>'
         : '<span class="status-pill status-fully-worked">Deal ' + esc((p.dealStatus || "closed").toLowerCase()) + '</span>') + '</td>' +
