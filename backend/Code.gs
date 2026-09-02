@@ -148,7 +148,7 @@ const FB_COLUMNS = ['RequestID', 'DealID', 'Username', 'PostText', 'TargetGroups
 // what the buyer has told us they want to spend, if known; like
 // AssetCategories, a buyer with neither set is treated as open to any
 // price for matching purposes.
-const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'OwnershipLengthMonths', 'PropertyURL', 'PriceRangeMin', 'PriceRangeMax', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'PendingDealID', 'CreatedAt', 'UploadedBy', 'DuplicateOfBuyerLeadID', 'DealTypes', 'IsResponsive', 'IsVip', 'HasClosedDeal', 'FirstResponsiveBy'];
+const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'OwnershipLengthMonths', 'PropertyURL', 'PriceRangeMin', 'PriceRangeMax', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'PendingDealID', 'CreatedAt', 'UploadedBy', 'DuplicateOfBuyerLeadID', 'DealTypes', 'IsResponsive', 'IsVip', 'HasClosedDeal', 'FirstResponsiveBy', 'IsUnresponsive', 'AssignedReps'];
 
 // A Pitch is "give this buyer lead to this rep, to work against this one
 // specific deal." This is the only thing that creates an actionable item in
@@ -260,8 +260,12 @@ function doPost(e) {
         return jsonOut(withSession(body, updateBuyerLeadVipStatus));
       case 'updateBuyerLeadClosedStatus':
         return jsonOut(withSession(body, updateBuyerLeadClosedStatus));
+      case 'updateBuyerLeadUnresponsiveStatus':
+        return jsonOut(withSession(body, updateBuyerLeadUnresponsiveStatus));
 
       // ---- admin only ----
+      case 'adminUpdateBuyerLeadRepTags':
+        return jsonOut(withAdminSession(body, adminUpdateBuyerLeadRepTags));
       case 'adminAddDeal':
         return jsonOut(withAdminSession(body, adminAddDeal));
       case 'adminUpdateDeal':
@@ -2359,6 +2363,7 @@ function applyBuyerLeadFilters(leads, f) {
     if (tag === 'vip' && l['IsVip'] !== true && l['IsVip'] !== 'TRUE') return false;
     if (tag === 'closed' && l['HasClosedDeal'] !== true && l['HasClosedDeal'] !== 'TRUE') return false;
     if (tag === 'responsive' && l['IsResponsive'] !== true && l['IsResponsive'] !== 'TRUE') return false;
+    if (tag === 'unresponsive' && l['IsUnresponsive'] !== true && l['IsUnresponsive'] !== 'TRUE') return false;
     return true;
   });
 }
@@ -2579,6 +2584,45 @@ function updateBuyerLeadClosedStatus(body, session) {
   const hasClosedDeal = !!body.hasClosedDeal;
   sheet.getRange(match._row, getColumnIndex(sheet, 'HasClosedDeal')).setValue(hasClosedDeal);
   if (hasClosedDeal) sheet.getRange(match._row, getColumnIndex(sheet, 'IsVip')).setValue(true);
+  return { ok: true };
+}
+
+// Same permission as VIP -- admin, or whichever rep uploaded this buyer or
+// has an active pitch on them, can mark them Unresponsive once it's clear
+// they're not worth continuing to chase. Purely a manual, independent flag
+// -- never auto-set or auto-cleared by the system (a later real response
+// doesn't silently clear it; only an explicit toggle here does), and
+// setting/clearing it never touches UploadedBy, FirstResponsiveBy, or
+// AssignedReps -- those rep tags stay exactly as they are unless admin
+// explicitly changes them via adminUpdateBuyerLeadRepTags below.
+function updateBuyerLeadUnresponsiveStatus(body, session) {
+  if (!body.buyerLeadId) return { ok: false, error: 'Missing buyerLeadId.' };
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const match = sheetToObjects(sheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
+  if (!match) return { ok: false, error: 'Lead not found.' };
+  if (!canEditBuyerLead(session, match)) return { ok: false, error: 'You need an active pitch on this buyer (or to have uploaded them yourself) to change this.' };
+  sheet.getRange(match._row, getColumnIndex(sheet, 'IsUnresponsive')).setValue(!!body.isUnresponsive);
+  return { ok: true };
+}
+
+// Admin-only -- a free-form, admin-curated list of reps tagged onto this
+// buyer for clean record keeping, separate from UploadedBy (who found
+// them) and FirstResponsiveBy (who got the first real response). Lets
+// admin add a rep who's now working this buyer, or drop one who's gone
+// unresponsive/stopped working it, without disturbing either of those
+// other two automatic tags. Replaces the whole list at once (checkbox UI
+// on the frontend), same convention as adminUpdateDeal's DealTypes.
+function adminUpdateBuyerLeadRepTags(body) {
+  if (!body.buyerLeadId) return { ok: false, error: 'Missing buyerLeadId.' };
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const match = sheetToObjects(sheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
+  if (!match) return { ok: false, error: 'Lead not found.' };
+  const repsSheet = getSheet(REPS_SHEET, REP_COLUMNS);
+  const validUsernames = sheetToObjects(repsSheet).map(function (r) { return String(r['Username'] || '').trim().toLowerCase(); });
+  const usernames = (Array.isArray(body.repUsernames) ? body.repUsernames : [])
+    .map(function (u) { return String(u || '').trim().toLowerCase(); })
+    .filter(function (u) { return u && validUsernames.indexOf(u) !== -1; });
+  sheet.getRange(match._row, getColumnIndex(sheet, 'AssignedReps')).setValue(usernames.join(', '));
   return { ok: true };
 }
 
@@ -3030,10 +3074,12 @@ function adminGetAllPitches(body) {
     // clean uploaded-by/first-responsive-by record matters most.
     p.isVip = !!(lead && (lead['IsVip'] === true || lead['IsVip'] === 'TRUE'));
     p.isResponsive = !!(lead && (lead['IsResponsive'] === true || lead['IsResponsive'] === 'TRUE'));
+    p.isUnresponsive = !!(lead && (lead['IsUnresponsive'] === true || lead['IsUnresponsive'] === 'TRUE'));
     p.hasClosedDeal = !!(lead && (lead['HasClosedDeal'] === true || lead['HasClosedDeal'] === 'TRUE'));
     p.dealTypes = lead ? lead['DealTypes'] : '';
     p.uploadedBy = lead ? lead['UploadedBy'] : '';
     p.firstResponsiveBy = lead ? lead['FirstResponsiveBy'] : '';
+    p.assignedReps = lead ? lead['AssignedReps'] : '';
   });
 
   const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
@@ -3398,6 +3444,7 @@ function getMyPitches(body, session) {
     // file header comment on rep-facing secrecy).
     p.isResponsive = !!(lead && (lead['IsResponsive'] === true || lead['IsResponsive'] === 'TRUE'));
     p.isVip = !!(lead && (lead['IsVip'] === true || lead['IsVip'] === 'TRUE'));
+    p.isUnresponsive = !!(lead && (lead['IsUnresponsive'] === true || lead['IsUnresponsive'] === 'TRUE'));
     p.hasClosedDeal = !!(lead && (lead['HasClosedDeal'] === true || lead['HasClosedDeal'] === 'TRUE'));
     p.hasResponded = allContacts.some(function (c) { return c['PitchID'] === p['PitchID'] && (c['Responded'] === true || c['Responded'] === 'TRUE'); });
     p.callingHours = lead ? callingHoursInfo(lead['State']) : null;

@@ -164,6 +164,7 @@
   .status-vip { background: #fdeccb; color: #8a5a00; font-weight: 700; }
   .status-vip-closed { background: #f4d35e; color: #4a3200; font-weight: 700; }
   .status-uploaded-by { background: var(--surface-muted); color: var(--muted); font-weight: 400; }
+  .status-unresponsive { background: var(--danger-light); color: #7d2820; }
 
   .deal-card {
     background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px;
@@ -855,6 +856,7 @@
           <option value="vip">VIP Only</option>
           <option value="closed">Top VIP Closed Only</option>
           <option value="responsive">Responsive Only</option>
+          <option value="unresponsive">Unresponsive Only</option>
         </select>
         <label class="checkbox-row" style="margin:0;"><input type="checkbox" id="buyerleads-filter-hideduplicates"> Hide Possible Duplicates</label>
       </div>
@@ -1209,7 +1211,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=64"></script>
-<script src="app.js?v=64"></script>
+<script src="config.js?v=65"></script>
+<script src="app.js?v=65"></script>
 </body>
 </html>

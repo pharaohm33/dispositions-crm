@@ -108,6 +108,20 @@ backend (see [SETUP.md](SETUP.md)).
   Deal Type tags, show together on the admin-wide **Pitches ("all buyer
   matches") tab** — every buyer↔deal pairing across the whole team in one
   place, not just inside one buyer's own pitch history.
+  A buyer can also be marked **Unresponsive** — the opposite manual call
+  from VIP, for "this one isn't panning out, stop chasing." It's fully
+  independent of the automatic Responsive tag (both can show at once if a
+  buyer responded once long ago but has since gone quiet) and never
+  auto-clears; only an explicit toggle changes it, and toggling it never
+  touches Uploaded By, First Response, or any rep tag. Either admin or a
+  rep with an active pitch/upload on that buyer can set it, same
+  permission as VIP. Separately, admin has a freely-editable **"Reps
+  Tagged On This Buyer"** checklist (its own section on a buyer's admin
+  detail page) — add a rep who's now working the buyer, or remove one
+  who's gone unresponsive or stopped working it, for clean record keeping
+  independent of the automatic Uploaded By/First Response tags. Tags stay
+  until admin explicitly removes them. The admin Buyer Leads Tag filter
+  also picks up "Unresponsive Only."
   Every list of buyer leads/pitches (admin Buyer Leads, admin Pitches, a
   rep's My Pitches, a rep's My Buyer List) has a **Show N at a time**
   selector (10/25/50/100) alongside its own pagination controls, and

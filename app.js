@@ -122,10 +122,18 @@ function buyerStatusTagsHtml(obj, isPitch) {
   const responsive = isPitch ? obj.isResponsive : (obj.IsResponsive === true || obj.IsResponsive === "TRUE");
   const vip = isPitch ? obj.isVip : (obj.IsVip === true || obj.IsVip === "TRUE");
   const closed = isPitch ? obj.hasClosedDeal : (obj.HasClosedDeal === true || obj.HasClosedDeal === "TRUE");
+  // Independent of Responsive -- Responsive is system-tracked the moment
+  // any real response ever comes in and never auto-clears; Unresponsive is
+  // a separate manual call ("this one isn't panning out, stop chasing")
+  // that also never auto-clears, so both can show together if a buyer
+  // responded once long ago but has since gone quiet. Only an explicit
+  // toggle changes either one.
+  const unresponsive = isPitch ? obj.isUnresponsive : (obj.IsUnresponsive === true || obj.IsUnresponsive === "TRUE");
   const tags = [];
   if (closed) tags.push('<span class="status-pill status-vip-closed">Top VIP Closed</span>');
   else if (vip) tags.push('<span class="status-pill status-vip">VIP</span>');
   if (responsive) tags.push('<span class="status-pill status-responded">Responsive</span>');
+  if (unresponsive) tags.push('<span class="status-pill status-unresponsive">Unresponsive</span>');
   return tags.join(" ");
 }
 
@@ -147,6 +155,20 @@ function uploaderTagHtml(uploadedBy) {
 function firstResponsiveTagHtml(username) {
   if (!username) return "";
   return '<span class="status-pill status-uploaded-by">First response: ' + esc(username) + '</span>';
+}
+
+// Admin-only, admin-curated list of every rep currently tagged onto this
+// buyer for record keeping (see adminUpdateBuyerLeadRepTags) -- separate
+// from UploadedBy and FirstResponsiveBy, which are both set automatically
+// and never edited directly. A rep only disappears from this list when
+// admin explicitly removes them (e.g. they've gone unresponsive or
+// stopped working the buyer), never automatically.
+function assignedRepsTagHtml(assignedReps) {
+  const usernames = splitCommaList(assignedReps);
+  if (usernames.length === 0) return "";
+  return usernames.map(function (u) {
+    return '<span class="status-pill status-uploaded-by">Tagged: ' + esc(u) + '</span>';
+  }).join(" ");
 }
 
 // A visible confirmation that a click actually registered -- separate from
@@ -1404,6 +1426,10 @@ async function openPitchDetail(pitchId) {
     '<p class="small-muted">Flag this buyer as VIP once they seem like a serious buyer — responsive when you send them deals, and/or they\'ve shared real investment criteria. You should follow up with them yourself and loop in admin to help close: if they don\'t come in at full asking price, work with admin on getting a serious offer instead (not every deal has room below asking, but it\'s always worth a try), and/or coordinate a time for them to visit the property if access needs it to be scheduled — e.g. a house with a lockbox, not vacant land.</p>' +
     '<button class="btn ' + (pitch.isVip ? "secondary" : "primary") + ' small" id="vip-toggle-btn">' + (pitch.isVip ? "Remove VIP Flag" : "Mark as VIP") + '</button>' +
 
+    '<div class="section-title">Unresponsive</div>' +
+    '<p class="small-muted">Mark this buyer Unresponsive once it\'s clear they\'re not worth continuing to chase. This is independent of Do Not Contact — you can still log calls/texts — and doesn\'t remove any tag on their record; only admin removing a tag does that.</p>' +
+    '<button class="btn ' + (pitch.isUnresponsive ? "secondary" : "danger") + ' small" id="unresponsive-toggle-btn">' + (pitch.isUnresponsive ? "Remove Unresponsive Flag" : "Mark Unresponsive") + '</button>' +
+
     '<div class="section-title">Do Not Contact</div>' +
     '<p class="small-muted">If this buyer has asked not to be contacted again, mark it here — it stops any further calls or texts from being logged for them, on any number, and admin won\'t be able to pitch them a new deal.</p>' +
     '<button class="btn ' + (pitch.doNotContact ? "secondary" : "danger") + ' small" id="dnc-toggle-btn">' + (pitch.doNotContact ? "Allow Contact Again" : "Mark Do Not Contact") + '</button>';
@@ -1439,6 +1465,14 @@ async function openPitchDetail(pitchId) {
     await loadMyPitches();
     openPitchDetail(pitchId);
     showToast(willBeVip ? "Marked as VIP." : "VIP flag removed.");
+  });
+
+  document.getElementById("unresponsive-toggle-btn").addEventListener("click", async function () {
+    const willBeUnresponsive = !pitch.isUnresponsive;
+    await api("updateBuyerLeadUnresponsiveStatus", { buyerLeadId: pitch.BuyerLeadID, isUnresponsive: willBeUnresponsive });
+    await loadMyPitches();
+    openPitchDetail(pitchId);
+    showToast(willBeUnresponsive ? "Marked Unresponsive." : "Unresponsive flag removed.");
   });
 
   wireRequestAddressButton();
@@ -3937,7 +3971,8 @@ function renderBuyerLeadsAdmin() {
       '<td class="small-muted">' + (pendingDealIdList(l).length > 0 ? esc(pendingDealIdList(l).map(dealLabelFor).join(", ")) : "&mdash;") + (dealTypeTagsHtml(l.DealTypes) ? '<div style="margin-top:4px;">' + dealTypeTagsHtml(l.DealTypes) + '</div>' : "") + '</td>' +
       '<td class="small-muted">' + (l.CreatedAt ? formatDate(l.CreatedAt) : "&mdash;") + '</td>' +
       '<td class="small-muted">' + (l.UploadedBy ? uploaderTagHtml(l.UploadedBy) : "&mdash;") +
-        (l.FirstResponsiveBy ? '<div style="margin-top:2px;">' + firstResponsiveTagHtml(l.FirstResponsiveBy) + '</div>' : "") + '</td>' +
+        (l.FirstResponsiveBy ? '<div style="margin-top:2px;">' + firstResponsiveTagHtml(l.FirstResponsiveBy) + '</div>' : "") +
+        (assignedRepsTagHtml(l.AssignedReps) ? '<div style="margin-top:2px;">' + assignedRepsTagHtml(l.AssignedReps) + '</div>' : "") + '</td>' +
       '<td>' + (l.openPitches.length || "&mdash;") + '</td>' +
       '<td style="white-space:nowrap;"><button class="btn secondary small view-buyer-btn" data-lead-id="' + esc(l.BuyerLeadID) + '">View / Give</button></td>' +
       '</tr>';
@@ -4277,7 +4312,7 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
       ([lead.City, lead.State, lead.Zip].filter(Boolean).length ? ' &middot; ' + [lead.City, lead.State, lead.Zip].filter(Boolean).join(", ") : "") + '</p></div>' +
       '<button class="link-btn" id="close-detail-btn">Close</button>' +
     '</div>' +
-    '<div style="margin-bottom:8px;">' + buyerStatusTagsHtml(lead, false) + (lead.UploadedBy ? ' ' + uploaderTagHtml(lead.UploadedBy) : "") + (lead.FirstResponsiveBy ? ' ' + firstResponsiveTagHtml(lead.FirstResponsiveBy) : "") + '</div>' +
+    '<div style="margin-bottom:8px;">' + buyerStatusTagsHtml(lead, false) + (lead.UploadedBy ? ' ' + uploaderTagHtml(lead.UploadedBy) : "") + (lead.FirstResponsiveBy ? ' ' + firstResponsiveTagHtml(lead.FirstResponsiveBy) : "") + (assignedRepsTagHtml(lead.AssignedReps) ? ' ' + assignedRepsTagHtml(lead.AssignedReps) : "") + '</div>' +
 
     (isDnc ? '<div class="banner danger"><strong>Do Not Contact.</strong> No rep can log a new call/text for this buyer, and they can\'t be given a new pitch.</div>' : "") +
 
@@ -4311,6 +4346,18 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
     '<div class="section-title">Closed Deal</div>' +
     '<p class="small-muted">Mark once this buyer has actually closed a deal — always implies VIP too, shown as "Top VIP Closed" everywhere this buyer appears, so whoever brought them in gets reached out to first for future deals.</p>' +
     '<button class="btn ' + (lead.HasClosedDeal === true || lead.HasClosedDeal === "TRUE" ? "secondary" : "primary") + ' small" id="admin-closed-toggle-btn">' + (lead.HasClosedDeal === true || lead.HasClosedDeal === "TRUE" ? "Remove Closed Flag" : "Mark as Closed") + '</button>' +
+
+    '<div class="section-title">Unresponsive</div>' +
+    '<p class="small-muted">Mark once it\'s clear this buyer isn\'t worth continuing to chase. Independent of Responsive (both can be set at once) and never auto-clears — only an explicit toggle here changes it, and it never touches Uploaded By, First Response, or the rep tags below.</p>' +
+    '<button class="btn ' + (lead.IsUnresponsive === true || lead.IsUnresponsive === "TRUE" ? "secondary" : "danger") + ' small" id="admin-unresponsive-toggle-btn">' + (lead.IsUnresponsive === true || lead.IsUnresponsive === "TRUE" ? "Remove Unresponsive Flag" : "Mark Unresponsive") + '</button>' +
+
+    '<div class="section-title">Reps Tagged On This Buyer</div>' +
+    '<p class="small-muted">Uploaded By and First Response are automatic and can\'t be edited here — this is a separate, freely-editable list for clean record keeping: add a rep who\'s now working this buyer, or remove one who\'s gone unresponsive or stopped working it. Removing someone here only removes their tag, not any pitch or contact history.</p>' +
+    '<div>' + buyerLeadsActiveReps.map(function (r) {
+      const checked = splitCommaList(lead.AssignedReps).indexOf(r.username) !== -1 ? " checked" : "";
+      return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="assigned-rep-checkbox" value="' + esc(r.username) + '"' + checked + '> ' + esc(r.name) + (r.isAdmin ? " — Admin" : "") + '</label>';
+    }).join("") + '</div>' +
+    '<div class="nav-row" style="justify-content:flex-end;"><button class="btn secondary small" id="admin-save-rep-tags-btn">Save Rep Tags</button></div>' +
 
     '<div class="section-title">Do Not Contact</div>' +
     '<p class="small-muted">Blocks any rep from logging a new call/text against this buyer and stops them from being given a new pitch. Existing pitch history is kept.</p>' +
@@ -4363,6 +4410,29 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
     await loadBuyerLeadsAdmin();
     openAdminBuyerLeadDetail(buyerLeadId);
     showToast(willBeClosed ? "Marked as Closed — tagged Top VIP Closed." : "Closed flag removed.");
+  });
+
+  document.getElementById("admin-unresponsive-toggle-btn").addEventListener("click", async function () {
+    const btn = this;
+    if (btn.disabled) return;
+    btn.disabled = true;
+    const willBeUnresponsive = !(lead.IsUnresponsive === true || lead.IsUnresponsive === "TRUE");
+    await api("updateBuyerLeadUnresponsiveStatus", { buyerLeadId: buyerLeadId, isUnresponsive: willBeUnresponsive });
+    await loadBuyerLeadsAdmin();
+    openAdminBuyerLeadDetail(buyerLeadId);
+    showToast(willBeUnresponsive ? "Marked Unresponsive." : "Unresponsive flag removed.");
+  });
+
+  document.getElementById("admin-save-rep-tags-btn").addEventListener("click", async function () {
+    const btn = this;
+    if (btn.disabled) return;
+    btn.disabled = true;
+    const repUsernames = Array.from(document.querySelectorAll(".assigned-rep-checkbox:checked")).map(function (cb) { return cb.value; });
+    const res = await api("adminUpdateBuyerLeadRepTags", { buyerLeadId: buyerLeadId, repUsernames: repUsernames });
+    if (!res.ok) { btn.disabled = false; showToast(res.error || "Could not save rep tags.", true); return; }
+    await loadBuyerLeadsAdmin();
+    openAdminBuyerLeadDetail(buyerLeadId);
+    showToast("Rep tags saved.");
   });
 
   const giveBtn = document.getElementById("give-new-pitch-btn");
@@ -4524,7 +4594,7 @@ function renderAdminPitchesTable() {
   tbody.innerHTML = pageItems.map(function (p) {
     const checked = adminPitchesSelectedIds.has(p.PitchID) ? " checked" : "";
     const tags = buyerStatusTagsHtml(p, true);
-    const adminTags = (p.uploadedBy ? uploaderTagHtml(p.uploadedBy) : "") + (p.firstResponsiveBy ? " " + firstResponsiveTagHtml(p.firstResponsiveBy) : "");
+    const adminTags = (p.uploadedBy ? uploaderTagHtml(p.uploadedBy) : "") + (p.firstResponsiveBy ? " " + firstResponsiveTagHtml(p.firstResponsiveBy) : "") + (assignedRepsTagHtml(p.assignedReps) ? " " + assignedRepsTagHtml(p.assignedReps) : "");
     return '<tr>' +
       '<td><input type="checkbox" class="pitch-select-checkbox" data-pitch-id="' + esc(p.PitchID) + '"' + checked + '></td>' +
       '<td>' + esc(p.buyerName) +
