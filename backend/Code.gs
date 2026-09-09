@@ -13,6 +13,10 @@
  *                         "new interested buyer" emails are sent
  *   AUTO_FEED_ENABLED, AUTO_FEED_BATCH_SIZE - set via the admin panel, not
  *                         by hand; see adminSetAutoFeed
+ *   BEEHIIV_API_KEY, BEEHIIV_PUBLICATION_ID - see the "Beehiiv sync" section
+ *                         near the bottom of this file. Every send actually
+ *                         goes out from beehiiv, never MailApp/Gmail, so the
+ *                         owner's personal email never carries the volume.
  *
  * Address secrecy model: a deal's exact street Address is stripped from
  * every non-admin session by default -- reps instead identify a deal by its
@@ -376,6 +380,8 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminAddStatusOption));
       case 'adminRemoveStatusOption':
         return jsonOut(withAdminSession(body, adminRemoveStatusOption));
+      case 'adminSendWeeklyDigestNow':
+        return jsonOut(withAdminSession(body, adminSendWeeklyDigestNow));
 
       default:
         return jsonOut({ ok: false, error: 'Unknown action.' });
@@ -712,6 +718,21 @@ function publicSignup(body) {
     });
   }
 
+  // A Buyer is tagged with their own Buy Box (state/city/asset class) on
+  // top of the flat 'buyer-lead' tag, so a real email in beehiiv can be
+  // aimed at e.g. "buyers in Texas who want Single Family" straight from
+  // the segment picker instead of blasting the whole buyer list every
+  // time. A Wholesaler/Realtor/Other signup is a rep joining the team, not
+  // a customer -- tagged 'rep' so they land in the same beehiiv list the
+  // weekly active-deals digest goes out to. Never blocks account creation
+  // if beehiiv is unreachable -- see beehiivUpsertSubscriber.
+  if (isBuyerSignup) {
+    const buyBoxTags = buildBuyBoxTags(splitCommaList(body.buyBoxStates), splitCommaList(body.buyBoxCities), buyBoxCategories, !!body.buyBoxNationwide);
+    beehiivUpsertSubscriber(email, name, ['buyer-lead'].concat(buyBoxTags));
+  } else {
+    beehiivUpsertSubscriber(email, name, ['rep']);
+  }
+
   return { ok: true };
 }
 
@@ -971,7 +992,44 @@ function adminAddDeal(body) {
   });
 
   const assignedCount = applyDealAssignMode(dealId, d.assetCategory, body.assignMode, now);
-  return { ok: true, dealId: dealId, assignedCount: assignedCount };
+
+  // Auto-draft the "new deal" email in beehiiv rather than auto-sending it
+  // -- beehiiv's recipient-targeting fields for a Create Post API call
+  // aren't reliably documented, and guessing wrong risks emailing the
+  // wrong list with something that can't be unsent. A draft is 100% safe
+  // to create automatically: admin opens beehiiv, picks the "buyer-lead"
+  // segment (optionally narrowed further by state/city/asset tags) from
+  // its own well-documented compose screen, and sends -- same one-click
+  // simplicity with none of that risk.
+  const draftUrl = beehiivCreateDraftPost(
+    'New deal: ' + (d.dealCode || d.city || d.address),
+    dealDraftHtml(d)
+  );
+
+  return { ok: true, dealId: dealId, assignedCount: assignedCount, beehiivDraftUrl: draftUrl };
+}
+
+// Plain, readable HTML for the auto-drafted "new deal" email -- deliberately
+// simple (no images, no styling system) since it's a starting point admin
+// edits in beehiiv's own post editor before picking a segment and sending,
+// not a finished piece of marketing copy.
+function dealDraftHtml(d) {
+  const rows = [
+    ['City/State', [d.city, d.state].filter(Boolean).join(', ')],
+    ['Zip', d.zip],
+    ['County', d.county],
+    ['Asking Price', d.price],
+    ['ARV', d.arv],
+    ['Rehab Estimate', d.rehabEstimate],
+    ['As-Is Value', d.asIsValue],
+    ['Asset Type', d.assetType || d.assetCategory]
+  ].filter(function (r) { return r[1]; });
+  let html = '<p>A new deal just went active:</p><ul>';
+  rows.forEach(function (r) { html += '<li><strong>' + r[0] + ':</strong> ' + r[1] + '</li>'; });
+  html += '</ul>';
+  if (d.description) html += '<p>' + d.description + '</p>';
+  html += '<p>Log in at SendMyBuyer to see full details and claim it.</p>';
+  return html;
 }
 
 // Shared by adminAddDeal (a brand new deal) and adminBulkAssignDeal (an
@@ -1372,6 +1430,7 @@ function adminAddRep(body) {
     'Username': username, 'Name': d.name, 'Phone': d.phone || '', 'Email': d.email || '', 'PasswordHash': hashPassword(d.password, salt), 'Salt': salt,
     'AllAccess': !!d.allAccess, 'IsAdmin': !!d.isAdmin, 'Active': true, 'CreatedAt': new Date().toISOString(), 'LastActive': ''
   });
+  if (d.email) beehiivUpsertSubscriber(d.email, d.name, ['rep']);
   return { ok: true };
 }
 
@@ -3783,4 +3842,135 @@ function addPitchContact(body, session) {
     }
   }
   return { ok: true, contactId: contactId };
+}
+
+// ---------- Beehiiv sync ----------
+//
+// Every subscriber-facing and rep-facing email goes out through beehiiv,
+// never MailApp/Gmail -- MailApp here stays reserved for the low-volume
+// operational pings (new signup, new interested buyer, new FB request)
+// that already existed before this. Two entry points:
+//   - beehiivUpsertSubscriber -- adds/updates one person with tags, so
+//     they land in the right beehiiv segment. Called from publicSignup
+//     and adminAddRep. Never throws -- a beehiiv hiccup must never block
+//     someone creating an account.
+//   - beehiivCreateDraftPost -- creates a DRAFT post (never auto-sent).
+//     beehiiv's recipient-targeting fields for a live Create Post API call
+//     aren't reliably documented publicly, so this deliberately stops at
+//     "draft, pre-filled, ready for a human to pick the segment and hit
+//     send" rather than risk guessing wrong on a real send that can't be
+//     unsent. Called from adminAddDeal and the weekly digest below.
+//
+// Script Properties required: BEEHIIV_API_KEY, BEEHIIV_PUBLICATION_ID.
+
+function beehiivUpsertSubscriber(email, name, tags) {
+  const props = PropertiesService.getScriptProperties();
+  const apiKey = props.getProperty('BEEHIIV_API_KEY');
+  const pubId = props.getProperty('BEEHIIV_PUBLICATION_ID');
+  if (!apiKey || !pubId || !email) return;
+  try {
+    UrlFetchApp.fetch('https://api.beehiiv.com/v2/publications/' + pubId + '/subscriptions', {
+      method: 'post',
+      contentType: 'application/json',
+      headers: { Authorization: 'Bearer ' + apiKey },
+      muteHttpExceptions: true,
+      payload: JSON.stringify({
+        email: email,
+        reactivate_existing: true,
+        send_welcome_email: false,
+        utm_source: 'dispositions-crm',
+        custom_fields: name ? [{ name: 'Name', value: name }] : [],
+        tags: tags || []
+      })
+    });
+  } catch (err) {
+    // Swallow -- see comment above. Nothing to recover, nothing to surface
+    // to the person signing up.
+  }
+}
+
+// Returns the draft's web_url on success (or '' if beehiiv didn't return
+// one / the call failed) so the caller can hand admin a direct link.
+function beehiivCreateDraftPost(title, bodyContentHtml) {
+  const props = PropertiesService.getScriptProperties();
+  const apiKey = props.getProperty('BEEHIIV_API_KEY');
+  const pubId = props.getProperty('BEEHIIV_PUBLICATION_ID');
+  if (!apiKey || !pubId) return '';
+  try {
+    const res = UrlFetchApp.fetch('https://api.beehiiv.com/v2/publications/' + pubId + '/posts', {
+      method: 'post',
+      contentType: 'application/json',
+      headers: { Authorization: 'Bearer ' + apiKey },
+      muteHttpExceptions: true,
+      payload: JSON.stringify({ title: title, body_content: bodyContentHtml, status: 'draft' })
+    });
+    if (res.getResponseCode() >= 300) return '';
+    const data = JSON.parse(res.getContentText());
+    const post = data && data.data ? data.data : data;
+    return (post && (post.web_url || post.hosted_url)) || '';
+  } catch (err) {
+    return '';
+  }
+}
+
+// One tag per state/city/asset-category on a Buyer's Buy Box, plus
+// 'nationwide' when set -- lets a real send in beehiiv be aimed at e.g.
+// "buyers in Texas who want Single Family" via the segment picker (AND of
+// several tags), instead of only ever reaching the flat 'buyer-lead' list.
+function buildBuyBoxTags(states, cities, categories, nationwide) {
+  const tags = [];
+  (states || []).forEach(function (s) { if (normalizeText(s)) tags.push('state-' + slugifyTag(s)); });
+  (cities || []).forEach(function (c) { if (normalizeText(c)) tags.push('city-' + slugifyTag(c)); });
+  (categories || []).forEach(function (c) { if (normalizeText(c)) tags.push('asset-' + slugifyTag(c)); });
+  if (nationwide) tags.push('nationwide');
+  return tags;
+}
+
+function slugifyTag(str) {
+  return String(str || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+// ---------- Weekly active-deals digest ----------
+//
+// Counts Active deals and auto-drafts the digest in beehiiv, same
+// draft-not-send pattern as the new-deal post above -- admin picks the
+// 'rep' segment and sends. Run installWeeklyDigestTrigger() ONCE, by hand,
+// from the Apps Script editor (select it in the function dropdown, click
+// Run) to schedule this for every Monday morning; it's not wired to any
+// doPost action since there's nothing for the front-end to pass it.
+function weeklyActiveDealsDigest() {
+  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const deals = sheetToObjects(dealsSheet);
+  const active = deals.filter(function (d) { return d['Status'] === 'Active'; });
+
+  const byCategory = {};
+  active.forEach(function (d) {
+    const cat = d['AssetCategory'] || 'Uncategorized';
+    byCategory[cat] = (byCategory[cat] || 0) + 1;
+  });
+
+  let html = '<p><strong>' + active.length + ' active deal' + (active.length === 1 ? '' : 's') + '</strong> on the board this week.</p>';
+  const catNames = Object.keys(byCategory);
+  if (catNames.length) {
+    html += '<ul>';
+    catNames.forEach(function (cat) { html += '<li>' + cat + ': ' + byCategory[cat] + '</li>'; });
+    html += '</ul>';
+  }
+  html += '<p>Log in to SendMyBuyer to see the full list and who’s covering what.</p>';
+
+  return beehiivCreateDraftPost('Weekly active deals: ' + active.length, html);
+}
+
+function installWeeklyDigestTrigger() {
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === 'weeklyActiveDealsDigest') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('weeklyActiveDealsDigest').timeBased().onWeekDay(ScriptApp.WeekDay.MONDAY).atHour(8).create();
+}
+
+// Admin-facing "run it now" button, for testing without waiting for Monday
+// -- same function, just callable on demand.
+function adminSendWeeklyDigestNow() {
+  const url = weeklyActiveDealsDigest();
+  return { ok: true, beehiivDraftUrl: url };
 }

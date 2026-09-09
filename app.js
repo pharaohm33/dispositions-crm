@@ -3960,6 +3960,21 @@ document.getElementById("autofeed-run-btn").addEventListener("click", async func
   await loadBuyerLeadsAdmin();
 });
 
+document.getElementById("beehiiv-digest-run-btn").addEventListener("click", async function () {
+  const btn = this;
+  const resultEl = document.getElementById("beehiiv-digest-result");
+  if (btn.disabled) return;
+  btn.disabled = true;
+  resultEl.textContent = "Creating draft in beehiiv…";
+  const res = await api("adminSendWeeklyDigestNow", {});
+  btn.disabled = false;
+  if (!res.ok) { resultEl.textContent = res.error || "Could not create the draft."; showToast(res.error || "Could not create the draft.", true); return; }
+  resultEl.innerHTML = res.beehiivDraftUrl
+    ? 'Draft created — <a href="' + res.beehiivDraftUrl + '" target="_blank" rel="noopener">open it in beehiiv</a>.'
+    : "Draft created — check the Posts tab in beehiiv.";
+  showToast("Weekly digest draft created in beehiiv.");
+});
+
 // Debounces a typed-input handler so a fast typist doesn't fire a server
 // round trip on every keystroke -- waits for a short pause before actually
 // reloading. Dropdowns/checkboxes below don't use this since a "change"

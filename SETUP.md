@@ -31,9 +31,15 @@ left) → scroll to **Script Properties** → **Add script property**. Add these
 |---|---|
 | `SESSION_SECRET` | Any long random string (mash the keyboard for 30+ characters) — this signs login sessions |
 | `ADMIN_NOTIFY_EMAIL` | The inbox that should get an email whenever a rep submits a Facebook post for approval |
+| `BEEHIIV_API_KEY` | From beehiiv → Settings → Integrations → API |
+| `BEEHIIV_PUBLICATION_ID` | From beehiiv → Settings → Publication (starts with `pub_`) |
 
-Neither of these ever appears in the public GitHub repo or the browser — they
-live only inside this Apps Script project.
+None of these ever appear in the public GitHub repo or the browser — they
+live only inside this Apps Script project. Buyers and reps get synced to
+beehiiv (tagged so you can email the right list) and new deals auto-create a
+draft post in beehiiv instead of sending real email through this app's own
+Google account — see "Beehiiv sync" near the bottom of `backend/Code.gs` for
+exactly what gets tagged and when.
 
 ## 4. Deploy as a Web App
 
@@ -75,6 +81,22 @@ background without you clicking anything:
    costs nothing otherwise. Don't run `installAutoFeedHourlyTrigger` more
    than once, or you'll end up with duplicate hourly triggers (check
    Triggers first if unsure).
+
+## Optional: weekly active-deals digest (time-driven trigger)
+
+Auto-drafts a "N active deals this week" post in beehiiv every Monday
+morning (never auto-sent — you pick the "rep" segment and send it
+yourself). The admin panel's **Beehiiv Digest → Send Weekly Digest Draft
+Now** button runs the same thing on demand, no trigger needed, handy for
+testing. To have it also run on its own every week:
+
+1. In the Apps Script editor, use the function dropdown at the top to select
+   **installWeeklyDigestTrigger**, then click **Run**.
+2. Confirm it under **Triggers** (the clock icon on the left).
+3. Don't run it more than once, or you'll end up with duplicate weekly
+   triggers (check Triggers first if unsure — it clears any existing one
+   with the same name before creating a new one, so re-running is actually
+   safe, just unnecessary).
 
 ## Redeploying after a change
 
