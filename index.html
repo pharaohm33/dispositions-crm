@@ -609,9 +609,13 @@
       <input type="text" id="admin-deals-filter-state" placeholder="State" style="flex:0 0 auto; max-width:100px;">
       <button class="btn primary" id="add-deal-btn">+ Add Deal</button>
     </div>
-    <div class="nav-row" style="justify-content:flex-start; margin-bottom:10px;">
+    <div class="nav-row" style="justify-content:flex-start; margin-bottom:10px; flex-wrap:wrap;">
       <button class="btn secondary small" id="check-all-deals-live-btn">Check All Source Links For Dead Listings</button>
       <span class="small-muted" id="check-all-deals-live-result"></span>
+    </div>
+    <div class="nav-row" style="justify-content:flex-start; margin-bottom:10px; flex-wrap:wrap;">
+      <button class="btn secondary small" id="sync-all-deal-pricing-btn">Sync All Pricing From Source Links</button>
+      <span class="small-muted" id="sync-all-deal-pricing-result"></span>
     </div>
     <table class="crm-table">
       <thead><tr><th>Deal Code</th><th>Address</th><th>Asset Type</th><th>Asking Price</th><th>Status</th><th>Coverage</th><th>Access</th></tr></thead>

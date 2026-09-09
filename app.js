@@ -2353,6 +2353,21 @@ document.getElementById("check-all-deals-live-btn").addEventListener("click", as
   await loadAdminDeals();
 });
 
+document.getElementById("sync-all-deal-pricing-btn").addEventListener("click", async function () {
+  const btn = this;
+  const resultEl = document.getElementById("sync-all-deal-pricing-result");
+  if (btn.disabled) return;
+  btn.disabled = true;
+  resultEl.textContent = " Checking every deal with a Source Link and republishing pages that changed — this can take a bit…";
+  const res = await api("adminSyncAllDealPricing", {});
+  btn.disabled = false;
+  if (!res.ok) { resultEl.textContent = " " + (res.error || "Could not run the sync."); showToast(res.error || "Could not run the sync.", true); return; }
+  resultEl.textContent = " Checked " + res.checkedCount + " deal(s), " + res.changedCount + " price(s) changed and republished." +
+    (res.errors.length > 0 ? " " + res.errors.length + " couldn't be synced." : "");
+  showToast(res.changedCount + " deal price(s) updated.");
+  await loadAdminDeals();
+});
+
 function openDealModal() {
   document.getElementById("deal-code-input").value = "";
   document.getElementById("deal-address-input").value = "";
@@ -2716,7 +2731,20 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     '<input type="text" id="deal-source-link-edit" value="' + esc(deal.SourceLink || "") + '" placeholder="https://...">' +
     (deal.SourceLink
       ? '<div class="nav-row" style="justify-content:flex-start; margin-top:6px;"><button class="btn secondary small" id="check-deal-live-btn">Check If Still Live</button><span class="small-muted" id="check-deal-live-result"></span></div>' +
-        '<p class="small-muted">Fetches the Source Link and looks for the specific "property not found" marker InvestorLift shows on a pulled listing — if it\'s there, this deal\'s Status is set to Dead automatically. Only works for InvestorLift links today, and will need updating if InvestorLift changes that page.</p>'
+        '<p class="small-muted">Fetches the Source Link and looks for the specific "property not found" marker InvestorLift shows on a pulled listing — if it\'s there, this deal\'s Status is set to Dead automatically. Only works for InvestorLift links today, and will need updating if InvestorLift changes that page.</p>' +
+        '<div class="nav-row" style="justify-content:flex-start; margin-top:6px;"><button class="btn secondary small" id="sync-deal-pricing-btn">Sync Price From Source &amp; Republish Page</button><span class="small-muted" id="sync-deal-pricing-result"></span></div>' +
+        '<p class="small-muted">Reads the current asking price off the Source Link. If it doesn\'t match Price below, updates Price here and regenerates + republishes this deal\'s public page at the same sendmybuyer.com link every time — so a link already shared with a buyer keeps showing the current price with nothing to reissue.</p>' +
+        (deal.PublicPageUrl
+          ? '<p class="small-muted">Public page: <a href="' + esc(deal.PublicPageUrl) + '" target="_blank" rel="noopener">' + esc(deal.PublicPageUrl) + '</a>' + (deal.LastPriceSyncAt ? ' &mdash; last synced ' + esc(new Date(deal.LastPriceSyncAt).toLocaleString()) : "") + '</p>'
+          : "") +
+        '<div class="section-title" style="margin-top:22px;">Create Deal Link <span class="small-muted">(Admin Facing Only)</span></div>' +
+        '<label class="field-label">Pictures Link <span class="small-muted">(Google Drive folder or file — leave blank to keep what\'s already saved)</span></label>' +
+        '<input type="text" id="deal-artifact-pictures-edit" value="' + esc(deal.ArtifactPicturesLink || "") + '" placeholder="https://drive.google.com/drive/folders/...">' +
+        '<p class="small-muted">Source Link: uses the link above — already inside the page.</p>' +
+        '<p class="small-muted">Contact Information: auto-filled from template — +1 520-633-6437, montanoemmanuel@gmail.com. Any contact info found on the source page gets replaced with this everywhere.' +
+          (deal.ArtifactPhotoPaths ? ' &mdash; ' + String(deal.ArtifactPhotoPaths).split(',').filter(Boolean).length + ' photo(s) currently published.' : '') + '</p>' +
+        '<div class="nav-row" style="justify-content:flex-start; margin-top:6px;"><button class="btn primary small" id="create-deal-artifact-btn">Create Deal Artifact Page</button><span class="small-muted" id="create-deal-artifact-result"></span></div>' +
+        '<p class="small-muted">Pulls the full listing off the Source Link and every photo from the Pictures Link, cleans and reformats all of it into one page without dropping any information, swaps in the contact template above, and publishes it to this deal\'s permanent sendmybuyer.com link. Safe to re-run any time — e.g. after adding more photos to the Drive folder.</p>'
       : "") +
     '<label class="field-label">Private Notes</label>' +
     '<textarea id="deal-admin-notes-edit">' + esc(deal.AdminPrivateNotes || "") + '</textarea>' +
@@ -2833,6 +2861,50 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
         resultEl.textContent = " Still appears live.";
         showToast("Still appears live.");
       }
+    });
+  }
+
+  const syncPricingBtn = document.getElementById("sync-deal-pricing-btn");
+  if (syncPricingBtn) {
+    syncPricingBtn.addEventListener("click", async function () {
+      const btn = this;
+      const resultEl = document.getElementById("sync-deal-pricing-result");
+      btn.disabled = true;
+      resultEl.textContent = " Checking source price…";
+      const res = await api("adminSyncDealPricing", { dealId: deal.DealID });
+      btn.disabled = false;
+      if (!res.ok) { resultEl.textContent = " " + (res.error || "Could not sync pricing."); showToast(res.error || "Could not sync pricing.", true); return; }
+      if (!res.priceFound) {
+        resultEl.textContent = " Couldn't find a price on the source page — left Price as-is.";
+        showToast("Couldn't find a price on the source page.", true);
+      } else if (!res.priceChanged) {
+        resultEl.textContent = " Already up to date (" + formatAdminMoney(res.newPrice) + ").";
+      } else if (res.pageError) {
+        resultEl.textContent = " Price updated to " + formatAdminMoney(res.newPrice) + ", but the public page failed to publish: " + res.pageError;
+        showToast("Price updated, but page publish failed — see details.", true);
+        openAdminDealDetail(deal.DealID);
+      } else {
+        resultEl.textContent = " Price updated: " + formatAdminMoney(res.oldPrice) + " → " + formatAdminMoney(res.newPrice) + ". Page republished.";
+        showToast("Price synced and page republished.");
+        openAdminDealDetail(deal.DealID);
+      }
+    });
+  }
+
+  const createArtifactBtn = document.getElementById("create-deal-artifact-btn");
+  if (createArtifactBtn) {
+    createArtifactBtn.addEventListener("click", async function () {
+      const btn = this;
+      const resultEl = document.getElementById("create-deal-artifact-result");
+      const picturesLink = document.getElementById("deal-artifact-pictures-edit").value.trim();
+      btn.disabled = true;
+      resultEl.textContent = " Pulling source listing and photos, generating page…";
+      const res = await api("adminCreateDealArtifactPage", { dealId: deal.DealID, picturesLink: picturesLink });
+      btn.disabled = false;
+      if (!res.ok) { resultEl.textContent = " " + (res.error || "Could not create the page."); showToast(res.error || "Could not create the page.", true); return; }
+      resultEl.textContent = " Published with " + res.photoCount + " photo(s)" + (res.priceChanged ? ", price updated to " + formatAdminMoney(res.price) : "") + ".";
+      showToast("Deal artifact page published.");
+      openAdminDealDetail(deal.DealID);
     });
   }
 

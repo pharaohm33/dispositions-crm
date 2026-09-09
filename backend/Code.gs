@@ -100,7 +100,7 @@ const PERSON_TYPES = ['Buyer', 'Wholesaler', 'Realtor', 'Other'];
 // buyer<->deal auto-matching -- see buyerMatchesDeal. AssetType stays a
 // free-text description field ("SFR - 3bd/2ba") separate from the
 // structured AssetCategory used for matching.
-const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt', 'Locked', 'DealTypes', 'FinancingType'];
+const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt', 'Locked', 'DealTypes', 'FinancingType', 'PublicPageUrl', 'LastPriceSyncAt', 'ArtifactPicturesLink', 'ArtifactPhotoPaths'];
 // Source distinguishes a deliberate, one-deal-at-a-time grant ('manual' --
 // the Access section's "Add Access" dropdown, or "Assign Myself") from one
 // written by the bulk-assign mechanism ('bulk' -- see applyDealAssignMode).
@@ -285,6 +285,12 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminCheckDealLive));
       case 'adminCheckAllDealsLive':
         return jsonOut(withAdminSession(body, adminCheckAllDealsLive));
+      case 'adminSyncDealPricing':
+        return jsonOut(withAdminSession(body, adminSyncDealPricing));
+      case 'adminSyncAllDealPricing':
+        return jsonOut(withAdminSession(body, adminSyncAllDealPricing));
+      case 'adminCreateDealArtifactPage':
+        return jsonOut(withAdminSession(body, adminCreateDealArtifactPage));
       case 'adminGetReps':
         return jsonOut(withAdminSession(body, adminGetReps));
       case 'adminAddRep':
@@ -1425,6 +1431,437 @@ function adminCheckAllDealsLive(body) {
   });
 
   return { ok: true, checkedCount: checkedCount, markedDeadCount: markedDeadCount, errors: errors };
+}
+
+// -- Price sync + public page publishing --------------------------------
+//
+// Keeps a deal's asking Price in step with its InvestorLift Source Link,
+// and regenerates + republishes the deal's public marketing page on
+// sendmybuyer.com whenever the price actually changes. The public page
+// lives at the SAME url for the life of the deal (deals/<DealID>.html,
+// keyed by the permanent DealID, never DealCode or a timestamp) and is
+// overwritten in place on every sync -- so a link handed to a buyer
+// yesterday shows today's price automatically, with nothing to reissue.
+//
+// Script Properties required: ANTHROPIC_API_KEY (console.anthropic.com),
+// GITHUB_TOKEN (a GitHub PAT with 'contents: write' on this repo -- fine-
+// grained token scoped to just this repo is enough). GITHUB_REPO and
+// GITHUB_BRANCH are optional overrides (default to this repo's own
+// 'owner/name' and 'main').
+//
+// Confirmed by fetching a live JNA Dynamic Holdings listing and inspecting
+// the raw server-rendered HTML: InvestorLift wraps the asking price in
+// <span class="priceBlock-cost">$1,234,567</span> in the "Financing
+// Information" panel. That class name is the same kind of thing
+// DEAD_LISTING_MARKERS above depends on -- InvestorLift could rename it
+// without notice, and this only ever gets updated by hand when that
+// happens. Falls back to the "Asking Price: $X" bullet in the listing body
+// copy if the class-based marker isn't found, since that wording has shown
+// up consistently across listings too.
+const PRICE_MARKER_PATTERNS = [
+  /priceBlock-cost["'][^>]*>\s*\$([\d,]+)/i,
+  /Asking Price:?\s*\$([\d,]+)/i
+];
+
+// Fetches one deal's Source Link and reports the asking price found there,
+// as a plain "$1,234,567" string matching how Price is stored/displayed
+// everywhere else in this app (see formatAdminMoney on the front end).
+// Returns { ok: true, price: null } rather than an error when the page
+// fetched fine but no known price marker was found -- that's a "can't
+// confirm a price today" outcome, not a hard failure, and callers should
+// treat it as "leave Price alone" rather than blank it out.
+function checkSourceLinkPrice(url) {
+  const res = UrlFetchApp.fetch(url, { headers: { 'User-Agent': LIVE_CHECK_USER_AGENT }, muteHttpExceptions: true, followRedirects: true });
+  const code = res.getResponseCode();
+  if (code < 200 || code >= 300) return { ok: false, error: 'Source link returned HTTP ' + code + '.' };
+  const html = res.getContentText();
+  for (let i = 0; i < PRICE_MARKER_PATTERNS.length; i++) {
+    const m = html.match(PRICE_MARKER_PATTERNS[i]);
+    if (m) return { ok: true, price: '$' + m[1] };
+  }
+  return { ok: true, price: null };
+}
+
+// Fetches a source listing page and reduces it to plain visible text --
+// strips <script>/<style>/<svg> blocks entirely, strips remaining tags,
+// decodes the handful of entities that show up in real listing copy, and
+// collapses whitespace. This is a regex approximation, not a real HTML
+// parser (Apps Script has none built in) -- good enough to hand a listing's
+// full copy to Claude as source material, not good enough to trust for
+// anything that needs exact fidelity. Capped at 20,000 characters so one
+// bloated page can't blow out the prompt; that easily covers a normal
+// InvestorLift listing's full body copy.
+function fetchSourceListingText(url) {
+  const res = UrlFetchApp.fetch(url, { headers: { 'User-Agent': LIVE_CHECK_USER_AGENT }, muteHttpExceptions: true, followRedirects: true });
+  if (res.getResponseCode() < 200 || res.getResponseCode() >= 300) throw new Error('Source link returned HTTP ' + res.getResponseCode() + '.');
+  let html = res.getContentText();
+  html = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<svg[\s\S]*?<\/svg>/gi, ' ');
+  let text = html.replace(/<(br|p|div|li|tr|h[1-6])[^>]*>/gi, '\n').replace(/<[^>]+>/g, ' ');
+  text = text.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&#39;|&rsquo;/g, "'").replace(/&quot;|&ldquo;|&rdquo;/g, '"').replace(/&mdash;/g, '—').replace(/&ndash;/g, '–');
+  text = text.replace(/[ \t]+/g, ' ').replace(/\n\s*\n+/g, '\n').split('\n').map(function (l) { return l.trim(); }).filter(Boolean).join('\n');
+  return text.slice(0, 20000);
+}
+
+// Extracts a Drive folder or file id out of any of the URL shapes Drive's
+// "Share" dialog hands out (folder links, file links, and the older
+// ?id= form). Returns { type: 'folder'|'file', id } or null if the link
+// doesn't look like a Drive URL at all.
+function parseDriveLink(link) {
+  if (!link) return null;
+  let m = link.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+  if (m) return { type: 'folder', id: m[1] };
+  m = link.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (m) return { type: 'file', id: m[1] };
+  m = link.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (m) return { type: 'file', id: m[1] };
+  return null;
+}
+
+// Pulls every image out of a Drive folder (or just the one file, for a
+// single-file link) that this Apps Script project's own account can see,
+// and pushes each one to GitHub as its own file under
+// deals/<dealId>/photos/ -- NOT embedded as base64 in the page HTML, since
+// GitHub's Contents API only accepts a file up to 1MB through this same
+// simple base64-PUT call, and a full photo set embedded inline (the way a
+// hand-built Claude Artifact page does it) blows well past that in total
+// page size. Returns the relative photo paths actually published, in Drive
+// order, capped at 24 photos; any single image over ~900KB or any image
+// that fails to fetch/publish is skipped rather than failing the whole
+// batch, since one bad file in a folder of thirty shouldn't block the rest.
+function publishDealPhotosFromDrive(dealId, picturesLink) {
+  const parsed = parseDriveLink(picturesLink);
+  if (!parsed) return [];
+
+  let files = [];
+  try {
+    if (parsed.type === 'folder') {
+      const iter = DriveApp.getFolderById(parsed.id).getFiles();
+      while (iter.hasNext() && files.length < 24) {
+        const f = iter.next();
+        if (String(f.getMimeType() || '').indexOf('image/') === 0) files.push(f);
+      }
+    } else {
+      files = [DriveApp.getFileById(parsed.id)];
+    }
+  } catch (err) {
+    throw new Error('Could not read the Pictures Link from Drive: ' + String(err));
+  }
+
+  const props = PropertiesService.getScriptProperties();
+  const token = props.getProperty('GITHUB_TOKEN');
+  if (!token) throw new Error('GITHUB_TOKEN script property is not set.');
+  const repo = props.getProperty('GITHUB_REPO') || 'pharaohm33/dispositions-crm';
+  const branch = props.getProperty('GITHUB_BRANCH') || 'main';
+  const headers = { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json' };
+
+  const published = [];
+  files.forEach(function (file, i) {
+    const blob = file.getBlob();
+    if (blob.getBytes().length > 900000) return; // skip -- see comment above
+    const ext = (blob.getContentType() || '').indexOf('png') !== -1 ? 'png' : ((blob.getContentType() || '').indexOf('webp') !== -1 ? 'webp' : 'jpg');
+    const path = 'deals/' + encodeURIComponent(dealId) + '/photos/' + (i + 1) + '.' + ext;
+    const apiUrl = 'https://api.github.com/repos/' + repo + '/contents/' + path;
+    try {
+      let sha = null;
+      const getRes = UrlFetchApp.fetch(apiUrl + '?ref=' + encodeURIComponent(branch), { headers: headers, muteHttpExceptions: true });
+      if (getRes.getResponseCode() === 200) sha = JSON.parse(getRes.getContentText()).sha;
+      const payload = { message: 'Publish photo ' + (i + 1) + ' for deal ' + dealId, content: Utilities.base64Encode(blob.getBytes()), branch: branch };
+      if (sha) payload.sha = sha;
+      const putRes = UrlFetchApp.fetch(apiUrl, { method: 'put', contentType: 'application/json', headers: headers, muteHttpExceptions: true, payload: JSON.stringify(payload) });
+      if (putRes.getResponseCode() < 300) published.push(path);
+    } catch (err) {
+      // Skip this one photo, keep going -- see comment above.
+    }
+  });
+  return published;
+}
+
+// One Messages API call that turns a deal's full source listing copy into
+// a single, complete, self-contained HTML marketing page in SendMyBuyer's
+// voice -- the "Create Deal Artifact Page" / price-sync regeneration engine.
+// Explicitly told to preserve every fact in sourceListingText (nothing
+// summarized away or dropped) while replacing every contact
+// name/phone/email/company found in that source text with SendMyBuyer's
+// own fixed contact block, and to build a real photo gallery out of
+// photoPaths (relative paths already published alongside this page on
+// sendmybuyer.com, e.g. "deals/<id>/photos/1.jpg") rather than linking out,
+// when any are given.
+function generateDealPageHtml(deal, sourceListingText, photoPaths) {
+  const props = PropertiesService.getScriptProperties();
+  const apiKey = props.getProperty('ANTHROPIC_API_KEY');
+  if (!apiKey) throw new Error('ANTHROPIC_API_KEY script property is not set.');
+
+  const facts = {
+    dealCode: deal['DealCode'] || '',
+    city: deal['City'] || '',
+    state: deal['State'] || '',
+    county: deal['County'] || '',
+    assetType: deal['AssetType'] || '',
+    dealTypes: deal['DealTypes'] || '',
+    price: deal['Price'] || '',
+    arv: deal['ARV'] || '',
+    rehabEstimate: deal['RehabEstimate'] || '',
+    asIsValue: deal['AsIsValue'] || '',
+    financingType: deal['FinancingType'] || '',
+    description: deal['Description'] || '',
+    photosAndDocsLink: deal['GeneralDriveLink'] || '',
+    contactPhone: '520-633-6437',
+    contactEmail: 'montanoemmanuel@gmail.com',
+    company: 'JNA Dynamic Holdings LLC'
+  };
+
+  const prompt = 'Generate ONE self-contained HTML document (no markdown fences, no commentary, ' +
+    'just the raw HTML starting with <!doctype html>) for a real-estate wholesale-assignment ' +
+    'marketing page, in the visual style of a clean, editorial real-estate one-pager -- serif ' +
+    'display headings, warm neutral paper background, a clear price block near the top, a photo ' +
+    'gallery (if photoPaths is non-empty), a deal-terms table, and a closing call-to-action band ' +
+    'with the contact phone/email. Use only inline <style> (no external CSS files) and Google Fonts ' +
+    'via a <link> tag if you want a serif+sans pairing.\n\n' +
+    'sourceListingText below is the full text pulled from this deal\'s original source listing. ' +
+    'Rewrite it into the neat, organized presentation described above WITHOUT summarizing away, ' +
+    'excluding, or softening any fact, number, address, unit detail, disclosure, or figure in it -- ' +
+    'every property, every number, every bullet point in the source must still be represented ' +
+    'somewhere on the page, just cleanly formatted instead of pasted raw. If sourceListingText is ' +
+    'empty, build the page from the structured facts JSON alone instead.\n\n' +
+    'Contact/attribution swap (do this everywhere, no exceptions): sourceListingText may contain ' +
+    'the original lister\'s name, phone number, email, or company (e.g. an agent name, a brokerage, ' +
+    'a marketplace\'s own support email). Do NOT reproduce ANY of that. Every contact point on the ' +
+    'output page -- and only these -- must be facts.contactPhone, facts.contactEmail, and ' +
+    'facts.company. If the source text names a specific person as the contact, replace that name ' +
+    'with facts.company; never invent a person\'s name that isn\'t in facts.\n\n' +
+    'photoPaths below (if any) are image files already published on this same site, given as paths ' +
+    'relative to the site root -- reference each one as <img src="/' + '<the exact path string>"> ' +
+    '(a single leading slash, then the path exactly as given, e.g. photoPaths entry ' +
+    '"deals/abc123/photos/1.jpg" becomes src="/deals/abc123/photos/1.jpg"), in a horizontally ' +
+    'scrollable gallery near the top, the same way you would for a normal photo-forward listing ' +
+    'page. Do not invent placeholder images if photoPaths is empty.\n\n' +
+    'Do not fabricate any figures beyond what is given below -- if a field is blank and not mentioned ' +
+    'in sourceListingText, omit that row rather than inventing a number. This is an assignment of ' +
+    'contract, not a direct sale -- the page must say so, and must not name or imply direct contact ' +
+    'with the underlying seller/owner.\n\n' +
+    'Deal facts (JSON):\n' + JSON.stringify(facts, null, 2) + '\n\n' +
+    'photoPaths (JSON):\n' + JSON.stringify(photoPaths || []) + '\n\n' +
+    'sourceListingText:\n' + (sourceListingText || '(none provided)');
+
+  const res = UrlFetchApp.fetch('https://api.anthropic.com/v1/messages', {
+    method: 'post',
+    contentType: 'application/json',
+    headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+    muteHttpExceptions: true,
+    payload: JSON.stringify({
+      model: 'claude-sonnet-5',
+      max_tokens: 16000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  if (res.getResponseCode() >= 300) throw new Error('Claude API returned HTTP ' + res.getResponseCode() + ': ' + res.getContentText());
+  const data = JSON.parse(res.getContentText());
+  const text = (data.content || []).map(function (b) { return b.text || ''; }).join('');
+  const html = text.replace(/^```(?:html)?\s*/i, '').replace(/```\s*$/, '').trim();
+  if (html.toLowerCase().indexOf('<!doctype') === -1 && html.toLowerCase().indexOf('<html') === -1) {
+    throw new Error('Claude did not return an HTML document.');
+  }
+  return html;
+}
+
+// Creates or overwrites deals/<dealId>.html in the GitHub Pages repo behind
+// sendmybuyer.com (same repo this Code.gs ships from) via the Contents API,
+// and returns the public sendmybuyer.com URL. Always writes to the SAME
+// path for a given dealId, so a link shared once stays correct forever --
+// this is the "old links show new updates automatically" behavior, not a
+// separate feature.
+function publishDealPageToGithub(dealId, html) {
+  const props = PropertiesService.getScriptProperties();
+  const token = props.getProperty('GITHUB_TOKEN');
+  if (!token) throw new Error('GITHUB_TOKEN script property is not set.');
+  const repo = props.getProperty('GITHUB_REPO') || 'pharaohm33/dispositions-crm';
+  const branch = props.getProperty('GITHUB_BRANCH') || 'main';
+  const path = 'deals/' + encodeURIComponent(dealId) + '.html';
+  const apiUrl = 'https://api.github.com/repos/' + repo + '/contents/' + path;
+  const headers = { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json' };
+
+  let sha = null;
+  const getRes = UrlFetchApp.fetch(apiUrl + '?ref=' + encodeURIComponent(branch), { headers: headers, muteHttpExceptions: true });
+  if (getRes.getResponseCode() === 200) sha = JSON.parse(getRes.getContentText()).sha;
+  else if (getRes.getResponseCode() !== 404) throw new Error('GitHub lookup failed: HTTP ' + getRes.getResponseCode() + ' ' + getRes.getContentText());
+
+  const payload = {
+    message: (sha ? 'Update' : 'Publish') + ' deal page ' + dealId + ' (auto price sync)',
+    content: Utilities.base64Encode(html, Utilities.Charset.UTF_8),
+    branch: branch
+  };
+  if (sha) payload.sha = sha;
+
+  const putRes = UrlFetchApp.fetch(apiUrl, {
+    method: 'put',
+    contentType: 'application/json',
+    headers: headers,
+    muteHttpExceptions: true,
+    payload: JSON.stringify(payload)
+  });
+  if (putRes.getResponseCode() >= 300) throw new Error('GitHub publish failed: HTTP ' + putRes.getResponseCode() + ' ' + putRes.getContentText());
+
+  return 'https://sendmybuyer.com/deals/' + dealId + '.html';
+}
+
+// Shared by adminCreateDealArtifactPage and adminSyncDealPricing's regen
+// step -- fetches the deal's current source listing text fresh (a price
+// change often comes with copy changes too, so this isn't cached), reuses
+// whatever photos are already cached in ArtifactPhotoPaths (photos don't
+// need re-publishing just because the price moved), and regenerates +
+// republishes the page. Requires SourceLink; throws if it's missing so
+// callers can decide how to surface that.
+function regenerateAndPublishDealPage(match) {
+  if (!match['SourceLink']) throw new Error('This deal has no Source Link set.');
+  let sourceText = '';
+  try {
+    sourceText = fetchSourceListingText(match['SourceLink']);
+  } catch (err) {
+    // Fall back to structured-facts-only generation rather than failing
+    // the whole regen just because the source page didn't fetch cleanly.
+  }
+  const photoPaths = match['ArtifactPhotoPaths'] ? String(match['ArtifactPhotoPaths']).split(',').filter(Boolean) : [];
+  const html = generateDealPageHtml(match, sourceText, photoPaths);
+  return publishDealPageToGithub(match['DealID'], html);
+}
+
+// Checks one deal's Source Link for its current asking price and, only if
+// that price differs from what's on file, updates Price and regenerates +
+// republishes the public page. Returns without touching anything (besides
+// LastPriceSyncAt) when the source price matches -- most syncs are no-ops,
+// and skipping the Claude/GitHub calls on a no-op keeps this cheap to run
+// often. Never touches a Sold/Dead deal, same reasoning as
+// adminCheckDealLive: nothing to gain from re-pricing a closed deal.
+function adminSyncDealPricing(body) {
+  if (!body.dealId) return { ok: false, error: 'Missing dealId.' };
+  const sheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const deals = sheetToObjects(sheet);
+  const match = deals.find(function (d) { return d['DealID'] === body.dealId; });
+  if (!match) return { ok: false, error: 'Deal not found.' };
+  if (!match['SourceLink']) return { ok: false, error: 'This deal has no Source Link set.' };
+  if (match['Status'] === 'Sold' || match['Status'] === 'Dead') return { ok: false, error: 'This deal is ' + match['Status'] + ' -- not syncing pricing on a closed deal.' };
+
+  let priceCheck;
+  try {
+    priceCheck = checkSourceLinkPrice(match['SourceLink']);
+  } catch (err) {
+    return { ok: false, error: 'Could not check the source link: ' + String(err) };
+  }
+  if (!priceCheck.ok) return priceCheck;
+
+  const now = new Date().toISOString();
+  sheet.getRange(match._row, getColumnIndex(sheet, 'LastPriceSyncAt')).setValue(now);
+
+  if (priceCheck.price === null) {
+    return { ok: true, priceFound: false, priceChanged: false, oldPrice: match['Price'], newPrice: match['Price'] };
+  }
+  if (priceCheck.price === match['Price']) {
+    return { ok: true, priceFound: true, priceChanged: false, oldPrice: match['Price'], newPrice: match['Price'] };
+  }
+
+  const oldPrice = match['Price'];
+  sheet.getRange(match._row, getColumnIndex(sheet, 'Price')).setValue(priceCheck.price);
+  sheet.getRange(match._row, getColumnIndex(sheet, 'UpdatedAt')).setValue(now);
+  match['Price'] = priceCheck.price;
+
+  let pageUrl = match['PublicPageUrl'] || '';
+  try {
+    pageUrl = regenerateAndPublishDealPage(match);
+    sheet.getRange(match._row, getColumnIndex(sheet, 'PublicPageUrl')).setValue(pageUrl);
+  } catch (err) {
+    // Price is already saved above even if the page regen/publish fails --
+    // don't leave Price stale just because Claude or GitHub hiccuped.
+    return { ok: true, priceFound: true, priceChanged: true, oldPrice: oldPrice, newPrice: priceCheck.price, pageUrl: pageUrl, pageError: String(err) };
+  }
+
+  return { ok: true, priceFound: true, priceChanged: true, oldPrice: oldPrice, newPrice: priceCheck.price, pageUrl: pageUrl };
+}
+
+// Same idea across every non-Sold/non-Dead deal with a Source Link, one at
+// a time (Apps Script has no concurrent UrlFetch, same constraint noted on
+// adminCheckAllDealsLive above) -- each synced deal that changed price also
+// costs one Claude call and one GitHub commit, so this is slower per-deal
+// than the plain dead-link sweep and shouldn't be wired to run as often.
+function adminSyncAllDealPricing(body) {
+  const sheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const deals = sheetToObjects(sheet).filter(function (d) {
+    return d['SourceLink'] && d['Status'] !== 'Sold' && d['Status'] !== 'Dead';
+  });
+
+  let checkedCount = 0;
+  let changedCount = 0;
+  const errors = [];
+  deals.forEach(function (d) {
+    checkedCount++;
+    const result = adminSyncDealPricing({ dealId: d['DealID'] });
+    if (!result.ok) { errors.push((d['DealCode'] || d['Address'] || d['DealID']) + ': ' + result.error); return; }
+    if (result.pageError) errors.push((d['DealCode'] || d['Address'] || d['DealID']) + ': price updated but page publish failed: ' + result.pageError);
+    if (result.priceChanged) changedCount++;
+  });
+
+  return { ok: true, checkedCount: checkedCount, changedCount: changedCount, errors: errors };
+}
+
+// The admin panel's "Create Deal Artifact Page" action -- a one-click, full
+// (re)build rather than the price-diff-gated sync above: pulls the current
+// price AND the full listing copy off Source Link, publishes every photo
+// found at body.picturesLink (a Drive folder or file share link) to
+// GitHub, and generates + publishes the page from all of that, always --
+// regardless of whether Price actually changed. Meant for first creating a
+// deal's public page (or deliberately rebuilding one, e.g. after adding
+// more photos to the Drive folder), not for routine upkeep -- use Sync
+// Price for that once the page already exists with photos in place.
+// body.picturesLink is optional; if given it's saved onto the deal as
+// ArtifactPicturesLink and its photos (re)published, replacing whatever
+// was cached before. If omitted, whatever ArtifactPicturesLink and
+// ArtifactPhotoPaths are already on the deal are reused as-is.
+function adminCreateDealArtifactPage(body) {
+  if (!body.dealId) return { ok: false, error: 'Missing dealId.' };
+  const sheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const deals = sheetToObjects(sheet);
+  const match = deals.find(function (d) { return d['DealID'] === body.dealId; });
+  if (!match) return { ok: false, error: 'Deal not found.' };
+  if (!match['SourceLink']) return { ok: false, error: 'This deal has no Source Link set. Add one under Private Admin Notes first.' };
+
+  const picturesLink = (body.picturesLink || '').trim();
+  if (picturesLink) {
+    sheet.getRange(match._row, getColumnIndex(sheet, 'ArtifactPicturesLink')).setValue(picturesLink);
+    match['ArtifactPicturesLink'] = picturesLink;
+    let photoPaths;
+    try {
+      photoPaths = publishDealPhotosFromDrive(match['DealID'], picturesLink);
+    } catch (err) {
+      return { ok: false, error: String(err) };
+    }
+    sheet.getRange(match._row, getColumnIndex(sheet, 'ArtifactPhotoPaths')).setValue(photoPaths.join(','));
+    match['ArtifactPhotoPaths'] = photoPaths.join(',');
+  }
+
+  const now = new Date().toISOString();
+  let priceChanged = false;
+  try {
+    const priceCheck = checkSourceLinkPrice(match['SourceLink']);
+    if (priceCheck.ok && priceCheck.price && priceCheck.price !== match['Price']) {
+      sheet.getRange(match._row, getColumnIndex(sheet, 'Price')).setValue(priceCheck.price);
+      match['Price'] = priceCheck.price;
+      priceChanged = true;
+    }
+    sheet.getRange(match._row, getColumnIndex(sheet, 'LastPriceSyncAt')).setValue(now);
+  } catch (err) {
+    // Non-fatal -- still build the page off whatever Price is already on file.
+  }
+
+  let pageUrl;
+  try {
+    pageUrl = regenerateAndPublishDealPage(match);
+  } catch (err) {
+    return { ok: false, error: String(err) };
+  }
+  sheet.getRange(match._row, getColumnIndex(sheet, 'PublicPageUrl')).setValue(pageUrl);
+  sheet.getRange(match._row, getColumnIndex(sheet, 'UpdatedAt')).setValue(now);
+
+  const photoCount = match['ArtifactPhotoPaths'] ? String(match['ArtifactPhotoPaths']).split(',').filter(Boolean).length : 0;
+  return { ok: true, pageUrl: pageUrl, photoCount: photoCount, priceChanged: priceChanged, price: match['Price'] };
 }
 
 // ---------- Status options ----------

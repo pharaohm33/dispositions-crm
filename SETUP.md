@@ -33,6 +33,12 @@ left) → scroll to **Script Properties** → **Add script property**. Add these
 | `ADMIN_NOTIFY_EMAIL` | The inbox that should get an email whenever a rep submits a Facebook post for approval |
 | `BEEHIIV_API_KEY` | From beehiiv → Settings → Integrations → API |
 | `BEEHIIV_PUBLICATION_ID` | From beehiiv → Settings → Publication (starts with `pub_`) |
+| `ANTHROPIC_API_KEY` | From [console.anthropic.com](https://console.anthropic.com) → API Keys — used to regenerate a deal's public page copy when its price syncs from the Source Link |
+| `GITHUB_TOKEN` | A GitHub personal access token with **Contents: read and write** on this repo only (fine-grained token, scoped to `dispositions-crm`) — used to publish/update `deals/<id>.html` pages that GitHub Pages then serves at sendmybuyer.com |
+
+`GITHUB_REPO` (default `pharaohm33/dispositions-crm`) and `GITHUB_BRANCH`
+(default `main`) are optional Script Properties if you ever fork this to a
+different repo/branch — leave them unset otherwise.
 
 None of these ever appear in the public GitHub repo or the browser — they
 live only inside this Apps Script project. Buyers and reps get synced to
@@ -40,6 +46,48 @@ beehiiv (tagged so you can email the right list) and new deals auto-create a
 draft post in beehiiv instead of sending real email through this app's own
 Google account — see "Beehiiv sync" near the bottom of `backend/Code.gs` for
 exactly what gets tagged and when.
+
+## Price sync + public deal pages (sendmybuyer.com)
+
+Every deal with a Source Link gets a permanent public page at
+`https://sendmybuyer.com/deals/<DealID>.html` — keyed by the deal's internal
+ID (never its Deal Code or a timestamp) and overwritten in place every time
+it's regenerated, so a link already sent to a buyer just shows whatever is
+current the next time they open it. Nothing ever needs to be reissued. Two
+admin-panel actions produce/update it:
+
+**Create Deal Artifact Page** (per deal, under Private Admin Notes) — the
+full build. Give it a **Pictures Link** (a Google Drive folder or single
+file, shared so this app's own Google account can see it) and click
+**Create Deal Artifact Page**. It:
+
+1. Reads the full listing text off the Source Link (InvestorLift today).
+2. Publishes every image found at the Pictures Link to this repo under
+   `deals/<DealID>/photos/` via the GitHub API
+   (`publishDealPhotosFromDrive`) — capped at 24 photos, skipping anything
+   over ~900KB.
+3. Sends that listing text + the deal's structured fields + the published
+   photo paths to the Claude API (`generateDealPageHtml`), instructed to
+   reformat everything into one clean page **without dropping any fact**
+   from the source, and to replace **every** contact name/phone/email/company
+   found in that source text with the fixed template — `520-633-6437` /
+   `montanoemmanuel@gmail.com` / JNA Dynamic Holdings LLC.
+4. Also re-checks the asking price from the same Source Link fetch and
+   updates Price if it moved.
+5. Publishes the resulting HTML to `deals/<DealID>.html`
+   (`publishDealPageToGithub`).
+
+Safe to re-run any time (e.g. after adding more photos to the Drive
+folder) — it always fully rebuilds. Leave Pictures Link blank on a re-run to
+keep whatever photos are already published rather than re-fetching Drive.
+
+**Sync Price From Source & Republish Page** (per deal, and the bulk **Sync
+All Pricing From Source Links** button above the deals table) — the routine
+upkeep version. Only re-reads the asking price; if it hasn't changed, it
+does nothing else (no Claude call, no GitHub commit — cheap to run often).
+If it has changed, it updates Price and regenerates + republishes the page
+using the photos already cached from the last Create/re-Create — it does
+**not** re-fetch or re-publish photos itself.
 
 ## 4. Deploy as a Web App
 
@@ -50,8 +98,9 @@ exactly what gets tagged and when.
    - **Who has access:** Anyone
 4. Click **Deploy**.
 5. The first time, Google will ask you to authorize the script (it needs
-   permission to read/write the Sheet and send email on your behalf via
-   `MailApp`). Click through the "unverified app" warning — it's your own
+   permission to read/write the Sheet, send email on your behalf via
+   `MailApp`, and read Drive files/folders via `DriveApp` for the Pictures
+   Link feature above). Click through the "unverified app" warning — it's your own
    script — and allow it.
 6. Copy the **Web app URL** you're given (ends in `/exec`).
 
