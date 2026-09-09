@@ -1626,10 +1626,31 @@ function generateDealPageHtml(deal, sourceListingText, photoPaths) {
     'margin-bottom only for per-section vertical spacing instead.\n\n' +
     'sourceListingText below is the full text pulled from this deal\'s original source listing. ' +
     'Rewrite it into the neat, organized presentation described above WITHOUT summarizing away, ' +
-    'excluding, or softening any fact, number, address, unit detail, disclosure, or figure in it -- ' +
-    'every property, every number, every bullet point in the source must still be represented ' +
-    'somewhere on the page, just cleanly formatted instead of pasted raw. If sourceListingText is ' +
-    'empty, build the page from the structured facts JSON alone instead.\n\n' +
+    'excluding, or softening any fact, number, unit detail, disclosure, or figure in it -- every ' +
+    'property, every number, every bullet point in the source must still be represented somewhere ' +
+    'on the page, just cleanly formatted instead of pasted raw. If sourceListingText is empty, build ' +
+    'the page from the structured facts JSON alone instead. Two specific exceptions to "keep ' +
+    'everything," below -- address and days-on-market -- override the general rule above.\n\n' +
+    'Address redaction (do this everywhere, no exceptions): never state a full street address on the ' +
+    'page, for the subject property or, on a multi-property portfolio, for any individual property ' +
+    'within it -- not in prose, not in a table, not in an image alt attribute. City, county, state, ' +
+    'ZIP, neighborhood/subdivision/community name, and cross-streets or "near X" descriptions are all ' +
+    'fine to keep; only the specific street number + street name is redacted. Where sourceListingText ' +
+    'gives a street address, either drop just that detail while keeping the rest of that sentence/row, ' +
+    'or replace it with something like "address available on request." Include one clear line, near ' +
+    'the top of the page (e.g. next to the location), telling an interested buyer they\'ll receive the ' +
+    'full address once they reach out -- e.g. "individual property addresses available upon request; ' +
+    'contact us for the full address list."\n\n' +
+    'Marketplace-metadata redaction: sourceListingText was pulled from a marketplace listing, and it ' +
+    'may carry that marketplace\'s own engagement stats -- days/weeks the LISTING has been up (e.g. ' +
+    '"N days on market," "7 days on [marketplace]," "listed M weeks ago"), view counts (e.g. "148 ' +
+    'views"), save/watch/favorite counts, or similar. NONE of that belongs on this page -- it\'s ' +
+    'metadata about the marketplace listing itself, not a fact about the property or the deal, and ' +
+    'reveals where/how this was sourced. Drop every instance entirely, wherever it appears in ' +
+    'sourceListingText, for the subject property and for any individual property in a portfolio. This ' +
+    'does NOT apply to tenant/lease duration facts (e.g. "tenant in place since March 2026," "lease ' +
+    'through 6/30/27," "3.5+ years") -- those describe the property\'s income history, not the ' +
+    'listing\'s marketplace activity, and must still be kept per the general rule above.\n\n' +
     'Contact/attribution swap (do this everywhere, no exceptions): sourceListingText may contain ' +
     'the original lister\'s name, phone number, email, or company (e.g. an agent name, a brokerage, ' +
     'a marketplace\'s own support email). Do NOT reproduce ANY of that. Every contact point on the ' +
