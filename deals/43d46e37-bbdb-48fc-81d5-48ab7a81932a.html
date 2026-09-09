@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lockwood Folly Golf Community Homesite — Supply, NC | 0.27 Acre Land Assignment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f6f1e9;
+    --paper-dark: #ece3d4;
+    --ink: #2b2621;
+    --ink-soft: #5c534a;
+    --accent: #7a5a3a;
+    --accent-deep: #4a3826;
+    --line: #d8cdb9;
+    --olive: #6b7154;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .display {
+    font-family: 'Fraunces', Georgia, serif;
+    color: var(--ink);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  a { color: inherit; }
+
+  .wrap {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  /* Header */
+  header.top {
+    border-bottom: 1px solid var(--line);
+    padding: 22px 0;
+    background: var(--paper);
+  }
+  header.top .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .brand {
+    font-family: 'Fraunces', serif;
+    font-size: 1.05rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+  }
+  .deal-tag {
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    border: 1px solid var(--line);
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: var(--paper-dark);
+  }
+
+  /* Hero */
+  .hero {
+    padding: 52px 0 30px;
+  }
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.75rem;
+    color: var(--olive);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  h1.title {
+    font-size: 2.5rem;
+    line-height: 1.15;
+    margin: 0 0 14px;
+  }
+  .location-line {
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+  .meta-strip {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    margin-top: 10px;
+  }
+  .meta-strip span { white-space: nowrap; }
+  .meta-strip .dot::before {
+    content: "•";
+    margin-right: 18px;
+    color: var(--line);
+  }
+
+  /* Price block */
+  .price-block {
+    margin-top: 32px;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 14px;
+    padding: 30px 34px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .price-block .label {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.72rem;
+    color: #cfc4b1;
+    margin-bottom: 6px;
+  }
+  .price-block .price {
+    font-family: 'Fraunces', serif;
+    font-size: 2.6rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .price-block .sub-figures {
+    display: flex;
+    gap: 34px;
+    flex-wrap: wrap;
+  }
+  .price-block .sub-figures div { min-width: 120px; }
+  .price-block .sub-figures .val {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    color: #f2ead9;
+  }
+
+  /* Gallery */
+  .gallery {
+    margin-top: 34px;
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .gallery img {
+    height: 260px;
+    border-radius: 10px;
+    flex: 0 0 auto;
+    border: 1px solid var(--line);
+  }
+
+  /* Sections */
+  section {
+    padding: 40px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  section:last-of-type { border-bottom: none; }
+
+  h2.section-title {
+    font-size: 1.5rem;
+    margin: 0 0 22px;
+  }
+
+  .prose p {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--ink-soft);
+    margin: 0 0 16px;
+  }
+  .prose ul {
+    padding-left: 20px;
+    color: var(--ink-soft);
+    line-height: 1.8;
+  }
+  .highlight-tags {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 18px 0 8px;
+  }
+  .highlight-tags span {
+    background: var(--paper-dark);
+    border: 1px solid var(--line);
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    color: var(--accent-deep);
+  }
+
+  /* Table */
+  table.terms {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 4px;
+  }
+  table.terms tr {
+    border-bottom: 1px solid var(--line);
+  }
+  table.terms tr:last-child { border-bottom: none; }
+  table.terms td {
+    padding: 14px 6px;
+    font-size: 0.95rem;
+  }
+  table.terms td:first-child {
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.72rem;
+    width: 42%;
+  }
+  table.terms td:last-child {
+    font-family: 'Fraunces', serif;
+    font-size: 1.05rem;
+    color: var(--ink);
+  }
+
+  /* Property detail grid */
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 18px;
+    margin-top: 10px;
+  }
+  .detail-card {
+    background: var(--paper-dark);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .detail-card .k {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+  .detail-card .v {
+    font-family: 'Fraunces', serif;
+    font-size: 1.15rem;
+  }
+
+  /* Disclosure box */
+  .disclosure {
+    background: #fbf7ee;
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    padding: 18px 22px;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    line-height: 1.7;
+    margin-top: 18px;
+  }
+  .disclosure strong { color: var(--ink); }
+
+  /* CTA band */
+  .cta-band {
+    background: var(--accent-deep);
+    color: var(--paper);
+    padding: 54px 0;
+    margin-top: 0;
+  }
+  .cta-band h2 {
+    color: var(--paper);
+    font-size: 2rem;
+    margin: 0 0 12px;
+  }
+  .cta-band p {
+    color: #e6d9c3;
+    max-width: 520px;
+    line-height: 1.7;
+    margin: 0 0 26px;
+    font-size: 0.98rem;
+  }
+  .cta-buttons {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .cta-buttons a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .cta-buttons a.primary {
+    background: var(--paper);
+    color: var(--accent-deep);
+  }
+  .cta-buttons a.secondary {
+    border: 1px solid #a08a68;
+    color: var(--paper);
+  }
+
+  footer.site-footer {
+    padding: 26px 0 40px;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 0.8rem;
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">JNA Dynamic Holdings LLC</div>
+    <div class="deal-tag">Deal Code: NC - 2 (Land)</div>
+  </div>
+</header>
+
+<div class="hero wrap">
+  <div class="eyebrow">Wholesale Assignment Opportunity — Land</div>
+  <h1 class="title">Lockwood Folly Golf Community Homesite</h1>
+  <div class="location-line">Supply, Brunswick County, North Carolina 28462</div>
+  <div class="meta-strip">
+    <span>0.27 Acre Lot</span>
+    <span class="dot">No Flood Zone or Wetlands Reported</span>
+    <span class="dot">Land / Vacant Homesite</span>
+  </div>
+
+  <div class="price-block">
+    <div>
+      <div class="label">Assignment Price</div>
+      <div class="price">$54,900</div>
+    </div>
+    <div class="sub-figures">
+      <div>
+        <div class="label">As-Is Value</div>
+        <div class="val">$67,000</div>
+      </div>
+      <div>
+        <div class="label">Lot Size</div>
+        <div class="val">0.27 Acres</div>
+      </div>
+      <div>
+        <div class="label">County</div>
+        <div class="val">Brunswick, NC</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="wrap">
+  <h2 class="section-title">Overview</h2>
+  <div class="prose">
+    <p>
+      This is a homesite located within the Lockwood Folly Golf Community in Supply, Brunswick County,
+      North Carolina. The 0.27-acre lot has no flood zone or wetlands reported, offering a clean vacant
+      parcel ready for a buyer's next move within a golf-course community setting.
+    </p>
+    <p>
+      This opportunity is being marketed at an assignment price of $54,900 against a stated as-is value
+      of $67,000.
+    </p>
+    <div class="highlight-tags">
+      <span>Golf Community Lot</span>
+      <span>0.27 Acres</span>
+      <span>No Flood / No Wetlands Reported</span>
+      <span>Vacant Land</span>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2 class="section-title">Property Snapshot</h2>
+  <div class="detail-grid">
+    <div class="detail-card">
+      <div class="k">Property Type</div>
+      <div class="v">Land</div>
+    </div>
+    <div class="detail-card">
+      <div class="k">Beds</div>
+      <div class="v">0</div>
+    </div>
+    <div class="detail-card">
+      <div class="k">Baths</div>
+      <div class="v">0</div>
+    </div>
+    <div class="detail-card">
+      <div class="k">Half Bath</div>
+      <div class="v">0</div>
+    </div>
+    <div class="detail-card">
+      <div class="k">Square Footage</div>
+      <div class="v">—</div>
+    </div>
+    <div class="detail-card">
+      <div class="k">Lot Size</div>
+      <div class="v">0.27 Acres</div>
+    </div>
+  </div>
+  <div class="disclosure">
+    <strong>Note:</strong> As a vacant land homesite, this listing carries no beds, baths, half-baths,
+    finished square footage, parking configuration, year built, or property condition/systems data —
+    these fields are not applicable and are reported here for completeness, consistent with the
+    original source listing.
+  </div>
+</section>
+
+<section class="wrap">
+  <h2 class="section-title">Deal Terms</h2>
+  <table class="terms">
+    <tr>
+      <td>Deal Code</td>
+      <td>NC - 2 (Land)</td>
+    </tr>
+    <tr>
+      <td>Assignment Price</td>
+      <td>$54,900</td>
+    </tr>
+    <tr>
+      <td>As-Is Value</td>
+      <td>$67,000</td>
+    </tr>
+    <tr>
+      <td>Deal Type</td>
+      <td>Land</td>
+    </tr>
+    <tr>
+      <td>Lot Size</td>
+      <td>0.27 Acres</td>
+    </tr>
+    <tr>
+      <td>City / State</td>
+      <td>Supply, NC</td>
+    </tr>
+    <tr>
+      <td>County</td>
+      <td>Brunswick County</td>
+    </tr>
+    <tr>
+      <td>Community</td>
+      <td>Lockwood Folly Golf Community</td>
+    </tr>
+    <tr>
+      <td>Flood / Wetlands</td>
+      <td>None Reported</td>
+    </tr>
+    <tr>
+      <td>Market Activity (per source listing)</td>
+      <td>15 Days Listed · 326 Views</td>
+    </tr>
+  </table>
+  <div class="disclosure">
+    <strong>Assignment of Contract Disclosure:</strong> This offering is an assignment of a purchase
+    and sale agreement — {{}} {{}}<strong>{"'"}JNA Dynamic Holdings LLC</strong> holds equitable interest
+    in this contract and is marketing that interest for assignment. This is not a direct sale by, and
+    does not constitute contact with, the underlying property owner/seller. All inquiries, offers, and
+    communications must be directed to JNA Dynamic Holdings LLC using the contact information below.
+  </div>
+</section>
+
+<div class="cta-band">
+  <div class="wrap">
+    <h2>Interested in this assignment?</h2>
+    <p>
+      Reach out directly to JNA Dynamic Holdings LLC to request the assignment agreement, ask questions
+      about the parcel, or make an offer on this Brunswick County land opportunity.
+    </p>
+    <div class="cta-buttons">
+      <a class="primary" href="tel:520-633-6437">Call 520-633-6437</a>
+      <a class="secondary" href="mailto:montanoemmanuel@gmail.com">Email montanoemmanuel@gmail.com</a>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap">
+    JNA Dynamic Holdings LLC — This is a marketing summary for an assignment of contract and is not an
+    offer of real property by a licensed broker. Figures shown are as provided and are not guaranteed.
+  </div>
+</footer>
+
+</body>
+</html>
