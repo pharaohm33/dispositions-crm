@@ -1,322 +1,308 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lockwood Folly Golf Community Homesite — Supply, NC | Deal NC-2</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lockwood Folly Golf Community Homesite — Supply, NC | Assignment Opportunity</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --paper: #f6f1e9;
-    --paper-dark: #ede5d6;
-    --ink: #2b2620;
-    --ink-soft: #5c5347;
-    --accent: #8a5a3b;
-    --accent-dark: #6e4429;
-    --line: #d8cdb9;
+  :root{
+    --paper:#f6f1e9;
+    --paper-dark:#efe6d8;
+    --ink:#2a2420;
+    --ink-soft:#584f47;
+    --accent:#8a5a34;
+    --accent-dark:#5f3d21;
+    --line:#d8cdbb;
   }
 
-  * { box-sizing: border-box; }
+  *{box-sizing:border-box;}
 
-  html, body {
-    margin: 0;
-    padding: 0;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: 'Source Sans 3', sans-serif;
-    font-size: 17px;
-    line-height: 1.6;
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Source Sans 3', sans-serif;
+    font-size:17px;
+    line-height:1.55;
   }
 
-  h1, h2, h3, .display {
-    font-family: 'Playfair Display', serif;
-    font-weight: 600;
-    color: var(--ink);
-    letter-spacing: 0.01em;
+  h1,h2,h3,h4{
+    font-family:'Playfair Display', serif;
+    color:var(--ink);
+    font-weight:600;
+    letter-spacing:0.2px;
   }
 
-  .wrap {
-    max-width: 880px;
-    margin: 0 auto;
-    padding: 0 28px;
+  a{color:var(--accent-dark);}
+
+  .wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding-left:24px;
+    padding-right:24px;
   }
 
-  header.top {
-    border-bottom: 1px solid var(--line);
-    padding-top: 36px;
-    padding-bottom: 24px;
-    background: var(--paper);
+  /* ---------- HEADER ---------- */
+  header.top{
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+    padding-top:28px;
+    padding-bottom:22px;
+  }
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:2.5px;
+    font-size:12.5px;
+    color:var(--accent-dark);
+    font-weight:600;
+    margin-bottom:10px;
+  }
+  header.top h1{
+    font-size:clamp(28px,4vw,42px);
+    margin-top:0;
+    margin-bottom:10px;
+    line-height:1.15;
+  }
+  .sub-loc{
+    font-size:17px;
+    color:var(--ink-soft);
+  }
+  .badge-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:16px;
+  }
+  .badge{
+    display:inline-block;
+    background:var(--paper-dark);
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    font-size:13px;
+    padding:5px 12px;
+    border-radius:999px;
   }
 
-  .eyebrow {
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-size: 12.5px;
-    color: var(--accent-dark);
-    font-weight: 600;
-    margin-bottom: 10px;
+  /* ---------- PRICE BLOCK ---------- */
+  section.price-block{
+    background:var(--paper-dark);
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    padding-top:28px;
+    padding-bottom:28px;
+  }
+  .price-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:32px;
+    align-items:flex-end;
+    justify-content:space-between;
+  }
+  .price-main .label{
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .price-main .figure{
+    font-family:'Playfair Display', serif;
+    font-size:48px;
+    font-weight:700;
+    color:var(--accent-dark);
+  }
+  .price-secondary{
+    display:flex;
+    gap:28px;
+    flex-wrap:wrap;
+  }
+  .price-secondary div .label{
+    text-transform:uppercase;
+    letter-spacing:1.2px;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .price-secondary div .figure{
+    font-family:'Playfair Display', serif;
+    font-size:24px;
+    font-weight:600;
+  }
+  .assignment-note{
+    margin-top:18px;
+    padding-top:16px;
+    border-top:1px dashed var(--line);
+    font-size:14.5px;
+    color:var(--ink-soft);
+    font-style:italic;
   }
 
-  header.top h1 {
-    font-size: 2.5rem;
-    margin: 0 0 12px 0;
-    line-height: 1.15;
+  /* ---------- GALLERY (only rendered if photos exist) ---------- */
+  section.gallery{
+    padding-top:24px;
+    padding-bottom:8px;
+  }
+  .gallery-scroll{
+    display:flex;
+    gap:14px;
+    overflow-x:auto;
+    padding-bottom:12px;
+  }
+  .gallery-scroll img{
+    height:260px;
+    border-radius:6px;
+    border:1px solid var(--line);
+    flex-shrink:0;
   }
 
-  .location-line {
-    font-size: 1.05rem;
-    color: var(--ink-soft);
+  /* ---------- GENERIC SECTION ---------- */
+  section.block{
+    padding-top:36px;
+    padding-bottom:8px;
+  }
+  section.block h2{
+    font-size:26px;
+    margin-top:0;
+    margin-bottom:16px;
+    padding-bottom:10px;
+    border-bottom:2px solid var(--accent);
+    display:inline-block;
+  }
+  p.lead{
+    color:var(--ink-soft);
+    font-size:16.5px;
   }
 
-  .disclaimer-banner {
-    background: var(--paper-dark);
-    border-top: 1px solid var(--line);
-    border-bottom: 1px solid var(--line);
-    padding-top: 14px;
-    padding-bottom: 14px;
+  .desc-box{
+    background:var(--paper-dark);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:20px 22px;
+    margin-top:12px;
+    margin-bottom:6px;
+    white-space:pre-line;
+    font-size:16px;
+    color:var(--ink);
   }
 
-  .disclaimer-banner p {
-    margin: 0;
-    font-size: 0.92rem;
-    color: var(--ink-soft);
-    font-style: italic;
+  /* ---------- TABLE ---------- */
+  table.terms{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:14px;
+    margin-bottom:10px;
+    font-size:15.5px;
+  }
+  table.terms th, table.terms td{
+    text-align:left;
+    padding:12px 14px;
+    border-bottom:1px solid var(--line);
+  }
+  table.terms th{
+    width:38%;
+    color:var(--ink-soft);
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.6px;
+    font-size:12.5px;
+  }
+  table.terms tr:last-child th, table.terms tr:last-child td{
+    border-bottom:none;
   }
 
-  section.price-block {
-    padding-top: 40px;
-    padding-bottom: 32px;
-    text-align: center;
+  ul.facts-list{
+    margin-top:10px;
+    margin-bottom:10px;
+    padding-left:20px;
+  }
+  ul.facts-list li{
+    margin-bottom:6px;
   }
 
-  .price-tag {
-    display: inline-block;
-    background: #fff;
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    padding: 26px 46px;
+  .stats-strip{
+    display:flex;
+    gap:26px;
+    flex-wrap:wrap;
+    margin-top:14px;
+    margin-bottom:14px;
+    font-size:14.5px;
+    color:var(--ink-soft);
+  }
+  .stats-strip strong{
+    color:var(--ink);
   }
 
-  .price-tag .label {
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-size: 12px;
-    color: var(--ink-soft);
-    margin-bottom: 6px;
+  .disclosure{
+    background:#fbf5ea;
+    border:1px solid var(--line);
+    border-left:4px solid var(--accent);
+    padding:16px 18px;
+    font-size:14.5px;
+    color:var(--ink-soft);
+    border-radius:4px;
+    margin-top:20px;
+    margin-bottom:20px;
   }
 
-  .price-tag .amount {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.9rem;
-    font-weight: 700;
-    color: var(--accent-dark);
+  /* ---------- CTA BAND ---------- */
+  section.cta{
+    background:var(--ink);
+    color:var(--paper);
+    padding-top:44px;
+    padding-bottom:44px;
+    margin-top:40px;
+  }
+  section.cta h2{
+    color:var(--paper);
+    font-size:30px;
+    margin-top:0;
+    margin-bottom:10px;
+    border:none;
+  }
+  section.cta p{
+    color:#d8cfc2;
+    font-size:16px;
+    margin-top:0;
+    margin-bottom:22px;
+    max-width:600px;
+  }
+  .cta-contacts{
+    display:flex;
+    flex-wrap:wrap;
+    gap:30px;
+  }
+  .cta-contacts div .label{
+    text-transform:uppercase;
+    letter-spacing:1.2px;
+    font-size:12px;
+    color:#b8ac99;
+    margin-bottom:4px;
+  }
+  .cta-contacts div .value{
+    font-size:19px;
+    font-weight:600;
+  }
+  .cta-contacts a{
+    color:var(--paper);
+    text-decoration:none;
+    border-bottom:1px solid #7c7264;
   }
 
-  .price-sub {
-    margin-top: 18px;
-    font-size: 1rem;
-    color: var(--ink-soft);
+  footer.site{
+    padding-top:22px;
+    padding-bottom:30px;
+    font-size:13px;
+    color:var(--ink-soft);
+    text-align:center;
   }
 
-  .price-sub strong {
-    color: var(--ink);
-  }
-
-  section.gallery {
-    padding-top: 8px;
-    padding-bottom: 30px;
-  }
-
-  .gallery-scroll {
-    display: flex;
-    gap: 14px;
-    overflow-x: auto;
-    padding-bottom: 10px;
-  }
-
-  .gallery-scroll img {
-    height: 260px;
-    border-radius: 4px;
-    border: 1px solid var(--line);
-    flex-shrink: 0;
-  }
-
-  section.narrative {
-    padding-top: 10px;
-    padding-bottom: 36px;
-  }
-
-  section.narrative h2, section.terms h2, section.details h2 {
-    font-size: 1.55rem;
-    margin-top: 0;
-    margin-bottom: 18px;
-    border-bottom: 2px solid var(--accent);
-    display: inline-block;
-    padding-bottom: 6px;
-  }
-
-  section.narrative p {
-    margin: 0 0 14px 0;
-    color: var(--ink);
-  }
-
-  ul.feature-list {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 10px 0;
-  }
-
-  ul.feature-list li {
-    padding: 8px 0;
-    border-bottom: 1px dashed var(--line);
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.98rem;
-  }
-
-  ul.feature-list li:last-child { border-bottom: none; }
-
-  ul.feature-list .k { color: var(--ink-soft); }
-  ul.feature-list .v { font-weight: 600; }
-
-  section.terms {
-    padding-top: 10px;
-    padding-bottom: 36px;
-  }
-
-  table.terms-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-    border: 1px solid var(--line);
-  }
-
-  table.terms-table tr {
-    border-bottom: 1px solid var(--line);
-  }
-
-  table.terms-table tr:last-child { border-bottom: none; }
-
-  table.terms-table td {
-    padding: 14px 18px;
-    font-size: 0.98rem;
-  }
-
-  table.terms-table td.term-label {
-    color: var(--ink-soft);
-    width: 42%;
-    font-weight: 500;
-    background: var(--paper-dark);
-  }
-
-  table.terms-table td.term-value {
-    font-weight: 600;
-    color: var(--ink);
-  }
-
-  section.details {
-    padding-top: 10px;
-    padding-bottom: 36px;
-  }
-
-  .details-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
-
-  .detail-card {
-    background: #fff;
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    padding: 16px 18px;
-  }
-
-  .detail-card .k {
-    text-transform: uppercase;
-    font-size: 11.5px;
-    letter-spacing: 0.08em;
-    color: var(--ink-soft);
-    margin-bottom: 6px;
-  }
-
-  .detail-card .v {
-    font-size: 1.02rem;
-    font-weight: 600;
-  }
-
-  section.assignment-note {
-    padding-top: 6px;
-    padding-bottom: 36px;
-  }
-
-  .note-box {
-    background: #efe3d3;
-    border: 1px solid var(--line);
-    border-left: 4px solid var(--accent-dark);
-    padding: 18px 22px;
-    border-radius: 3px;
-    font-size: 0.95rem;
-    color: var(--ink-soft);
-  }
-
-  .note-box strong { color: var(--ink); }
-
-  footer.cta-band {
-    background: var(--ink);
-    color: var(--paper);
-    padding-top: 46px;
-    padding-bottom: 46px;
-    margin-top: 20px;
-  }
-
-  footer.cta-band h2 {
-    color: var(--paper);
-    font-size: 1.9rem;
-    margin: 0 0 10px 0;
-  }
-
-  footer.cta-band p.sub {
-    color: #cfc6b8;
-    margin: 0 0 26px 0;
-    font-size: 1rem;
-  }
-
-  .cta-contacts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 18px;
-  }
-
-  .cta-contacts a {
-    display: inline-block;
-    background: var(--paper);
-    color: var(--ink);
-    text-decoration: none;
-    padding: 14px 24px;
-    border-radius: 3px;
-    font-weight: 600;
-    font-size: 0.98rem;
-  }
-
-  .cta-contacts a.secondary {
-    background: transparent;
-    color: var(--paper);
-    border: 1px solid #6f6a5f;
-  }
-
-  .company-line {
-    margin-top: 26px;
-    font-size: 0.9rem;
-    color: #a89f8f;
-  }
-
-  @media (max-width: 600px) {
-    header.top h1 { font-size: 1.9rem; }
-    .price-tag .amount { font-size: 2.2rem; }
-    .details-grid { grid-template-columns: 1fr; }
+  @media (max-width:600px){
+    .price-main .figure{font-size:36px;}
+    table.terms th{width:46%;}
   }
 </style>
 </head>
@@ -324,122 +310,122 @@
 
 <header class="top">
   <div class="wrap">
-    <div class="eyebrow">Deal Code: NC - 2 (Land) &nbsp;•&nbsp; Assignment of Contract</div>
+    <div class="eyebrow">Wholesale Assignment of Contract &middot; Land</div>
     <h1>Lockwood Folly Golf Community Homesite</h1>
-    <div class="location-line">Supply, Brunswick County, North Carolina</div>
+    <div class="sub-loc">Brunswick County &middot; Supply, NC 28462</div>
+    <div class="badge-row">
+      <span class="badge">Deal Code: NC - 2 (Land)</span>
+      <span class="badge">0.27 Acres</span>
+      <span class="badge">No Flood or Wetlands Reported</span>
+      <span class="badge">County: Brunswick</span>
+    </div>
   </div>
 </header>
 
-<div class="disclaimer-banner">
-  <div class="wrap">
-    <p>This offering is a wholesale assignment of contract, not a direct sale of the underlying property. The rights being marketed are the assignor's equitable interest in the purchase contract. All inquiries and communications should be directed to the contact listed below, not to the underlying seller or owner.</p>
-  </div>
-</div>
-
 <section class="price-block">
   <div class="wrap">
-    <div class="price-tag">
-      <div class="label">Assignment Price</div>
-      <div class="amount">$54,900</div>
+    <div class="price-grid">
+      <div class="price-main">
+        <div class="label">Assignment Price</div>
+        <div class="figure">$54,900</div>
+      </div>
+      <div class="price-secondary">
+        <div>
+          <div class="label">As-Is Value</div>
+          <div class="figure">$67,000</div>
+        </div>
+      </div>
     </div>
-    <div class="price-sub">Reported As-Is Value: <strong>$67,000</strong></div>
+    <div class="assignment-note">
+      This offering is a wholesale <strong>assignment of contract</strong>. The buyer is purchasing the equitable/contract interest held by {{COMPANY}}, not the property directly from the underlying property owner. All inquiries, offers, and financing requests should be directed to {{COMPANY}} using the contact information below.
+    </div>
   </div>
 </section>
 
-<section class="narrative">
+<section class="block">
   <div class="wrap">
     <h2>Property Overview</h2>
-    <p>A 0.27-acre residential homesite located within the Lockwood Folly Golf Community in Supply, Brunswick County, North Carolina. The lot is reported to have no flood zone designation and no wetlands present.</p>
-    <ul class="feature-list">
-      <li><span class="k">Deal Code</span><span class="v">NC - 2 (Land)</span></li>
-      <li><span class="k">Deal Type</span><span class="v">Land</span></li>
-      <li><span class="k">City / State</span><span class="v">Supply, NC</span></li>
-      <li><span class="k">County</span><span class="v">Brunswick</span></li>
-      <li><span class="k">Community</span><span class="v">Lockwood Folly Golf Community</span></li>
-      <li><span class="k">Lot Size</span><span class="v">0.27 Acres</span></li>
-      <li><span class="k">Flood Zone</span><span class="v">None reported</span></li>
-      <li><span class="k">Wetlands</span><span class="v">None reported</span></li>
-      <li><span class="k">Beds / Baths / Half-Bath</span><span class="v">0 / 0 / 0 (vacant land)</span></li>
-      <li><span class="k">Square Footage</span><span class="v">Not applicable — vacant land</span></li>
-    </ul>
+    <p class="lead">
+      A 0.27-acre homesite located within the Lockwood Folly Golf Community in Supply, Brunswick County, North Carolina. No flood zone or wetlands have been reported for the parcel.
+    </p>
+    <div class="desc-box">BRUNSWICK COUNTY, NC — LOCKWOOD FOLLY GOLF COMMUNITY HOMESITE | 0.27 ACRES | NO FLOOD OR WETLANDS REPORTED | $54,900
+
+As-Is Value: $67,000</div>
+
+    <div class="stats-strip">
+      <div><strong>15</strong> days on market (per original marketplace listing)</div>
+      <div><strong>326</strong> views (per original marketplace listing)</div>
+    </div>
   </div>
 </section>
 
-<section class="terms">
+<section class="block">
   <div class="wrap">
-    <h2>Deal Terms</h2>
-    <table class="terms-table">
-      <tr>
-        <td class="term-label">Assignment Price</td>
-        <td class="term-value">$54,900</td>
-      </tr>
-      <tr>
-        <td class="term-label">As-Is Value</td>
-        <td class="term-value">$67,000</td>
-      </tr>
-      <tr>
-        <td class="term-label">Deal Type</td>
-        <td class="term-value">Land</td>
-      </tr>
-      <tr>
-        <td class="term-label">Lot Size</td>
-        <td class="term-value">0.27 Acres</td>
-      </tr>
-      <tr>
-        <td class="term-label">Location</td>
-        <td class="term-value">Supply, Brunswick County, NC</td>
-      </tr>
-      <tr>
-        <td class="term-label">Transaction Structure</td>
-        <td class="term-value">Assignment of Contract</td>
-      </tr>
+    <h2>Property Details</h2>
+    <table class="terms">
+      <tr><th>Property Type</th><td>Land</td></tr>
+      <tr><th>Deal Type</th><td>Land</td></tr>
+      <tr><th>Beds</th><td>0</td></tr>
+      <tr><th>Baths</th><td>0</td></tr>
+      <tr><th>Half-Bath</th><td>0</td></tr>
+      <tr><th>Sq. Ft.</th><td>&mdash; (not listed)</td></tr>
+      <tr><th>Lot Size</th><td>0.27 acres (per listing description; source data field also recorded lot size as "0")</td></tr>
+      <tr><th>Parking</th><td>&mdash; (not listed)</td></tr>
+      <tr><th>Built In</th><td>&mdash; (not listed)</td></tr>
+      <tr><th>Flood / Wetlands</th><td>No flood or wetlands reported</td></tr>
+      <tr><th>County</th><td>Brunswick</td></tr>
+      <tr><th>City / State</th><td>Supply, NC 28462</td></tr>
     </table>
   </div>
 </section>
 
-<section class="details">
+<section class="block">
   <div class="wrap">
-    <h2>Additional Details</h2>
-    <div class="details-grid">
-      <div class="detail-card">
-        <div class="k">Type</div>
-        <div class="v">Land</div>
-      </div>
-      <div class="detail-card">
-        <div class="k">Parking</div>
-        <div class="v">Not applicable</div>
-      </div>
-      <div class="detail-card">
-        <div class="k">Lot Size</div>
-        <div class="v">0.27 Acres</div>
-      </div>
-      <div class="detail-card">
-        <div class="k">Flood / Wetlands</div>
-        <div class="v">None reported</div>
-      </div>
+    <h2>Deal Terms</h2>
+    <table class="terms">
+      <tr><th>Assignment Price</th><td>$54,900</td></tr>
+      <tr><th>As-Is Value</th><td>$67,000</td></tr>
+      <tr><th>ARV</th><td>&mdash; (not provided)</td></tr>
+      <tr><th>Gross Margin</th><td>&mdash; (not provided)</td></tr>
+      <tr><th>Financing</th><td>Financing inquiries welcomed — contact {{COMPANY}} to discuss options</td></tr>
+      <tr><th>Transaction Structure</th><td>Assignment of contract — buyer steps into contract position held by {{COMPANY}}</td></tr>
+    </table>
+
+    <div class="disclosure">
+      <strong>Disclosure:</strong> This is a wholesale real estate assignment opportunity. {{COMPANY}} holds an equitable/contractual interest in this property and is marketing the assignment of that contract. This is not a direct offering by, and does not imply direct contact with, the underlying property owner/seller. All figures (price, as-is value) are as represented in the original source listing; no additional financial details (ARV, gross margin, rehab estimate) were provided and are therefore not stated.
     </div>
   </div>
 </section>
 
-<section class="assignment-note">
+<section class="cta">
   <div class="wrap">
-    <div class="note-box">
-      <strong>Note on transaction structure:</strong> This listing represents an assignable purchase contract held by <strong>JNA Dynamic Holdings LLC</strong>. The buyer will be purchasing the contractual rights to acquire this homesite, not acquiring title directly from the current owner in this transaction. All figures above — including price and as-is value — are as reported and no additional figures beyond those provided have been assumed or estimated.
-    </div>
-  </div>
-</section>
-
-<footer class="cta-band">
-  <div class="wrap">
-    <h2>Interested in This Homesite?</h2>
-    <p class="sub">Contact us directly to request the assignment contract, ask questions, or move forward on the Lockwood Folly Golf Community lot.</p>
+    <h2>Interested in This Assignment?</h2>
+    <p>Reach out to {{COMPANY}} directly to make an offer, request financing information, or receive the full photo and document package for this 0.27-acre Lockwood Folly Golf Community homesite.</p>
     <div class="cta-contacts">
-      <a href="tel:520-633-6437">Call 520-633-6437</a>
-      <a href="mailto:montanoemmanuel@gmail.com" class="secondary">Email montanoemmanuel@gmail.com</a>
+      <div>
+        <div class="label">Company</div>
+        <div class="value">{{COMPANY}}</div>
+      </div>
+      <div>
+        <div class="label">Phone</div>
+        <div class="value"><a href="tel:+15206336437">520-633-6437</a></div>
+      </div>
+      <div>
+        <div class="label">Email</div>
+        <div class="value"><a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a></div>
+      </div>
     </div>
-    <div class="company-line">Marketed by JNA Dynamic Holdings LLC — Deal Code: NC - 2 (Land)</div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    Deal Code: NC - 2 (Land) &middot; Supply, Brunswick County, NC &middot; Marketed as an assignment of contract by {{COMPANY}}.
   </div>
 </footer>
 
+<script>
+  document.querySelectorAll('body').forEach(function(){});
+</script>
 </body>
 </html>
