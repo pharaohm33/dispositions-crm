@@ -63,7 +63,7 @@ const FOLLOWUP_HOURS = 24;
 const MATCH_STATUSES = ['Active Match', 'Negotiating', 'Closing', 'Dead Match'];
 const DEFAULT_ASSET_CATEGORIES = ['Single Family', 'Condominium / Townhouse', 'Multifamily (1-4 Units)', 'Multifamily (4+ Units)', 'Fix and Flip', 'Residential Vacant Land', 'Commercial'];
 
-const REP_COLUMNS = ['Username', 'Name', 'Phone', 'Email', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'LastActive', 'PreferredCity', 'PreferredState', 'PreferredZip', 'PersonType', 'CategoryAccess', 'BulkAssignOverride', 'TargetMarket', 'BuyBoxNationwide', 'BuyBoxStates', 'BuyBoxCities', 'BuyBoxDealTypes', 'BuyBoxAssetCategories', 'BuyBoxOtherAssetClass', 'BuyBoxNotes'];
+const REP_COLUMNS = ['Username', 'Name', 'Phone', 'Email', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'LastActive', 'PreferredCity', 'PreferredState', 'PreferredZip', 'PersonType', 'CategoryAccess', 'BulkAssignOverride', 'TargetMarket', 'BuyBoxNationwide', 'BuyBoxStates', 'BuyBoxCities', 'BuyBoxDealTypes', 'BuyBoxAssetCategories', 'BuyBoxOtherAssetClass', 'BuyBoxNotes', 'BuyBoxFinancingTypes', 'DealAreaStates', 'DealAreaCities'];
 
 // A Buyer's self-reported purchase criteria, collected at signup (see
 // publicSignup) -- Deal Type is a fixed strategy list (does this buyer
@@ -73,6 +73,11 @@ const REP_COLUMNS = ['Username', 'Name', 'Phone', 'Email', 'PasswordHash', 'Salt
 // type are two different questions. Admin can review/edit all of this
 // from a Buyer's row on the Team tab.
 const BUY_BOX_DEAL_TYPES = ['Fix and Flip', 'Land', 'Buy and Hold'];
+
+// How this deal can be purchased -- shown to reps/buyers alongside the
+// other deal financials, admin-set from a fixed list (not per-deal
+// free text) so it stays consistent everywhere it's displayed.
+const FINANCING_TYPES = ['All Cash', 'Investment Loan (Ex: Hard Money, Bridge, DSCR, New Construction Loan)', 'Seller Financing', 'Seller Carryback/"Stack Method" (Seller Preferred Equity / Seller carry in 2nd Lien)'];
 
 // Self-identified at signup -- informational only (admin visibility/
 // filtering in the Team tab), doesn't gate any functionality. Not
@@ -95,7 +100,7 @@ const PERSON_TYPES = ['Buyer', 'Wholesaler', 'Realtor', 'Other'];
 // buyer<->deal auto-matching -- see buyerMatchesDeal. AssetType stays a
 // free-text description field ("SFR - 3bd/2ba") separate from the
 // structured AssetCategory used for matching.
-const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt', 'Locked', 'DealTypes'];
+const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt', 'Locked', 'DealTypes', 'FinancingType'];
 // Source distinguishes a deliberate, one-deal-at-a-time grant ('manual' --
 // the Access section's "Add Access" dropdown, or "Assign Myself") from one
 // written by the bulk-assign mechanism ('bulk' -- see applyDealAssignMode).
@@ -595,6 +600,7 @@ function login(body) {
       dealTypes: splitCommaList(rep['BuyBoxDealTypes']),
       assetCategories: splitCommaList(rep['BuyBoxAssetCategories']),
       otherAssetClass: rep['BuyBoxOtherAssetClass'] || '',
+      financingTypes: splitCommaList(rep['BuyBoxFinancingTypes']),
       notes: rep['BuyBoxNotes'] || ''
     }
   };
@@ -675,6 +681,17 @@ function publicSignup(body) {
   const dealTypes = (Array.isArray(body.buyBoxDealTypes) ? body.buyBoxDealTypes : splitCommaList(body.buyBoxDealTypes))
     .filter(function (t) { return BUY_BOX_DEAL_TYPES.indexOf(t) !== -1; });
   const buyBoxCategories = Array.isArray(body.buyBoxAssetCategories) ? body.buyBoxAssetCategories : splitCommaList(body.buyBoxAssetCategories);
+  const buyBoxFinancingTypes = (Array.isArray(body.buyBoxFinancingTypes) ? body.buyBoxFinancingTypes : splitCommaList(body.buyBoxFinancingTypes))
+    .filter(function (f) { return FINANCING_TYPES.indexOf(f) !== -1; });
+  // Where a non-Buyer signup (Wholesaler/Realtor/Other -- someone selling
+  // deals, not buying them) would like to work: same standing-access
+  // mechanism as CategoryAccess (see repDealAreaLists/dealMatchesRepDealArea),
+  // just keyed on deal State/City instead of AssetCategory. Only collected
+  // for non-Buyer signups -- a Buyer's location preference is their Buy Box
+  // States/Cities above, a completely separate question (where they want to
+  // BUY, not where they want to sell deals for us).
+  const dealAreaStates = isBuyerSignup ? [] : splitCommaList(body.dealAreaStates);
+  const dealAreaCities = isBuyerSignup ? [] : splitCommaList(body.dealAreaCities);
   appendRowByHeaders(sheet, {
     'Username': email, 'Name': name, 'Phone': String(body.phone || '').trim(), 'Email': email,
     'PasswordHash': hashPassword(password, salt), 'Salt': salt,
@@ -686,7 +703,10 @@ function publicSignup(body) {
     'BuyBoxDealTypes': dealTypes.join(', '),
     'BuyBoxAssetCategories': buyBoxCategories.join(', '),
     'BuyBoxOtherAssetClass': String(body.buyBoxOtherAssetClass || '').trim(),
-    'BuyBoxNotes': String(body.buyBoxNotes || '').trim()
+    'BuyBoxFinancingTypes': buyBoxFinancingTypes.join(', '),
+    'BuyBoxNotes': String(body.buyBoxNotes || '').trim(),
+    'DealAreaStates': dealAreaStates.join(', '),
+    'DealAreaCities': dealAreaCities.join(', ')
   });
 
   // Opt-in (Team tab setting) -- when on, a fresh signup is immediately
@@ -727,13 +747,21 @@ function publicSignup(body) {
   // weekly active-deals digest goes out to. Never blocks account creation
   // if beehiiv is unreachable -- see beehiivUpsertSubscriber.
   if (isBuyerSignup) {
-    const buyBoxTags = buildBuyBoxTags(splitCommaList(body.buyBoxStates), splitCommaList(body.buyBoxCities), buyBoxCategories, dealTypes, !!body.buyBoxNationwide);
+    const buyBoxTags = buildBuyBoxTags(splitCommaList(body.buyBoxStates), splitCommaList(body.buyBoxCities), buyBoxCategories, dealTypes, !!body.buyBoxNationwide, buyBoxFinancingTypes);
     beehiivUpsertSubscriber(email, name, ['buyer-lead'].concat(buyBoxTags));
   } else {
-    beehiivUpsertSubscriber(email, name, ['rep']);
+    const areaTags = buildBuyBoxTags(dealAreaStates, dealAreaCities, [], [], false, []);
+    beehiivUpsertSubscriber(email, name, ['rep'].concat(areaTags));
   }
 
-  return { ok: true };
+  // Tells a brand-new rep right away whether there's already something to
+  // work in the area they just picked, instead of them finding out only
+  // after logging in and finding either a full or an empty Deals tab.
+  // Purely informational here -- the actual access grant is automatic (see
+  // accessibleDealIds), this count is just what unlocks for them.
+  const matchingDealsCount = isBuyerSignup ? 0 : dealsMatchingArea(dealAreaStates, dealAreaCities).length;
+
+  return { ok: true, matchingDealsCount: matchingDealsCount };
 }
 
 // Shared "who is support" for forgot-password and address-request
@@ -761,6 +789,39 @@ function repCategoryList(rep) {
   return rep ? splitCommaList(rep['CategoryAccess']).map(normalizeText).filter(Boolean) : [];
 }
 
+// A rep's Deal Area (states and/or cities they'd prefer to sell deals in --
+// collected at signup for anyone who isn't a Buyer, editable later from the
+// Team tab's Edit Details) is the same kind of standing grant as
+// CategoryAccess above, just keyed on deal location instead of asset
+// category: it covers every deal in that state/city automatically, present
+// AND future. Checked everywhere deal access is checked (canAccessDeal,
+// accessibleDealIds), same as CategoryAccess. A rep only needs to match
+// EITHER their chosen states OR their chosen cities on a given deal, not
+// both -- letting them cast a wide net by state and/or narrow in on
+// specific cities in states they didn't blanket-select.
+function repDealAreaLists(rep) {
+  return {
+    states: rep ? splitCommaList(rep['DealAreaStates']).map(normalizeText).filter(Boolean) : [],
+    cities: rep ? splitCommaList(rep['DealAreaCities']).map(normalizeText).filter(Boolean) : []
+  };
+}
+
+function dealMatchesRepDealArea(deal, areaLists) {
+  if (areaLists.states.length > 0 && deal['State'] && areaLists.states.indexOf(normalizeText(deal['State'])) !== -1) return true;
+  if (areaLists.cities.length > 0 && deal['City'] && areaLists.cities.indexOf(normalizeText(deal['City'])) !== -1) return true;
+  return false;
+}
+
+// Deals currently in a rep's chosen Deal Area -- used both to grant standing
+// access (see canAccessDeal/accessibleDealIds) and to tell a rep at signup
+// how many deals are already waiting for them in the area they just picked.
+function dealsMatchingArea(states, cities) {
+  const areaLists = { states: (states || []).map(normalizeText).filter(Boolean), cities: (cities || []).map(normalizeText).filter(Boolean) };
+  if (areaLists.states.length === 0 && areaLists.cities.length === 0) return [];
+  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  return sheetToObjects(dealsSheet).filter(function (d) { return dealIsActive(d) && dealMatchesRepDealArea(d, areaLists); });
+}
+
 function findRepByUsername(username) {
   const repsSheet = getSheet(REPS_SHEET, REP_COLUMNS);
   return sheetToObjects(repsSheet).find(function (r) { return String(r['Username'] || '').trim().toLowerCase() === username; });
@@ -777,9 +838,13 @@ function canAccessDeal(session, dealId) {
 
   const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
   const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === dealId; });
-  if (!deal || !deal['AssetCategory']) return false;
-  const categories = repCategoryList(findRepByUsername(session.u));
-  return categories.indexOf(normalizeText(deal['AssetCategory'])) !== -1;
+  if (!deal) return false;
+  const rep = findRepByUsername(session.u);
+  if (deal['AssetCategory']) {
+    const categories = repCategoryList(rep);
+    if (categories.indexOf(normalizeText(deal['AssetCategory'])) !== -1) return true;
+  }
+  return dealMatchesRepDealArea(deal, repDealAreaLists(rep));
 }
 
 function accessibleDealIds(session) {
@@ -790,11 +855,14 @@ function accessibleDealIds(session) {
     if (String(row['Username'] || '').trim().toLowerCase() === session.u) ids[row['DealID']] = true;
   });
 
-  const categories = repCategoryList(findRepByUsername(session.u));
-  if (categories.length > 0) {
+  const rep = findRepByUsername(session.u);
+  const categories = repCategoryList(rep);
+  const areaLists = repDealAreaLists(rep);
+  if (categories.length > 0 || areaLists.states.length > 0 || areaLists.cities.length > 0) {
     const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
     sheetToObjects(dealsSheet).forEach(function (d) {
-      if (d['AssetCategory'] && categories.indexOf(normalizeText(d['AssetCategory'])) !== -1) ids[d['DealID']] = true;
+      if (d['AssetCategory'] && categories.indexOf(normalizeText(d['AssetCategory'])) !== -1) { ids[d['DealID']] = true; return; }
+      if (dealMatchesRepDealArea(d, areaLists)) ids[d['DealID']] = true;
     });
   }
   return ids;
@@ -837,11 +905,13 @@ function getDeals(body, session) {
     const allAccessCount = activeReps.filter(function (r) { return r['AllAccess'] === true || r['AllAccess'] === 'TRUE'; }).length;
     const specificallyAssignableUsernames = {};
     const categoryListByUsername = {};
+    const areaListsByUsername = {};
     activeReps.forEach(function (r) {
       if (!(r['AllAccess'] === true || r['AllAccess'] === 'TRUE')) {
         const u = String(r['Username'] || '').trim().toLowerCase();
         specificallyAssignableUsernames[u] = true;
         categoryListByUsername[u] = repCategoryList(r);
+        areaListsByUsername[u] = repDealAreaLists(r);
       }
     });
 
@@ -868,6 +938,9 @@ function getDeals(body, session) {
           if (categoryListByUsername[u].indexOf(dealCategory) !== -1) accessUsernames[u] = true;
         });
       }
+      Object.keys(areaListsByUsername).forEach(function (u) {
+        if (dealMatchesRepDealArea(d, areaListsByUsername[u])) accessUsernames[u] = true;
+      });
       const totalCount = allAccessCount + Object.keys(accessUsernames).length;
       const adminCoversThis = currentAdminAllAccess || !!accessUsernames[session.u];
       copy.currentAdminHasAccess = adminCoversThis;
@@ -981,6 +1054,7 @@ function adminAddDeal(body) {
   // dealMatchesBuyBox match on it, instead of Strategy being reference-only
   // info nothing on a deal could ever be checked against.
   const dealTypes = (Array.isArray(d.dealTypes) ? d.dealTypes : splitCommaList(d.dealTypes)).filter(function (t) { return BUY_BOX_DEAL_TYPES.indexOf(t) !== -1; });
+  const financingType = FINANCING_TYPES.indexOf(d.financingType) !== -1 ? d.financingType : '';
   appendRowByHeaders(sheet, {
     'DealID': dealId, 'DealCode': d.dealCode || '', 'Address': d.address, 'City': d.city || '', 'State': d.state || '', 'Zip': d.zip || '',
     'County': d.county || '', 'MatchCities': d.matchCities || '', 'AssetType': d.assetType || '', 'AssetCategory': d.assetCategory || '',
@@ -988,7 +1062,7 @@ function adminAddDeal(body) {
     'Status': d.status || DEFAULT_STATUSES[0],
     'Description': d.description || '', 'GeneralDriveLink': d.generalDriveLink || '', 'SensitiveDriveLink': d.sensitiveDriveLink || '',
     'AdminPrivateNotes': d.adminPrivateNotes || '', 'SourceLink': d.sourceLink || '',
-    'CreatedAt': now, 'UpdatedAt': now, 'DealTypes': dealTypes.join(', ')
+    'CreatedAt': now, 'UpdatedAt': now, 'DealTypes': dealTypes.join(', '), 'FinancingType': financingType
   });
 
   const assignedCount = applyDealAssignMode(dealId, d.assetCategory, body.assignMode, now);
@@ -1022,7 +1096,8 @@ function dealDraftHtml(d, dealTypes) {
     ['ARV', d.arv],
     ['Rehab Estimate', d.rehabEstimate],
     ['As-Is Value', d.asIsValue],
-    ['Asset Type', d.assetType || d.assetCategory]
+    ['Asset Type', d.assetType || d.assetCategory],
+    ['Financing Type', d.financingType]
   ].filter(function (r) { return r[1]; });
   let html = '<p>A new deal just went active:</p><ul>';
   rows.forEach(function (r) { html += '<li><strong>' + r[0] + ':</strong> ' + r[1] + '</li>'; });
@@ -1042,6 +1117,7 @@ function dealDraftHtml(d, dealTypes) {
   });
   if (d.assetCategory) matchTags.push('asset-' + slugifyTag(d.assetCategory));
   (dealTypes || []).forEach(function (t) { matchTags.push('strategy-' + slugifyTag(t)); });
+  if (d.financingType) matchTags.push('financing-' + slugifyTag(d.financingType));
 
   if (matchTags.length) {
     html += '<p><strong>Tags that match this deal:</strong> ' +
@@ -1221,7 +1297,8 @@ function adminUpdateDeal(body) {
   // clear it (Price present in this save's payload but empty), not saves
   // of other fields that don't touch Price at all.
   if (d.Price !== undefined && !d.Price) return { ok: false, error: 'Asking Price is required.' };
-  const editable = ['DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink'];
+  if (d.FinancingType !== undefined && d.FinancingType && FINANCING_TYPES.indexOf(d.FinancingType) === -1) d.FinancingType = '';
+  const editable = ['DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'FinancingType', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink'];
   editable.forEach(function (field) {
     if (d[field] === undefined) return;
     const col = getColumnIndex(sheet, field);
@@ -1417,6 +1494,13 @@ function adminGetReps(body) {
         }
       });
     }
+    const areaLists = repDealAreaLists(r);
+    if (areaLists.states.length > 0 || areaLists.cities.length > 0) {
+      if (!specificallyWorkedDealIdsByUsername[username]) specificallyWorkedDealIdsByUsername[username] = {};
+      activeDeals.forEach(function (d) {
+        if (dealMatchesRepDealArea(d, areaLists)) specificallyWorkedDealIdsByUsername[username][d['DealID']] = true;
+      });
+    }
     const dealsAssignedCount = allAccess ? activeDealsCount :
       Object.keys(specificallyWorkedDealIdsByUsername[username] || {}).length;
     return {
@@ -1433,7 +1517,8 @@ function adminGetReps(body) {
       buyBoxNationwide: r['BuyBoxNationwide'] === true || r['BuyBoxNationwide'] === 'TRUE',
       buyBoxStates: r['BuyBoxStates'] || '', buyBoxCities: r['BuyBoxCities'] || '',
       buyBoxDealTypes: r['BuyBoxDealTypes'] || '', buyBoxAssetCategories: r['BuyBoxAssetCategories'] || '',
-      buyBoxOtherAssetClass: r['BuyBoxOtherAssetClass'] || '', buyBoxNotes: r['BuyBoxNotes'] || ''
+      buyBoxOtherAssetClass: r['BuyBoxOtherAssetClass'] || '', buyBoxFinancingTypes: r['BuyBoxFinancingTypes'] || '', buyBoxNotes: r['BuyBoxNotes'] || '',
+      dealAreaStates: r['DealAreaStates'] || '', dealAreaCities: r['DealAreaCities'] || ''
     };
   });
   return { ok: true, reps: reps };
@@ -3384,6 +3469,19 @@ function adminSetRepPreferredArea(body) {
     // deal access on its own.
     sheet.getRange(match._row, getColumnIndex(sheet, 'TargetMarket')).setValue(body.targetMarket || '');
   }
+  // Deal Area (states/cities this rep wants to sell deals in) -- unlike
+  // TargetMarket above, this DOES grant standing deal access (see
+  // repDealAreaLists/canAccessDeal/accessibleDealIds), so admin can
+  // correct/widen/narrow it here the same way they can for a Buyer's Buy
+  // Box, e.g. a rep calls in wanting to add a state.
+  if (body.dealAreaStates !== undefined) {
+    const states = Array.isArray(body.dealAreaStates) ? body.dealAreaStates : splitCommaList(body.dealAreaStates);
+    sheet.getRange(match._row, getColumnIndex(sheet, 'DealAreaStates')).setValue(states.join(', '));
+  }
+  if (body.dealAreaCities !== undefined) {
+    const cities = Array.isArray(body.dealAreaCities) ? body.dealAreaCities : splitCommaList(body.dealAreaCities);
+    sheet.getRange(match._row, getColumnIndex(sheet, 'DealAreaCities')).setValue(cities.join(', '));
+  }
   if (body.personType !== undefined) {
     // Blank is allowed here (admin clearing/not setting it for an
     // internally-added rep) even though public signup itself requires a
@@ -3423,6 +3521,8 @@ function applyBuyBoxUpdate(sheet, row, buyBoxBody) {
   const assetCategories = Array.isArray(bb.assetCategories) ? bb.assetCategories : splitCommaList(bb.assetCategories);
   sheet.getRange(row, getColumnIndex(sheet, 'BuyBoxAssetCategories')).setValue(assetCategories.join(', '));
   sheet.getRange(row, getColumnIndex(sheet, 'BuyBoxOtherAssetClass')).setValue(String(bb.otherAssetClass || '').trim());
+  const financingTypes = (Array.isArray(bb.financingTypes) ? bb.financingTypes : splitCommaList(bb.financingTypes)).filter(function (f) { return FINANCING_TYPES.indexOf(f) !== -1; });
+  sheet.getRange(row, getColumnIndex(sheet, 'BuyBoxFinancingTypes')).setValue(financingTypes.join(', '));
   sheet.getRange(row, getColumnIndex(sheet, 'BuyBoxNotes')).setValue(String(bb.notes || '').trim());
 }
 
@@ -3445,6 +3545,7 @@ function repUpdateMyBuyBox(body, session) {
       dealTypes: splitCommaList(updated['BuyBoxDealTypes']),
       assetCategories: splitCommaList(updated['BuyBoxAssetCategories']),
       otherAssetClass: updated['BuyBoxOtherAssetClass'] || '',
+      financingTypes: splitCommaList(updated['BuyBoxFinancingTypes']),
       notes: updated['BuyBoxNotes'] || ''
     }
   };
@@ -3977,12 +4078,13 @@ function beehiivCreateDraftPost(title, bodyContentHtml) {
 // Strategy checkbox of the same name) -- each gets its own tag prefix
 // ('strategy-' vs 'asset-') specifically so that never collides into one
 // ambiguous tag in beehiiv, no matter what admin names a category.
-function buildBuyBoxTags(states, cities, categories, dealTypes, nationwide) {
+function buildBuyBoxTags(states, cities, categories, dealTypes, nationwide, financingTypes) {
   const tags = [];
   (states || []).forEach(function (s) { if (normalizeText(s)) tags.push('state-' + slugifyTag(s)); });
   (cities || []).forEach(function (c) { if (normalizeText(c)) tags.push('city-' + slugifyTag(c)); });
   (categories || []).forEach(function (c) { if (normalizeText(c)) tags.push('asset-' + slugifyTag(c)); });
   (dealTypes || []).forEach(function (t) { if (normalizeText(t)) tags.push('strategy-' + slugifyTag(t)); });
+  (financingTypes || []).forEach(function (f) { if (normalizeText(f)) tags.push('financing-' + slugifyTag(f)); });
   if (nationwide) tags.push('nationwide');
   return tags;
 }

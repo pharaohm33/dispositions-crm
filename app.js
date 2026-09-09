@@ -64,7 +64,7 @@ function dealMatchesBuyBox(deal, buyBox) {
   const categories = (buyBox.assetCategories || []).slice();
   if (buyBox.otherAssetClass) categories.push(buyBox.otherAssetClass);
   const dealTypes = buyBox.dealTypes || [];
-  const hasAnyCriteria = buyBox.nationwide || (buyBox.states || []).length > 0 || (buyBox.cities || []).length > 0 || categories.length > 0 || dealTypes.length > 0;
+  const hasAnyCriteria = buyBox.nationwide || (buyBox.states || []).length > 0 || (buyBox.cities || []).length > 0 || categories.length > 0 || dealTypes.length > 0 || (buyBox.financingTypes || []).length > 0;
   if (!hasAnyCriteria) return true;
 
   if (!buyBox.nationwide) {
@@ -93,6 +93,16 @@ function dealMatchesBuyBox(deal, buyBox) {
       const wanted = dealTypes.map(function (t) { return t.trim().toLowerCase(); });
       if (!wanted.some(function (t) { return dealDealTypes.indexOf(t) !== -1; })) return false;
     }
+  }
+  // Financing Type -- same "don't exclude on missing info" treatment as
+  // Deal Type above: a buyer who's picked specific financing types they'll
+  // consider only matches a deal whose own Financing Type is one of them;
+  // a deal with no Financing Type set yet isn't excluded just because the
+  // buyer has a preference.
+  const financingTypes = buyBox.financingTypes || [];
+  if (financingTypes.length > 0 && deal.FinancingType) {
+    const wanted = financingTypes.map(function (f) { return f.trim().toLowerCase(); });
+    if (wanted.indexOf(String(deal.FinancingType).trim().toLowerCase()) === -1) return false;
   }
   return true;
 }
@@ -238,6 +248,7 @@ function buildBuyerShareText(deal, shortenDescription) {
   if (deal.ARV || deal.RehabEstimate) lines.push("Gross Margin: " + formatGrossMargin(deal.GrossMargin).replace(/&mdash;/g, "—"));
   if (deal.AsIsValue) lines.push("As-Is Value: " + formatAdminMoney(deal.AsIsValue));
   if (deal.AsIsValue) lines.push("As-Is Equity: " + formatAsIsEquity(deal.AsIsEquity).replace(/&mdash;/g, "—"));
+  if (deal.FinancingType) lines.push("Financing Type: " + deal.FinancingType);
   if (deal.Description) lines.push(shortenDescription ? truncateText(deal.Description, 220) : deal.Description);
   if (deal.GeneralDriveLink) lines.push("Deal Link with pictures: " + deal.GeneralDriveLink);
   return lines.join("\n");
@@ -448,10 +459,16 @@ document.getElementById("forgot-password-link").addEventListener("click", functi
 // getAssetCategoryOptions, which requires a logged-in session.
 let signupAssetCategoriesCache = [];
 const BUY_BOX_DEAL_TYPES = ["Fix and Flip", "Land", "Buy and Hold"];
+// Same fixed list as backend FINANCING_TYPES (Code.gs) -- how a deal can
+// be purchased, shown alongside its other financials.
+const FINANCING_TYPES = ["All Cash", "Investment Loan (Ex: Hard Money, Bridge, DSCR, New Construction Loan)", "Seller Financing", "Seller Carryback/\"Stack Method\" (Seller Preferred Equity / Seller carry in 2nd Lien)"];
 
 async function loadSignupBuyBoxOptions() {
   document.getElementById("signup-buybox-dealtypes").innerHTML = BUY_BOX_DEAL_TYPES.map(function (t) {
     return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="signup-buybox-dealtype-checkbox" value="' + esc(t) + '"> ' + esc(t) + '</label>';
+  }).join("");
+  document.getElementById("signup-buybox-financingtypes").innerHTML = FINANCING_TYPES.map(function (f) {
+    return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="signup-buybox-financingtype-checkbox" value="' + esc(f) + '"> ' + esc(f) + '</label>';
   }).join("");
   const res = await api("getSignupAssetCategoryOptions", {});
   if (!res.ok) return;
@@ -465,6 +482,10 @@ document.getElementById("signup-persontype").addEventListener("change", function
   const isBuyer = this.value === "Buyer";
   document.getElementById("signup-buybox-section").hidden = !isBuyer;
   if (isBuyer && signupAssetCategoriesCache.length === 0) loadSignupBuyBoxOptions();
+  // Deal Area (states/cities they'd like to sell deals in) is the mirror
+  // image of a Buyer's Buy Box -- shown for everyone EXCEPT a Buyer, once
+  // they've picked a type at all.
+  document.getElementById("signup-dealarea-section").hidden = !this.value || isBuyer;
 });
 
 function collectSignupBuyBox() {
@@ -475,7 +496,15 @@ function collectSignupBuyBox() {
     buyBoxDealTypes: Array.from(document.querySelectorAll(".signup-buybox-dealtype-checkbox:checked")).map(function (cb) { return cb.value; }),
     buyBoxAssetCategories: Array.from(document.querySelectorAll(".signup-buybox-category-checkbox:checked")).map(function (cb) { return cb.value; }),
     buyBoxOtherAssetClass: document.getElementById("signup-buybox-other").value.trim(),
+    buyBoxFinancingTypes: Array.from(document.querySelectorAll(".signup-buybox-financingtype-checkbox:checked")).map(function (cb) { return cb.value; }),
     buyBoxNotes: document.getElementById("signup-buybox-notes").value.trim()
+  };
+}
+
+function collectSignupDealArea() {
+  return {
+    dealAreaStates: document.getElementById("signup-dealarea-states").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean),
+    dealAreaCities: document.getElementById("signup-dealarea-cities").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean)
   };
 }
 
@@ -526,7 +555,7 @@ document.getElementById("signup-btn").addEventListener("click", async function (
     name: name, email: email, phone: phone, personType: personType, password: password,
     captchaTargetX: signupCaptcha.targetX, captchaExpiresAt: signupCaptcha.expiresAt,
     captchaToken: signupCaptcha.token, captchaSubmittedX: sliderX
-  }, personType === "Buyer" ? collectSignupBuyBox() : {}));
+  }, personType === "Buyer" ? collectSignupBuyBox() : collectSignupDealArea()));
   if (!signupRes.ok) {
     btn.disabled = false;
     errorEl.textContent = signupRes.error || "Could not create your account.";
@@ -547,7 +576,16 @@ document.getElementById("signup-btn").addEventListener("click", async function (
   }
   setSession(loginRes);
   showView(loginRes);
-  showToast("Welcome! Your account is ready.");
+  // Lets a new rep know right away whether their picked area already has
+  // something to work, instead of finding out only after landing on
+  // (possibly empty) Deals tab -- matchingDealsCount is 0 for a Buyer
+  // signup (that path uses buyBox matching, not Deal Area) and for a rep
+  // who left both States and Cities blank.
+  if (personType !== "Buyer" && signupRes.matchingDealsCount > 0) {
+    showToast("Welcome! Your account is ready — " + signupRes.matchingDealsCount + " deal" + (signupRes.matchingDealsCount === 1 ? "" : "s") + " already match" + (signupRes.matchingDealsCount === 1 ? "es" : "") + " your area.");
+  } else {
+    showToast("Welcome! Your account is ready.");
+  }
 });
 
 showView(getSession());
@@ -648,6 +686,11 @@ document.getElementById("edit-my-buybox-btn").addEventListener("click", function
     const checked = categories.indexOf(c.toLowerCase()) !== -1 ? " checked" : "";
     return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="my-buybox-category-checkbox" value="' + esc(c) + '"' + checked + '> ' + esc(c) + '</label>';
   }).join("");
+  const financingTypes = (bb.financingTypes || []).map(function (f) { return f.toLowerCase(); });
+  document.getElementById("my-buybox-financingtypes").innerHTML = FINANCING_TYPES.map(function (f) {
+    const checked = financingTypes.indexOf(f.toLowerCase()) !== -1 ? " checked" : "";
+    return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="my-buybox-financingtype-checkbox" value="' + esc(f) + '"' + checked + '> ' + esc(f) + '</label>';
+  }).join("");
   document.getElementById("my-buybox-modal").hidden = false;
 });
 
@@ -667,6 +710,7 @@ document.getElementById("my-buybox-save").addEventListener("click", async functi
       dealTypes: Array.from(document.querySelectorAll(".my-buybox-dealtype-checkbox:checked")).map(function (cb) { return cb.value; }),
       assetCategories: Array.from(document.querySelectorAll(".my-buybox-category-checkbox:checked")).map(function (cb) { return cb.value; }),
       otherAssetClass: document.getElementById("my-buybox-other").value.trim(),
+      financingTypes: Array.from(document.querySelectorAll(".my-buybox-financingtype-checkbox:checked")).map(function (cb) { return cb.value; }),
       notes: document.getElementById("my-buybox-notes").value.trim()
     }
   });
@@ -864,6 +908,7 @@ async function openRepDealDetail(dealId) {
       (deal.ARV || deal.RehabEstimate ? '<div><strong>Gross Margin:</strong> ' + formatGrossMargin(deal.GrossMargin) + '</div>' : "") +
       (deal.AsIsValue ? '<div><strong>As-Is Value:</strong> ' + esc(formatAdminMoney(deal.AsIsValue)) + '</div>' : "") +
       (deal.AsIsValue ? '<div><strong>As-Is Equity:</strong> ' + formatAsIsEquity(deal.AsIsEquity) + '</div>' : "") +
+      (deal.FinancingType ? '<div><strong>Financing Type:</strong> ' + esc(deal.FinancingType) + '</div>' : "") +
       (deal.Description ? '<div style="margin-top:8px;">' + esc(deal.Description) + '</div>' : "") +
       (deal.GeneralDriveLink ? '<div style="margin-top:8px;"><a href="' + esc(deal.GeneralDriveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
       (!deal.Address ? '<div style="margin-top:10px;"><button class="btn secondary small" id="request-address-btn" data-deal-id="' + esc(deal.DealID) + '">Request Address Access</button>' +
@@ -1345,6 +1390,7 @@ function renderPitchDealInfo(deal) {
       (deal.ARV || deal.RehabEstimate ? '<div><strong>Gross Margin:</strong> ' + formatGrossMargin(deal.GrossMargin) + '</div>' : "") +
       (deal.AsIsValue ? '<div><strong>As-Is Value:</strong> ' + esc(formatAdminMoney(deal.AsIsValue)) + '</div>' : "") +
       (deal.AsIsValue ? '<div><strong>As-Is Equity:</strong> ' + formatAsIsEquity(deal.AsIsEquity) + '</div>' : "") +
+      (deal.FinancingType ? '<div><strong>Financing Type:</strong> ' + esc(deal.FinancingType) + '</div>' : "") +
       (deal.GeneralDriveLink ? '<div style="margin-top:8px;"><strong>Deal Documents:</strong> <a href="' + esc(deal.GeneralDriveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
       (!deal.Address ? '<div style="margin-top:10px;"><button class="btn secondary small" id="request-address-btn" data-deal-id="' + esc(deal.DealID) + '">Request Address Access</button>' +
         '<div class="small-muted" style="margin-top:6px;">Pitch off the general deal info first — only use this once a buyer has responded, is genuinely interested, and specifically asks you for the address. This just emails admin to ask; it does not grant it.</div></div>' : "") +
@@ -2233,9 +2279,10 @@ function matchingBuyersForDeal(deal) {
       cities: splitCommaList(r.buyBoxCities),
       assetCategories: splitCommaList(r.buyBoxAssetCategories),
       otherAssetClass: r.buyBoxOtherAssetClass,
-      dealTypes: splitCommaList(r.buyBoxDealTypes)
+      dealTypes: splitCommaList(r.buyBoxDealTypes),
+      financingTypes: splitCommaList(r.buyBoxFinancingTypes)
     };
-    const hasCriteria = bb.nationwide || bb.states.length > 0 || bb.cities.length > 0 || bb.assetCategories.length > 0 || bb.otherAssetClass || bb.dealTypes.length > 0;
+    const hasCriteria = bb.nationwide || bb.states.length > 0 || bb.cities.length > 0 || bb.assetCategories.length > 0 || bb.otherAssetClass || bb.dealTypes.length > 0 || bb.financingTypes.length > 0;
     return hasCriteria && dealMatchesBuyBox(deal, bb);
   });
 }
@@ -2319,6 +2366,8 @@ function openDealModal() {
   document.getElementById("deal-arv-input").value = "";
   document.getElementById("deal-rehab-input").value = "";
   document.getElementById("deal-asisvalue-input").value = "";
+  document.getElementById("deal-financingtype-input").innerHTML = '<option value="">&mdash; none &mdash;</option>' +
+    FINANCING_TYPES.map(function (f) { return '<option value="' + esc(f) + '">' + esc(f) + '</option>'; }).join("");
   document.getElementById("deal-description-input").value = "";
   document.getElementById("deal-general-drive-input").value = "";
   document.getElementById("deal-sensitive-drive-input").value = "";
@@ -2374,6 +2423,7 @@ document.getElementById("deal-modal-save").addEventListener("click", async funct
     arv: formatAdminMoney(document.getElementById("deal-arv-input").value.trim()),
     rehabEstimate: formatAdminMoney(document.getElementById("deal-rehab-input").value.trim()),
     asIsValue: formatAdminMoney(document.getElementById("deal-asisvalue-input").value.trim()),
+    financingType: document.getElementById("deal-financingtype-input").value,
     status: document.getElementById("deal-status-input").value,
     description: document.getElementById("deal-description-input").value.trim(),
     generalDriveLink: document.getElementById("deal-general-drive-input").value.trim(),
@@ -2513,6 +2563,10 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     '</div>' +
     '<label class="field-label">As-Is Value <span class="small-muted">(optional — current value with no repairs done; the selling point for a deal that\'s undervalued as-is rather than a rehab spread)</span></label>' +
     '<input type="text" id="deal-asisvalue-edit" value="' + esc(deal.AsIsValue || "") + '">' +
+    '<label class="field-label">Financing Type</label>' +
+    '<select id="deal-financingtype-edit"><option value="">&mdash; none &mdash;</option>' +
+      FINANCING_TYPES.map(function (f) { return '<option value="' + esc(f) + '"' + (f === deal.FinancingType ? " selected" : "") + '>' + esc(f) + '</option>'; }).join("") +
+    '</select>' +
     '<p class="small-muted">Gross Margin (ARV &minus; Rehab Estimate &minus; Price): <strong>' + formatGrossMargin(deal.GrossMargin) + '</strong></p>' +
     '<p class="small-muted">As-Is Equity (As-Is Value &minus; Price): <strong>' + formatAsIsEquity(deal.AsIsEquity) + '</strong></p>' +
     '<div class="nav-row" style="justify-content:flex-end;">' +
@@ -2736,7 +2790,8 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
         ARV: formatAdminMoney(document.getElementById("deal-arv-edit").value.trim()),
         RehabEstimate: formatAdminMoney(document.getElementById("deal-rehab-edit").value.trim()),
         Price: formatAdminMoney(document.getElementById("deal-price-edit").value.trim()),
-        AsIsValue: formatAdminMoney(document.getElementById("deal-asisvalue-edit").value.trim())
+        AsIsValue: formatAdminMoney(document.getElementById("deal-asisvalue-edit").value.trim()),
+        FinancingType: document.getElementById("deal-financingtype-edit").value
       }
     });
     await loadAdminDeals();
@@ -3071,6 +3126,11 @@ function renderAreaBuyBoxCheckboxes(rep) {
     const checked = checkedCategories.indexOf(c.toLowerCase()) !== -1 ? " checked" : "";
     return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="area-buybox-category-checkbox" value="' + esc(c) + '"' + checked + '> ' + esc(c) + '</label>';
   }).join("");
+  const checkedFinancingTypes = splitCommaList(rep.buyBoxFinancingTypes).map(function (f) { return f.toLowerCase(); });
+  document.getElementById("area-buybox-financingtypes").innerHTML = FINANCING_TYPES.map(function (f) {
+    const checked = checkedFinancingTypes.indexOf(f.toLowerCase()) !== -1 ? " checked" : "";
+    return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="area-buybox-financingtype-checkbox" value="' + esc(f) + '"' + checked + '> ' + esc(f) + '</label>';
+  }).join("");
 }
 
 function openAreaModal(rep) {
@@ -3096,12 +3156,21 @@ function openAreaModal(rep) {
   renderAreaBuyBoxCheckboxes(rep);
   document.getElementById("area-buybox-section").hidden = rep.personType !== "Buyer";
 
+  // Deal Area (states/cities this rep wants to sell deals in) -- the mirror
+  // image of Buy Box above, so shown for everyone EXCEPT a Buyer instead of
+  // only for one. Grants standing deal access the moment it's saved (see
+  // canAccessDeal/accessibleDealIds), same as Category Access above.
+  document.getElementById("area-dealarea-states").value = rep.dealAreaStates || "";
+  document.getElementById("area-dealarea-cities").value = rep.dealAreaCities || "";
+  document.getElementById("area-dealarea-section").hidden = rep.personType === "Buyer";
+
   document.getElementById("area-modal").hidden = false;
   document.getElementById("area-modal-save").setAttribute("data-username", rep.username);
 }
 
 document.getElementById("area-persontype-input").addEventListener("change", function () {
   document.getElementById("area-buybox-section").hidden = this.value !== "Buyer";
+  document.getElementById("area-dealarea-section").hidden = this.value === "Buyer";
 });
 
 document.getElementById("area-modal-cancel").addEventListener("click", function () {
@@ -3123,6 +3192,8 @@ document.getElementById("area-modal-save").addEventListener("click", async funct
     personType: document.getElementById("area-persontype-input").value,
     categoryAccess: Array.from(document.querySelectorAll(".area-categoryaccess-checkbox:checked")).map(function (cb) { return cb.value; }),
     targetMarket: document.getElementById("area-targetmarket-input").value.trim(),
+    dealAreaStates: document.getElementById("area-dealarea-states").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean),
+    dealAreaCities: document.getElementById("area-dealarea-cities").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean),
     buyBox: {
       nationwide: document.getElementById("area-buybox-nationwide").checked,
       states: document.getElementById("area-buybox-states").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean),
@@ -3130,6 +3201,7 @@ document.getElementById("area-modal-save").addEventListener("click", async funct
       dealTypes: Array.from(document.querySelectorAll(".area-buybox-dealtype-checkbox:checked")).map(function (cb) { return cb.value; }),
       assetCategories: Array.from(document.querySelectorAll(".area-buybox-category-checkbox:checked")).map(function (cb) { return cb.value; }),
       otherAssetClass: document.getElementById("area-buybox-other").value.trim(),
+      financingTypes: Array.from(document.querySelectorAll(".area-buybox-financingtype-checkbox:checked")).map(function (cb) { return cb.value; }),
       notes: document.getElementById("area-buybox-notes").value.trim()
     }
   });

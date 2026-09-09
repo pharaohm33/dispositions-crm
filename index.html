@@ -288,12 +288,22 @@
       <input type="text" id="signup-buybox-cities">
       <label class="field-label">Strategy <span class="small-muted">(check any that apply)</span></label>
       <div id="signup-buybox-dealtypes" class="chip-list"></div>
+      <label class="field-label">Financing Type(s) You'll Consider <span class="small-muted">(check any that apply)</span></label>
+      <div id="signup-buybox-financingtypes" class="chip-list"></div>
       <label class="field-label">Asset Class(es) <span class="small-muted">(check any that apply)</span></label>
       <div id="signup-buybox-categories" class="chip-list"></div>
       <label class="field-label">Another asset class not listed? <span class="small-muted">(optional)</span></label>
       <input type="text" id="signup-buybox-other">
       <label class="field-label">Notes About Your Purchase Criteria <span class="small-muted">(optional)</span></label>
       <textarea id="signup-buybox-notes" placeholder="Price range, condition, financing, timeline, anything else that helps us match you to the right deals..."></textarea>
+    </div>
+    <div id="signup-dealarea-section" hidden>
+      <div class="section-title">Your Deal Area</div>
+      <p class="small-muted">Which states and/or cities would you like to sell deals in? Optional, but if we already have active deals there, you'll see them on your Deals tab as soon as you sign up — and any new one we add there later, automatically.</p>
+      <label class="field-label">States <span class="small-muted">(comma separated, e.g. AZ, TX, NC)</span></label>
+      <input type="text" id="signup-dealarea-states">
+      <label class="field-label">Cities <span class="small-muted">(comma separated, optional — in addition to any states above)</span></label>
+      <input type="text" id="signup-dealarea-cities">
     </div>
 
     <label class="field-label">Password <span class="small-muted">(at least 8 characters)</span></label>
@@ -1062,6 +1072,8 @@
     </div>
     <label class="field-label">As-Is Value <span class="small-muted">(optional — current value with no repairs done; use this instead of/alongside ARV when the deal's selling point is being undervalued as-is, not a rehab spread)</span></label>
     <input type="text" id="deal-asisvalue-input">
+    <label class="field-label">Financing Type</label>
+    <select id="deal-financingtype-input"></select>
     <label class="field-label">Status</label>
     <select id="deal-status-input"></select>
     <label class="field-label">Description / Notes</label>
@@ -1128,6 +1140,8 @@
     <input type="text" id="my-buybox-cities">
     <label class="field-label">Strategy</label>
     <div id="my-buybox-dealtypes" class="chip-list"></div>
+    <label class="field-label">Financing Type(s) You'll Consider</label>
+    <div id="my-buybox-financingtypes" class="chip-list"></div>
     <label class="field-label">Asset Class(es)</label>
     <div id="my-buybox-categories" class="chip-list"></div>
     <label class="field-label">Another asset class not listed? <span class="small-muted">(optional)</span></label>
@@ -1228,12 +1242,23 @@
       <input type="text" id="area-buybox-cities">
       <label class="field-label">Strategy</label>
       <div id="area-buybox-dealtypes" class="chip-list"></div>
+      <label class="field-label">Financing Type(s) They'll Consider</label>
+      <div id="area-buybox-financingtypes" class="chip-list"></div>
       <label class="field-label">Asset Class(es)</label>
       <div id="area-buybox-categories" class="chip-list"></div>
       <label class="field-label">Other Asset Class <span class="small-muted">(optional)</span></label>
       <input type="text" id="area-buybox-other">
       <label class="field-label">Purchase Criteria Notes <span class="small-muted">(optional)</span></label>
       <textarea id="area-buybox-notes"></textarea>
+    </div>
+
+    <div id="area-dealarea-section" hidden>
+      <div class="section-title">Deal Area</div>
+      <p class="small-muted">Which states and/or cities this person wants to sell deals in — set at signup, editable here. Grants standing access to every matching deal automatically, current ones right away and any new one added later, same as Category Access above.</p>
+      <label class="field-label">States <span class="small-muted">(comma separated)</span></label>
+      <input type="text" id="area-dealarea-states">
+      <label class="field-label">Cities <span class="small-muted">(comma separated, optional)</span></label>
+      <input type="text" id="area-dealarea-cities">
     </div>
 
     <div class="nav-row">
