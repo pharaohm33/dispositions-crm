@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marietta, GA — 1.10 Acre Residential Homesite | GA-1 (Land)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e9;
+    --paper-dark:#ece4d4;
+    --ink:#26221c;
+    --ink-soft:#5a5347;
+    --brand:#8a6b3f;
+    --brand-dark:#5f4a2d;
+    --line:#d8cdb9;
+    --accent:#3f5a44;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.55;
+  }
+  h1,h2,h3{
+    font-family:'Playfair Display',serif;
+    margin:0;
+    color:var(--ink);
+  }
+  a{color:var(--brand-dark);}
+  .wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+  header.top{
+    border-bottom:1px solid var(--line);
+    background:var(--paper);
+    padding:18px 0;
+  }
+  header.top .wrap{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .brand-mark{
+    font-family:'Playfair Display',serif;
+    font-size:1.15rem;
+    font-weight:600;
+    letter-spacing:0.02em;
+  }
+  .deal-code{
+    font-size:0.8rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    border:1px solid var(--line);
+    padding:5px 10px;
+    border-radius:20px;
+  }
+  .assignment-banner{
+    background:var(--brand-dark);
+    color:#f6f1e9;
+    text-align:center;
+    font-size:0.85rem;
+    letter-spacing:0.03em;
+    padding:8px 16px;
+  }
+  .hero{
+    padding:48px 0 28px;
+    border-bottom:1px solid var(--line);
+  }
+  .hero .kicker{
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    font-size:0.78rem;
+    color:var(--brand-dark);
+    font-weight:600;
+    margin-bottom:10px;
+  }
+  .hero h1{
+    font-size:2.3rem;
+    line-height:1.2;
+    font-weight:600;
+    max-width:760px;
+  }
+  .hero .location{
+    margin-top:10px;
+    font-size:1.05rem;
+    color:var(--ink-soft);
+  }
+  .stats-row{
+    display:flex;
+    gap:18px;
+    margin-top:16px;
+    flex-wrap:wrap;
+    font-size:0.85rem;
+    color:var(--ink-soft);
+  }
+  .stats-row span{
+    background:var(--paper-dark);
+    padding:4px 10px;
+    border-radius:14px;
+  }
+  .price-block{
+    margin-top:28px;
+    display:flex;
+    gap:32px;
+    flex-wrap:wrap;
+    align-items:flex-end;
+  }
+  .price-block .price-main .label{
+    font-size:0.78rem;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--ink-soft);
+  }
+  .price-block .price-main .value{
+    font-family:'Playfair Display',serif;
+    font-size:2.6rem;
+    font-weight:700;
+    color:var(--accent);
+  }
+  .price-secondary{
+    display:flex;
+    gap:24px;
+    flex-wrap:wrap;
+  }
+  .price-secondary .item .label{
+    font-size:0.75rem;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--ink-soft);
+  }
+  .price-secondary .item .val{
+    font-size:1.15rem;
+    font-weight:600;
+  }
+  .cta-btn{
+    display:inline-block;
+    margin-top:22px;
+    background:var(--accent);
+    color:#fff;
+    text-decoration:none;
+    padding:12px 22px;
+    border-radius:6px;
+    font-weight:600;
+    font-size:0.92rem;
+    letter-spacing:0.02em;
+  }
+  .cta-btn.secondary{
+    background:transparent;
+    border:1px solid var(--accent);
+    color:var(--accent);
+    margin-left:10px;
+  }
+  section{
+    padding:36px 0;
+    border-bottom:1px solid var(--line);
+  }
+  section h2{
+    font-size:1.5rem;
+    margin-bottom:16px;
+    font-weight:600;
+  }
+  .gallery{
+    display:flex;
+    gap:14px;
+    overflow-x:auto;
+    padding-bottom:8px;
+  }
+  .gallery img{
+    height:280px;
+    border-radius:8px;
+    flex-shrink:0;
+    box-shadow:0 4px 14px rgba(0,0,0,0.12);
+  }
+  .description p{
+    font-size:1rem;
+    color:var(--ink);
+    max-width:760px;
+  }
+  .description .headline{
+    font-family:'Playfair Display',serif;
+    font-size:1.25rem;
+    font-weight:600;
+    color:var(--brand-dark);
+    margin-bottom:12px;
+  }
+  table.terms{
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.95rem;
+  }
+  table.terms tr{
+    border-bottom:1px solid var(--line);
+  }
+  table.terms td{
+    padding:11px 6px;
+    vertical-align:top;
+  }
+  table.terms td.label{
+    color:var(--ink-soft);
+    width:42%;
+    font-weight:500;
+  }
+  table.terms td.val{
+    font-weight:600;
+  }
+  .grid-2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:28px;
+  }
+  @media (max-width:640px){
+    .grid-2{grid-template-columns:1fr;}
+    .hero h1{font-size:1.7rem;}
+    .price-block .price-main .value{font-size:2rem;}
+  }
+  ul.facts-list{
+    padding-left:20px;
+    margin:0;
+  }
+  ul.facts-list li{
+    margin-bottom:8px;
+  }
+  .disclosure-box{
+    background:var(--paper-dark);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:18px 20px;
+    font-size:0.88rem;
+    color:var(--ink-soft);
+  }
+  .disclosure-box strong{color:var(--ink);}
+  footer.cta-band{
+    background:var(--brand-dark);
+    color:#f6f1e9;
+    padding:48px 0;
+  }
+  footer.cta-band h2{
+    color:#f6f1e9;
+    font-size:1.8rem;
+    margin-bottom:8px;
+  }
+  footer.cta-band p{
+    color:#e6dcc8;
+    max-width:600px;
+    margin-bottom:22px;
+  }
+  .contact-line{
+    display:flex;
+    gap:28px;
+    flex-wrap:wrap;
+    font-size:1.05rem;
+    margin-top:14px;
+  }
+  .contact-line a{
+    color:#f6f1e9;
+    text-decoration:none;
+    border-bottom:1px solid #b7a37e;
+  }
+  .company-name{
+    font-family:'Playfair Display',serif;
+    font-size:1.1rem;
+    margin-top:26px;
+    color:#e6dcc8;
+  }
+  .fine-print{
+    text-align:center;
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    padding:22px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="assignment-banner">
+  This offering is a marketing of an ASSIGNMENT OF CONTRACT (wholesale). Buyer will be assigned the equitable interest in the underlying purchase contract, not a direct transaction with the property owner.
+</div>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand-mark">JNA Dynamic Holdings LLC</div>
+    <div class="deal-code">Deal Code: GA-1 (Land)</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="kicker">Land / Residential Infill Homesite</div>
+    <h1>1.10 Acre Residential Infill Homesite — R-2 Zoning, Public Water Available</h1>
+    <div class="location">Marietta, Cobb County, Georgia 30008</div>
+
+    <div class="stats-row">
+      <span>9 Days on Market</span>
+      <span>252 Views</span>
+      <span>Lot Size: 1.10 Acres</span>
+      <span>Zoning: R-2</span>
+      <span>Utilities: Public Water</span>
+    </div>
+
+    <div class="price-block">
+      <div class="price-main">
+        <div class="label">Assignment Price</div>
+        <div class="value">$46,999</div>
+      </div>
+      <div class="price-secondary">
+        <div class="item">
+          <div class="label">Estimated As-Is Value</div>
+          <div class="val">$63,900 – $99,900</div>
+        </div>
+        <div class="item">
+          <div class="label">Deal Type</div>
+          <div class="val">Land</div>
+        </div>
+        <div class="item">
+          <div class="label">County</div>
+          <div class="val">Cobb</div>
+        </div>
+      </div>
+    </div>
+
+    <a class="cta-btn" href="mailto:montanoemmanuel@gmail.com?subject=Inquiry%20-%20GA-1%20(Land)%20Marietta%20GA">Make an Offer</a>
+    <a class="cta-btn secondary" href="https://claude.ai/code/artifact/a1e1aeab-7ab0-4c27-b5bd-59d7203e212a" target="_blank" rel="noopener">View Photos &amp; Documents</a>
+  </div>
+</section>
+
+<section class="description">
+  <div class="wrap">
+    <h2>Property Overview</h2>
+    <div class="headline">MARIETTA, GA — 1.10 ACRE RESIDENTIAL INFILL HOMESITE | R-2 ZONING | PUBLIC WATER</div>
+    <p>
+      A 1.10-acre vacant land parcel located in Cobb County, Marietta, GA 30008. The lot is zoned R-2 (residential)
+      and carries access to public water service, positioning it as an infill homesite opportunity within an
+      established residential area.
+    </p>
+    <p>
+      This is raw land with no existing structure — there are no beds, baths, half-baths, or finished square
+      footage associated with the parcel, and no "built" year applies. Parking and financing details were not
+      specified in the original source listing.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap grid-2">
+    <div>
+      <h2>Property Snapshot</h2>
+      <ul class="facts-list">
+        <li><strong>Address:</strong> Cobb County, Marietta, GA 30008 (full address available via inquiry / documents)</li>
+        <li><strong>Property Type:</strong> Land</li>
+        <li><strong>Lot Size:</strong> 1.10 acres</li>
+        <li><strong>Zoning:</strong> R-2 (residential)</li>
+        <li><strong>Utilities:</strong> Public water available</li>
+        <li><strong>Beds / Baths / Half-Bath / Sq. Ft.:</strong> Not applicable (vacant land)</li>
+        <li><strong>Year Built:</strong> Not applicable</li>
+        <li><strong>Parking:</strong> Not specified</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Market Activity</h2>
+      <ul class="facts-list">
+        <li><strong>Days on Market:</strong> 9</li>
+        <li><strong>Total Views:</strong> 252</li>
+        <li><strong>Estimated As-Is Value Range:</strong> $63,900 – $99,900</li>
+        <li><strong>ARV:</strong> Not specified</li>
+        <li><strong>Gross Margin:</strong> Not specified</li>
+        <li><strong>Financing Information:</strong> Not specified in source listing (financing may be available — inquire directly)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Deal Terms</h2>
+    <table class="terms">
+      <tr><td class="label">Deal Code</td><td class="val">GA-1 (Land)</td></tr>
+      <tr><td class="label">City / State</td><td class="val">Marietta, GA</td></tr>
+      <tr><td class="label">County</td><td class="val">Cobb</td></tr>
+      <tr><td class="label">Deal Type</td><td class="val">Land</td></tr>
+      <tr><td class="label">Lot Size</td><td class="val">1.10 acres</td></tr>
+      <tr><td class="label">Zoning</td><td class="val">R-2</td></tr>
+      <tr><td class="label">Utilities</td><td class="val">Public water</td></tr>
+      <tr><td class="label">Assignment Price</td><td class="val">$46,999</td></tr>
+      <tr><td class="label">Estimated As-Is Value</td><td class="val">$63,900 – $99,900</td></tr>
+      <tr><td class="label">ARV</td><td class="val">Not specified</td></tr>
+      <tr><td class="label">Transaction Structure</td><td class="val">Assignment of Contract</td></tr>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="disclosure-box">
+      <strong>Disclosure:</strong> This is a marketing of an assignment of contract for a wholesale real estate
+      transaction. The seller of record (property owner) is not a party to this marketing and is not being
+      contacted directly through this page. All inquiries, offers, and communications regarding this opportunity
+      should be directed to {{ COMPANY }} at the contact information below. All figures, including the estimated
+      as-is value range of $63,900–$99,900, the 1.10-acre lot size, R-2 zoning designation, and public water
+      utility status, are as represented in the original source listing and have not been independently verified.
+      ARV, gross margin, and financing details were not provided in the source listing and are omitted here rather
+      than estimated.
+    </div>
+  </div>
+</section>
+
+<footer class="cta-band">
+  <div class="wrap">
+    <h2>Interested in This Assignment?</h2>
+    <p>
+      Reach out today to request the full document package, ask questions about the R-2 zoning and public water
+      access, or submit an offer on this 1.10-acre Marietta homesite (Deal GA-1).
+    </p>
+    <div class="contact-line">
+      <span>📞 <a href="tel:5206336437">520-633-6437</a></span>
+      <span>✉️ <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a></span>
+    </div>
+    <div class="company-name">JNA Dynamic Holdings LLC</div>
+  </div>
+</footer>
+
+<div class="fine-print">
+  This page describes an assignment-of-contract wholesale opportunity. Not a direct offer of sale by the property owner. All information deemed reliable but not guaranteed; buyer to independently verify all details, zoning, utilities, and valuations prior to closing.
+</div>
+
+</body>
+</html>
