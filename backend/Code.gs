@@ -3863,13 +3863,27 @@ function addPitchContact(body, session) {
 //
 // Script Properties required: BEEHIIV_API_KEY, BEEHIIV_PUBLICATION_ID.
 
+// beehiiv's Create Subscription endpoint has NO field to set tags at
+// creation time (confirmed against their API reference -- 'tags' there is
+// response-only). Tags only apply through a SECOND call, POST
+// /subscriptions/{id}/tags, after the subscriber exists. Both calls still
+// swallowed on failure -- see comment above. Splits a full name into
+// First/Last since that's beehiiv's actual built-in custom field naming (a
+// plain 'Name' field silently doesn't save).
 function beehiivUpsertSubscriber(email, name, tags) {
   const props = PropertiesService.getScriptProperties();
   const apiKey = props.getProperty('BEEHIIV_API_KEY');
   const pubId = props.getProperty('BEEHIIV_PUBLICATION_ID');
   if (!apiKey || !pubId || !email) return;
+
+  const nameParts = String(name || '').trim().split(/\s+/);
+  const customFields = [];
+  if (nameParts[0]) customFields.push({ name: 'First Name', value: nameParts[0] });
+  if (nameParts.length > 1) customFields.push({ name: 'Last Name', value: nameParts.slice(1).join(' ') });
+
+  let subscriptionId = '';
   try {
-    UrlFetchApp.fetch('https://api.beehiiv.com/v2/publications/' + pubId + '/subscriptions', {
+    const res = UrlFetchApp.fetch('https://api.beehiiv.com/v2/publications/' + pubId + '/subscriptions', {
       method: 'post',
       contentType: 'application/json',
       headers: { Authorization: 'Bearer ' + apiKey },
@@ -3879,13 +3893,26 @@ function beehiivUpsertSubscriber(email, name, tags) {
         reactivate_existing: true,
         send_welcome_email: false,
         utm_source: 'dispositions-crm',
-        custom_fields: name ? [{ name: 'Name', value: name }] : [],
-        tags: tags || []
+        custom_fields: customFields
       })
     });
+    const body = JSON.parse(res.getContentText());
+    subscriptionId = body && body.data && body.data.id;
   } catch (err) {
-    // Swallow -- see comment above. Nothing to recover, nothing to surface
-    // to the person signing up.
+    return;
+  }
+  if (!subscriptionId || !tags || !tags.length) return;
+
+  try {
+    UrlFetchApp.fetch('https://api.beehiiv.com/v2/publications/' + pubId + '/subscriptions/' + subscriptionId + '/tags', {
+      method: 'post',
+      contentType: 'application/json',
+      headers: { Authorization: 'Bearer ' + apiKey },
+      muteHttpExceptions: true,
+      payload: JSON.stringify({ tags: tags })
+    });
+  } catch (err) {
+    // Swallow -- the subscriber itself is already saved either way.
   }
 }
 
@@ -3959,6 +3986,16 @@ function weeklyActiveDealsDigest() {
   html += '<p>Log in to SendMyBuyer to see the full list and who’s covering what.</p>';
 
   return beehiivCreateDraftPost('Weekly active deals: ' + active.length, html);
+}
+
+// Select this function in the editor's dropdown and click Run, once, the
+// first time beehiiv sync is set up -- calling UrlFetchApp for the first
+// time is what triggers Google's "allow this script to make external
+// requests" permission prompt. doGet/doPost never trigger it on their own
+// when run manually from the editor (no real request object to work with),
+// so this exists purely to force that prompt. Safe to run more than once.
+function authorizeExternalRequests() {
+  UrlFetchApp.fetch('https://www.google.com');
 }
 
 function installWeeklyDigestTrigger() {
