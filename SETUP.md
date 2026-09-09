@@ -62,10 +62,13 @@ file, shared so this app's own Google account can see it) and click
 **Create Deal Artifact Page**. It:
 
 1. Reads the full listing text off the Source Link (InvestorLift today).
-2. Publishes every image found at the Pictures Link to this repo under
+2. Publishes up to 24 images found at the Pictures Link to this repo under
    `deals/<DealID>/photos/` via the GitHub API
-   (`publishDealPhotosFromDrive`) — capped at 24 photos, skipping anything
-   over ~900KB.
+   (`publishDealPhotosFromDrive`), skipping anything over ~900KB. If the
+   Drive folder has more than 24 eligible images (or none were published at
+   all but a Drive-linked "Documents" field is set), the generated page
+   gets a "View all photos" link back to that Google Drive folder —
+   never to the Source Link/marketplace itself (see `findMorePhotosLink`).
 3. Sends that listing text + the deal's structured fields + the published
    photo paths to the Claude API (`generateDealPageHtml`), instructed to
    reformat everything into one clean page **without dropping any fact**

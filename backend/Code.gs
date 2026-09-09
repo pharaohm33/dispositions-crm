@@ -100,7 +100,7 @@ const PERSON_TYPES = ['Buyer', 'Wholesaler', 'Realtor', 'Other'];
 // buyer<->deal auto-matching -- see buyerMatchesDeal. AssetType stays a
 // free-text description field ("SFR - 3bd/2ba") separate from the
 // structured AssetCategory used for matching.
-const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt', 'Locked', 'DealTypes', 'FinancingType', 'PublicPageUrl', 'LastPriceSyncAt', 'ArtifactPicturesLink', 'ArtifactPhotoPaths', 'LastAutoPriceSyncAt'];
+const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt', 'Locked', 'DealTypes', 'FinancingType', 'PublicPageUrl', 'LastPriceSyncAt', 'ArtifactPicturesLink', 'ArtifactPhotoPaths', 'LastAutoPriceSyncAt', 'ArtifactPhotoTotalFound'];
 // Source distinguishes a deliberate, one-deal-at-a-time grant ('manual' --
 // the Access section's "Add Access" dropdown, or "Assign Myself") from one
 // written by the bulk-assign mechanism ('bulk' -- see applyDealAssignMode).
@@ -1530,24 +1530,35 @@ function parseDriveLink(link) {
 // order, capped at 24 photos; any single image over ~900KB or any image
 // that fails to fetch/publish is skipped rather than failing the whole
 // batch, since one bad file in a folder of thirty shouldn't block the rest.
+const MAX_PUBLISHED_PHOTOS_PER_DEAL = 24;
+
+// Returns { paths, totalFound, isDriveLink }. totalFound counts every
+// eligible image in the Drive folder/file, NOT capped at
+// MAX_PUBLISHED_PHOTOS_PER_DEAL -- that's what lets the caller tell "we
+// published everything" apart from "there are more than we published,"
+// which is what decides whether the generated page needs a link back to
+// the full Drive folder (see regenerateAndPublishDealPage).
 function publishDealPhotosFromDrive(dealId, picturesLink) {
   const parsed = parseDriveLink(picturesLink);
-  if (!parsed) return [];
+  if (!parsed) return { paths: [], totalFound: 0, isDriveLink: false };
 
-  let files = [];
+  let allFiles = [];
   try {
     if (parsed.type === 'folder') {
       const iter = DriveApp.getFolderById(parsed.id).getFiles();
-      while (iter.hasNext() && files.length < 24) {
+      while (iter.hasNext()) {
         const f = iter.next();
-        if (String(f.getMimeType() || '').indexOf('image/') === 0) files.push(f);
+        if (String(f.getMimeType() || '').indexOf('image/') === 0) allFiles.push(f);
       }
     } else {
-      files = [DriveApp.getFileById(parsed.id)];
+      allFiles = [DriveApp.getFileById(parsed.id)];
     }
   } catch (err) {
     throw new Error('Could not read the Pictures Link from Drive: ' + String(err));
   }
+
+  const totalFound = allFiles.length;
+  const files = allFiles.slice(0, MAX_PUBLISHED_PHOTOS_PER_DEAL);
 
   const props = PropertiesService.getScriptProperties();
   const token = props.getProperty('GITHUB_TOKEN');
@@ -1575,7 +1586,7 @@ function publishDealPhotosFromDrive(dealId, picturesLink) {
       // Skip this one photo, keep going -- see comment above.
     }
   });
-  return published;
+  return { paths: published, totalFound: totalFound, isDriveLink: true };
 }
 
 // One Messages API call that turns a deal's full source listing copy into
@@ -1588,7 +1599,7 @@ function publishDealPhotosFromDrive(dealId, picturesLink) {
 // photoPaths (relative paths already published alongside this page on
 // sendmybuyer.com, e.g. "deals/<id>/photos/1.jpg") rather than linking out,
 // when any are given.
-function generateDealPageHtml(deal, sourceListingText, photoPaths) {
+function generateDealPageHtml(deal, sourceListingText, photoPaths, morePhotosLink) {
   const props = PropertiesService.getScriptProperties();
   const apiKey = props.getProperty('ANTHROPIC_API_KEY');
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY script property is not set.');
@@ -1606,7 +1617,6 @@ function generateDealPageHtml(deal, sourceListingText, photoPaths) {
     asIsValue: deal['AsIsValue'] || '',
     financingType: deal['FinancingType'] || '',
     description: deal['Description'] || '',
-    photosAndDocsLink: deal['GeneralDriveLink'] || '',
     contactPhone: '520-633-6437',
     contactEmail: 'montanoemmanuel@gmail.com',
     company: 'JNA Dynamic Holdings LLC'
@@ -1684,12 +1694,21 @@ function generateDealPageHtml(deal, sourceListingText, photoPaths) {
     '"deals/abc123/photos/1.jpg" becomes src="/deals/abc123/photos/1.jpg"), in a horizontally ' +
     'scrollable gallery near the top, the same way you would for a normal photo-forward listing ' +
     'page. Do not invent placeholder images if photoPaths is empty.\n\n' +
+    'morePhotosLink below, if non-empty, is a Google Drive URL holding additional photos beyond what ' +
+    'photoPaths includes on this page (either because more exist than were embedded, or because none ' +
+    'were embedded at all). When morePhotosLink is non-empty, add one small, clearly-labeled link near ' +
+    'the gallery (or near the location, if there\'s no gallery) -- e.g. "View all photos" or "View full ' +
+    'photo set" -- as a normal <a href="MOREPHOTOSLINK_VALUE" target="_blank" rel="noopener"> pointing ' +
+    'at that exact URL. Do not describe morePhotosLink\'s destination as a marketplace, listing, or ' +
+    'external site -- it\'s just "more photos," consistent with the no-sourcing-disclosure rule above. ' +
+    'When morePhotosLink is empty, do not add any such link.\n\n' +
     'Do not fabricate any figures beyond what is given below -- if a field is blank and not mentioned ' +
     'in sourceListingText, omit that row rather than inventing a number. This is an assignment of ' +
     'contract, not a direct sale -- the page must say so, and must not name or imply direct contact ' +
     'with the underlying seller/owner.\n\n' +
     'Deal facts (JSON):\n' + JSON.stringify(facts, null, 2) + '\n\n' +
     'photoPaths (JSON):\n' + JSON.stringify(photoPaths || []) + '\n\n' +
+    'morePhotosLink:\n' + (morePhotosLink || '(none)') + '\n\n' +
     'sourceListingText:\n' + (sourceListingText || '(none provided)');
 
   const res = UrlFetchApp.fetch('https://api.anthropic.com/v1/messages', {
@@ -1753,6 +1772,31 @@ function publishDealPageToGithub(dealId, html) {
   return 'https://sendmybuyer.com/deals/' + dealId + '.html';
 }
 
+// Works out whether the page should show a "view all photos" link, and to
+// where. Only ever points at a Google Drive URL -- never at SourceLink
+// (InvestorLift or otherwise), since that would reveal sourcing (see the
+// no-sourcing-disclosure rule in generateDealPageHtml's prompt) and defeat
+// the whole point of not linking buyers off to the marketplace this was
+// found on. Two cases: (1) ArtifactPicturesLink is a Drive folder/file and
+// more images exist there than got published (ArtifactPhotoTotalFound >
+// however many paths are cached), or (2) no photos were ever published at
+// all but GeneralDriveLink -- the separate "Documents (Google Drive)"
+// field -- looks like a Drive link, in which case that's offered as a
+// fallback place to see photos.
+function findMorePhotosLink(match, photoPaths) {
+  const picturesLink = match['ArtifactPicturesLink'] || '';
+  const isDrive = function (url) { return /drive\.google\.com/i.test(url); };
+
+  if (picturesLink && isDrive(picturesLink)) {
+    const totalFound = Number(match['ArtifactPhotoTotalFound']) || 0;
+    if (totalFound > photoPaths.length) return picturesLink;
+    return null;
+  }
+  const generalLink = match['GeneralDriveLink'] || '';
+  if (photoPaths.length === 0 && generalLink && isDrive(generalLink)) return generalLink;
+  return null;
+}
+
 // Shared by adminCreateDealArtifactPage and adminSyncDealPricing's regen
 // step -- fetches the deal's current source listing text fresh (a price
 // change often comes with copy changes too, so this isn't cached), reuses
@@ -1770,7 +1814,8 @@ function regenerateAndPublishDealPage(match) {
     // the whole regen just because the source page didn't fetch cleanly.
   }
   const photoPaths = match['ArtifactPhotoPaths'] ? String(match['ArtifactPhotoPaths']).split(',').filter(Boolean) : [];
-  const html = generateDealPageHtml(match, sourceText, photoPaths);
+  const morePhotosLink = findMorePhotosLink(match, photoPaths);
+  const html = generateDealPageHtml(match, sourceText, photoPaths, morePhotosLink);
   return publishDealPageToGithub(match['DealID'], html);
 }
 
@@ -1944,14 +1989,16 @@ function adminCreateDealArtifactPage(body) {
   if (picturesLink) {
     sheet.getRange(match._row, getColumnIndex(sheet, 'ArtifactPicturesLink')).setValue(picturesLink);
     match['ArtifactPicturesLink'] = picturesLink;
-    let photoPaths;
+    let photoResult;
     try {
-      photoPaths = publishDealPhotosFromDrive(match['DealID'], picturesLink);
+      photoResult = publishDealPhotosFromDrive(match['DealID'], picturesLink);
     } catch (err) {
       return { ok: false, error: String(err) };
     }
-    sheet.getRange(match._row, getColumnIndex(sheet, 'ArtifactPhotoPaths')).setValue(photoPaths.join(','));
-    match['ArtifactPhotoPaths'] = photoPaths.join(',');
+    sheet.getRange(match._row, getColumnIndex(sheet, 'ArtifactPhotoPaths')).setValue(photoResult.paths.join(','));
+    sheet.getRange(match._row, getColumnIndex(sheet, 'ArtifactPhotoTotalFound')).setValue(photoResult.totalFound);
+    match['ArtifactPhotoPaths'] = photoResult.paths.join(',');
+    match['ArtifactPhotoTotalFound'] = photoResult.totalFound;
   }
 
   const now = new Date().toISOString();
@@ -1978,7 +2025,8 @@ function adminCreateDealArtifactPage(body) {
   sheet.getRange(match._row, getColumnIndex(sheet, 'UpdatedAt')).setValue(now);
 
   const photoCount = match['ArtifactPhotoPaths'] ? String(match['ArtifactPhotoPaths']).split(',').filter(Boolean).length : 0;
-  return { ok: true, pageUrl: pageUrl, photoCount: photoCount, priceChanged: priceChanged, price: match['Price'] };
+  const photoTotalFound = Number(match['ArtifactPhotoTotalFound']) || 0;
+  return { ok: true, pageUrl: pageUrl, photoCount: photoCount, photoTotalFound: photoTotalFound, priceChanged: priceChanged, price: match['Price'] };
 }
 
 // ---------- Status options ----------

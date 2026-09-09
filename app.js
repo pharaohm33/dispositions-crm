@@ -2934,7 +2934,9 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
       const res = await api("adminCreateDealArtifactPage", { dealId: deal.DealID, picturesLink: picturesLink });
       btn.disabled = false;
       if (!res.ok) { resultEl.textContent = " " + (res.error || "Could not create the page."); showToast(res.error || "Could not create the page.", true); return; }
-      resultEl.textContent = " Published with " + res.photoCount + " photo(s)" + (res.priceChanged ? ", price updated to " + formatAdminMoney(res.price) : "") + ".";
+      resultEl.textContent = " Published with " + res.photoCount + " photo(s)" +
+        (res.photoTotalFound > res.photoCount ? " (" + res.photoTotalFound + " found in Drive — page links to the full folder for the rest)" : "") +
+        (res.priceChanged ? ", price updated to " + formatAdminMoney(res.price) : "") + ".";
       showToast("Deal artifact page published.");
       openAdminDealDetail(deal.DealID);
     });
