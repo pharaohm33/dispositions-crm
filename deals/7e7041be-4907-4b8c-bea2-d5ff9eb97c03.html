@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NC - 1 (Land) — Lewisville, NC | Assignment of Contract Opportunity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e8;
+    --paper-darker:#efe7d8;
+    --ink:#2a2420;
+    --ink-soft:#59504a;
+    --accent:#8a5a3b;
+    --accent-deep:#6b4128;
+    --line:#d9cdb9;
+    --white:#fffdf9;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Source Sans 3', sans-serif;
+    line-height:1.6;
+  }
+  h1,h2,h3,.serif{
+    font-family:'Playfair Display', serif;
+    font-weight:600;
+    color:var(--ink);
+    margin:0;
+  }
+  a{color:var(--accent-deep);}
+  .wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+  header.top{
+    padding:40px 0 20px;
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:.75rem;
+    color:var(--accent-deep);
+    font-weight:600;
+    margin-bottom:10px;
+  }
+  header.top h1{
+    font-size:2.4rem;
+    line-height:1.15;
+  }
+  header.top .sub{
+    margin-top:10px;
+    font-size:1.05rem;
+    color:var(--ink-soft);
+  }
+  .disclaimer-badge{
+    display:inline-block;
+    margin-top:16px;
+    background:var(--paper-darker);
+    border:1px solid var(--line);
+    padding:8px 14px;
+    font-size:.82rem;
+    color:var(--ink-soft);
+    border-radius:4px;
+  }
+
+  .price-block{
+    margin:34px 0;
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:28px 30px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 1px 3px rgba(0,0,0,0.03);
+  }
+  .price-main .label{
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .price-main .amount{
+    font-family:'Playfair Display', serif;
+    font-size:2.6rem;
+    color:var(--accent-deep);
+    font-weight:700;
+  }
+  .price-figures{
+    display:flex;
+    gap:30px;
+    flex-wrap:wrap;
+  }
+  .fig{
+    text-align:left;
+  }
+  .fig .label{
+    font-size:.72rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+  }
+  .fig .val{
+    font-size:1.25rem;
+    font-weight:600;
+    font-family:'Playfair Display', serif;
+    color:var(--ink);
+  }
+
+  section{
+    margin:40px 0;
+  }
+  section h2{
+    font-size:1.5rem;
+    margin-bottom:14px;
+    position:relative;
+    padding-bottom:10px;
+  }
+  section h2::after{
+    content:"";
+    display:block;
+    width:52px;
+    height:3px;
+    background:var(--accent);
+    margin-top:10px;
+  }
+
+  .desc p{
+    margin:0 0 12px;
+    color:var(--ink-soft);
+    font-size:1.02rem;
+  }
+
+  table.terms{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:6px;
+    overflow:hidden;
+  }
+  table.terms tr{
+    border-bottom:1px solid var(--line);
+  }
+  table.terms tr:last-child{
+    border-bottom:none;
+  }
+  table.terms td{
+    padding:13px 18px;
+    font-size:.98rem;
+  }
+  table.terms td.k{
+    color:var(--ink-soft);
+    width:45%;
+    font-weight:500;
+  }
+  table.terms td.v{
+    font-weight:600;
+    color:var(--ink);
+  }
+
+  .grid-two{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+  }
+  @media (max-width:640px){
+    .grid-two{grid-template-columns:1fr;}
+  }
+
+  .stat-strip{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    margin:18px 0;
+  }
+  .stat-pill{
+    background:var(--paper-darker);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:6px 16px;
+    font-size:.85rem;
+    color:var(--ink-soft);
+  }
+
+  .notes-box{
+    background:var(--paper-darker);
+    border-left:3px solid var(--accent);
+    padding:16px 20px;
+    font-size:.92rem;
+    color:var(--ink-soft);
+    border-radius:2px;
+  }
+
+  footer.cta{
+    margin-top:60px;
+    background:var(--accent-deep);
+    color:var(--white);
+    padding:52px 0;
+  }
+  footer.cta h2{
+    color:var(--white);
+    font-size:1.9rem;
+  }
+  footer.cta h2::after{
+    background:var(--paper);
+  }
+  footer.cta p{
+    color:#f0e6d8;
+    font-size:1.05rem;
+    max-width:600px;
+  }
+  .contact-row{
+    display:flex;
+    gap:28px;
+    flex-wrap:wrap;
+    margin-top:26px;
+  }
+  .contact-item{
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.25);
+    border-radius:6px;
+    padding:16px 22px;
+  }
+  .contact-item .label{
+    font-size:.72rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    opacity:.75;
+    margin-bottom:4px;
+  }
+  .contact-item .val{
+    font-size:1.15rem;
+    font-weight:600;
+    font-family:'Playfair Display', serif;
+  }
+  .contact-item a{
+    color:var(--white);
+    text-decoration:none;
+  }
+  .contact-item a:hover{
+    text-decoration:underline;
+  }
+  .company-line{
+    margin-top:30px;
+    font-size:.95rem;
+    opacity:.85;
+  }
+  .fine-print{
+    max-width:920px;
+    margin:0 auto;
+    padding:20px 24px 50px;
+    font-size:.8rem;
+    color:var(--ink-soft);
+    line-height:1.7;
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">Deal Code: NC - 1 (Land) &nbsp;·&nbsp; Assignment of Contract</div>
+    <h1>1.09-Acre Buildable Parcel — Lewisville, Forsyth County, NC</h1>
+    <div class="sub">Forsyth County, Lewisville, NC 27023 &nbsp;·&nbsp; RS-9 Residential Single-Family Zoning</div>
+    <div class="disclaimer-badge">
+      This offering is a marketing of the assignment of an existing purchase contract. The seller under contract is the equitable holder, not the fee-simple owner. No direct contact with the underlying property owner is offered or implied.
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="price-block">
+    <div class="price-main">
+      <div class="label">Assignment Price</div>
+      <div class="amount">$34,900</div>
+    </div>
+    <div class="price-figures">
+      <div class="fig">
+        <div class="label">After Repair / Build-Out Value (ARV)</div>
+        <div class="val">$700,000</div>
+      </div>
+      <div class="fig">
+        <div class="label">As-Is Value</div>
+        <div class="val">$60,000</div>
+      </div>
+      <div class="fig">
+        <div class="label">Lot Size</div>
+        <div class="val">1.09 acres</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-strip">
+    <div class="stat-pill">Property Type: Land</div>
+    <div class="stat-pill">Deal Type: Land</div>
+    <div class="stat-pill">Beds: —</div>
+    <div class="stat-pill">Baths: —</div>
+    <div class="stat-pill">Half-Bath: —</div>
+    <div class="stat-pill">Sq. Ft.: —</div>
+    <div class="stat-pill">Parking: —</div>
+    <div class="stat-pill">Built In: —</div>
+  </div>
+
+  <section class="desc">
+    <h2>Overview</h2>
+    <p>
+      This 1.09-acre parcel in Lewisville, Forsyth County, North Carolina is zoned RS-9 (Residential Single-Family),
+      making it suitable for the development of two individual home sites.
+    </p>
+    <p>
+      Based on current market conditions, each completed home site carries an estimated average post-build
+      value of approximately $350,000 — supporting a combined after-build value estimate around $700,000 for the two sites.
+    </p>
+    <p>
+      No structures currently exist on the parcel. This is a land/development play best suited for a buyer
+      prepared to plan, permit, and build under RS-9 guidelines.
+    </p>
+  </section>
+
+  <section>
+    <h2>Deal Terms &amp; Property Details</h2>
+    <table class="terms">
+      <tr><td class="k">Deal Code</td><td class="v">NC - 1 (Land)</td></tr>
+      <tr><td class="k">Property Address</td><td class="v">Forsyth County, Lewisville, NC 27023</td></tr>
+      <tr><td class="k">County</td><td class="v">Forsyth</td></tr>
+      <tr><td class="k">State</td><td class="v">North Carolina</td></tr>
+      <tr><td class="k">Asset / Deal Type</td><td class="v">Land</td></tr>
+      <tr><td class="k">Zoning</td><td class="v">RS-9 — Residential Single-Family</td></tr>
+      <tr><td class="k">Lot Size</td><td class="v">1.09 acres</td></tr>
+      <tr><td class="k">Buildable Home Sites</td><td class="v">2 potential sites</td></tr>
+      <tr><td class="k">Avg. Estimated Post-Build Value (per site)</td><td class="v">$350,000</td></tr>
+      <tr><td class="k">Assignment Price</td><td class="v">$34,900</td></tr>
+      <tr><td class="k">ARV (After Build-Out, Combined)</td><td class="v">$700,000</td></tr>
+      <tr><td class="k">As-Is Value</td><td class="v">$60,000</td></tr>
+      <tr><td class="k">Gross Margin</td><td class="v">Not disclosed</td></tr>
+      <tr><td class="k">Financing Information</td><td class="v">Not disclosed</td></tr>
+      <tr><td class="k">Property Condition &amp; Systems</td><td class="v">Not disclosed (vacant land)</td></tr>
+      <tr><td class="k">Beds / Baths / Half-Bath / Sq. Ft.</td><td class="v">— / — / — / —</td></tr>
+      <tr><td class="k">Parking</td><td class="v">Not disclosed</td></tr>
+      <tr><td class="k">Year Built</td><td class="v">Not applicable (vacant land)</td></tr>
+    </table>
+  </section>
+
+  <section class="grid-two">
+    <div>
+      <h2>Listing Activity</h2>
+      <div class="notes-box">
+        Originally sourced via a real estate investor marketplace listing.<br><br>
+        Days on market at time of sourcing: <strong>15 days</strong><br>
+        Views at time of sourcing: <strong>490 views</strong>
+      </div>
+    </div>
+    <div>
+      <h2>Structure of Offering</h2>
+      <div class="notes-box">
+        This transaction is being marketed as an <strong>assignment of contract</strong>, not a direct sale of
+        real property. The buyer will be assigned the rights under the existing purchase agreement.
+        No warranties are made regarding title, condition, or buildability beyond the facts stated here,
+        and no direct communication with the underlying seller/owner is included in this offering.
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer class="cta">
+  <div class="wrap">
+    <h2>Interested in This Assignment?</h2>
+    <p>
+      Reach out today to request the assignment contract, ask questions about the RS-9 zoning and
+      two-site build potential, or to move forward with this Lewisville, NC land opportunity.
+    </p>
+    <div class="contact-row">
+      <div class="contact-item">
+        <div class="label">Phone</div>
+        <div class="val"><a href="tel:520-633-6437">520-633-6437</a></div>
+      </div>
+      <div class="contact-item">
+        <div class="label">Email</div>
+        <div class="val"><a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a></div>
+      </div>
+    </div>
+    <div class="company-line">Offered by JNA Dynamic Holdings LLC</div>
+  </div>
+</footer>
+
+<div class="fine-print">
+  This page is a marketing summary prepared for informational purposes only and does not constitute an offer to sell real property.
+  This is the marketing of an assignment of a contractual interest in the property described above; the marketer does not hold title
+  to the property and does not represent the underlying seller/owner. All figures, including ARV, as-is value, and build-out estimates,
+  are provided for illustration and should be independently verified by any prospective buyer prior to entering into any agreement.
+  Contact JNA Dynamic Holdings LLC directly at the phone number or email address listed above with any questions.
+</div>
+
+</body>
+</html>
