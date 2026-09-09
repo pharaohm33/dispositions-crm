@@ -1,314 +1,270 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TX-1 Ranch Estate — Poolville, TX | Assignment of Contract</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TX-1 Ranch Estate | 38 Acres + 2 Homes + 7-Acre Stocked Bass Lake | Poolville, TX</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --paper: #f6f1e9;
+    --ink: #2b2620;
+    --rule: #d8cdb9;
+    --accent: #7a5230;
+    --accent-dark: #4d3117;
+    --card: #fffdf9;
+  }
+
   * { box-sizing: border-box; }
-  html, body {
+
+  body {
     margin: 0;
-    padding: 0;
-    background-color: #f4efe7;
-    color: #2b2620;
+    background: var(--paper);
+    color: var(--ink);
     font-family: 'Source Sans 3', sans-serif;
-    font-size: 17px;
-    line-height: 1.6;
+    font-size: 16px;
+    line-height: 1.55;
   }
-  h1, h2, h3, .display {
+
+  h1, h2, h3 {
     font-family: 'Playfair Display', serif;
-    font-weight: 700;
-    color: #1c1712;
+    font-weight: 600;
+    color: var(--accent-dark);
   }
+
   .wrap {
     max-width: 880px;
     margin: 0 auto;
     padding-left: 24px;
     padding-right: 24px;
   }
-  a { color: #7a4a2b; }
 
-  /* ===== Top bar ===== */
+  a { color: var(--accent-dark); }
+
+  /* ---------- HEADER ---------- */
   .topbar {
-    background-color: #1c1712;
-    color: #e9dfce;
+    background: var(--accent-dark);
+    color: #f6f1e9;
     padding-top: 10px;
     padding-bottom: 10px;
     font-size: 13px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
-  .topbar .wrap {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+  .topbar .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
 
-  /* ===== Hero ===== */
-  .hero {
-    margin-top: 46px;
-    margin-bottom: 10px;
+  header.hero {
+    padding-top: 46px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid var(--rule);
   }
   .eyebrow {
-    font-size: 13px;
-    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: #8a6a3f;
-    font-weight: 600;
-    margin-bottom: 14px;
+    letter-spacing: 0.14em;
+    font-size: 12.5px;
+    color: var(--accent);
+    margin-bottom: 10px;
   }
-  .hero h1 {
-    font-size: 40px;
-    line-height: 1.15;
+  h1 {
+    font-size: 34px;
     margin-top: 0;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
+    line-height: 1.2;
   }
-  .hero .location {
-    font-size: 19px;
-    color: #55493a;
-    margin-bottom: 0;
+  .location-line {
+    font-size: 17px;
+    margin-bottom: 4px;
+    color: #4a4136;
   }
-  .badge-row {
-    margin-top: 18px;
-    margin-bottom: 0;
+  .stat-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 22px;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #4a4136;
   }
-  .badge {
-    display: inline-block;
-    background: #ece2ce;
-    border: 1px solid #d9c8a8;
-    color: #4c3d24;
-    padding: 6px 14px;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 600;
-  }
+  .stat-row strong { color: var(--ink); font-size: 15px; }
 
-  /* ===== Price block ===== */
-  .price-block {
-    margin-top: 34px;
-    margin-bottom: 34px;
-    background: #1c1712;
-    color: #f4efe7;
-    border-radius: 10px;
-    padding: 30px 34px;
-  }
-  .price-grid {
+  /* ---------- PRICE BLOCK ---------- */
+  section.price-block {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 28px 30px;
+    margin-top: 30px;
+    margin-bottom: 30px;
     display: flex;
     flex-wrap: wrap;
     gap: 30px;
-    align-items: flex-end;
+    align-items: center;
+    justify-content: space-between;
   }
   .price-main .label {
-    font-size: 13px;
     text-transform: uppercase;
+    font-size: 12.5px;
     letter-spacing: 0.1em;
-    color: #cbb98c;
+    color: var(--accent);
     margin-bottom: 6px;
   }
   .price-main .amount {
     font-family: 'Playfair Display', serif;
-    font-size: 46px;
-    font-weight: 800;
-    color: #f4efe7;
+    font-size: 42px;
+    color: var(--accent-dark);
+    font-weight: 700;
   }
   .price-sub {
-    font-size: 15px;
-    color: #d8cbae;
+    display: flex;
+    gap: 34px;
+    flex-wrap: wrap;
   }
-  .price-sub .amt {
-    font-size: 22px;
-    font-weight: 700;
-    color: #f4efe7;
-    font-family: 'Playfair Display', serif;
+  .price-sub div .label {
+    text-transform: uppercase;
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    color: #8a7d63;
   }
-  .assignment-note {
-    margin-top: 18px;
-    margin-bottom: 0;
-    padding-top: 16px;
-    border-top: 1px solid #3a3327;
-    font-size: 14px;
-    color: #d8cbae;
+  .price-sub div .val {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ink);
   }
 
-  /* ===== Section headings ===== */
-  section.block {
-    margin-top: 44px;
-    margin-bottom: 44px;
+  /* ---------- SECTION GENERIC ---------- */
+  section {
+    margin-top: 40px;
+    margin-bottom: 40px;
   }
-  section.block h2 {
-    font-size: 26px;
+  section h2 {
+    font-size: 24px;
     margin-top: 0;
-    margin-bottom: 18px;
+    margin-bottom: 14px;
     padding-bottom: 10px;
-    border-bottom: 2px solid #1c1712;
+    border-bottom: 2px solid var(--accent);
     display: inline-block;
   }
+  p { margin-top: 0; margin-bottom: 14px; }
 
-  /* ===== Gallery ===== */
-  .gallery-scroll {
+  .lead {
+    font-size: 16.5px;
+    color: #3a352c;
+  }
+
+  /* ---------- NOTICE / DISCLOSURE BOXES ---------- */
+  .notice {
+    background: #efe4d0;
+    border: 1px solid var(--rule);
+    border-left: 5px solid var(--accent);
+    padding: 16px 20px;
+    border-radius: 4px;
+    font-size: 14.5px;
+    margin-top: 18px;
+    margin-bottom: 18px;
+  }
+  .notice strong { color: var(--accent-dark); }
+
+  /* ---------- GALLERY (kept for structural parity, hidden if empty) ---------- */
+  .gallery {
     display: flex;
     gap: 14px;
     overflow-x: auto;
-    padding-bottom: 12px;
+    padding-bottom: 10px;
   }
-  .gallery-scroll img {
-    height: 280px;
-    width: auto;
-    border-radius: 8px;
-    flex-shrink: 0;
-    object-fit: cover;
-    border: 1px solid #d9c8a8;
+  .gallery img {
+    height: 260px;
+    border-radius: 6px;
+    flex: 0 0 auto;
+    border: 1px solid var(--rule);
   }
 
-  /* ===== Description ===== */
-  .desc p {
-    margin-top: 0;
-    margin-bottom: 14px;
-  }
-  .note-box {
-    background: #ece2ce;
-    border-left: 4px solid #8a6a3f;
-    padding: 14px 18px;
-    font-size: 15px;
-    color: #4c3d24;
-  }
-
-  /* ===== Tables ===== */
-  table.terms {
+  /* ---------- TABLES ---------- */
+  table {
     width: 100%;
     border-collapse: collapse;
+    background: var(--card);
+    border: 1px solid var(--rule);
+  }
+  table caption {
+    text-align: left;
+    font-size: 13px;
+    color: #8a7d63;
+    padding-bottom: 8px;
+  }
+  th, td {
+    text-align: left;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--rule);
     font-size: 15px;
   }
-  table.terms th, table.terms td {
-    text-align: left;
-    padding: 12px 10px;
-    border-bottom: 1px solid #d9c8a8;
-  }
-  table.terms th {
-    width: 45%;
-    color: #6b5a3f;
+  th {
+    width: 42%;
+    color: var(--accent-dark);
     font-weight: 600;
-    text-transform: uppercase;
-    font-size: 12.5px;
-    letter-spacing: 0.06em;
+    background: #f0e8d8;
   }
-  table.terms td {
-    font-weight: 600;
-  }
+  tr:last-child th, tr:last-child td { border-bottom: none; }
+
   .two-col {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 40px;
+    gap: 28px;
   }
-  @media (max-width: 640px) {
+  @media (max-width: 700px) {
     .two-col { grid-template-columns: 1fr; }
   }
 
-  /* ===== Stats strip ===== */
-  .stats-strip {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    background: #ece2ce;
-    border-radius: 8px;
-    padding: 22px;
+  ul.plain {
+    padding-left: 20px;
+    margin-top: 0;
   }
-  .stat {
-    text-align: center;
-  }
-  .stat .num {
-    font-family: 'Playfair Display', serif;
-    font-size: 26px;
-    font-weight: 700;
-    color: #1c1712;
-  }
-  .stat .lbl {
-    font-size: 12.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: #6b5a3f;
-    margin-top: 4px;
-  }
-  @media (max-width: 640px) {
-    .stats-strip { grid-template-columns: repeat(2, 1fr); }
-  }
+  ul.plain li { margin-bottom: 8px; }
 
-  /* ===== Docs link ===== */
-  .docs-link-box {
-    background: #fff;
-    border: 1px solid #d9c8a8;
-    border-radius: 8px;
-    padding: 20px;
-  }
-  .docs-link-box a {
-    font-weight: 600;
-    word-break: break-all;
-  }
-
-  /* ===== CTA band ===== */
+  /* ---------- CTA BAND ---------- */
   .cta-band {
-    background: #3c2f1e;
-    color: #f4efe7;
-    margin-top: 60px;
-    margin-bottom: 0;
-    padding-top: 50px;
-    padding-bottom: 50px;
+    background: var(--accent-dark);
+    color: #f6f1e9;
+    padding-top: 46px;
+    padding-bottom: 46px;
+    margin-top: 50px;
   }
   .cta-band h2 {
-    color: #f4efe7;
-    font-size: 30px;
-    margin-top: 0;
-    margin-bottom: 12px;
-    border-bottom: none;
+    color: #f6f1e9;
+    border-bottom: 2px solid #cbb182;
   }
-  .cta-band p {
-    color: #d8cbae;
-    margin-top: 0;
-    margin-bottom: 24px;
-    font-size: 16px;
-    max-width: 560px;
-  }
+  .cta-band p { color: #e8ddc9; }
   .cta-contacts {
     display: flex;
     flex-wrap: wrap;
-    gap: 22px;
+    gap: 30px;
+    margin-top: 20px;
   }
   .cta-contacts .item {
-    background: rgba(244,239,231,0.08);
-    border: 1px solid rgba(244,239,231,0.25);
-    border-radius: 8px;
-    padding: 14px 20px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 6px;
+    padding: 16px 22px;
   }
-  .cta-contacts .item .k {
-    font-size: 12px;
+  .cta-contacts .item .label {
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #cbb98c;
+    font-size: 11.5px;
+    color: #cbb182;
     margin-bottom: 4px;
   }
-  .cta-contacts .item .v {
-    font-family: 'Playfair Display', serif;
-    font-size: 19px;
-    font-weight: 700;
-    color: #f4efe7;
+  .cta-contacts .item .val {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fffdf9;
   }
-  .cta-contacts .item .v a {
-    color: #f4efe7;
-    text-decoration: none;
-  }
+  .cta-contacts .item a { color: #fffdf9; text-decoration: none; }
 
-  footer.foot {
+  footer {
+    text-align: center;
+    font-size: 13px;
+    color: #8a7d63;
     padding-top: 24px;
     padding-bottom: 30px;
-    font-size: 13px;
-    color: #8a7a5c;
-    text-align: center;
   }
 </style>
 </head>
@@ -317,138 +273,176 @@
   <div class="topbar">
     <div class="wrap">
       <span>Wholesale Assignment Opportunity</span>
-      <span>Parker County, TX</span>
+      <span>Parker County, Texas</span>
     </div>
   </div>
 
-  <div class="wrap hero">
-    <div class="eyebrow">Land &amp; Ranch Estate &middot; Assignment of Contract</div>
-    <h1>TX-1 Ranch Estate — 38 Acres + 2 Homes + 7-Acre Stocked Bass Lake</h1>
-    <p class="location">Poolville, Parker County, Texas 76487 (full address disclosed to qualified/serious buyers only — not for public posting)</p>
-    <div class="badge-row">
-      <span class="badge">Deal Type: Land</span>
-      <span class="badge">3 Bed</span>
-      <span class="badge">4,462 Sq. Ft. Main Residence</span>
-      <span class="badge">Built 1974</span>
-      <span class="badge">Owner Occupied</span>
+  <header class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Assignment of Contract &middot; Land / Ranch Estate</div>
+      <h1>TX-1 (Ranch Estate) &mdash; 38 Acres + 2 Homes + 7-Acre Stocked Bass Lake</h1>
+      <div class="location-line">Poolville, Parker County, Texas 76487 &mdash; full street address released to verified, one-off buyers only (see disclosure below)</div>
+      <div class="stat-row">
+        <span><strong>3</strong> Beds</span>
+        <span><strong>&mdash;</strong> Baths</span>
+        <span><strong>&mdash;</strong> Half-Bath</span>
+        <span><strong>4,462</strong> Sq. Ft.</span>
+        <span><strong>1974</strong> Year Built</span>
+        <span><strong>38 days</strong> on market</span>
+        <span><strong>121</strong> views</span>
+      </div>
     </div>
-  </div>
+  </header>
 
   <div class="wrap">
-    <div class="price-block">
-      <div class="price-grid">
-        <div class="price-main">
-          <div class="label">Assignment Price</div>
-          <div class="amount">$1,500,000</div>
+
+    <section class="price-block">
+      <div class="price-main">
+        <div class="label">Assignment Price</div>
+        <div class="amount">$1,500,000</div>
+      </div>
+      <div class="price-sub">
+        <div>
+          <div class="label">As-Is Value</div>
+          <div class="val">$2,400,000 (est.)</div>
         </div>
-        <div class="price-sub">
-          Estimated As-Is Value<br>
-          <span class="amt">$2,400,000</span>
+        <div>
+          <div class="label">Repair Estimate</div>
+          <div class="val">Up to $1,000</div>
+        </div>
+        <div>
+          <div class="label">ARV</div>
+          <div class="val">&mdash;</div>
+        </div>
+        <div>
+          <div class="label">Gross Margin</div>
+          <div class="val">&mdash;</div>
         </div>
       </div>
-      <p class="assignment-note">
-        This offering is a <strong>wholesale assignment of contract</strong>. The purchaser is acquiring the equitable/contract interest held by {{COMPANY}} — not a direct purchase from, or contact with, the underlying property owner/seller. All inquiries and offers are handled exclusively through {{COMPANY}}.
+    </section>
+
+    <section>
+      <h2>Overview</h2>
+      <p class="lead">
+        This is an off-market ranch estate offered at $1,500,000 with an as-is value most likely around
+        $2,400,000. The property is being marketed as an assignment of contract &mdash; the buyer purchases the
+        equitable interest and rights under the existing purchase agreement, not the property directly from the
+        underlying seller/owner. There is no direct contact with the underlying owner at any stage of this
+        marketing process; all inquiries are handled exclusively through {{COMPANY}} below.
       </p>
-    </div>
-  </div>
+      <p>
+        A full deal overview and photo set (115 images referenced in the original listing) are housed in the
+        seller's shared Google Drive folder, available upon request or via the link below:
+      </p>
+      <p><a href="https://drive.google.com/drive/folders/14UAcnv16xtpkkKNHXHIPofXbeucvTBIq?usp=sharing" target="_blank" rel="noopener">Deal Overview &amp; Photos &mdash; Google Drive Folder</a></p>
 
-  <div class="wrap">
-    <div class="stats-strip">
-      <div class="stat"><div class="num">38</div><div class="lbl">Days on Market (source listing)</div></div>
-      <div class="stat"><div class="num">121</div><div class="lbl">Views (source listing)</div></div>
-      <div class="stat"><div class="num">3.81</div><div class="lbl">Acres (per listing lot size field)</div></div>
-      <div class="stat"><div class="num">4,462</div><div class="lbl">Sq. Ft. Main House</div></div>
-    </div>
-  </div>
+      <div class="notice">
+        <strong>Confidentiality Notice:</strong> Please only disclose the property address to genuine, one-off
+        buyers. Do not post the address online anywhere, on this page or elsewhere. County, city, and state are
+        provided above; the full street address will be released privately to qualified buyers only.
+      </div>
+    </section>
 
-  <section class="block wrap desc">
-    <h2>Overview</h2>
-    <p>Off-market ranch estate offered at <strong>$1,500,000</strong>, with an estimated as-is value of approximately <strong>$2,400,000</strong>. The offering — internally referenced as <strong>TX-1 (Ranch Estate)</strong> — is described as featuring 38 acres, two homes, and a 7-acre stocked bass lake, in addition to the main residence and details captured in the original listing below.</p>
-    <p>A full deal overview and photo set are maintained via Google Drive (link below). Property condition is noted as Light Rehab, with a light estimated repair budget.</p>
-    <div class="note-box">
-      Disclosure from source listing: "Please only disclose address to one-off buyers and do not post any addresses online anywhere." In keeping with this instruction, the specific street address is withheld from this page and will be provided directly to qualified buyers by {{COMPANY}}.
-    </div>
-  </section>
+    <section>
+      <h2>Property Snapshot</h2>
+      <div class="two-col">
+        <table>
+          <tr><th>Deal Code</th><td>TX-1 (Ranch Estate)</td></tr>
+          <tr><th>City / State</th><td>Poolville, TX</td></tr>
+          <tr><th>County</th><td>Parker</td></tr>
+          <tr><th>Deal Type</th><td>Land</td></tr>
+          <tr><th>Land Highlights</th><td>38 acres (per listing headline) &mdash; 2 homes &mdash; 7-acre stocked bass lake</td></tr>
+          <tr><th>Lot Size (listing field)</th><td>3.81 acres</td></tr>
+          <tr><th>Beds</th><td>3</td></tr>
+          <tr><th>Baths</th><td>&mdash;</td></tr>
+          <tr><th>Half-Bath</th><td>&mdash;</td></tr>
+          <tr><th>Square Footage</th><td>4,462 sq. ft.</td></tr>
+        </table>
+        <table>
+          <tr><th>Year Built</th><td>1974</td></tr>
+          <tr><th>Parking</th><td>Attached Garage</td></tr>
+          <tr><th>Property Condition</th><td>Light Rehab</td></tr>
+          <tr><th>Roof Age</th><td>1&ndash;3 years</td></tr>
+          <tr><th>Heating System</th><td>Other</td></tr>
+          <tr><th>Heating Age</th><td>0&ndash;5 years</td></tr>
+          <tr><th>Air Conditioning</th><td>Central AC</td></tr>
+          <tr><th>Foundation Type</th><td>Slab</td></tr>
+          <tr><th>Foundation Condition</th><td>Good</td></tr>
+          <tr><th>Occupancy</th><td>Owner Occupied</td></tr>
+        </table>
+      </div>
+    </section>
 
-  <section class="block wrap">
-    <h2>Property Details</h2>
-    <div class="two-col">
-      <table class="terms">
-        <tr><th>Deal Code</th><td>TX-1 (Ranch Estate) — 38 acres + 2 Homes + 7-Acre Stocked Bass Lake</td></tr>
-        <tr><th>City / County / State</th><td>Poolville, Parker County, TX</td></tr>
-        <tr><th>Deal Type</th><td>Land</td></tr>
-        <tr><th>Beds</th><td>3</td></tr>
-        <tr><th>Baths</th><td>Not specified</td></tr>
-        <tr><th>Half-Bath</th><td>Not specified</td></tr>
-        <tr><th>Square Footage</th><td>4,462 sq. ft.</td></tr>
-        <tr><th>Lot Size</th><td>3.81 acres (per listing field)</td></tr>
-        <tr><th>Year Built</th><td>1974</td></tr>
-        <tr><th>Parking</th><td>Attached Garage</td></tr>
-      </table>
-      <table class="terms">
-        <tr><th>Property Condition</th><td>Light Rehab</td></tr>
-        <tr><th>Roof Age</th><td>1–3 years</td></tr>
-        <tr><th>Heating System</th><td>Other</td></tr>
-        <tr><th>Heating Age</th><td>0–5 years</td></tr>
-        <tr><th>Air Conditioning</th><td>Central AC</td></tr>
-        <tr><th>Foundation Type</th><td>Slab</td></tr>
-        <tr><th>Foundation Condition</th><td>Good</td></tr>
-        <tr><th>Occupancy</th><td>Owner Occupied</td></tr>
+    <section>
+      <h2>Deal Terms</h2>
+      <table>
+        <caption>Assignment of contract &mdash; buyer assumes contract position, not a direct deed transfer from the owner</caption>
+        <tr><th>Contract Type</th><td>Assignment of Contract (Wholesale)</td></tr>
+        <tr><th>List / Assignment Price</th><td>$1,500,000</td></tr>
+        <tr><th>Estimated As-Is Value</th><td>$2,400,000 (per source listing, "most likely" estimate)</td></tr>
         <tr><th>Repair Estimate</th><td>Up to $1,000.00</td></tr>
+        <tr><th>ARV</th><td>&mdash;</td></tr>
+        <tr><th>Gross Margin</th><td>&mdash;</td></tr>
+        <tr><th>Financing</th><td>Not specified &mdash; contact {{COMPANY}} to discuss financing options for this deal</td></tr>
+        <tr><th>Days on Market (source listing)</th><td>38 days</td></tr>
+        <tr><th>Views (source listing)</th><td>121</td></tr>
       </table>
-    </div>
-  </section>
+    </section>
 
-  <section class="block wrap">
-    <h2>Deal Terms</h2>
-    <table class="terms">
-      <tr><th>List Price (Assignment)</th><td>$1,500,000</td></tr>
-      <tr><th>Estimated As-Is Value</th><td>$2,400,000</td></tr>
-      <tr><th>ARV</th><td>Not provided</td></tr>
-      <tr><th>Gross Margin</th><td>Not provided</td></tr>
-      <tr><th>Repair Estimate</th><td>Up to $1,000.00</td></tr>
-      <tr><th>Financing</th><td>Financing inquiries available upon request through {{COMPANY}}</td></tr>
-      <tr><th>Transaction Structure</th><td>Assignment of Contract</td></tr>
-      <tr><th>Days on Market (source)</th><td>38</td></tr>
-      <tr><th>Views (source)</th><td>121</td></tr>
-    </table>
-  </section>
+    <section>
+      <h2>Notes From the Source Listing</h2>
+      <ul class="plain">
+        <li>For sale at $1,500,000 off market, most likely $2,400,000 as-is value ranch estate.</li>
+        <li>Please only disclose address to one-off buyers and do not post any addresses online anywhere.</li>
+        <li>Deal overview and pictures (115 images) are available via the linked Google Drive folder.</li>
+        <li>Repair estimate listed as up to $1,000.00; property condition rated Light Rehab.</li>
+        <li>Property was Owner Occupied at time of listing.</li>
+      </ul>
+    </section>
 
-  <section class="block wrap">
-    <h2>Deal Overview &amp; Photos (External)</h2>
-    <div class="docs-link-box">
-      <p style="margin-top:0;">Per the source listing, the seller noted the images and full deal overview are hosted via Google Drive rather than posted publicly. Access the folder here:</p>
-      <a href="https://drive.google.com/drive/folders/14UAcnv16xtpkkKNHXHIPofXbeucvTBIq?usp=sharing" target="_blank" rel="noopener">https://drive.google.com/drive/folders/14UAcnv16xtpkkKNHXHIPofXbeucvTBIq?usp=sharing</a>
-      <p style="margin-bottom:0; margin-top:14px; font-size:14px; color:#6b5a3f;">Note: The original source listing referenced 115 images available to logged-in marketplace users. No photo files were provided directly for this page; please use the link above or contact {{COMPANY}} for the full photo set.</p>
-    </div>
-  </section>
+  </div>
 
   <div class="cta-band">
     <div class="wrap">
       <h2>Interested in This Assignment?</h2>
-      <p>Reach out directly to {{COMPANY}} to request the full address, Google Drive deal package, or to submit an offer on this assignment of contract. This is not a solicitation to contact the underlying property owner.</p>
+      <p>
+        This opportunity is offered by {{COMPANY}} as an assignment of contract. Reach out directly using the
+        contact information below &mdash; do not contact or attempt to contact the underlying seller/owner.
+      </p>
       <div class="cta-contacts">
         <div class="item">
-          <div class="k">Company</div>
-          <div class="v">JNA Dynamic Holdings LLC</div>
+          <div class="label">Phone</div>
+          <div class="val"><a href="tel:5206336437">520-633-6437</a></div>
         </div>
         <div class="item">
-          <div class="k">Phone</div>
-          <div class="v"><a href="tel:5206336437">520-633-6437</a></div>
+          <div class="label">Email</div>
+          <div class="val"><a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a></div>
         </div>
         <div class="item">
-          <div class="k">Email</div>
-          <div class="v"><a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a></div>
+          <div class="label">Company</div>
+          <div class="val">JNA Dynamic Holdings LLC</div>
         </div>
       </div>
     </div>
   </div>
 
-  <footer class="foot">
+  <footer>
     <div class="wrap">
-      This is a marketing summary of an assignment-of-contract opportunity prepared by JNA Dynamic Holdings LLC. Figures reflect the original source listing and provided deal facts; no additional figures have been added or estimated.
+      This page is a marketing summary of an assignment-of-contract opportunity and does not constitute an offer
+      of real property by the underlying owner. All figures are as provided by {{COMPANY}} and are not guaranteed.
     </div>
   </footer>
+
+<script>
+  // simple text replace for company placeholder tokens without needing a templating engine
+  document.querySelectorAll('body *').forEach(function(node){
+    Array.from(node.childNodes).forEach(function(child){
+      if (child.nodeType === 3 && child.nodeValue.indexOf('{{COMPANY}}') !== -1) {
+        child.nodeValue = child.nodeValue.replace(/\{\{COMPANY\}\}/g, 'JNA Dynamic Holdings LLC');
+      }
+    });
+  });
+</script>
 
 </body>
 </html>
