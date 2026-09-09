@@ -1637,10 +1637,12 @@ function generateDealPageHtml(deal, sourceListingText, photoPaths) {
     'ZIP, neighborhood/subdivision/community name, and cross-streets or "near X" descriptions are all ' +
     'fine to keep; only the specific street number + street name is redacted. Where sourceListingText ' +
     'gives a street address, either drop just that detail while keeping the rest of that sentence/row, ' +
-    'or replace it with something like "address available on request." Include one clear line, near ' +
-    'the top of the page (e.g. next to the location), telling an interested buyer they\'ll receive the ' +
-    'full address once they reach out -- e.g. "individual property addresses available upon request; ' +
-    'contact us for the full address list."\n\n' +
+    'or replace it with something like "address available on request." REQUIRED, not optional: include ' +
+    'one clear line, near the top of the page (e.g. right next to the city/state location), telling an ' +
+    'interested buyer they will receive the full address once they reach out -- for example "Address ' +
+    'available upon request" or, for a multi-property portfolio, "Individual property addresses ' +
+    'available upon request; contact us for the full address list." Every generated page must have a ' +
+    'line like this somewhere near the top, worded consistently with that pattern.\n\n' +
     'Marketplace-metadata redaction: sourceListingText was pulled from a marketplace listing, and it ' +
     'may carry that marketplace\'s own engagement stats -- days/weeks the LISTING has been up (e.g. ' +
     '"N days on market," "7 days on [marketplace]," "listed M weeks ago"), view counts (e.g. "148 ' +
@@ -1654,9 +1656,17 @@ function generateDealPageHtml(deal, sourceListingText, photoPaths) {
     'Contact/attribution swap (do this everywhere, no exceptions): sourceListingText may contain ' +
     'the original lister\'s name, phone number, email, or company (e.g. an agent name, a brokerage, ' +
     'a marketplace\'s own support email). Do NOT reproduce ANY of that. Every contact point on the ' +
-    'output page -- and only these -- must be facts.contactPhone, facts.contactEmail, and ' +
-    'facts.company. If the source text names a specific person as the contact, replace that name ' +
-    'with facts.company; never invent a person\'s name that isn\'t in facts.\n\n' +
+    'output page -- and only these -- must be the ACTUAL VALUES given below as facts.contactPhone, ' +
+    'facts.contactEmail, and facts.company (e.g. write the literal text 520-633-6437, not a ' +
+    'reference to it). If the source text names a specific person as the contact, replace that name ' +
+    'with the literal company name string; never invent a person\'s name that isn\'t in facts. ' +
+    'CRITICAL: the output is plain static HTML with no templating engine and no JavaScript ' +
+    'substitution step -- every value from facts must be written out as its actual literal text ' +
+    'directly in the HTML. Never write a placeholder, template expression, or variable reference of ' +
+    'any kind anywhere in the output (not ${...}, not {{...}}, not {facts.company} or {facts.x}, not ' +
+    'any other bracket/brace syntax) -- if you write facts.company or company or {{COMPANY}} instead ' +
+    'of typing JNA Dynamic Holdings LLC itself, that text will appear verbatim, uninterpreted, on the ' +
+    'live page exactly as you wrote it.\n\n' +
     'photoPaths below (if any) are image files already published on this same site, given as paths ' +
     'relative to the site root -- reference each one as <img src="/' + '<the exact path string>"> ' +
     '(a single leading slash, then the path exactly as given, e.g. photoPaths entry ' +
