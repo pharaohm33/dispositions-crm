@@ -3,497 +3,405 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>IL-1 (SFH Portfolio) — Rockford, IL | Winnebago County Assignment Opportunity</title>
+<title>IL-1 SFH Portfolio — Rockford, IL | Assignment of Contract</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --paper:#f6f1e9;
-    --paper-dark:#eee6d8;
-    --ink:#2b2621;
-    --ink-soft:#5c554c;
-    --brass:#a9803f;
-    --brass-dark:#7c5c2c;
-    --line:#d9cdb8;
-    --white:#fffdf9;
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #f7f2ea;
+    color: #2b2621;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    color: #201c18;
+  }
+  .wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  a { color: #7a3b1e; }
+
+  header.top {
+    background: #201c18;
+    color: #f2e9dc;
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+  header.top .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  header.top .brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    letter-spacing: 0.03em;
+  }
+  header.top .tag {
+    font-size: 13px;
+    color: #cbb896;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
   }
 
-  *{box-sizing:border-box;}
-
-  body{
-    margin:0;
-    background:var(--paper);
-    color:var(--ink);
-    font-family:'Source Sans 3', sans-serif;
-    font-size:16px;
-    line-height:1.55;
+  section.hero {
+    padding-top: 44px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #e1d5c1;
+  }
+  section.hero .dealcode {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #8a5a2f;
+    margin-bottom: 8px;
+  }
+  section.hero h1 {
+    font-size: 38px;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  section.hero .location {
+    font-size: 18px;
+    color: #4a423a;
+    margin-bottom: 6px;
+  }
+  section.hero .address-note {
+    display: inline-block;
+    background: #ede1cd;
+    border: 1px solid #d8c6a3;
+    padding: 8px 14px;
+    border-radius: 4px;
+    font-size: 14.5px;
+    color: #5a4326;
+    margin-top: 10px;
+    margin-bottom: 22px;
   }
 
-  h1,h2,h3,h4{
-    font-family:'Playfair Display', serif;
-    font-weight:600;
-    color:var(--ink);
-    margin:0;
+  .price-block {
+    display: flex;
+    gap: 36px;
+    flex-wrap: wrap;
+    background: #fffdf9;
+    border: 1px solid #e1d5c1;
+    border-radius: 6px;
+    padding: 24px 28px;
+    margin-top: 10px;
+  }
+  .price-block .item .label {
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: #8a7a63;
+    margin-bottom: 4px;
+  }
+  .price-block .item .value {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: #201c18;
+  }
+  .price-block .item.main .value {
+    font-size: 34px;
+    color: #7a3b1e;
   }
 
-  .wrap{
-    max-width:920px;
-    margin:0 auto;
-    padding-left:28px;
-    padding-right:28px;
+  section.gallery {
+    padding-top: 30px;
+    padding-bottom: 10px;
+  }
+  section.gallery h2 {
+    font-size: 22px;
+    margin-top: 0;
+    margin-bottom: 14px;
+  }
+  .scroller {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 14px;
+    scrollbar-width: thin;
+  }
+  .scroller img {
+    height: 240px;
+    width: auto;
+    border-radius: 5px;
+    flex-shrink: 0;
+    border: 1px solid #e1d5c1;
+    object-fit: cover;
   }
 
-  a{ color: var(--brass-dark); }
+  section.overview {
+    padding-top: 30px;
+    padding-bottom: 10px;
+  }
+  section.overview h2 { font-size: 22px; margin-top: 0; margin-bottom: 12px; }
+  section.overview p { margin-top: 0; margin-bottom: 12px; }
+  ul.facts-list {
+    padding-left: 20px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+  ul.facts-list li { margin-bottom: 6px; }
 
-  /* ---------- HEADER ---------- */
-  .site-header{
-    background:var(--paper-dark);
-    border-bottom:1px solid var(--line);
-    padding-top:22px;
-    padding-bottom:22px;
+  section.terms {
+    padding-top: 34px;
+    padding-bottom: 10px;
   }
-  .site-header .eyebrow{
-    text-transform:uppercase;
-    letter-spacing:0.14em;
-    font-size:12.5px;
-    color:var(--brass-dark);
-    font-weight:600;
-    margin-bottom:8px;
+  section.terms h2 { font-size: 22px; margin-top: 0; margin-bottom: 14px; }
+  table.terms-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fffdf9;
+    border: 1px solid #e1d5c1;
+    margin-bottom: 26px;
   }
-  .site-header h1{
-    font-size:2.1rem;
-    line-height:1.15;
+  table.terms-table th, table.terms-table td {
+    text-align: left;
+    padding: 11px 16px;
+    border-bottom: 1px solid #ece1cd;
+    font-size: 15.5px;
   }
-  .site-header .sub{
-    margin-top:8px;
-    color:var(--ink-soft);
-    font-size:1.02rem;
+  table.terms-table th {
+    width: 45%;
+    color: #6e6252;
+    font-weight: 600;
+    background: #f2e9d9;
   }
-  .badge-row{
-    margin-top:14px;
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-  }
-  .badge{
-    display:inline-block;
-    background:var(--white);
-    border:1px solid var(--line);
-    color:var(--ink-soft);
-    padding:5px 12px;
-    border-radius:999px;
-    font-size:12.5px;
-    font-weight:600;
-    letter-spacing:0.02em;
-  }
+  table.terms-table tr:last-child th,
+  table.terms-table tr:last-child td { border-bottom: none; }
 
-  /* ---------- PRICE BLOCK ---------- */
-  .price-band{
-    background:var(--white);
-    border-bottom:1px solid var(--line);
-    padding-top:26px;
-    padding-bottom:26px;
+  section.disclosure {
+    padding-top: 8px;
+    padding-bottom: 34px;
   }
-  .price-grid{
-    display:flex;
-    flex-wrap:wrap;
-    gap:28px;
-    align-items:flex-end;
-    justify-content:space-between;
-  }
-  .price-main .label{
-    text-transform:uppercase;
-    letter-spacing:0.12em;
-    font-size:12px;
-    color:var(--ink-soft);
-    font-weight:600;
-  }
-  .price-main .amount{
-    font-family:'Playfair Display', serif;
-    font-size:3rem;
-    color:var(--brass-dark);
-    line-height:1.05;
-    margin-top:4px;
-  }
-  .price-note{
-    font-size:13px;
-    color:var(--ink-soft);
-    margin-top:6px;
-    max-width:420px;
-  }
-  .stat-strip{
-    display:flex;
-    gap:26px;
-    flex-wrap:wrap;
-  }
-  .stat{
-    min-width:110px;
-  }
-  .stat .label{
-    text-transform:uppercase;
-    letter-spacing:0.1em;
-    font-size:11px;
-    color:var(--ink-soft);
-    font-weight:600;
-  }
-  .stat .value{
-    font-family:'Playfair Display', serif;
-    font-size:1.4rem;
-    margin-top:2px;
+  section.disclosure p {
+    font-size: 13.5px;
+    color: #6e6252;
+    font-style: italic;
+    margin-top: 0;
+    margin-bottom: 6px;
   }
 
-  /* ---------- GENERIC SECTION ---------- */
-  section.block{
-    padding-top:42px;
-    padding-bottom:42px;
-    border-bottom:1px solid var(--line);
+  section.cta {
+    background: #201c18;
+    color: #f2e9dc;
+    padding-top: 40px;
+    padding-bottom: 40px;
   }
-  section.block:last-of-type{
-    border-bottom:none;
+  section.cta h2 {
+    color: #f2e9dc;
+    font-size: 28px;
+    margin-top: 0;
+    margin-bottom: 10px;
   }
-  .block h2{
-    font-size:1.55rem;
-    margin-bottom:6px;
+  section.cta p {
+    color: #cbb896;
+    margin-top: 0;
+    margin-bottom: 20px;
+    max-width: 640px;
   }
-  .block .kicker{
-    text-transform:uppercase;
-    letter-spacing:0.12em;
-    font-size:12px;
-    color:var(--brass-dark);
-    font-weight:600;
-    margin-bottom:8px;
+  .cta-contact {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
   }
-  .block p{
-    color:var(--ink);
+  .cta-contact .item .label {
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: #a08a5f;
+    margin-bottom: 4px;
   }
-  .lede{
-    color:var(--ink-soft);
-    max-width:680px;
-    margin-top:10px;
+  .cta-contact .item .value {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: #f2e9dc;
   }
+  .cta-contact .item .value a { color: #f2e9dc; text-decoration: none; }
 
-  /* ---------- GALLERY (present only if photos exist) ---------- */
-  .gallery{
-    display:flex;
-    gap:14px;
-    overflow-x:auto;
-    padding-bottom:10px;
-    margin-top:18px;
-  }
-  .gallery img{
-    height:280px;
-    border-radius:6px;
-    flex:0 0 auto;
-    border:1px solid var(--line);
-  }
-
-  /* ---------- HIGHLIGHT CARDS ---------- */
-  .cards{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-    gap:16px;
-    margin-top:22px;
-  }
-  .card{
-    background:var(--white);
-    border:1px solid var(--line);
-    border-radius:8px;
-    padding:18px 18px;
-  }
-  .card .num{
-    font-family:'Playfair Display', serif;
-    font-size:1.6rem;
-    color:var(--brass-dark);
-  }
-  .card .cap{
-    font-size:13px;
-    color:var(--ink-soft);
-    margin-top:4px;
-  }
-
-  /* ---------- TABLES ---------- */
-  table.deal-table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:20px;
-    background:var(--white);
-    border:1px solid var(--line);
-  }
-  table.deal-table caption{
-    text-align:left;
-    font-size:12px;
-    letter-spacing:0.1em;
-    text-transform:uppercase;
-    color:var(--ink-soft);
-    margin-bottom:8px;
-    font-weight:600;
-  }
-  table.deal-table th, table.deal-table td{
-    text-align:left;
-    padding:12px 16px;
-    border-bottom:1px solid var(--line);
-    font-size:14.5px;
-  }
-  table.deal-table th{
-    width:44%;
-    color:var(--ink-soft);
-    font-weight:600;
-    background:var(--paper-dark);
-  }
-  table.deal-table tr:last-child th, table.deal-table tr:last-child td{
-    border-bottom:none;
-  }
-
-  ul.spec-list{
-    margin-top:16px;
-    padding-left:0;
-    list-style:none;
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:10px 24px;
-  }
-  ul.spec-list li{
-    border-bottom:1px dotted var(--line);
-    padding-bottom:8px;
-    font-size:14.5px;
-  }
-  ul.spec-list li strong{
-    display:inline-block;
-    min-width:150px;
-    color:var(--ink-soft);
-    font-weight:600;
-  }
-
-  .disclosure-box{
-    background:var(--paper-dark);
-    border:1px solid var(--line);
-    border-radius:8px;
-    padding:20px 22px;
-    margin-top:22px;
-    font-size:14px;
-    color:var(--ink-soft);
-  }
-  .disclosure-box strong{ color:var(--ink); }
-
-  /* ---------- CTA BAND ---------- */
-  .cta-band{
-    background:var(--ink);
-    color:var(--paper);
-    padding-top:46px;
-    padding-bottom:46px;
-  }
-  .cta-band h2{
-    color:var(--paper);
-    font-size:1.9rem;
-  }
-  .cta-band p{
-    color:#cfc6b8;
-    max-width:560px;
-    margin-top:10px;
-  }
-  .cta-contacts{
-    margin-top:26px;
-    display:flex;
-    flex-wrap:wrap;
-    gap:22px;
-  }
-  .cta-contacts a{
-    color:var(--paper);
-    text-decoration:none;
-    border:1px solid #55503f;
-    padding:12px 20px;
-    border-radius:6px;
-    font-weight:600;
-    font-size:15px;
-    background:#3a352b;
-    display:inline-block;
-  }
-  .cta-contacts a:hover{
-    background:var(--brass-dark);
-    border-color:var(--brass-dark);
-  }
-  .cta-company{
-    margin-top:18px;
-    font-size:13px;
-    color:#a89f8e;
-    letter-spacing:0.04em;
-  }
-
-  footer{
-    background:var(--paper-dark);
-    padding-top:18px;
-    padding-bottom:18px;
-    text-align:center;
-    font-size:12.5px;
-    color:var(--ink-soft);
-  }
-
-  @media (max-width:600px){
-    .price-main .amount{ font-size:2.3rem; }
-    table.deal-table th{ width:52%; }
+  footer.foot {
+    padding-top: 18px;
+    padding-bottom: 18px;
+    text-align: center;
+    font-size: 13px;
+    color: #8a7a63;
   }
 </style>
 </head>
 <body>
 
-  <header class="site-header">
-    <div class="wrap">
-      <div class="eyebrow">Assignment of Contract Opportunity · Deal Code IL-1 (SFH Portfolio)</div>
-      <h1>Rockford, Illinois — 13-Home Single-Family Portfolio</h1>
-      <div class="sub">Winnebago County, IL 61103 · Property addresses available upon request · Deal type: Portfolio, Buy &amp; Hold</div>
-      <div class="badge-row">
-        <span class="badge">10 Occupied / 3 Vacant</span>
-        <span class="badge">7 Units HAP-Backed Income</span>
-        <span class="badge">Turnkey Portfolio</span>
-      </div>
-    </div>
-  </header>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">JNA Dynamic Holdings LLC</div>
+    <div class="tag">Assignment of Contract Opportunity</div>
+  </div>
+</header>
 
-  <div class="price-band">
-    <div class="wrap">
-      <div class="price-grid">
-        <div class="price-main">
-          <div class="label">Assignment Price</div>
-          <div class="amount">$1,476,923</div>
-          <div class="price-note">This is a marketing offering for the assignment of an existing purchase contract, not a direct sale by the underlying property owner. All inquiries are directed to the assignor listed below.</div>
-        </div>
-        <div class="stat-strip">
-          <div class="stat">
-            <div class="label">ARV</div>
-            <div class="value">$2,000,000</div>
-          </div>
-          <div class="stat">
-            <div class="label">Gross Margin</div>
-            <div class="value">$523,077</div>
-          </div>
-          <div class="stat">
-            <div class="label">Repair Estimate</div>
-            <div class="value">Up to $10,000</div>
-          </div>
-        </div>
+<section class="hero">
+  <div class="wrap">
+    <div class="dealcode">Deal Code: IL-1 (SFH Portfolio)</div>
+    <h1>13-Home Single-Family Rental Portfolio</h1>
+    <div class="location">Rockford, IL · Winnebago County, Illinois 61103</div>
+    <div class="address-note">Individual property addresses available upon request; contact us for the full address list.</div>
+
+    <div class="price-block">
+      <div class="item main">
+        <div class="label">Assignment Price</div>
+        <div class="value">$1,476,923</div>
+      </div>
+      <div class="item">
+        <div class="label">After Repair Value (ARV)</div>
+        <div class="value">$2,000,000</div>
+      </div>
+      <div class="item">
+        <div class="label">Gross Margin</div>
+        <div class="value">$523,077</div>
+      </div>
+      <div class="item">
+        <div class="label">Repair Estimate</div>
+        <div class="value">Up to $10,000</div>
       </div>
     </div>
   </div>
+</section>
 
-  <section class="block">
-    <div class="wrap">
-      <div class="kicker">Portfolio Overview</div>
-      <h2>13 Single-Family Homes, Rockford / Winnebago County, IL</h2>
-      <p class="lede">Marketed ARV across the portfolio is $2,000,000. Note: the underlying source materials for this offering also referenced a separate listed figure of $1,600,000 for the portfolio, alongside the $1,476,923 assignment price shown above — both figures are reproduced here as provided.</p>
-
-      <div class="cards">
-        <div class="card">
-          <div class="num">13</div>
-          <div class="cap">Single-family homes in portfolio</div>
-        </div>
-        <div class="card">
-          <div class="num">10</div>
-          <div class="cap">Occupied units</div>
-        </div>
-        <div class="card">
-          <div class="num">3</div>
-          <div class="cap">Vacant units</div>
-        </div>
-        <div class="card">
-          <div class="num">$19,632</div>
-          <div class="cap">Monthly rent roll</div>
-        </div>
-        <div class="card">
-          <div class="num">≈8.46%</div>
-          <div class="cap">NOI yield</div>
-        </div>
-        <div class="card">
-          <div class="num">≈$123,077</div>
-          <div class="cap">Per door (based on $1,600,000 figure)</div>
-        </div>
-        <div class="card">
-          <div class="num">7</div>
-          <div class="cap">Units with HAP-backed income</div>
-        </div>
-        <div class="card">
-          <div class="num">$1,600,000</div>
-          <div class="cap">Portfolio price as referenced in source listing</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="block">
-    <div class="wrap">
-      <div class="kicker">Representative Unit Specifications</div>
-      <h2>Sample Property Detail (Per Source Listing)</h2>
-      <p class="lede">The following unit-level specifications were provided in the original listing for a representative property within the portfolio. Full address detail for all 13 homes is available upon request.</p>
-
-      <ul class="spec-list">
-        <li><strong>Location</strong> Winnebago County, Rockford, IL 61103</li>
-        <li><strong>Beds</strong> 4</li>
-        <li><strong>Baths</strong> 1</li>
-        <li><strong>Half Bath</strong> 1</li>
-        <li><strong>Square Footage</strong> 2,042 sq. ft.</li>
-        <li><strong>Type</strong> Single-Family</li>
-        <li><strong>Parking</strong> Driveway</li>
-        <li><strong>Built In</strong> 1958</li>
-        <li><strong>Lot Size</strong> 0.16 acres</li>
-        <li><strong>Property Condition</strong> Turn Key</li>
-        <li><strong>Roof Age</strong> 1–3 years</li>
-        <li><strong>Heating System</strong> Other</li>
-        <li><strong>Heating Age</strong> 0–5 years</li>
-        <li><strong>Air Conditioning</strong> Central AC</li>
-        <li><strong>Foundation Type</strong> Full basement</li>
-        <li><strong>Foundation Condition</strong> Good</li>
-        <li><strong>Occupancy</strong> Tenant Occupied</li>
-      </ul>
-    </div>
-  </section>
-
-  <section class="block">
-    <div class="wrap">
-      <div class="kicker">Deal Terms</div>
-      <h2>Financial &amp; Contract Summary</h2>
-
-      <table class="deal-table">
-        <caption>Key Figures</caption>
-        <tbody>
-          <tr><th>Deal Code</th><td>IL-1 (SFH Portfolio)</td></tr>
-          <tr><th>Location</th><td>Rockford, IL — Winnebago County</td></tr>
-          <tr><th>Deal Type</th><td>Portfolio — Buy and Hold</td></tr>
-          <tr><th>Assignment Price</th><td>$1,476,923</td></tr>
-          <tr><th>Portfolio Price (as listed)</th><td>$1,600,000</td></tr>
-          <tr><th>ARV</th><td>$2,000,000</td></tr>
-          <tr><th>Gross Margin</th><td>$523,077</td></tr>
-          <tr><th>Repair Estimate</th><td>Up to $10,000</td></tr>
-          <tr><th>Monthly Rent Roll</th><td>$19,632/mo</td></tr>
-          <tr><th>NOI Yield</th><td>≈ 8.46%</td></tr>
-          <tr><th>Per-Door Basis</th><td>≈ $123,077 per door</td></tr>
-          <tr><th>Occupancy</th><td>10 occupied / 3 vacant (13 total units)</td></tr>
-          <tr><th>HAP-Backed Units</th><td>7 units</td></tr>
-        </tbody>
-      </table>
-
-      <div class="disclosure-box">
-        <strong>Disclosure:</strong> This offering is an assignment of an existing purchase and sale contract. The party presenting this opportunity, JNA Dynamic Holdings LLC, holds equitable interest via contract and is marketing the assignment of that contract — this is not a direct sale by, and does not imply direct contact with, the underlying seller or property owner. Property addresses are withheld and available upon qualified request. All figures above (price, ARV, rent roll, yield, occupancy, unit count, repair estimate, gross margin) are reproduced as provided in the original source materials and have not been independently verified by the party presenting this page.
-      </div>
-    </div>
-  </section>
-
-  <div class="cta-band">
-    <div class="wrap">
-      <h2>Interested in This Portfolio?</h2>
-      <p>Reach out for the full property list, addresses, rent roll detail, and photo/document package for this Rockford, IL 13-home single-family portfolio.</p>
-      <div class="cta-contacts">
-        <a href="tel:520-633-6437">Call/Text: 520-633-6437</a>
-        <a href="mailto:montanoemmanuel@gmail.com">Email: montanoemmanuel@gmail.com</a>
-      </div>
-      <div class="cta-company">Presented by JNA Dynamic Holdings LLC — assignment of contract offering.</div>
+<section class="gallery">
+  <div class="wrap">
+    <h2>Photo Gallery</h2>
+    <div class="scroller">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/1.jpg" alt="Portfolio property exterior 1">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/2.jpg" alt="Portfolio property exterior 2">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/3.jpg" alt="Portfolio property exterior 3">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/4.jpg" alt="Portfolio property exterior 4">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/5.jpg" alt="Portfolio property exterior 5">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/6.jpg" alt="Portfolio property exterior 6">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/7.jpg" alt="Portfolio property exterior 7">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/8.jpg" alt="Portfolio property exterior 8">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/9.jpg" alt="Portfolio property exterior 9">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/10.jpg" alt="Portfolio property exterior 10">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/11.jpg" alt="Portfolio property interior 11">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/12.jpg" alt="Portfolio property interior 12">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/13.jpg" alt="Portfolio property interior 13">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/14.jpg" alt="Portfolio property interior 14">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/15.jpg" alt="Portfolio property interior 15">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/16.jpg" alt="Portfolio property interior 16">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/17.jpg" alt="Portfolio property interior 17">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/18.jpg" alt="Portfolio property interior 18">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/19.jpg" alt="Portfolio property interior 19">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/20.jpg" alt="Portfolio property interior 20">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/21.jpg" alt="Portfolio property interior 21">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/22.jpg" alt="Portfolio property interior 22">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/23.jpg" alt="Portfolio property interior 23">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/24.jpg" alt="Portfolio property interior 24">
     </div>
   </div>
+</section>
 
-  <footer>
-    <div class="wrap">
-      JNA Dynamic Holdings LLC · Deal Code IL-1 (SFH Portfolio) · Rockford, Winnebago County, IL
+<section class="overview">
+  <div class="wrap">
+    <h2>Portfolio Overview</h2>
+    <p>This offering is a turnkey portfolio of 13 single-family homes located in Rockford, IL (Winnebago County). The portfolio is being marketed as a buy-and-hold investment with an established rent roll and a mix of occupied and vacant units.</p>
+    <ul class="facts-list">
+      <li><strong>13 single-family homes</strong> in one portfolio</li>
+      <li><strong>10 occupied / 3 vacant</strong> units</li>
+      <li><strong>$19,632/month</strong> gross rent roll</li>
+      <li><strong>≈ 8.46% NOI yield</strong></li>
+      <li>Portfolio pricing referenced at <strong>$1,600,000</strong>, equating to <strong>≈ $123,077 per door</strong></li>
+      <li>7 of the units carry <strong>HAP-backed (Housing Assistance Payment) income</strong></li>
+      <li>Deal type: <strong>Portfolio</strong> — Buy and Hold strategy</li>
+      <li>ARV referenced at <strong>$2,000,000</strong> for the portfolio</li>
+    </ul>
+    <p><strong>Note on figures:</strong> the underlying source data references a listed assignment price of $1,476,923 alongside a separately stated portfolio sale figure of $1,600,000 (≈$123,077 per door). Both figures are presented here as given; buyers should confirm final pricing directly with us.</p>
+    <p>Detailed specifications below (beds/baths/square footage/systems) reflect a representative unit within the portfolio as documented in the source records.</p>
+  </div>
+</section>
+
+<section class="terms">
+  <div class="wrap">
+    <h2>Representative Unit Specifications</h2>
+    <table class="terms-table">
+      <tr><th>Bedrooms</th><td>4</td></tr>
+      <tr><th>Full Bathrooms</th><td>1</td></tr>
+      <tr><th>Half Bathrooms</th><td>1</td></tr>
+      <tr><th>Square Footage</th><td>2,042 sq. ft.</td></tr>
+      <tr><th>Type</th><td>Single-Family</td></tr>
+      <tr><th>Parking</th><td>Driveway</td></tr>
+      <tr><th>Year Built</th><td>1958</td></tr>
+      <tr><th>Lot Size</th><td>0.16 acres</td></tr>
+    </table>
+
+    <h2>Property Condition &amp; Systems</h2>
+    <table class="terms-table">
+      <tr><th>Property Condition</th><td>Turn Key</td></tr>
+      <tr><th>Roof Age</th><td>1–3 years</td></tr>
+      <tr><th>Heating System</th><td>Other</td></tr>
+      <tr><th>Heating Age</th><td>0–5 years</td></tr>
+      <tr><th>Air Conditioning</th><td>Central AC</td></tr>
+      <tr><th>Foundation Type</th><td>Full basement</td></tr>
+      <tr><th>Foundation Condition</th><td>Good</td></tr>
+      <tr><th>Occupancy</th><td>Tenant Occupied</td></tr>
+    </table>
+
+    <h2>Deal &amp; Financing Terms</h2>
+    <table class="terms-table">
+      <tr><th>Deal Type</th><td>Portfolio — Buy and Hold</td></tr>
+      <tr><th>Price</th><td>$1,476,923</td></tr>
+      <tr><th>ARV</th><td>$2,000,000</td></tr>
+      <tr><th>Gross Margin</th><td>$523,077</td></tr>
+      <tr><th>Repair Estimate</th><td>Up to $10,000.00</td></tr>
+      <tr><th>Monthly Rent Roll</th><td>$19,632</td></tr>
+      <tr><th>NOI Yield</th><td>≈ 8.46%</td></tr>
+      <tr><th>Occupancy Mix</th><td>10 occupied / 3 vacant (of 13 units)</td></tr>
+      <tr><th>HAP-Backed Units</th><td>7 units</td></tr>
+      <tr><th>Per-Door Basis</th><td>≈ $123,077 per door</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="disclosure">
+  <div class="wrap">
+    <p>This is a marketing offer for the assignment of a purchase and sale contract, not a direct sale of real property. The assignor holds an equitable interest under contract and is offering to assign that contractual interest for the stated assignment price. Buyer will contract directly with the assignor (JNA Dynamic Holdings LLC); this listing does not constitute contact with, or an offer from, the underlying seller/owner of the properties.</p>
+    <p>All figures — pricing, rent roll, yield, condition details, and specifications — are provided as furnished in the original source records and have not been independently verified. Buyers are encouraged to perform their own due diligence prior to executing any agreement.</p>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <h2>Interested in this Portfolio?</h2>
+    <p>Reach out today for the full address list, complete photo/document package, and current lease and rent-roll detail on this 13-home Rockford, IL portfolio.</p>
+    <div class="cta-contact">
+      <div class="item">
+        <div class="label">Phone</div>
+        <div class="value"><a href="tel:5206336437">520-633-6437</a></div>
+      </div>
+      <div class="item">
+        <div class="label">Email</div>
+        <div class="value"><a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a></div>
+      </div>
+      <div class="item">
+        <div class="label">Company</div>
+        <div class="value">JNA Dynamic Holdings LLC</div>
+      </div>
     </div>
-  </footer>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    JNA Dynamic Holdings LLC · Deal Code IL-1 (SFH Portfolio) · Rockford, IL, Winnebago County
+  </div>
+</footer>
 
 </body>
 </html>
