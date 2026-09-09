@@ -852,6 +852,15 @@
     </div>
 
     <div class="card">
+      <div class="section-title" style="margin-top:0;">New Deals Digest</div>
+      <p class="small-muted">Auto-drafts a "new deals" email listing whatever's gone up since the last one (never sent automatically) — open beehiiv, pick the "rep" segment, and send. Runs on its own once a day once the trigger's installed (see SETUP.md), but only actually creates a draft if it's been at least 3 days since the last one AND there's something new — so a bulk upload never creates a pile of separate drafts. This button skips that gate and creates one right now for testing, as long as there's at least one new deal to include.</p>
+      <div class="nav-row" style="justify-content:flex-end;">
+        <button class="btn primary" id="new-deals-digest-run-btn">Send New Deals Digest Draft Now</button>
+      </div>
+      <div id="new-deals-digest-result" class="small-muted"></div>
+    </div>
+
+    <div class="card">
       <div class="section-title" style="margin-top:0;">Filter &amp; Mass-Select</div>
       <label class="checkbox-row" id="buyerleads-lastupload-row" hidden>
         <input type="checkbox" id="buyerleads-filter-lastupload">

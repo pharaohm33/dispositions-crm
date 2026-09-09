@@ -98,6 +98,34 @@ testing. To have it also run on its own every week:
    with the same name before creating a new one, so re-running is actually
    safe, just unnecessary).
 
+## Optional: new-deals digest (time-driven trigger, throttled)
+
+Auto-drafts a "N new deals just added" post in beehiiv listing exactly
+which deals went up since the last one (never auto-sent — same pick-a-
+segment-and-send-yourself pattern as the weekly digest above). Unlike the
+weekly digest, this doesn't run on a fixed schedule — it checks once a day,
+but only actually creates a draft if **both** are true: at least 3 days
+have passed since the last one, and at least one new deal has gone up
+since then. That's the safeguard against a bulk upload (10 deals added in
+one sitting) turning into 10 separate rep-facing drafts — it always
+collapses into one draft covering everything new since the last send. The
+admin panel's **New Deals Digest → Send New Deals Digest Draft Now** button
+skips the wait and creates one immediately, as long as there's at least one
+new deal to include — handy for testing.
+
+1. In the Apps Script editor, use the function dropdown at the top to select
+   **installNewDealsDigestTrigger**, then click **Run**.
+2. Confirm it under **Triggers** (the clock icon on the left) — it's a
+   daily trigger, not weekly.
+3. Don't run it more than once, or you'll end up with duplicate daily
+   triggers (same self-clearing safety as the weekly one above, so
+   re-running is safe, just unnecessary).
+4. The very first time this ever runs (whether from the trigger or the
+   on-demand button), there's no prior digest to compare against — it just
+   records the current time as a starting point rather than dumping every
+   historical deal into one giant first draft. The first real digest covers
+   only deals added after that point.
+
 ## Redeploying after a change
 
 If you (or I) ever change `Code.gs`, you must redeploy for it to take effect:

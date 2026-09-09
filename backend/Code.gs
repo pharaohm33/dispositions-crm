@@ -387,6 +387,8 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminRemoveStatusOption));
       case 'adminSendWeeklyDigestNow':
         return jsonOut(withAdminSession(body, adminSendWeeklyDigestNow));
+      case 'adminSendNewDealsDigestNow':
+        return jsonOut(withAdminSession(body, adminSendNewDealsDigestNow));
 
       default:
         return jsonOut({ ok: false, error: 'Unknown action.' });
@@ -4146,4 +4148,118 @@ function installWeeklyDigestTrigger() {
 function adminSendWeeklyDigestNow() {
   const url = weeklyActiveDealsDigest();
   return { ok: true, beehiivDraftUrl: url };
+}
+
+// ---------- New-deals digest (throttled) ----------
+//
+// A rep-facing "here's what's new" notice, separate from the weekly
+// active-count digest above -- this one lists the SPECIFIC deals added
+// since the last digest, not a running total, so a rep can act on exactly
+// what's new instead of re-scanning the whole board. Same draft-not-send
+// pattern as everything else that reaches beehiiv from this app (see
+// dealDraftHtml/weeklyActiveDealsDigest) -- admin still reviews and clicks
+// send in beehiiv, this only ever prepares the draft.
+//
+// The throttle this exists for: bulk-uploading 10 deals in one sitting
+// must not mean 10 separate rep-facing drafts (or worse, 10 separate real
+// sends if you ever switch this to auto-send later). LAST_NEW_DEALS_DIGEST_AT
+// (a Script Property, an ISO timestamp) is only ever advanced at the
+// moment a draft actually gets created, never on every check -- so:
+//   - Deals added between drafts just accumulate; nothing is ever skipped
+//     or lost, they all show up whenever the next draft is created.
+//   - No new draft is created until at least 3 days have passed since the
+//     last one AND at least one Active deal has a CreatedAt after it.
+//   - The very first time this ever runs, there's no prior timestamp to
+//     compare against -- rather than dumping every historical deal into
+//     one giant first draft, it just records "now" as the baseline and
+//     waits for genuinely new deals from that point forward.
+function checkNewDealsDigest() {
+  const props = PropertiesService.getScriptProperties();
+  const lastAtRaw = props.getProperty('LAST_NEW_DEALS_DIGEST_AT');
+
+  if (!lastAtRaw) {
+    props.setProperty('LAST_NEW_DEALS_DIGEST_AT', new Date().toISOString());
+    return { ok: true, created: false, reason: 'First run -- baseline set, no prior deals to compare against.' };
+  }
+
+  const lastAt = new Date(lastAtRaw);
+  const daysSinceLast = (Date.now() - lastAt.getTime()) / (24 * 60 * 60 * 1000);
+  if (daysSinceLast < 3) {
+    return { ok: true, created: false, reason: 'Only ' + daysSinceLast.toFixed(1) + ' day(s) since the last digest -- waiting for the 3-day minimum.' };
+  }
+
+  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const newDeals = sheetToObjects(dealsSheet).filter(function (d) {
+    return dealIsActive(d) && d['CreatedAt'] && new Date(d['CreatedAt']) > lastAt;
+  });
+  if (newDeals.length === 0) {
+    return { ok: true, created: false, reason: 'No new deals since the last digest yet.' };
+  }
+
+  const draftUrl = newDealsDigestDraft(newDeals);
+  props.setProperty('LAST_NEW_DEALS_DIGEST_AT', new Date().toISOString());
+  return { ok: true, created: true, dealCount: newDeals.length, beehiivDraftUrl: draftUrl };
+}
+
+function newDealsDigestDraft(newDeals) {
+  let html = '<p><strong>' + newDeals.length + ' new deal' + (newDeals.length === 1 ? '' : 's') + '</strong> just went up since the last update:</p><ul>';
+  newDeals.forEach(function (d) {
+    const label = d['DealCode'] || [d['City'], d['State']].filter(Boolean).join(', ') || 'New deal';
+    const bits = [d['AssetType'], d['Price'] ? formatAdminMoneyForDraft(d['Price']) : ''].filter(Boolean).join(' · ');
+    html += '<li><strong>' + label + '</strong>' + (bits ? ': ' + bits : '') + '</li>';
+  });
+  html += '</ul><p>Log in to SendMyBuyer to see full details and start pitching.</p>';
+  return beehiivCreateDraftPost(newDeals.length + ' new deal' + (newDeals.length === 1 ? '' : 's') + ' just added', html);
+}
+
+// Plain $-formatting for the digest HTML -- deliberately not reusing the
+// admin-only formatAdminMoney helper name to avoid any confusion about
+// scope; this one only ever touches Price, which is already rep-visible
+// everywhere else, so there's no secrecy concern in exposing it here too.
+function formatAdminMoneyForDraft(value) {
+  const n = parseMoney(value);
+  return n === null ? String(value) : ('$' + Math.round(n).toLocaleString());
+}
+
+// Run this ONCE, by hand, from the Apps Script editor (select it in the
+// function dropdown, click Run) to schedule a daily check -- checkNewDealsDigest
+// itself enforces the actual 3-day/new-deals gate, this trigger just calls
+// it once a day so that gate has a chance to pass as soon as it's true,
+// not days later.
+function installNewDealsDigestTrigger() {
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === 'checkNewDealsDigest') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('checkNewDealsDigest').timeBased().everyDays(1).atHour(8).create();
+}
+
+// Admin-facing "run it now" -- bypasses the 3-day wait entirely (unlike
+// the daily trigger, which always respects it) so you can verify the
+// draft's content looks right without waiting on a real 3-day window.
+// Still respects the same "no prior baseline yet" bootstrap as
+// checkNewDealsDigest -- a first-ever click here (before any automatic
+// check has run) sets the baseline and asks you to click again rather
+// than dumping every historical deal into one giant draft. Does NOT
+// advance LAST_NEW_DEALS_DIGEST_AT quietly in the background first -- it
+// reads the real current value, so running this to test does still push
+// out the next real automatic digest by resetting that timestamp, same as
+// a real one firing would.
+function adminSendNewDealsDigestNow() {
+  const props = PropertiesService.getScriptProperties();
+  const lastAtRaw = props.getProperty('LAST_NEW_DEALS_DIGEST_AT');
+  if (!lastAtRaw) {
+    props.setProperty('LAST_NEW_DEALS_DIGEST_AT', new Date().toISOString());
+    return { ok: false, error: 'First run -- baseline set. Click again once there\'s a new deal to include.' };
+  }
+  const lastAt = new Date(lastAtRaw);
+
+  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const newDeals = sheetToObjects(dealsSheet).filter(function (d) {
+    return dealIsActive(d) && d['CreatedAt'] && new Date(d['CreatedAt']) > lastAt;
+  });
+  if (newDeals.length === 0) return { ok: false, error: 'No new deals since the last digest to include.' };
+
+  const draftUrl = newDealsDigestDraft(newDeals);
+  props.setProperty('LAST_NEW_DEALS_DIGEST_AT', new Date().toISOString());
+  return { ok: true, dealCount: newDeals.length, beehiivDraftUrl: draftUrl };
 }
