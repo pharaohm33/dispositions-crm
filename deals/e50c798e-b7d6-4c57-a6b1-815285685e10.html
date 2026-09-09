@@ -1,410 +1,428 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GA-1 (Land) — 1.10 Acre Homesite, Marietta, GA | JNA Dynamic Holdings LLC</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GA-1 (Land) — 1.10 Acre Residential Homesite, Marietta, GA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --paper: #f6f1e9;
-    --paper-deep: #efe7d8;
-    --ink: #2b2620;
-    --ink-soft: #6b6155;
-    --line: #ded3bf;
-    --accent: #8a5a34;
-    --accent-deep: #6e4527;
-  }
-
   * { box-sizing: border-box; }
-
   html, body {
     margin: 0;
     padding: 0;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: 'Inter', -apple-system, sans-serif;
+    background-color: #f6f1e8;
+    color: #2b2620;
+    font-family: 'Inter', sans-serif;
     font-size: 16px;
-    line-height: 1.55;
+    line-height: 1.6;
   }
-
   h1, h2, h3 {
-    font-family: 'Source Serif 4', Georgia, serif;
+    font-family: 'Playfair Display', serif;
     font-weight: 600;
-    color: var(--ink);
-    margin: 0;
+    color: #1f1b15;
   }
-
+  a { color: #8a5a2b; }
   .wrap {
-    max-width: 860px;
+    max-width: 960px;
     margin: 0 auto;
-    padding: 0 28px;
+    padding-left: 24px;
+    padding-right: 24px;
   }
 
-  header.top {
-    border-bottom: 1px solid var(--line);
-    padding-top: 34px;
+  header.topbar {
+    border-bottom: 1px solid #e2d8c4;
+    padding-top: 22px;
     padding-bottom: 22px;
-    margin-bottom: 0;
+    background-color: #f6f1e8;
+  }
+  header.topbar .brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    letter-spacing: 0.02em;
+    font-weight: 600;
+  }
+  header.topbar .tag {
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #7a7263;
+    margin-top: 4px;
   }
 
-  .eyebrow {
+  section.hero {
+    padding-top: 48px;
+    padding-bottom: 32px;
+  }
+  section.hero .kicker {
+    font-size: 0.8rem;
     text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-size: 12px;
-    color: var(--accent-deep);
+    letter-spacing: 0.12em;
+    color: #8a5a2b;
     font-weight: 600;
     margin-bottom: 10px;
   }
-
-  header.top h1 {
-    font-size: 34px;
-    line-height: 1.2;
+  section.hero h1 {
+    font-size: 2.4rem;
+    line-height: 1.15;
+    margin-top: 0;
+    margin-bottom: 14px;
   }
-
-  header.top .loc {
-    margin-top: 8px;
-    color: var(--ink-soft);
-    font-size: 16px;
+  section.hero .loc {
+    font-size: 1.05rem;
+    color: #45403a;
+    margin-bottom: 6px;
   }
-
-  .assignment-note {
-    margin-top: 20px;
-    margin-bottom: 0;
-    background: #fbf6ec;
-    border: 1px solid var(--line);
-    border-left: 4px solid var(--accent);
-    padding: 14px 18px;
-    font-size: 14px;
-    color: var(--ink-soft);
-    border-radius: 2px;
-  }
-
-  section {
-    margin-top: 40px;
-    margin-bottom: 0;
+  section.hero .addr-note {
+    display: inline-block;
+    background-color: #efe4cd;
+    border: 1px solid #ddc99a;
+    color: #6b4a1d;
+    font-size: 0.88rem;
+    padding: 8px 14px;
+    border-radius: 4px;
+    margin-top: 10px;
+    margin-bottom: 24px;
   }
 
   .price-block {
-    background: var(--paper-deep);
-    border: 1px solid var(--line);
-    border-radius: 6px;
+    background-color: #fffdf9;
+    border: 1px solid #e2d8c4;
+    border-radius: 8px;
     padding: 28px 30px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    align-items: baseline;
+  }
+  .price-block .price-main .label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8a7f68;
+    margin-bottom: 6px;
+  }
+  .price-block .price-main .value {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: #1f1b15;
+  }
+  .price-block .price-sub .label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8a7f68;
+    margin-bottom: 6px;
+  }
+  .price-block .price-sub .value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #3c3628;
+  }
+
+  section.gallery {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+  section.gallery h2 {
+    font-size: 1.3rem;
+    margin-bottom: 14px;
+  }
+  .gallery-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    scroll-snap-type: x mandatory;
+  }
+  .gallery-scroll img {
+    height: 260px;
+    width: auto;
+    flex: 0 0 auto;
+    border-radius: 6px;
+    scroll-snap-align: start;
+    border: 1px solid #e2d8c4;
+    object-fit: cover;
+  }
+
+  section.description {
+    padding-top: 28px;
+    padding-bottom: 28px;
+    border-top: 1px solid #e2d8c4;
+  }
+  section.description h2 {
+    font-size: 1.4rem;
+    margin-bottom: 14px;
+  }
+  section.description p {
+    color: #3c3628;
+    margin-top: 0;
+  }
+  section.description ul {
+    margin-top: 12px;
+    padding-left: 20px;
+  }
+  section.description li {
+    margin-bottom: 6px;
+  }
+
+  section.terms {
+    padding-top: 28px;
+    padding-bottom: 28px;
+    border-top: 1px solid #e2d8c4;
+  }
+  section.terms h2 {
+    font-size: 1.4rem;
+    margin-bottom: 16px;
+  }
+  table.terms-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fffdf9;
+    border: 1px solid #e2d8c4;
+  }
+  table.terms-table tr {
+    border-bottom: 1px solid #ece3cf;
+  }
+  table.terms-table tr:last-child {
+    border-bottom: none;
+  }
+  table.terms-table td {
+    padding: 12px 16px;
+    vertical-align: top;
+  }
+  table.terms-table td.label {
+    width: 38%;
+    font-weight: 600;
+    color: #6b4a1d;
+    font-size: 0.92rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  table.terms-table td.value {
+    color: #2b2620;
+  }
+
+  section.disclosure {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+  section.disclosure p {
+    font-size: 0.85rem;
+    color: #7a7263;
+    font-style: italic;
+  }
+
+  section.cta {
+    background-color: #2b2620;
+    color: #f6f1e8;
+    padding-top: 48px;
+    padding-bottom: 48px;
+    margin-top: 20px;
+  }
+  section.cta h2 {
+    color: #f6f1e8;
+    font-size: 1.9rem;
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+  section.cta p {
+    color: #d9d2c2;
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+  .cta-contacts {
     display: flex;
     flex-wrap: wrap;
     gap: 28px;
-    align-items: baseline;
   }
-
-  .price-block .price-main .label {
-    font-size: 12px;
+  .cta-contacts .item .label {
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--ink-soft);
-    margin-bottom: 6px;
-  }
-
-  .price-block .price-main .value {
-    font-family: 'Source Serif 4', serif;
-    font-size: 42px;
-    font-weight: 700;
-    color: var(--accent-deep);
-  }
-
-  .price-sub {
-    display: flex;
-    gap: 30px;
-    flex-wrap: wrap;
-  }
-
-  .price-sub .label {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--ink-soft);
+    color: #b7ac93;
     margin-bottom: 4px;
   }
-
-  .price-sub .value {
-    font-size: 18px;
+  .cta-contacts .item .value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
     font-weight: 600;
+    color: #f6f1e8;
   }
-
-  h2.section-title {
-    font-size: 22px;
-    margin-bottom: 16px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid var(--ink);
-  }
-
-  .gallery {
-    display: flex;
-    gap: 14px;
-    overflow-x: auto;
-    padding-bottom: 6px;
-  }
-
-  .gallery img {
-    height: 260px;
-    border-radius: 6px;
-    border: 1px solid var(--line);
-    flex-shrink: 0;
-  }
-
-  .desc p {
-    font-size: 17px;
-    color: var(--ink);
-  }
-
-  .stat-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 16px;
-    margin-top: 16px;
-    margin-bottom: 0;
-  }
-
-  .stat {
-    background: #fff;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 14px 16px;
-  }
-
-  .stat .label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink-soft);
-    margin-bottom: 6px;
-  }
-
-  .stat .value {
-    font-size: 17px;
-    font-weight: 600;
-  }
-
-  table.terms {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 16px;
-    background: #fff;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    overflow: hidden;
-  }
-
-  table.terms tr {
-    border-bottom: 1px solid var(--line);
-  }
-
-  table.terms tr:last-child {
-    border-bottom: none;
-  }
-
-  table.terms td {
-    padding: 13px 18px;
-    font-size: 15px;
-  }
-
-  table.terms td.k {
-    color: var(--ink-soft);
-    width: 42%;
-    font-weight: 500;
-  }
-
-  table.terms td.v {
-    font-weight: 600;
-  }
-
-  .market-activity {
-    display: flex;
-    gap: 40px;
-    margin-top: 14px;
-    margin-bottom: 0;
-    color: var(--ink-soft);
-    font-size: 14px;
-  }
-
-  .market-activity strong {
-    color: var(--ink);
-    font-size: 16px;
-    display: block;
-    font-family: 'Source Serif 4', serif;
-  }
-
-  .disclosure {
-    font-size: 13px;
-    color: var(--ink-soft);
-    background: var(--paper-deep);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 16px 18px;
-    margin-top: 16px;
-    margin-bottom: 0;
-  }
-
-  .cta-band {
-    margin-top: 56px;
-    margin-bottom: 0;
-    background: var(--ink);
-    color: var(--paper);
-    padding: 44px 0 48px;
-  }
-
-  .cta-band h2 {
-    color: var(--paper);
-    font-size: 28px;
-    margin-bottom: 10px;
-  }
-
-  .cta-band p {
-    color: #d8d2c4;
-    font-size: 15px;
-    margin-bottom: 22px;
-    max-width: 520px;
-  }
-
-  .cta-contacts {
-    display: flex;
-    gap: 30px;
-    flex-wrap: wrap;
-  }
-
-  .cta-contacts a {
-    color: var(--paper);
+  .cta-contacts .item .value a {
+    color: #f6f1e8;
     text-decoration: none;
-    border: 1px solid #6f6a5c;
-    border-radius: 6px;
-    padding: 12px 20px;
-    font-size: 15px;
-    font-weight: 600;
-    display: inline-block;
+    border-bottom: 1px solid #8a7f68;
   }
 
-  .cta-contacts a.primary {
-    background: var(--accent);
-    border-color: var(--accent);
+  footer.foot {
+    padding-top: 22px;
+    padding-bottom: 32px;
+    background-color: #2b2620;
   }
-
-  .company-line {
-    margin-top: 20px;
-    margin-bottom: 0;
-    color: #a49c8b;
-    font-size: 13px;
-  }
-
-  footer.site-footer {
-    padding: 26px 0 40px;
-    text-align: center;
-    font-size: 12px;
-    color: var(--ink-soft);
-    margin-top: 0;
+  footer.foot p {
+    color: #8a7f68;
+    font-size: 0.78rem;
+    margin: 0;
   }
 </style>
 </head>
 <body>
 
-<header class="top">
+<header class="topbar">
   <div class="wrap">
-    <div class="eyebrow">Deal Code: GA-1 (Land) &middot; Cobb County</div>
-    <h1>1.10 Acre Residential Infill Homesite</h1>
-    <div class="loc">Marietta, GA 30008 &middot; Cobb County, Georgia &middot; Full address available upon request</div>
-    <div class="assignment-note">
-      This offering is a <strong>wholesale assignment of contract</strong>. The advertised price reflects the assignment fee for the purchase contract; buyer will close through the assignee. This is not a direct sale by, and does not involve direct contact with, the underlying property owner/seller.
-    </div>
+    <div class="brand">JNA Dynamic Holdings LLC</div>
+    <div class="tag">Land &amp; Real Estate Assignments</div>
   </div>
 </header>
 
-<div class="wrap">
+<section class="hero">
+  <div class="wrap">
+    <div class="kicker">Deal Code: GA-1 (Land)</div>
+    <h1>1.10 Acre Residential Infill Homesite</h1>
+    <div class="loc">Marietta, Cobb County, Georgia</div>
+    <div class="addr-note">Address available upon request — contact us for the full property address.</div>
 
-  <section>
     <div class="price-block">
       <div class="price-main">
         <div class="label">Assignment Price</div>
         <div class="value">$46,999</div>
       </div>
       <div class="price-sub">
-        <div>
-          <div class="label">Estimated As-Is Value</div>
-          <div class="value">$63,900 &ndash; $99,900</div>
-        </div>
-        <div>
-          <div class="label">Lot Size</div>
-          <div class="value">1.10 Acres</div>
-        </div>
-        <div>
-          <div class="label">Deal Type</div>
-          <div class="value">Land</div>
-        </div>
+        <div class="label">Estimated As-Is Value</div>
+        <div class="value">$63,900 – $99,900</div>
       </div>
     </div>
-  </section>
-
-  <section class="desc">
-    <h2 class="section-title">Overview</h2>
-    <p>Marietta, GA &mdash; 1.10 acre residential infill homesite. R-2 zoning. Public water available.</p>
-  </section>
-
-  <section>
-    <h2 class="section-title">Property Snapshot</h2>
-    <div class="stat-grid">
-      <div class="stat"><div class="label">Property Type</div><div class="value">Land</div></div>
-      <div class="stat"><div class="label">Lot Size</div><div class="value">1.10 Acres</div></div>
-      <div class="stat"><div class="label">Zoning</div><div class="value">R-2</div></div>
-      <div class="stat"><div class="label">Water</div><div class="value">Public</div></div>
-      <div class="stat"><div class="label">Beds</div><div class="value">&ndash;</div></div>
-      <div class="stat"><div class="label">Baths</div><div class="value">&ndash;</div></div>
-      <div class="stat"><div class="label">Half-Bath</div><div class="value">&ndash;</div></div>
-      <div class="stat"><div class="label">Sq. Ft.</div><div class="value">&ndash;</div></div>
-      <div class="stat"><div class="label">Parking</div><div class="value">&ndash;</div></div>
-      <div class="stat"><div class="label">Built In</div><div class="value">&ndash;</div></div>
-    </div>
-  </section>
-
-  <section>
-    <h2 class="section-title">Deal Terms</h2>
-    <table class="terms">
-      <tr><td class="k">Assignment / Contract Price</td><td class="v">$46,999</td></tr>
-      <tr><td class="k">ARV</td><td class="v">&ndash; (not applicable / not provided)</td></tr>
-      <tr><td class="k">Gross Margin</td><td class="v">&ndash; (not provided)</td></tr>
-      <tr><td class="k">Estimated As-Is Value Range</td><td class="v">$63,900 &ndash; $99,900</td></tr>
-      <tr><td class="k">County</td><td class="v">Cobb County, GA</td></tr>
-      <tr><td class="k">City / Zip</td><td class="v">Marietta, GA 30008</td></tr>
-      <tr><td class="k">Lot Size</td><td class="v">1.10 Acres</td></tr>
-      <tr><td class="k">Zoning</td><td class="v">R-2 (Residential)</td></tr>
-      <tr><td class="k">Utilities</td><td class="v">Public Water</td></tr>
-      <tr><td class="k">Deal Type</td><td class="v">Land / Assignment of Contract</td></tr>
-      <tr><td class="k">Financing</td><td class="v">Financing inquiries welcomed &mdash; contact for details</td></tr>
-    </table>
-  </section>
-
-  <section>
-    <h2 class="section-title">Disclosures</h2>
-    <div class="disclosure">
-      This is a marketing summary of a wholesale real estate assignment offered by JNA Dynamic Holdings LLC. Figures for ARV and gross margin were not disclosed in the original source listing and are omitted here rather than estimated. All acreage, zoning, and utility information is as represented in the source listing and has not been independently verified by JNA Dynamic Holdings LLC; buyers are encouraged to perform their own due diligence, including title, survey, zoning, and utility confirmation, prior to executing a contract. This listing does not constitute an offer to sell real property directly; it is an offer to assign a contractual interest.
-    </div>
-  </section>
-
-</div>
-
-<div class="cta-band">
-  <div class="wrap">
-    <h2>Interested in this assignment?</h2>
-    <p>Reach out directly to lock in due diligence details, review the assignment contract, and secure this 1.10 acre Marietta infill homesite before it's gone.</p>
-    <div class="cta-contacts">
-      <a class="primary" href="tel:5206336437">Call 520-633-6437</a>
-      <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
-    </div>
-    <div class="company-line">Offered by JNA Dynamic Holdings LLC &mdash; Deal Code GA-1 (Land)</div>
   </div>
-</div>
+</section>
 
-<footer class="site-footer">
+<section class="gallery">
   <div class="wrap">
-    &copy; JNA Dynamic Holdings LLC. Assignment of contract opportunity. Not a direct offering by the property owner.
+    <h2>Property Photos</h2>
+    <div class="gallery-scroll">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/1.jpg" alt="Marietta GA residential infill homesite photo 1">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/2.jpg" alt="Marietta GA residential infill homesite photo 2">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/3.jpg" alt="Marietta GA residential infill homesite photo 3">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/4.jpg" alt="Marietta GA residential infill homesite photo 4">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/5.jpg" alt="Marietta GA residential infill homesite photo 5">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/6.jpg" alt="Marietta GA residential infill homesite photo 6">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/7.jpg" alt="Marietta GA residential infill homesite photo 7">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/8.jpg" alt="Marietta GA residential infill homesite photo 8">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/9.jpg" alt="Marietta GA residential infill homesite photo 9">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/10.jpg" alt="Marietta GA residential infill homesite photo 10">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/11.jpg" alt="Marietta GA residential infill homesite photo 11">
+    </div>
+  </div>
+</section>
+
+<section class="description">
+  <div class="wrap">
+    <h2>Overview</h2>
+    <p>
+      A 1.10 acre residential infill homesite located in Marietta, Cobb County, Georgia. The parcel
+      is zoned R-2 and has public water available, making it a ready-to-build opportunity in an
+      established residential area.
+    </p>
+    <ul>
+      <li>Lot size: 1.10 acres</li>
+      <li>Zoning: R-2 (residential)</li>
+      <li>Utilities: Public water available</li>
+      <li>Location: Marietta, Cobb County, Georgia</li>
+      <li>Estimated as-is value range: $63,900 – $99,900</li>
+    </ul>
+    <p>
+      Address available upon request — please contact us directly and we will provide the full
+      parcel address and any available documentation.
+    </p>
+  </div>
+</section>
+
+<section class="terms">
+  <div class="wrap">
+    <h2>Deal Terms</h2>
+    <table class="terms-table">
+      <tr>
+        <td class="label">Deal Code</td>
+        <td class="value">GA-1 (Land)</td>
+      </tr>
+      <tr>
+        <td class="label">Deal Type</td>
+        <td class="value">Land — Assignment of Contract</td>
+      </tr>
+      <tr>
+        <td class="label">City / County / State</td>
+        <td class="value">Marietta, Cobb County, Georgia</td>
+      </tr>
+      <tr>
+        <td class="label">Assignment Price</td>
+        <td class="value">$46,999</td>
+      </tr>
+      <tr>
+        <td class="label">Estimated As-Is Value</td>
+        <td class="value">$63,900 – $99,900</td>
+      </tr>
+      <tr>
+        <td class="label">Lot Size</td>
+        <td class="value">1.10 acres</td>
+      </tr>
+      <tr>
+        <td class="label">Zoning</td>
+        <td class="value">R-2 (Residential)</td>
+      </tr>
+      <tr>
+        <td class="label">Utilities</td>
+        <td class="value">Public water available</td>
+      </tr>
+      <tr>
+        <td class="label">Property Address</td>
+        <td class="value">Available upon request</td>
+      </tr>
+    </table>
+  </div>
+</section>
+
+<section class="disclosure">
+  <div class="wrap">
+    <p>
+      This offering is being marketed as an assignment of contract. JNA Dynamic Holdings LLC holds
+      an equitable interest in the underlying purchase agreement and is marketing that contract
+      interest for assignment; this is not a direct sale by, and does not constitute contact with,
+      the underlying property owner. All figures, including the estimated as-is value range, are
+      provided for informational purposes and should be independently verified by any prospective
+      buyer prior to entering into an agreement.
+    </p>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <h2>Interested in This Assignment?</h2>
+    <p>Reach out today for the full property address, documentation, and assignment contract details.</p>
+    <div class="cta-contacts">
+      <div class="item">
+        <div class="label">Call or Text</div>
+        <div class="value"><a href="tel:5206336437">520-633-6437</a></div>
+      </div>
+      <div class="item">
+        <div class="label">Email</div>
+        <div class="value"><a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a></div>
+      </div>
+      <div class="item">
+        <div class="label">Company</div>
+        <div class="value">JNA Dynamic Holdings LLC</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>© JNA Dynamic Holdings LLC. This is a marketing description of an assignment of contract, not an offer of real estate for sale by the underlying owner. Buyer to perform independent due diligence.</p>
   </div>
 </footer>
 
