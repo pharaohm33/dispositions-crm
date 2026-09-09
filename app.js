@@ -2358,11 +2358,12 @@ document.getElementById("sync-all-deal-pricing-btn").addEventListener("click", a
   const resultEl = document.getElementById("sync-all-deal-pricing-result");
   if (btn.disabled) return;
   btn.disabled = true;
-  resultEl.textContent = " Checking every deal with a Source Link and republishing pages that changed — this can take a bit…";
+  resultEl.textContent = " Checking every deal with a Source Link (skipping anything synced in the last 3 hours) and republishing pages that changed — this can take a bit…";
   const res = await api("adminSyncAllDealPricing", {});
   btn.disabled = false;
   if (!res.ok) { resultEl.textContent = " " + (res.error || "Could not run the sync."); showToast(res.error || "Could not run the sync.", true); return; }
   resultEl.textContent = " Checked " + res.checkedCount + " deal(s), " + res.changedCount + " price(s) changed and republished." +
+    (res.skippedRecentCount > 0 ? " Skipped " + res.skippedRecentCount + " already synced in the last 3 hours." : "") +
     (res.errors.length > 0 ? " " + res.errors.length + " couldn't be synced: " + res.errors.slice(0, 5).join("; ") + (res.errors.length > 5 ? " …" : "") : "");
   showToast(res.changedCount + " deal price(s) updated.");
   await loadAdminDeals();

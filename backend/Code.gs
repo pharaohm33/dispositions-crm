@@ -1787,10 +1787,30 @@ function adminSyncDealPricing(body) {
 // adminCheckAllDealsLive above) -- each synced deal that changed price also
 // costs one Claude call and one GitHub commit, so this is slower per-deal
 // than the plain dead-link sweep and shouldn't be wired to run as often.
+// A full bulk sync of everything, every time, is what was timing out the
+// browser's request on a 9-deal portfolio (each changed price costs a
+// Claude call + a GitHub commit, easily adding up past what the client
+// waits around for even though the script itself keeps running server-side
+// and finishes). Skipping anything synced in the last 3 hours means a
+// re-run right after a partial/timed-out run -- or just running this
+// regularly -- does much less work each time instead of redoing deals that
+// were already just checked.
+const RECENT_SYNC_SKIP_MS = 3 * 60 * 60 * 1000;
+
 function adminSyncAllDealPricing(body) {
   const sheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
-  const deals = sheetToObjects(sheet).filter(function (d) {
+  const now = new Date();
+  const eligible = sheetToObjects(sheet).filter(function (d) {
     return d['SourceLink'] && d['Status'] !== 'Sold' && d['Status'] !== 'Dead';
+  });
+
+  let skippedRecentCount = 0;
+  const deals = eligible.filter(function (d) {
+    if (!d['LastPriceSyncAt']) return true;
+    const last = new Date(d['LastPriceSyncAt']);
+    if (isNaN(last.getTime())) return true;
+    if ((now - last) < RECENT_SYNC_SKIP_MS) { skippedRecentCount++; return false; }
+    return true;
   });
 
   let checkedCount = 0;
@@ -1811,7 +1831,7 @@ function adminSyncAllDealPricing(body) {
     if (result.priceChanged) changedCount++;
   });
 
-  return { ok: true, checkedCount: checkedCount, changedCount: changedCount, errors: errors };
+  return { ok: true, checkedCount: checkedCount, changedCount: changedCount, skippedRecentCount: skippedRecentCount, errors: errors };
 }
 
 // The admin panel's "Create Deal Artifact Page" action -- a one-click, full
