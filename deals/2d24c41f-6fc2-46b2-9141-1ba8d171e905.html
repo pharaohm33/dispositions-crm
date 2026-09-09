@@ -3,453 +3,487 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SC-1 (Land) — Aynor, Horry County, SC | 88-Lot Phase One Assignment</title>
+<title>SC-1 (Land) — 88-Lot Phase One Assemblage, Aynor, Horry County SC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  :root{
+    --paper:#f6f1e9;
+    --paper-dark:#efe7d8;
+    --ink:#231f1a;
+    --ink-soft:#5a5347;
+    --line:#d9cfba;
+    --accent:#8a5a34;
+    --accent-dark:#6b431f;
+    --card:#fffdfa;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',Arial,sans-serif;
+    font-size:16px;
+    line-height:1.6;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces',Georgia,serif;
+    font-weight:600;
+    color:var(--ink);
+    margin:0;
+  }
+  .wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding:0 28px;
+  }
+  a{color:var(--accent-dark);}
 
-  * { box-sizing: border-box; }
-
-  html, body {
-    margin: 0;
-    padding: 0;
-    background-color: #f6f1e9;
-    color: #2b2620;
-    font-family: 'Source Sans 3', sans-serif;
-    font-size: 17px;
-    line-height: 1.6;
+  /* ---------------- top bar ---------------- */
+  .topbar{
+    border-bottom:1px solid var(--line);
+    padding-top:22px;
+    padding-bottom:22px;
+    margin-bottom:0;
+  }
+  .topbar .row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .brand{
+    font-family:'Fraunces',serif;
+    font-size:1.15rem;
+    letter-spacing:0.02em;
+  }
+  .dealcode{
+    font-family:'Inter',sans-serif;
+    font-size:0.78rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    background:var(--paper-dark);
+    border:1px solid var(--line);
+    padding:6px 12px;
+    border-radius:20px;
   }
 
-  h1, h2, h3 {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    color: #211d17;
-    letter-spacing: 0.01em;
+  /* ---------------- hero ---------------- */
+  .hero{
+    margin-top:44px;
+    margin-bottom:36px;
+  }
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:0.18em;
+    font-size:0.75rem;
+    color:var(--accent-dark);
+    font-weight:600;
+    margin-bottom:14px;
+  }
+  .hero h1{
+    font-size:2.6rem;
+    line-height:1.12;
+    margin-bottom:16px;
+  }
+  .hero p.sub{
+    max-width:640px;
+    color:var(--ink-soft);
+    font-size:1.05rem;
+    margin:0;
   }
 
-  .wrap {
-    max-width: 860px;
-    margin: 0 auto;
-    padding-left: 24px;
-    padding-right: 24px;
+  /* ---------------- price block ---------------- */
+  .price-block{
+    margin-top:8px;
+    margin-bottom:40px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:28px 30px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    align-items:flex-end;
+    justify-content:space-between;
+  }
+  .price-main .label{
+    text-transform:uppercase;
+    font-size:0.75rem;
+    letter-spacing:0.12em;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .price-main .amount{
+    font-family:'Fraunces',serif;
+    font-size:2.8rem;
+    color:var(--accent-dark);
+    line-height:1;
+  }
+  .price-main .amount-note{
+    font-size:0.85rem;
+    color:var(--ink-soft);
+    margin-top:6px;
+  }
+  .price-side{
+    display:flex;
+    gap:26px;
+    flex-wrap:wrap;
+  }
+  .price-side .stat{
+    min-width:120px;
+  }
+  .price-side .stat .label{
+    text-transform:uppercase;
+    font-size:0.7rem;
+    letter-spacing:0.1em;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .price-side .stat .value{
+    font-family:'Fraunces',serif;
+    font-size:1.3rem;
   }
 
-  a { color: #7a4a2b; }
-
-  /* ---------- top notice ---------- */
-  .notice-band {
-    background-color: #2b2620;
-    color: #f6f1e9;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    font-size: 13.5px;
-    text-align: center;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
+  /* ---------------- gallery ---------------- */
+  .gallery-section{
+    margin-top:0;
+    margin-bottom:40px;
+  }
+  .gallery{
+    display:flex;
+    gap:14px;
+    overflow-x:auto;
+    padding-bottom:8px;
+  }
+  .gallery img{
+    height:280px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    flex-shrink:0;
   }
 
-  /* ---------- header ---------- */
-  .site-header {
-    margin-top: 46px;
-    margin-bottom: 10px;
+  /* ---------------- generic section ---------------- */
+  section.block{
+    margin-top:0;
+    margin-bottom:44px;
+  }
+  section.block h2{
+    font-size:1.5rem;
+    margin-bottom:18px;
+    padding-bottom:10px;
+    border-bottom:2px solid var(--ink);
+    display:inline-block;
+  }
+  .lead{
+    color:var(--ink-soft);
+    font-size:1rem;
+    margin-bottom:16px;
+  }
+  ul.facts{
+    list-style:none;
+    padding:0;
+    margin:0;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px 24px;
+  }
+  ul.facts li{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px 14px;
+    font-size:0.95rem;
+  }
+  ul.facts li b{
+    display:block;
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+    font-weight:600;
   }
 
-  .kicker {
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: #8a6a3f;
-    margin-bottom: 10px;
+  .note-box{
+    background:var(--paper-dark);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px 20px;
+    font-size:0.92rem;
+    color:var(--ink-soft);
+    margin-top:18px;
   }
 
-  .site-header h1 {
-    font-size: 42px;
-    margin: 0 0 8px 0;
-    line-height: 1.1;
+  /* ---------------- terms table ---------------- */
+  table.terms{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  table.terms tr{
+    border-bottom:1px solid var(--line);
+  }
+  table.terms tr:last-child{
+    border-bottom:none;
+  }
+  table.terms td{
+    padding:13px 18px;
+    font-size:0.95rem;
+    vertical-align:top;
+  }
+  table.terms td.k{
+    width:38%;
+    color:var(--ink-soft);
+    font-weight:600;
+    background:var(--paper-dark);
   }
 
-  .location-line {
-    font-size: 18px;
-    color: #55503f;
-    margin-bottom: 0;
+  /* ---------------- documents ---------------- */
+  .doc-list{
+    list-style:none;
+    padding:0;
+    margin:0;
+  }
+  .doc-list li{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px 16px;
+    margin-bottom:10px;
+    font-size:0.92rem;
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .doc-list li .fname{
+    color:var(--ink-soft);
+    font-family:monospace;
+    font-size:0.82rem;
   }
 
-  .tags {
-    margin-top: 18px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+  /* ---------------- disclosure ---------------- */
+  .disclosure{
+    border-left:4px solid var(--accent-dark);
+    padding:16px 20px;
+    background:var(--card);
+    font-size:0.9rem;
+    color:var(--ink-soft);
   }
 
-  .tag {
-    display: inline-block;
-    border: 1px solid #cbbfa4;
-    border-radius: 999px;
-    padding: 5px 14px;
-    font-size: 13px;
-    color: #5a5240;
-    background: #fdfbf6;
+  /* ---------------- CTA band ---------------- */
+  .cta-band{
+    background:var(--ink);
+    color:var(--paper);
+    padding-top:52px;
+    padding-bottom:52px;
+    margin-top:20px;
+  }
+  .cta-band h2{
+    color:var(--paper);
+    font-size:2rem;
+    margin-bottom:12px;
+  }
+  .cta-band p{
+    color:#cfc7b8;
+    max-width:560px;
+    margin-bottom:26px;
+  }
+  .cta-contacts{
+    display:flex;
+    gap:30px;
+    flex-wrap:wrap;
+  }
+  .cta-contacts a{
+    color:var(--paper);
+    text-decoration:none;
+    font-family:'Fraunces',serif;
+    font-size:1.25rem;
+    border-bottom:2px solid var(--accent);
+    padding-bottom:3px;
+  }
+  .cta-contacts .co{
+    color:#cfc7b8;
+    font-size:0.85rem;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    margin-bottom:4px;
   }
 
-  /* ---------- price block ---------- */
-  .price-block {
-    margin-top: 34px;
-    margin-bottom: 34px;
-    background: #211d17;
-    color: #f6f1e9;
-    border-radius: 10px;
-    padding: 30px 32px;
+  footer.bottom{
+    padding-top:22px;
+    padding-bottom:30px;
+    text-align:center;
+    font-size:0.8rem;
+    color:var(--ink-soft);
   }
 
-  .price-block .label {
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: #c9a86a;
-    margin-bottom: 6px;
+  @media(max-width:600px){
+    .hero h1{font-size:2rem;}
+    ul.facts{grid-template-columns:1fr;}
+    .price-main .amount{font-size:2.2rem;}
   }
-
-  .price-block .amount {
-    font-family: 'Fraunces', serif;
-    font-size: 46px;
-    line-height: 1.1;
-    margin-bottom: 14px;
-  }
-
-  .price-sub {
-    font-size: 15px;
-    color: #d9d2c0;
-    border-top: 1px solid #423c31;
-    padding-top: 14px;
-    margin-top: 14px;
-  }
-
-  .price-sub strong { color: #f6f1e9; }
-
-  /* ---------- gallery (present only if photos exist) ---------- */
-  .gallery {
-    margin-top: 30px;
-    margin-bottom: 30px;
-  }
-
-  .gallery-track {
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    padding-bottom: 8px;
-  }
-
-  .gallery-track img {
-    height: 260px;
-    border-radius: 8px;
-    flex: 0 0 auto;
-  }
-
-  /* ---------- sections ---------- */
-  section.block {
-    margin-top: 40px;
-    margin-bottom: 40px;
-  }
-
-  section.block h2 {
-    font-size: 26px;
-    border-bottom: 2px solid #d8ceb8;
-    padding-bottom: 10px;
-    margin-bottom: 18px;
-  }
-
-  p { margin-top: 0; margin-bottom: 14px; }
-
-  ul.plain {
-    padding-left: 20px;
-    margin-top: 0;
-  }
-
-  ul.plain li { margin-bottom: 8px; }
-
-  /* ---------- table ---------- */
-  table.terms {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fdfbf6;
-    border: 1px solid #e2d8c2;
-    border-radius: 6px;
-    overflow: hidden;
-  }
-
-  table.terms tr {
-    border-bottom: 1px solid #e9e0cc;
-  }
-
-  table.terms tr:last-child {
-    border-bottom: none;
-  }
-
-  table.terms td {
-    padding: 12px 16px;
-    vertical-align: top;
-  }
-
-  table.terms td.k {
-    width: 42%;
-    font-weight: 600;
-    color: #4c4738;
-    background: #f1e9d8;
-  }
-
-  .docs-list li { margin-bottom: 6px; }
-
-  .note-box {
-    background: #f1e9d8;
-    border-left: 4px solid #b08b4f;
-    padding: 16px 18px;
-    font-size: 15px;
-    color: #46402f;
-    border-radius: 4px;
-    margin-top: 14px;
-  }
-
-  .disclaimer {
-    font-size: 14px;
-    color: #6b6553;
-    margin-top: 14px;
-  }
-
-  /* ---------- CTA band ---------- */
-  .cta-band {
-    background: #211d17;
-    color: #f6f1e9;
-    margin-top: 50px;
-    padding-top: 46px;
-    padding-bottom: 46px;
-  }
-
-  .cta-band h2 {
-    color: #f6f1e9;
-    font-size: 30px;
-    margin-bottom: 12px;
-  }
-
-  .cta-band p {
-    color: #d9d2c0;
-    font-size: 16px;
-  }
-
-  .cta-contacts {
-    margin-top: 22px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 26px;
-  }
-
-  .cta-contacts .item {
-    font-size: 18px;
-  }
-
-  .cta-contacts .item .lbl {
-    display: block;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #c9a86a;
-    margin-bottom: 4px;
-  }
-
-  .cta-contacts a {
-    color: #f6f1e9;
-    text-decoration: none;
-    border-bottom: 1px solid #c9a86a;
-  }
-
-  footer.site-footer {
-    text-align: center;
-    font-size: 13px;
-    color: #8a8570;
-    margin-top: 40px;
-    margin-bottom: 30px;
-  }
-
 </style>
 </head>
 <body>
 
-  <div class="notice-band">
-    This offering is an Assignment of Contract — not a direct sale by the underlying property owner.
+<div class="topbar">
+  <div class="wrap row">
+    <div class="brand">JNA Dynamic Holdings LLC</div>
+    <div class="dealcode">Deal SC-1 (Land)</div>
   </div>
+</div>
 
+<div class="wrap hero">
+  <div class="eyebrow">Off-Market Assignment of Contract · Horry County, South Carolina</div>
+  <h1>Hucks Tract — Phase One, 88 Residential Lots<br>US-501 Corridor, Aynor / Conway, SC</h1>
+  <p class="sub">E Highway 501, Aynor, SC 29511 &middot; Horry County &middot; Land / entitlement-stage residential lot assemblage, offered as Phase One of a larger planned community.</p>
+</div>
+
+<div class="wrap price-block">
+  <div class="price-main">
+    <div class="label">Listing Price</div>
+    <div class="amount">$2,376,000</div>
+    <div class="amount-note">As posted on the original marketplace listing for this parcel.</div>
+  </div>
+  <div class="price-side">
+    <div class="stat">
+      <div class="label">Deal Summary Asking Price</div>
+      <div class="value">$2,684,000</div>
+    </div>
+    <div class="stat">
+      <div class="label">Asking Basis</div>
+      <div class="value">$30,500 / lot</div>
+    </div>
+    <div class="stat">
+      <div class="label">Phase One Lot Count</div>
+      <div class="value">88 lots</div>
+    </div>
+    <div class="stat">
+      <div class="label">Lot Size (Land)</div>
+      <div class="value">101.19 acres</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="note-box">
+    Note on pricing: two figures appear across the source materials for this deal — the marketplace listing shows a price of <b>$2,376,000</b>, while the deal-summary outreach text references an asking price of <b>$2,684,000</b> (built from 88 planned lots at $30,500/lot). Both figures are carried forward here exactly as sourced; buyers should confirm current pricing with {{company}} before making an offer.
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="block">
+    <h2>Overview</h2>
+    <p class="lead">
+      Off-market land opportunity: 88 residential lots representing Phase One of a larger, 170-lot planned community (the "Hucks Tract") in Horry County, SC, positioned directly on the US-501 corridor between Aynor and Conway. Diligence has already been performed on the file — this is not a blind land buy. A completed Phase I Environmental Site Assessment and roadway geotechnical report are both available, along with a rezoning submission package.
+    </p>
+    <p class="lead">
+      The parcel sits along the same US-501 corridor as Horry County's newly approved 500-acre Rural Civic Center project, which is moving toward construction and is expected to bring additional growth momentum to the surrounding area.
+    </p>
+    <ul class="facts">
+      <li><b>Address</b>E Highway 501, Aynor, SC 29511 (Horry County)</li>
+      <li><b>Asset Type / Deal Type</b>Land</li>
+      <li><b>Offering Scope</b>Phase One only</li>
+      <li><b>Broader Hucks Tract Reference Plan</b>170 lots total</li>
+      <li><b>Phase One Lot Count</b>88 lots</li>
+      <li><b>Minimum Lot Size (master concept)</b>10,000 SF</li>
+      <li><b>Minimum Lot Width (master concept)</b>55 ft</li>
+      <li><b>Utilities Noted on Master Plan</b>Public water &amp; sewer</li>
+      <li><b>Roads Noted on Master Plan</b>Public roads</li>
+      <li><b>Total Land Size</b>101.19 acres</li>
+      <li><b>Beds / Baths / Half-Bath</b>0 / 0 / 0</li>
+      <li><b>Square Footage</b>Not applicable (raw / entitlement-stage land)</li>
+    </ul>
+    <div class="note-box">
+      Buyer to independently verify final Phase One lot yield, boundary, entitlement status, and development costs. Property condition, systems, parking, and year-built fields were not specified in the source listing and are omitted here rather than estimated.
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>Diligence Completed</h2>
+    <ul class="facts">
+      <li><b>Environmental</b>Phase I Environmental Site Assessment (ESA) completed</li>
+      <li><b>Geotechnical</b>Roadway geotechnical diligence completed</li>
+      <li><b>Rezoning</b>Rezoning submission package on file (dated 7/11/24, v2)</li>
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2>Documents on File</h2>
+    <ul class="doc-list">
+      <li><span>Geotechnical Report</span><span class="fname">59648_g1425ag-hucks-tract-south-block-geotechnical-report.pdf</span></li>
+      <li><span>Rezoning Package</span><span class="fname">59650_hucks-rezoning-7-11-24v2.pdf</span></li>
+      <li><span>Phase I ESA</span><span class="fname">59651_hucks-tract-phase-i-esa-10mb.pdf</span></li>
+    </ul>
+    <p class="lead" style="margin-top:14px;">
+      Full photo set, general location map, and deal overview package:
+      <a href="https://drive.google.com/drive/folders/1tsmnuH5SKBiGMBTdtjH8HbZloEUilIOm?usp=sharing" target="_blank" rel="noopener">view shared drive folder</a>.
+      The original marketplace listing for this parcel included 13 images (login-gated) and had recorded 26 days on market with 427 views at time of pull.
+    </p>
+  </section>
+
+  <section class="block">
+    <h2>Deal Terms</h2>
+    <table class="terms">
+      <tr><td class="k">Deal Code</td><td>SC-1 (Land)</td></tr>
+      <tr><td class="k">Location</td><td>Aynor, Horry County, SC 29511 (E Highway 501)</td></tr>
+      <tr><td class="k">Deal Type</td><td>Land</td></tr>
+      <tr><td class="k">Listing Price</td><td>$2,376,000</td></tr>
+      <tr><td class="k">Deal-Summary Asking Price</td><td>$2,684,000 ($30,500/lot &times; 88 lots)</td></tr>
+      <tr><td class="k">Phase One Lot Count</td><td>88 lots</td></tr>
+      <tr><td class="k">Master Plan Reference (Full Tract)</td><td>170 lots</td></tr>
+      <tr><td class="k">Minimum Lot Size</td><td>10,000 SF</td></tr>
+      <tr><td class="k">Minimum Lot Width</td><td>55 ft</td></tr>
+      <tr><td class="k">Total Acreage</td><td>101.19 acres</td></tr>
+      <tr><td class="k">Utilities</td><td>Public water &amp; sewer noted on master plan</td></tr>
+      <tr><td class="k">Roads</td><td>Public roads noted on master plan</td></tr>
+      <tr><td class="k">Diligence Completed</td><td>Phase I ESA, roadway geotechnical report, rezoning package</td></tr>
+      <tr><td class="k">Buyer Responsibility</td><td>Verify final Phase One yield, boundary, entitlement &amp; development costs</td></tr>
+      <tr><td class="k">Contract Type</td><td>Assignment of Contract — this offering is the sale of a purchase contract/equitable interest, not a direct sale of real property. Closing does not include, and buyer should not expect, direct contact with the underlying property owner.</td></tr>
+    </table>
+  </section>
+
+  <section class="block">
+    <div class="disclosure">
+      This page markets the assignment of a purchase contract on the property described above. {{company}} holds equitable interest under contract and is offering that interest for assignment; this is not a direct offer of the real property by, through, or on behalf of the underlying seller, and no direct communication with the seller is implied or available through this listing. All figures above — pricing, acreage, lot counts, lot dimensions, and diligence items — are carried over as provided in the underlying deal file. Buyers must perform their own independent due diligence, including verification of lot yield, boundary, entitlement status, utility availability, and all development costs, prior to entering any agreement.
+    </div>
+  </section>
+</div>
+
+<div class="cta-band">
   <div class="wrap">
-
-    <header class="site-header">
-      <div class="kicker">Deal Code: SC-1 (Land) · Horry County, South Carolina</div>
-      <h1>Hucks Tract — Phase One, 88 Residential Lots</h1>
-      <p class="location-line">E Highway 501, Aynor, SC 29511 &nbsp;·&nbsp; Horry County</p>
-      <div class="tags">
-        <span class="tag">Land / Residential Lots</span>
-        <span class="tag">101.19 Acres</span>
-        <span class="tag">88 Lots — Phase One</span>
-        <span class="tag">170-Lot Master Plan Reference</span>
-        <span class="tag">Assignment of Contract</span>
+    <h2>Interested in this assignment?</h2>
+    <p>Reach out for the full diligence package — geotech report, ESA, rezoning file, photos and location map — and to discuss terms on this 88-lot Phase One assignment in Aynor, SC.</p>
+    <div class="cta-contacts">
+      <div>
+        <div class="co">Call</div>
+        <a href="tel:5206336437">520-633-6437</a>
       </div>
-    </header>
-
-    <div class="price-block">
-      <div class="label">Assignment Price</div>
-      <div class="amount">$2,376,000</div>
-      <div class="price-sub">
-        Outreach materials for this deal also reference an asking basis of <strong>$30,500 per planned lot</strong> across the 88 Phase One lots, which totals <strong>$2,684,000</strong>. Both figures are presented here as they appear in the deal's source materials; buyer to confirm current pricing directly with {{COMPANY}} prior to contract.
+      <div>
+        <div class="co">Email</div>
+        <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
       </div>
-    </div>
-
-    <section class="block">
-      <h2>Overview</h2>
-      <p>
-        Off-market land opportunity in Horry County, South Carolina: 88 residential lots representing Phase One of a
-        larger 170-lot planned community on the Hucks Tract, positioned directly on the US-501 corridor near
-        Aynor and Conway, SC. The total assembled site spans approximately 101.19 acres.
-      </p>
-      <p>
-        Diligence work has already been completed on the file — this is not a blind land purchase. A completed
-        Phase I Environmental Site Assessment and roadway geotechnical report are both on hand, along with a
-        rezoning submission for the tract.
-      </p>
-      <p>
-        The parcel sits along the same US-501 corridor as Horry County's newly approved 500-acre Rural Civic
-        Center project, which is moving toward construction and is expected to bring additional growth momentum
-        to the surrounding area.
-      </p>
-      <div class="note-box">
-        This listing covers land only — there are no existing residential improvements. Beds, baths, half-baths,
-        square footage, year built, and parking are not applicable to this offering.
-      </div>
-    </section>
-
-    <section class="block">
-      <h2>Deal Terms</h2>
-      <table class="terms">
-        <tr>
-          <td class="k">Deal Code</td>
-          <td>SC-1 (Land)</td>
-        </tr>
-        <tr>
-          <td class="k">Address</td>
-          <td>E Highway 501, Aynor, SC 29511 (Horry County)</td>
-        </tr>
-        <tr>
-          <td class="k">Asset Type / Deal Type</td>
-          <td>Land — Residential Lots (Assignment of Contract)</td>
-        </tr>
-        <tr>
-          <td class="k">Assignment Price</td>
-          <td>$2,376,000</td>
-        </tr>
-        <tr>
-          <td class="k">Alternate Asking Basis (per outreach materials)</td>
-          <td>$30,500 per lot × 88 lots = $2,684,000</td>
-        </tr>
-        <tr>
-          <td class="k">Offering Scope</td>
-          <td>Phase One only</td>
-        </tr>
-        <tr>
-          <td class="k">Phase One Lot Count</td>
-          <td>88 lots</td>
-        </tr>
-        <tr>
-          <td class="k">Broader Hucks Tract Reference Plan</td>
-          <td>170 lots total (master concept)</td>
-        </tr>
-        <tr>
-          <td class="k">Total Site Size</td>
-          <td>101.19 acres</td>
-        </tr>
-        <tr>
-          <td class="k">Minimum Lot Size (master concept)</td>
-          <td>10,000 SF</td>
-        </tr>
-        <tr>
-          <td class="k">Minimum Lot Width (master concept)</td>
-          <td>55 ft</td>
-        </tr>
-        <tr>
-          <td class="k">Utilities</td>
-          <td>Public water &amp; sewer noted on master plan</td>
-        </tr>
-        <tr>
-          <td class="k">Roads</td>
-          <td>Public roads noted on master plan</td>
-        </tr>
-        <tr>
-          <td class="k">Diligence Completed</td>
-          <td>Phase I ESA completed; roadway geotechnical diligence completed</td>
-        </tr>
-        <tr>
-          <td class="k">Beds / Baths / Half-Bath / Sq.Ft / Built / Parking</td>
-          <td>N/A — vacant land, no existing structures</td>
-        </tr>
-        <tr>
-          <td class="k">Listing Activity (source listing)</td>
-          <td>26 days on market · 427 views</td>
-        </tr>
-        <tr>
-          <td class="k">Buyer Responsibility</td>
-          <td>Buyer to independently verify final Phase One lot yield, boundary, entitlement status, and development cost</td>
-        </tr>
-      </table>
-    </section>
-
-    <section class="block">
-      <h2>Documents on File</h2>
-      <ul class="plain docs-list">
-        <li>Geotechnical Report — Hucks Tract South Block (roadway geotechnical diligence)</li>
-        <li>Rezoning Submission — Hucks Tract (v2)</li>
-        <li>Phase I Environmental Site Assessment (ESA) — Hucks Tract</li>
-      </ul>
-      <p>
-        Full photos, general location map, and the complete deal overview package are available here:
-        <a href="https://drive.google.com/drive/folders/1tsmnuH5SKBiGMBTdtjH8HbZloEUilIOm?usp=sharing" target="_blank" rel="noopener">Deal Photos &amp; Documents Folder</a>.
-      </p>
-      <p class="disclaimer">
-        This is a marketing summary of an assignable contract position and does not constitute an offer of the underlying
-        real property by its owner. {{COMPANY}} holds an equitable interest under contract and is marketing that
-        contract position for assignment. All figures above are drawn directly from the deal's diligence materials;
-        buyer is responsible for independent verification of acreage, lot yield, entitlements, utilities, zoning,
-        and development costs prior to closing.
-      </p>
-    </section>
-
-  </div>
-
-  <div class="cta-band">
-    <div class="wrap">
-      <h2>Interested in This Assignment?</h2>
-      <p>Reach out directly to lock in diligence details, review the document package, and discuss assignment terms for SC-1 (Land).</p>
-      <div class="cta-contacts">
-        <div class="item">
-          <span class="lbl">Company</span>
-          {{COMPANY}}
-        </div>
-        <div class="item">
-          <span class="lbl">Phone</span>
-          <a href="tel:+15206336437">520-633-6437</a>
-        </div>
-        <div class="item">
-          <span class="lbl">Email</span>
-          <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
-        </div>
+      <div>
+        <div class="co">Company</div>
+        <a href="mailto:montanoemmanuel@gmail.com" style="border-bottom:none;">JNA Dynamic Holdings LLC</a>
       </div>
     </div>
   </div>
+</div>
 
-  <footer class="site-footer">
-    <div class="wrap">
-      SC-1 (Land) · Aynor, Horry County, SC · Marketed as an Assignment of Contract by {{COMPANY}}
-    </div>
-  </footer>
-
-<script>
-  document.querySelectorAll('body').forEach(function(){});
-</script>
+<footer class="bottom">
+  <div class="wrap">
+    &copy; JNA Dynamic Holdings LLC. Offered subject to assignment of contract. Errors, omissions, prior sale, or withdrawal without notice.
+  </div>
+</footer>
 
 </body>
 </html>
