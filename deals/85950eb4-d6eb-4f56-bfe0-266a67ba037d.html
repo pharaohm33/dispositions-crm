@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MO-1 (SFH) — 5936 Pamplin Ave, St. Louis, MO 63147 | Assignment Opportunity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f7f2ea;
+    --ink:#2a231c;
+    --ink-soft:#5b5148;
+    --line:#ddd2c0;
+    --accent:#8a5a34;
+    --accent-dark:#5f3d21;
+    --card:#fffdf9;
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    font-size:16px;
+    line-height:1.6;
+  }
+
+  h1,h2,h3,.serif{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    color:var(--ink);
+  }
+
+  .wrap{
+    max-width:880px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+
+  header.topbar{
+    border-bottom:1px solid var(--line);
+    padding-top:22px;
+    padding-bottom:22px;
+  }
+
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:0.14em;
+    font-size:12px;
+    color:var(--accent-dark);
+    font-weight:600;
+  }
+
+  .dealcode{
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  section.hero{
+    padding-top:40px;
+    padding-bottom:20px;
+  }
+
+  .hero h1{
+    font-size:38px;
+    line-height:1.15;
+    margin:10px 0 6px 0;
+  }
+
+  .hero .address-sub{
+    font-size:16px;
+    color:var(--ink-soft);
+    margin-bottom:0;
+  }
+
+  .stat-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    margin-top:22px;
+    margin-bottom:0;
+  }
+
+  .stat-row div{
+    min-width:70px;
+  }
+
+  .stat-num{
+    font-family:'Fraunces', serif;
+    font-size:22px;
+    font-weight:600;
+  }
+
+  .stat-label{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--ink-soft);
+  }
+
+  .listing-meta{
+    margin-top:14px;
+    margin-bottom:0;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  /* Price block */
+  section.pricebox{
+    padding-top:28px;
+    padding-bottom:28px;
+  }
+
+  .price-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:28px 30px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:30px;
+    justify-content:space-between;
+    align-items:center;
+  }
+
+  .price-main .label{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+
+  .price-main .amount{
+    font-family:'Fraunces', serif;
+    font-size:44px;
+    font-weight:700;
+    color:var(--accent-dark);
+  }
+
+  .price-sub{
+    display:flex;
+    gap:26px;
+    flex-wrap:wrap;
+  }
+
+  .price-sub .figure{
+    text-align:left;
+  }
+
+  .price-sub .figure .fnum{
+    font-family:'Fraunces', serif;
+    font-size:22px;
+    font-weight:600;
+  }
+
+  .price-sub .figure .flabel{
+    font-size:12px;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+  }
+
+  .winit{
+    display:inline-block;
+    margin-top:16px;
+    font-size:13px;
+    color:var(--accent-dark);
+    border:1px solid var(--accent);
+    padding:6px 14px;
+    border-radius:20px;
+  }
+
+  /* Gallery (kept dormant if no photos, structure only used when populated) */
+  section.gallery{
+    padding-top:8px;
+    padding-bottom:24px;
+  }
+
+  .gallery-scroll{
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    padding-bottom:8px;
+  }
+
+  .gallery-scroll img{
+    height:220px;
+    border-radius:8px;
+    border:1px solid var(--line);
+  }
+
+  /* Sections generic */
+  section.block{
+    padding-top:30px;
+    padding-bottom:30px;
+    border-top:1px solid var(--line);
+  }
+
+  section.block h2{
+    font-size:24px;
+    margin-top:0;
+    margin-bottom:16px;
+  }
+
+  p.lede{
+    color:var(--ink-soft);
+    font-size:15px;
+  }
+
+  table.terms{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden;
+  }
+
+  table.terms td{
+    padding:12px 16px;
+    border-bottom:1px solid var(--line);
+    font-size:14.5px;
+  }
+
+  table.terms tr:last-child td{
+    border-bottom:none;
+  }
+
+  table.terms td.k{
+    color:var(--ink-soft);
+    width:46%;
+  }
+
+  table.terms td.v{
+    font-weight:600;
+  }
+
+  .two-col{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:26px;
+  }
+
+  @media (max-width:640px){
+    .two-col{grid-template-columns:1fr;}
+    .hero h1{font-size:30px;}
+    .price-main .amount{font-size:34px;}
+  }
+
+  ul.plain{
+    margin:0;
+    padding-left:18px;
+  }
+
+  ul.plain li{
+    margin-bottom:6px;
+    font-size:14.5px;
+  }
+
+  .disclosure-box{
+    background:#f1e9da;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:18px 20px;
+    font-size:13.5px;
+    color:var(--ink-soft);
+  }
+
+  .disclosure-box strong{
+    color:var(--ink);
+  }
+
+  a.doclink{
+    color:var(--accent-dark);
+    font-weight:600;
+    text-decoration:underline;
+  }
+
+  /* CTA band */
+  section.cta{
+    background:var(--accent-dark);
+    color:#fbf5ea;
+    padding-top:44px;
+    padding-bottom:44px;
+    margin-top:10px;
+  }
+
+  section.cta h2{
+    color:#fbf5ea;
+    font-size:28px;
+    margin-top:0;
+    margin-bottom:10px;
+  }
+
+  section.cta p{
+    color:#e7d9c4;
+    margin-top:0;
+    margin-bottom:22px;
+    font-size:15px;
+  }
+
+  .cta-contacts{
+    display:flex;
+    flex-wrap:wrap;
+    gap:26px;
+  }
+
+  .cta-contacts .item{
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.25);
+    padding:14px 20px;
+    border-radius:8px;
+  }
+
+  .cta-contacts .item .k{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:#e7d9c4;
+    margin-bottom:4px;
+  }
+
+  .cta-contacts .item .v{
+    font-family:'Fraunces', serif;
+    font-size:17px;
+    font-weight:600;
+  }
+
+  footer.foot{
+    padding-top:22px;
+    padding-bottom:30px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="eyebrow">Wholesale Assignment Opportunity</div>
+    <div class="dealcode">Deal Code: MO-1 (SFH) · Presented by JNA Dynamic Holdings LLC</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Land / Single-Family Rehab Deal</div>
+    <h1>5936 Pamplin Ave</h1>
+    <p class="address-sub">St. Louis, MO 63147 &middot; Full address released to verified buyers</p>
+
+    <div class="stat-row">
+      <div>
+        <div class="stat-num">3</div>
+        <div class="stat-label">Beds</div>
+      </div>
+      <div>
+        <div class="stat-num">2</div>
+        <div class="stat-label">Baths</div>
+      </div>
+      <div>
+        <div class="stat-num">0</div>
+        <div class="stat-label">Half-Bath</div>
+      </div>
+      <div>
+        <div class="stat-num">1,184</div>
+        <div class="stat-label">Sq. Ft.</div>
+      </div>
+      <div>
+        <div class="stat-num">1939</div>
+        <div class="stat-label">Year Built</div>
+      </div>
+      <div>
+        <div class="stat-num">3,045</div>
+        <div class="stat-label">Lot Sq. Ft.</div>
+      </div>
+    </div>
+
+    <p class="listing-meta">9 days on market &middot; 167 views &middot; Single-Family &middot; Driveway parking &middot; Occupancy: Vacant</p>
+  </div>
+</section>
+
+<section class="pricebox">
+  <div class="wrap">
+    <div class="price-card">
+      <div class="price-main">
+        <div class="label">Assignment Price</div>
+        <div class="amount">$65,000</div>
+        <div class="winit">Win it now for $75,000 &middot; Make Offer accepted</div>
+      </div>
+      <div class="price-sub">
+        <div class="figure">
+          <div class="fnum">$135,000</div>
+          <div class="flabel">After Repair Value</div>
+        </div>
+        <div class="figure">
+          <div class="fnum">$70,000</div>
+          <div class="flabel">Gross Margin</div>
+        </div>
+        <div class="figure">
+          <div class="fnum">$15,000&ndash;$20,000</div>
+          <div class="flabel">Repair Estimate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Overview</h2>
+    <p class="lede">This 3-bed, 2-bath, 1,184 sq. ft. single-family home sits on a 3,045 sq. ft. lot in St. Louis, MO 63147, built in 1939. Property last sold for $126,500 on 11/08/2023. Currently vacant and positioned as a light rehab project with strong spread between assignment price and after-repair value.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Additional Details</h2>
+    <div class="two-col">
+      <table class="terms">
+        <tr><td class="k">Type</td><td class="v">Single-Family</td></tr>
+        <tr><td class="k">Parking</td><td class="v">Driveway</td></tr>
+        <tr><td class="k">Built in</td><td class="v">1939</td></tr>
+        <tr><td class="k">Lot Size</td><td class="v">3,045 sqft</td></tr>
+      </table>
+      <table class="terms">
+        <tr><td class="k">Property Condition</td><td class="v">Light Rehab</td></tr>
+        <tr><td class="k">Roof Age</td><td class="v">Unknown years</td></tr>
+        <tr><td class="k">Heating System</td><td class="v">Baseboard</td></tr>
+        <tr><td class="k">Heating Age</td><td class="v">Unknown years</td></tr>
+        <tr><td class="k">Air Conditioning</td><td class="v">Central AC</td></tr>
+        <tr><td class="k">Foundation Type</td><td class="v">Full basement</td></tr>
+        <tr><td class="k">Foundation Condition</td><td class="v">Good</td></tr>
+        <tr><td class="k">Occupancy</td><td class="v">Vacant</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Deal Terms</h2>
+    <table class="terms">
+      <tr><td class="k">Deal Code</td><td class="v">MO-1 (SFH)</td></tr>
+      <tr><td class="k">Deal Type</td><td class="v">Land / Assignment of Contract</td></tr>
+      <tr><td class="k">City / State</td><td class="v">St. Louis, MO</td></tr>
+      <tr><td class="k">Assignment Price</td><td class="v">$65,000</td></tr>
+      <tr><td class="k">Win-It-Now Price</td><td class="v">$75,000</td></tr>
+      <tr><td class="k">After Repair Value (ARV)</td><td class="v">$135,000</td></tr>
+      <tr><td class="k">Gross Margin</td><td class="v">$70,000</td></tr>
+      <tr><td class="k">Repair Estimate</td><td class="v">$15,000.00 &ndash; $20,000.00</td></tr>
+      <tr><td class="k">Last Sold Price</td><td class="v">$126,500 (11/08/2023)</td></tr>
+      <tr><td class="k">Days on Market</td><td class="v">9 days</td></tr>
+      <tr><td class="k">Views</td><td class="v">167</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Documents & Photos</h2>
+    <ul class="plain">
+      <li>Comp Report: 5936_Pamplin_Ave__Saint_Louis__MO__63147 Comp Report (PDF)</li>
+      <li>Full photo set (22 images referenced in original listing) and supporting documents available upon request &mdash; <a class="doclink" href="https://claude.ai/code/artifact/4f44d05c-38c9-4bd1-a1b2-60cbbb2f3687">view photos &amp; docs</a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Disclosures</h2>
+    <div class="disclosure-box">
+      <p style="margin-top:0;"><strong>This offering is an assignment of contract, not a direct sale of real property.</strong> JNA Dynamic Holdings LLC (dealCode MO-1 (SFH)) holds an equitable interest in the underlying purchase contract for this property and is marketing that contract interest for assignment. This is not an offer to sell real estate directly, and buyers will not be contracting with the underlying property seller/owner. All inquiries, offers, and financing arrangements are to be directed solely to JNA Dynamic Holdings LLC using the contact information below.</p>
+      <p style="margin-bottom:0;">Figures shown (price, ARV, repair estimate, gross margin, last sold price/date, square footage, lot size, year built, and property condition details) are as provided in the original source listing and have not been independently verified. Buyers should perform their own due diligence, including title, inspection, and repair-cost confirmation, prior to closing.</p>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <h2>Ready to Move on This Assignment?</h2>
+    <p>Contact JNA Dynamic Holdings LLC directly to request the assignment contract, full document package, and photo set for 5936 Pamplin Ave, St. Louis, MO 63147.</p>
+    <div class="cta-contacts">
+      <div class="item">
+        <div class="k">Phone</div>
+        <div class="v">520-633-6437</div>
+      </div>
+      <div class="item">
+        <div class="k">Email</div>
+        <div class="v">montanoemmanuel@gmail.com</div>
+      </div>
+      <div class="item">
+        <div class="k">Company</div>
+        <div class="v">JNA Dynamic Holdings LLC</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    <p style="margin:0;">Marketed by JNA Dynamic Holdings LLC. This is an assignment-of-contract opportunity; no direct representation of, or contact with, the underlying seller is implied.</p>
+  </div>
+</footer>
+
+</body>
+</html>
