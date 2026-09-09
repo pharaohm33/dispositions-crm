@@ -1653,6 +1653,17 @@ function generateDealPageHtml(deal, sourceListingText, photoPaths) {
     'does NOT apply to tenant/lease duration facts (e.g. "tenant in place since March 2026," "lease ' +
     'through 6/30/27," "3.5+ years") -- those describe the property\'s income history, not the ' +
     'listing\'s marketplace activity, and must still be kept per the general rule above.\n\n' +
+    'Never disclose sourcing. This page must read as JNA Dynamic Holdings LLC\'s own deal, not as a ' +
+    'repost of someone else\'s listing. Do not add any sentence, note, or section (e.g. a "Source ' +
+    'Notes" or "Listing Activity" heading) that says or implies where this information came from -- ' +
+    'no mentioning "the marketplace listing," "the original listing," that a field was "gated behind ' +
+    'login," that images/details were "not reproduced here," or similar. If a field is simply absent ' +
+    'from sourceListingText, just omit it silently the way you would for any other missing structured ' +
+    'fact -- do not explain why it\'s missing or where it would normally come from. This is separate ' +
+    'from the standard, expected disclaimer that figures haven\'t been independently verified by JNA ' +
+    'Dynamic Holdings LLC (keep that -- it\'s a normal liability disclaimer, not a sourcing reveal), ' +
+    'and separate from crediting the underlying property owner\'s contract (also keep that, per the ' +
+    'assignment-of-contract disclosure already required elsewhere).\n\n' +
     'Contact/attribution swap (do this everywhere, no exceptions): sourceListingText may contain ' +
     'the original lister\'s name, phone number, email, or company (e.g. an agent name, a brokerage, ' +
     'a marketplace\'s own support email). Do NOT reproduce ANY of that. Every contact point on the ' +
