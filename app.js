@@ -2353,19 +2353,50 @@ document.getElementById("check-all-deals-live-btn").addEventListener("click", as
   await loadAdminDeals();
 });
 
+// A bulk sync is now several small round trips instead of one big one, so
+// a large portfolio doesn't time out the browser waiting on a single huge
+// request -- each batch call only has a few deals' worth of Claude/GitHub
+// work to do. This only ever skips deals based on LastAutoPriceSyncAt (set
+// exclusively by this batch flow), never by a manual single-deal sync or
+// a Create Deal Artifact Page run -- see the comment on
+// getDealsPendingAutoPriceSync in Code.gs.
+const PRICE_SYNC_BATCH_SIZE = 3;
+
 document.getElementById("sync-all-deal-pricing-btn").addEventListener("click", async function () {
   const btn = this;
   const resultEl = document.getElementById("sync-all-deal-pricing-result");
   if (btn.disabled) return;
   btn.disabled = true;
-  resultEl.textContent = " Checking every deal with a Source Link (skipping anything synced in the last 3 hours) and republishing pages that changed — this can take a bit…";
-  const res = await api("adminSyncAllDealPricing", {});
+
+  resultEl.textContent = " Finding deals due for an auto price check…";
+  const pending = await api("adminGetDealsPendingPriceSync", {});
+  if (!pending.ok) { btn.disabled = false; resultEl.textContent = " " + (pending.error || "Could not start the sync."); showToast(pending.error || "Could not start the sync.", true); return; }
+
+  const dealIds = pending.dealIds;
+  if (dealIds.length === 0) {
+    btn.disabled = false;
+    resultEl.textContent = " Nothing to do — all " + pending.totalEligible + " deal(s) with a Source Link were auto-synced in the last 3 hours.";
+    return;
+  }
+
+  let checkedCount = 0;
+  let changedCount = 0;
+  const errors = [];
+  for (let i = 0; i < dealIds.length; i += PRICE_SYNC_BATCH_SIZE) {
+    const batch = dealIds.slice(i, i + PRICE_SYNC_BATCH_SIZE);
+    resultEl.textContent = " Syncing " + Math.min(i + PRICE_SYNC_BATCH_SIZE, dealIds.length) + " of " + dealIds.length + "…";
+    const res = await api("adminSyncDealPricingBatch", { dealIds: batch });
+    if (!res.ok) { errors.push(res.error || "A batch failed."); continue; }
+    checkedCount += res.checkedCount;
+    changedCount += res.changedCount;
+    errors.push.apply(errors, res.errors);
+  }
+
   btn.disabled = false;
-  if (!res.ok) { resultEl.textContent = " " + (res.error || "Could not run the sync."); showToast(res.error || "Could not run the sync.", true); return; }
-  resultEl.textContent = " Checked " + res.checkedCount + " deal(s), " + res.changedCount + " price(s) changed and republished." +
-    (res.skippedRecentCount > 0 ? " Skipped " + res.skippedRecentCount + " already synced in the last 3 hours." : "") +
-    (res.errors.length > 0 ? " " + res.errors.length + " couldn't be synced: " + res.errors.slice(0, 5).join("; ") + (res.errors.length > 5 ? " …" : "") : "");
-  showToast(res.changedCount + " deal price(s) updated.");
+  resultEl.textContent = " Checked " + checkedCount + " deal(s), " + changedCount + " price(s) changed and republished." +
+    (pending.skippedRecentCount > 0 ? " Skipped " + pending.skippedRecentCount + " already auto-synced in the last 3 hours." : "") +
+    (errors.length > 0 ? " " + errors.length + " couldn't be synced: " + errors.slice(0, 5).join("; ") + (errors.length > 5 ? " …" : "") : "");
+  showToast(changedCount + " deal price(s) updated.");
   await loadAdminDeals();
 });
 

@@ -81,13 +81,23 @@ Safe to re-run any time (e.g. after adding more photos to the Drive
 folder) — it always fully rebuilds. Leave Pictures Link blank on a re-run to
 keep whatever photos are already published rather than re-fetching Drive.
 
-**Sync Price From Source & Republish Page** (per deal, and the bulk **Sync
-All Pricing From Source Links** button above the deals table) — the routine
-upkeep version. Only re-reads the asking price; if it hasn't changed, it
-does nothing else (no Claude call, no GitHub commit — cheap to run often).
-If it has changed, it updates Price and regenerates + republishes the page
-using the photos already cached from the last Create/re-Create — it does
-**not** re-fetch or re-publish photos itself.
+**Sync Price From Source & Republish Page** (per deal) — the routine upkeep
+version. Only re-reads the asking price; if it hasn't changed, it does
+nothing else (no Claude call, no GitHub commit — cheap to run often). If it
+has changed, it updates Price and regenerates + republishes the page using
+the photos already cached from the last Create/re-Create — it does **not**
+re-fetch or re-publish photos itself.
+
+**Sync All Pricing From Source Links** (above the deals table) — the same
+thing across every eligible deal, but as several small batches (3 deals per
+call) instead of one huge request, so a large portfolio doesn't time out
+the browser waiting on it. It also skips anything auto-synced in the last 3
+hours (tracked separately as `LastAutoPriceSyncAt`, distinct from the
+general `LastPriceSyncAt` shown in the UI) — so re-running it, including
+right after a run that got interrupted, mostly picks up where it left off
+instead of redoing everything. Manual actions (a single-deal Sync Price
+click, or Create Deal Artifact Page) never count toward that skip window —
+only a previous bulk auto-run does.
 
 ## 4. Deploy as a Web App
 

@@ -100,7 +100,7 @@ const PERSON_TYPES = ['Buyer', 'Wholesaler', 'Realtor', 'Other'];
 // buyer<->deal auto-matching -- see buyerMatchesDeal. AssetType stays a
 // free-text description field ("SFR - 3bd/2ba") separate from the
 // structured AssetCategory used for matching.
-const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt', 'Locked', 'DealTypes', 'FinancingType', 'PublicPageUrl', 'LastPriceSyncAt', 'ArtifactPicturesLink', 'ArtifactPhotoPaths'];
+const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt', 'Locked', 'DealTypes', 'FinancingType', 'PublicPageUrl', 'LastPriceSyncAt', 'ArtifactPicturesLink', 'ArtifactPhotoPaths', 'LastAutoPriceSyncAt'];
 // Source distinguishes a deliberate, one-deal-at-a-time grant ('manual' --
 // the Access section's "Add Access" dropdown, or "Assign Myself") from one
 // written by the bulk-assign mechanism ('bulk' -- see applyDealAssignMode).
@@ -287,8 +287,10 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminCheckAllDealsLive));
       case 'adminSyncDealPricing':
         return jsonOut(withAdminSession(body, adminSyncDealPricing));
-      case 'adminSyncAllDealPricing':
-        return jsonOut(withAdminSession(body, adminSyncAllDealPricing));
+      case 'adminGetDealsPendingPriceSync':
+        return jsonOut(withAdminSession(body, adminGetDealsPendingPriceSync));
+      case 'adminSyncDealPricingBatch':
+        return jsonOut(withAdminSession(body, adminSyncDealPricingBatch));
       case 'adminCreateDealArtifactPage':
         return jsonOut(withAdminSession(body, adminCreateDealArtifactPage));
       case 'adminGetReps':
@@ -1782,56 +1784,97 @@ function adminSyncDealPricing(body) {
   return { ok: true, priceFound: true, priceChanged: true, oldPrice: oldPrice, newPrice: priceCheck.price, pageUrl: pageUrl };
 }
 
-// Same idea across every non-Sold/non-Dead deal with a Source Link, one at
-// a time (Apps Script has no concurrent UrlFetch, same constraint noted on
-// adminCheckAllDealsLive above) -- each synced deal that changed price also
-// costs one Claude call and one GitHub commit, so this is slower per-deal
-// than the plain dead-link sweep and shouldn't be wired to run as often.
-// A full bulk sync of everything, every time, is what was timing out the
-// browser's request on a 9-deal portfolio (each changed price costs a
-// Claude call + a GitHub commit, easily adding up past what the client
-// waits around for even though the script itself keeps running server-side
-// and finishes). Skipping anything synced in the last 3 hours means a
-// re-run right after a partial/timed-out run -- or just running this
-// regularly -- does much less work each time instead of redoing deals that
-// were already just checked.
-const RECENT_SYNC_SKIP_MS = 3 * 60 * 60 * 1000;
+// Bulk pricing sync, split across small client-driven batches instead of
+// one huge server call -- a full sweep of every deal in one request is what
+// was timing out the browser on a 9-deal portfolio (each changed price
+// costs a Claude call + a GitHub commit, easily adding up past what the
+// client waits around for even though the script itself kept running
+// server-side and finished anyway). The admin panel now calls
+// adminGetDealsPendingPriceSync once to get the work list, then calls
+// adminSyncDealPricingBatch repeatedly with a few dealIds at a time --
+// several short round trips instead of one long one that can time out.
+//
+// LastAutoPriceSyncAt (separate from LastPriceSyncAt) is what the 3-hour
+// skip below actually checks, and it is ONLY ever set by
+// adminSyncDealPricingBatch -- never by a manual single-deal "Sync Price"
+// click (adminSyncDealPricing) or by "Create Deal Artifact Page"
+// (adminCreateDealArtifactPage), even though both of those also touch the
+// older, more general LastPriceSyncAt ("last synced" shown in the UI).
+// That split is deliberate: a manual action shouldn't make the next bulk
+// auto-run silently skip that deal just because someone happened to touch
+// it by hand recently -- only a previous auto-run counts toward the
+// auto-run's own skip window.
+const RECENT_AUTO_SYNC_SKIP_MS = 3 * 60 * 60 * 1000;
+const PRICE_SYNC_BATCH_DELAY_MS = 600;
 
-function adminSyncAllDealPricing(body) {
-  const sheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+function getDealsPendingAutoPriceSync(sheet) {
   const now = new Date();
   const eligible = sheetToObjects(sheet).filter(function (d) {
     return d['SourceLink'] && d['Status'] !== 'Sold' && d['Status'] !== 'Dead';
   });
-
   let skippedRecentCount = 0;
-  const deals = eligible.filter(function (d) {
-    if (!d['LastPriceSyncAt']) return true;
-    const last = new Date(d['LastPriceSyncAt']);
+  const pending = eligible.filter(function (d) {
+    if (!d['LastAutoPriceSyncAt']) return true;
+    const last = new Date(d['LastAutoPriceSyncAt']);
     if (isNaN(last.getTime())) return true;
-    if ((now - last) < RECENT_SYNC_SKIP_MS) { skippedRecentCount++; return false; }
+    if ((now - last) < RECENT_AUTO_SYNC_SKIP_MS) { skippedRecentCount++; return false; }
     return true;
   });
+  return { totalEligible: eligible.length, pending: pending, skippedRecentCount: skippedRecentCount };
+}
+
+// Step 1 of the bulk flow: returns just the dealIds due for an auto price
+// check right now (not Sold/Dead, has a Source Link, not auto-synced in
+// the last 3 hours) -- cheap, no external fetches, just a sheet read. The
+// admin panel then chunks this list into small batches itself.
+function adminGetDealsPendingPriceSync(body) {
+  const sheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const result = getDealsPendingAutoPriceSync(sheet);
+  return {
+    ok: true,
+    dealIds: result.pending.map(function (d) { return d['DealID']; }),
+    totalEligible: result.totalEligible,
+    skippedRecentCount: result.skippedRecentCount
+  };
+}
+
+// Step 2 of the bulk flow: syncs pricing for exactly the dealIds given
+// (a small batch, chosen by the caller) and stamps LastAutoPriceSyncAt on
+// each one that was actually checked -- see the comment above for why that
+// field, specifically, is what gates the next bulk run's skip logic.
+function adminSyncDealPricingBatch(body) {
+  const dealIds = Array.isArray(body.dealIds) ? body.dealIds : [];
+  if (dealIds.length === 0) return { ok: false, error: 'Missing dealIds.' };
+  const sheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const dealsByIdAtStart = {};
+  sheetToObjects(sheet).forEach(function (d) { dealsByIdAtStart[d['DealID']] = d; });
+  const autoSyncCol = getColumnIndex(sheet, 'LastAutoPriceSyncAt');
 
   let checkedCount = 0;
   let changedCount = 0;
   const errors = [];
-  deals.forEach(function (d, i) {
+  dealIds.forEach(function (dealId, i) {
     // A short pause between deals -- hitting several InvestorLift listing
-    // pages back-to-back with no gap from one script execution has been
-    // observed to get blocked (a non-2xx response, surfaced as an error
-    // below) even though the exact same fetch succeeds as a one-off single
-    // sync. Not confirmed to be deliberate rate-limiting on InvestorLift's
-    // end, but spacing requests out is cheap insurance either way.
-    if (i > 0) Utilities.sleep(600);
+    // pages back-to-back with no gap has been observed to get blocked (a
+    // non-2xx response, surfaced as an error below) even though the exact
+    // same fetch succeeds as a one-off single sync. Not confirmed to be
+    // deliberate rate-limiting on InvestorLift's end, but spacing requests
+    // out is cheap insurance either way.
+    if (i > 0) Utilities.sleep(PRICE_SYNC_BATCH_DELAY_MS);
+    const label = (dealsByIdAtStart[dealId] && (dealsByIdAtStart[dealId]['DealCode'] || dealsByIdAtStart[dealId]['Address'])) || dealId;
     checkedCount++;
-    const result = adminSyncDealPricing({ dealId: d['DealID'] });
-    if (!result.ok) { errors.push((d['DealCode'] || d['Address'] || d['DealID']) + ': ' + result.error); return; }
-    if (result.pageError) errors.push((d['DealCode'] || d['Address'] || d['DealID']) + ': price updated but page publish failed: ' + result.pageError);
+    const result = adminSyncDealPricing({ dealId: dealId });
+    if (!result.ok) { errors.push(label + ': ' + result.error); return; }
+    if (result.pageError) errors.push(label + ': price updated but page publish failed: ' + result.pageError);
     if (result.priceChanged) changedCount++;
+
+    // Row indices don't shift between the upfront read and here (no rows
+    // are added/removed mid-batch), so it's safe to reuse the row number
+    // captured in dealsByIdAtStart rather than re-reading the whole sheet.
+    if (dealsByIdAtStart[dealId]) sheet.getRange(dealsByIdAtStart[dealId]._row, autoSyncCol).setValue(new Date().toISOString());
   });
 
-  return { ok: true, checkedCount: checkedCount, changedCount: changedCount, skippedRecentCount: skippedRecentCount, errors: errors };
+  return { ok: true, checkedCount: checkedCount, changedCount: changedCount, errors: errors };
 }
 
 // The admin panel's "Create Deal Artifact Page" action -- a one-click, full
