@@ -1616,7 +1616,12 @@ function generateDealPageHtml(deal, sourceListingText, photoPaths) {
     'display headings, warm neutral paper background, a clear price block near the top, a photo ' +
     'gallery (if photoPaths is non-empty), a deal-terms table, and a closing call-to-action band ' +
     'with the contact phone/email. Use only inline <style> (no external CSS files) and Google Fonts ' +
-    'via a <link> tag if you want a serif+sans pairing.\n\n' +
+    'via a <link> tag if you want a serif+sans pairing. If every top-level section shares one ' +
+    'centering class (e.g. a ".wrap" with max-width + margin:0 auto), do not give any individual ' +
+    'section its own margin/margin-left/margin-right shorthand rule -- on shared-specificity ' +
+    'selectors the later rule in the stylesheet silently wins and cancels that centering for just ' +
+    'that section, pinning it to one edge while everything else stays centered. Use margin-top/' +
+    'margin-bottom only for per-section vertical spacing instead.\n\n' +
     'sourceListingText below is the full text pulled from this deal\'s original source listing. ' +
     'Rewrite it into the neat, organized presentation described above WITHOUT summarizing away, ' +
     'excluding, or softening any fact, number, address, unit detail, disclosure, or figure in it -- ' +
