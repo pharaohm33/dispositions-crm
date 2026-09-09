@@ -849,7 +849,12 @@ function canAccessDeal(session, dealId) {
   return dealMatchesRepDealArea(deal, repDealAreaLists(rep));
 }
 
-function accessibleDealIds(session) {
+// allDeals is optional -- pass the Deals sheet's rows in when the caller
+// already has them (see getDeals, its only caller) so this doesn't re-read
+// the entire Deals sheet a second time in the same request. Falls back to
+// reading it itself if omitted, so any future caller doesn't have to know
+// about this.
+function accessibleDealIds(session, allDeals) {
   const sheet = getSheet(ASSIGNMENTS_SHEET, ASSIGNMENT_COLUMNS);
   const assignments = sheetToObjects(sheet);
   const ids = {};
@@ -861,8 +866,8 @@ function accessibleDealIds(session) {
   const categories = repCategoryList(rep);
   const areaLists = repDealAreaLists(rep);
   if (categories.length > 0 || areaLists.states.length > 0 || areaLists.cities.length > 0) {
-    const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
-    sheetToObjects(dealsSheet).forEach(function (d) {
+    const deals = allDeals || sheetToObjects(getSheet(DEALS_SHEET, DEAL_COLUMNS));
+    deals.forEach(function (d) {
       if (d['AssetCategory'] && categories.indexOf(normalizeText(d['AssetCategory'])) !== -1) { ids[d['DealID']] = true; return; }
       if (dealMatchesRepDealArea(d, areaLists)) ids[d['DealID']] = true;
     });
@@ -876,7 +881,7 @@ function getDeals(body, session) {
   const sheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
   let deals = sheetToObjects(sheet);
   if (!session.a && !session.all) {
-    const ids = accessibleDealIds(session);
+    const ids = accessibleDealIds(session, deals);
     deals = deals.filter(function (d) { return ids[d['DealID']]; });
   }
   deals = deals.map(withComputedFields);
