@@ -1003,7 +1003,7 @@ function adminAddDeal(body) {
   // simplicity with none of that risk.
   const draftUrl = beehiivCreateDraftPost(
     'New deal: ' + (d.dealCode || d.city || d.address),
-    dealDraftHtml(d)
+    dealDraftHtml(d, dealTypes)
   );
 
   return { ok: true, dealId: dealId, assignedCount: assignedCount, beehiivDraftUrl: draftUrl };
@@ -1013,7 +1013,7 @@ function adminAddDeal(body) {
 // simple (no images, no styling system) since it's a starting point admin
 // edits in beehiiv's own post editor before picking a segment and sending,
 // not a finished piece of marketing copy.
-function dealDraftHtml(d) {
+function dealDraftHtml(d, dealTypes) {
   const rows = [
     ['City/State', [d.city, d.state].filter(Boolean).join(', ')],
     ['Zip', d.zip],
@@ -1029,6 +1029,29 @@ function dealDraftHtml(d) {
   html += '</ul>';
   if (d.description) html += '<p>' + d.description + '</p>';
   html += '<p>Log in at SendMyBuyer to see full details and claim it.</p>';
+
+  // The actual point of auto-drafting this in beehiiv instead of just
+  // logging it in the CRM: when you go to send it, beehiiv's segment
+  // picker needs to know which tags to combine to reach only the buyers
+  // whose Buy Box actually matches this deal. Spelling that out here
+  // means you never have to work it out by hand deal by deal.
+  const matchTags = [];
+  if (d.state) matchTags.push('state-' + slugifyTag(d.state));
+  splitCommaList(d.matchCities).concat(d.city ? [d.city] : []).forEach(function (c) {
+    if (c) matchTags.push('city-' + slugifyTag(c));
+  });
+  if (d.assetCategory) matchTags.push('asset-' + slugifyTag(d.assetCategory));
+  (dealTypes || []).forEach(function (t) { matchTags.push('strategy-' + slugifyTag(t)); });
+
+  if (matchTags.length) {
+    html += '<p><strong>Tags that match this deal:</strong> ' +
+      matchTags.map(function (t) { return '<code>' + t + '</code>'; }).join(', ') +
+      '. In beehiiv\'s segment picker, start with <code>buyer-lead</code> + the ' +
+      'asset/strategy tags -- add a state or city tag too if the list is still too ' +
+      'broad, but note a buyer who set <code>nationwide</code> or only a state ' +
+      '(no city) on their Buy Box won\'t carry every tag here, so requiring all of ' +
+      'them at once can under-match.</p>';
+  }
   return html;
 }
 
