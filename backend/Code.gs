@@ -727,7 +727,7 @@ function publicSignup(body) {
   // weekly active-deals digest goes out to. Never blocks account creation
   // if beehiiv is unreachable -- see beehiivUpsertSubscriber.
   if (isBuyerSignup) {
-    const buyBoxTags = buildBuyBoxTags(splitCommaList(body.buyBoxStates), splitCommaList(body.buyBoxCities), buyBoxCategories, !!body.buyBoxNationwide);
+    const buyBoxTags = buildBuyBoxTags(splitCommaList(body.buyBoxStates), splitCommaList(body.buyBoxCities), buyBoxCategories, dealTypes, !!body.buyBoxNationwide);
     beehiivUpsertSubscriber(email, name, ['buyer-lead'].concat(buyBoxTags));
   } else {
     beehiivUpsertSubscriber(email, name, ['rep']);
@@ -3940,15 +3940,26 @@ function beehiivCreateDraftPost(title, bodyContentHtml) {
   }
 }
 
-// One tag per state/city/asset-category on a Buyer's Buy Box, plus
-// 'nationwide' when set -- lets a real send in beehiiv be aimed at e.g.
-// "buyers in Texas who want Single Family" via the segment picker (AND of
-// several tags), instead of only ever reaching the flat 'buyer-lead' list.
-function buildBuyBoxTags(states, cities, categories, nationwide) {
+// One tag per state/city/asset-category/strategy on a Buyer's Buy Box,
+// plus 'nationwide' when set -- lets a real send in beehiiv be aimed at
+// e.g. "buyers in Texas who want Single Family" via the segment picker
+// (AND of several tags), instead of only ever reaching the flat
+// 'buyer-lead' list.
+//
+// Strategy (dealTypes -- the fixed Fix and Flip/Land/Buy and Hold list)
+// and Asset Category are two DIFFERENT questions on the signup form, but
+// admin can freely add custom Asset Categories (Team tab), and nothing
+// stops one from being worded identically to a Strategy option (e.g.
+// someone adds "Fix and Flip" as an Asset Category too, alongside the
+// Strategy checkbox of the same name) -- each gets its own tag prefix
+// ('strategy-' vs 'asset-') specifically so that never collides into one
+// ambiguous tag in beehiiv, no matter what admin names a category.
+function buildBuyBoxTags(states, cities, categories, dealTypes, nationwide) {
   const tags = [];
   (states || []).forEach(function (s) { if (normalizeText(s)) tags.push('state-' + slugifyTag(s)); });
   (cities || []).forEach(function (c) { if (normalizeText(c)) tags.push('city-' + slugifyTag(c)); });
   (categories || []).forEach(function (c) { if (normalizeText(c)) tags.push('asset-' + slugifyTag(c)); });
+  (dealTypes || []).forEach(function (t) { if (normalizeText(t)) tags.push('strategy-' + slugifyTag(t)); });
   if (nationwide) tags.push('nationwide');
   return tags;
 }
