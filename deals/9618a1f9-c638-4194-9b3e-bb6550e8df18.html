@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ocala, FL — Vacant Land Assignment Opportunity | JNA Dynamic Holdings LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #f6f1e9;
+    color: #2b2620;
+    font-family: 'Inter', Arial, sans-serif;
+    line-height: 1.6;
+  }
+  h1, h2, h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 600;
+    color: #1f1b15;
+  }
+  .wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  header.top {
+    background: #1f1b15;
+    color: #f6f1e9;
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+  header.top .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  header.top .brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    letter-spacing: 0.02em;
+  }
+  header.top .code {
+    font-size: 0.85rem;
+    color: #cbbfa5;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .hero {
+    padding-top: 40px;
+    padding-bottom: 10px;
+  }
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.78rem;
+    color: #8a7a5c;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  h1.headline {
+    font-size: 2.3rem;
+    margin-top: 0;
+    margin-bottom: 8px;
+  }
+  .locline {
+    font-size: 1.05rem;
+    color: #4a4237;
+    margin-top: 0;
+    margin-bottom: 6px;
+  }
+  .address-note {
+    display: inline-block;
+    background: #ece2cd;
+    border: 1px solid #d9c9a3;
+    color: #5c4d2e;
+    font-size: 0.88rem;
+    padding: 8px 14px;
+    border-radius: 4px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+
+  .price-block {
+    background: #fffdf9;
+    border: 1px solid #e4d8bf;
+    border-radius: 8px;
+    padding: 22px 26px;
+    margin-top: 8px;
+    margin-bottom: 30px;
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+  .price-block .item .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8a7a5c;
+    margin-bottom: 4px;
+  }
+  .price-block .item .value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: #1f1b15;
+  }
+
+  .gallery {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-top: 4px;
+    padding-bottom: 16px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .gallery img {
+    height: 260px;
+    width: auto;
+    flex: 0 0 auto;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid #e4d8bf;
+  }
+  .more-photos {
+    font-size: 0.85rem;
+    margin-top: 0;
+    margin-bottom: 30px;
+  }
+  .more-photos a { color: #8a5a2b; }
+
+  section {
+    margin-top: 40px;
+    margin-bottom: 40px;
+  }
+  h2.section-title {
+    font-size: 1.4rem;
+    border-bottom: 2px solid #d9c9a3;
+    padding-bottom: 8px;
+    margin-top: 0;
+    margin-bottom: 18px;
+  }
+
+  table.terms {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fffdf9;
+    border: 1px solid #e4d8bf;
+  }
+  table.terms tr {
+    border-bottom: 1px solid #ece2cd;
+  }
+  table.terms tr:last-child { border-bottom: none; }
+  table.terms td {
+    padding: 12px 16px;
+    font-size: 0.95rem;
+  }
+  table.terms td.k {
+    color: #8a7a5c;
+    width: 45%;
+    font-weight: 600;
+  }
+  table.terms td.v {
+    color: #1f1b15;
+  }
+
+  .notes p {
+    margin-top: 0;
+    margin-bottom: 14px;
+    font-size: 0.95rem;
+    color: #3c352a;
+  }
+
+  .disclaimer {
+    font-size: 0.8rem;
+    color: #7a6f5c;
+    border-top: 1px solid #d9c9a3;
+    padding-top: 16px;
+    margin-top: 30px;
+  }
+
+  .cta-band {
+    background: #1f1b15;
+    color: #f6f1e9;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    margin-top: 50px;
+  }
+  .cta-band h2 {
+    color: #f6f1e9;
+    font-size: 1.7rem;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  .cta-band p {
+    color: #d8cdb6;
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+  .cta-contact {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+  }
+  .cta-contact div {
+    font-size: 1.05rem;
+  }
+  .cta-contact span.label {
+    display: block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #a8987a;
+    margin-bottom: 4px;
+  }
+  .cta-contact a { color: #f6f1e9; font-weight: 600; text-decoration: none; }
+  .cta-contact a:hover { text-decoration: underline; }
+
+  footer.bottom {
+    padding-top: 20px;
+    padding-bottom: 30px;
+  }
+  footer.bottom p {
+    font-size: 0.78rem;
+    color: #8a7a5c;
+    margin-top: 4px;
+    margin-bottom: 4px;
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">JNA Dynamic Holdings LLC</div>
+    <div class="code">Deal Fl-1</div>
+  </div>
+</header>
+
+<div class="hero wrap">
+  <p class="eyebrow">Land Assignment Opportunity</p>
+  <h1 class="headline">Vacant Land Parcel — Ocala, Florida</h1>
+  <p class="locline">Marion County, Ocala, FL 34475</p>
+  <div class="address-note">Address available upon request — contact us for the full parcel address.</div>
+</div>
+
+<div class="wrap">
+  <div class="price-block">
+    <div class="item">
+      <div class="label">Assignment Price</div>
+      <div class="value">$15,500</div>
+    </div>
+    <div class="item">
+      <div class="label">Lot Size</div>
+      <div class="value">0.21 Acres</div>
+    </div>
+    <div class="item">
+      <div class="label">Asset Type</div>
+      <div class="value">Land</div>
+    </div>
+  </div>
+
+  <div class="gallery">
+    <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/1.jpg" alt="Vacant land parcel in Ocala, FL — photo 1">
+    <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/2.jpg" alt="Vacant land parcel in Ocala, FL — photo 2">
+    <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/3.jpg" alt="Vacant land parcel in Ocala, FL — photo 3">
+    <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/4.jpg" alt="Vacant land parcel in Ocala, FL — photo 4">
+    <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/5.jpg" alt="Vacant land parcel in Ocala, FL — photo 5">
+    <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/6.jpg" alt="Vacant land parcel in Ocala, FL — photo 6">
+    <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/7.jpg" alt="Vacant land parcel in Ocala, FL — photo 7">
+    <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/8.jpg" alt="Vacant land parcel in Ocala, FL — photo 8">
+    <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/9.jpg" alt="Vacant land parcel in Ocala, FL — photo 9">
+  </div>
+
+  <section>
+    <h2 class="section-title">Property Overview</h2>
+    <p style="margin-top:0; margin-bottom:14px;">
+      A vacant land parcel located in Marion County, in Ocala, Florida, zip code 34475. This is a raw land site
+      with no existing structure — no bedrooms, no bathrooms, and no habitable square footage to report, as the lot
+      is unimproved.
+    </p>
+    <table class="terms">
+      <tr><td class="k">Type</td><td class="v">Land</td></tr>
+      <tr><td class="k">County</td><td class="v">Marion</td></tr>
+      <tr><td class="k">City / State / Zip</td><td class="v">Ocala, FL 34475</td></tr>
+      <tr><td class="k">Lot Size</td><td class="v">0.21 acres</td></tr>
+      <tr><td class="k">Beds</td><td class="v">0</td></tr>
+      <tr><td class="k">Baths</td><td class="v">0</td></tr>
+      <tr><td class="k">Half-Bath</td><td class="v">N/A</td></tr>
+      <tr><td class="k">Sq. Ft.</td><td class="v">N/A</td></tr>
+      <tr><td class="k">Parking</td><td class="v">N/A</td></tr>
+      <tr><td class="k">Year Built</td><td class="v">N/A</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2 class="section-title">Deal Terms</h2>
+    <table class="terms">
+      <tr><td class="k">Assignment Price</td><td class="v">$15,500</td></tr>
+      <tr><td class="k">ARV</td><td class="v">Not provided</td></tr>
+      <tr><td class="k">Gross Margin</td><td class="v">Not provided</td></tr>
+      <tr><td class="k">Deal Type</td><td class="v">Land</td></tr>
+      <tr><td class="k">Transaction Structure</td><td class="v">Assignment of Contract</td></tr>
+    </table>
+  </section>
+
+  <section class="notes">
+    <h2 class="section-title">Important Disclosures</h2>
+    <p>This offering is being marketed as an assignment of contract. JNA Dynamic Holdings LLC holds an equitable
+      interest in the underlying purchase agreement with the property owner and is offering to assign that contract
+      to a buyer; this is not a direct sale by the owner, and buyers will not be contracting directly with the
+      underlying seller.</p>
+    <p>All figures, measurements, and details on this page — including lot size, pricing, and location information —
+      have not been independently verified by JNA Dynamic Holdings LLC and should be confirmed by the buyer during
+      due diligence.</p>
+  </section>
+</div>
+
+<div class="cta-band">
+  <div class="wrap">
+    <h2>Interested in this parcel?</h2>
+    <p>Contact us today for the full property address, additional photos, and details on how to move forward with this assignment.</p>
+    <div class="cta-contact">
+      <div>
+        <span class="label">Phone</span>
+        <a href="tel:5206336437">520-633-6437</a>
+      </div>
+      <div>
+        <span class="label">Email</span>
+        <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
+      </div>
+      <div>
+        <span class="label">Company</span>
+        <span>JNA Dynamic Holdings LLC</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="bottom">
+  <div class="wrap">
+    <p>Deal Code: Fl-1 · Ocala, Marion County, FL</p>
+    <p>&copy; JNA Dynamic Holdings LLC. All rights reserved.</p>
+  </div>
+</footer>
+
+</body>
+</html>
