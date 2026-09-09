@@ -1791,7 +1791,14 @@ function adminSyncAllDealPricing(body) {
   let checkedCount = 0;
   let changedCount = 0;
   const errors = [];
-  deals.forEach(function (d) {
+  deals.forEach(function (d, i) {
+    // A short pause between deals -- hitting several InvestorLift listing
+    // pages back-to-back with no gap from one script execution has been
+    // observed to get blocked (a non-2xx response, surfaced as an error
+    // below) even though the exact same fetch succeeds as a one-off single
+    // sync. Not confirmed to be deliberate rate-limiting on InvestorLift's
+    // end, but spacing requests out is cheap insurance either way.
+    if (i > 0) Utilities.sleep(600);
     checkedCount++;
     const result = adminSyncDealPricing({ dealId: d['DealID'] });
     if (!result.ok) { errors.push((d['DealCode'] || d['Address'] || d['DealID']) + ': ' + result.error); return; }

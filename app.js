@@ -2363,7 +2363,7 @@ document.getElementById("sync-all-deal-pricing-btn").addEventListener("click", a
   btn.disabled = false;
   if (!res.ok) { resultEl.textContent = " " + (res.error || "Could not run the sync."); showToast(res.error || "Could not run the sync.", true); return; }
   resultEl.textContent = " Checked " + res.checkedCount + " deal(s), " + res.changedCount + " price(s) changed and republished." +
-    (res.errors.length > 0 ? " " + res.errors.length + " couldn't be synced." : "");
+    (res.errors.length > 0 ? " " + res.errors.length + " couldn't be synced: " + res.errors.slice(0, 5).join("; ") + (res.errors.length > 5 ? " …" : "") : "");
   showToast(res.changedCount + " deal price(s) updated.");
   await loadAdminDeals();
 });
