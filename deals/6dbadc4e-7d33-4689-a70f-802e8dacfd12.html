@@ -1,81 +1,103 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NC-1 (Land) — 1.46± Acre Homesite, Havelock, NC | JNA Dynamic Holdings LLC</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NC-1 (Land) — 1.46 Acre Homesite, Havelock NC | JNA Dynamic Holdings LLC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#f6f1e9;
-    --ink:#2b2620;
-    --ink-soft:#5c554b;
+    --ink:#242019;
+    --ink-soft:#5a5348;
     --line:#ddd3c2;
     --accent:#8a5a34;
+    --accent-dark:#5f3d22;
     --card:#fffdf9;
   }
+
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
+
   body{
+    margin:0;
     background:var(--paper);
     color:var(--ink);
     font-family:'Source Sans 3', sans-serif;
-    font-size:16px;
-    line-height:1.55;
+    font-size:17px;
+    line-height:1.6;
   }
+
   h1,h2,h3{
-    font-family:'Fraunces', serif;
-    font-weight:600;
+    font-family:'Playfair Display', serif;
     color:var(--ink);
-    margin:0;
+    font-weight:600;
+    letter-spacing:0.2px;
   }
-  a{color:var(--accent);}
+
   .wrap{
-    max-width:880px;
+    max-width:920px;
     margin:0 auto;
     padding-left:24px;
     padding-right:24px;
   }
 
-  header.top{
-    background:var(--paper);
-    border-bottom:1px solid var(--line);
-    padding-top:28px;
-    padding-bottom:28px;
+  a{ color:var(--accent-dark); }
+
+  /* ---------------- HEADER ---------------- */
+  header.topbar{
+    background:var(--ink);
+    color:#f1ece2;
+    padding-top:14px;
+    padding-bottom:14px;
   }
-  .eyebrow{
+  header.topbar .wrap{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  header.topbar .brand{
+    font-family:'Playfair Display', serif;
+    font-size:20px;
+    letter-spacing:0.5px;
+  }
+  header.topbar .tag{
+    font-size:13px;
+    color:#cfc6b3;
     text-transform:uppercase;
-    letter-spacing:.14em;
-    font-size:12px;
-    color:var(--ink-soft);
-    margin-bottom:10px;
+    letter-spacing:1.5px;
   }
-  header.top h1{
-    font-size:clamp(28px,4vw,42px);
+
+  /* ---------------- HERO / PRICE ---------------- */
+  section.hero{
+    background:var(--paper);
+    margin-top:48px;
+    margin-bottom:12px;
+  }
+  .deal-code{
+    display:inline-block;
+    font-size:12px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--accent-dark);
+    background:#efe3d1;
+    border:1px solid var(--line);
+    padding:4px 10px;
+    border-radius:2px;
+    margin-bottom:14px;
+  }
+  section.hero h1{
+    font-size:42px;
+    margin:0 0 8px 0;
     line-height:1.15;
   }
-  header.top .sub{
-    margin-top:10px;
-    font-size:17px;
+  section.hero .loc{
+    font-size:18px;
     color:var(--ink-soft);
-  }
-
-  .assignment-flag{
-    display:inline-block;
-    margin-top:16px;
-    background:#f1e6d5;
-    border:1px solid var(--line);
-    color:var(--ink);
-    font-size:13px;
-    padding:8px 14px;
-    border-radius:3px;
-  }
-
-  section{
-    margin-top:44px;
-    margin-bottom:44px;
+    margin-bottom:28px;
   }
 
   .price-block{
@@ -85,321 +107,357 @@
     padding:28px 30px;
     display:flex;
     flex-wrap:wrap;
-    gap:28px;
-    align-items:flex-end;
+    gap:32px;
+    align-items:baseline;
   }
-  .price-block .figure .label{
+  .price-block .price-main{
+    font-family:'Playfair Display', serif;
+    font-size:44px;
+    color:var(--accent-dark);
+    font-weight:700;
+  }
+  .price-block .price-label{
+    font-size:13px;
     text-transform:uppercase;
-    letter-spacing:.1em;
-    font-size:12px;
+    letter-spacing:1.2px;
     color:var(--ink-soft);
-    margin-bottom:6px;
+    display:block;
+    margin-bottom:4px;
   }
-  .price-block .figure .value{
-    font-family:'Fraunces', serif;
-    font-size:34px;
-    color:var(--accent);
+  .price-block .facts-mini{
+    display:flex;
+    gap:28px;
+    flex-wrap:wrap;
   }
-  .price-block .figure .value.small{
-    font-size:20px;
-    color:var(--ink);
-  }
-  .price-note{
-    flex-basis:100%;
-    font-size:13.5px;
+  .price-block .facts-mini div span{
+    display:block;
+    font-size:13px;
     color:var(--ink-soft);
-    border-top:1px dashed var(--line);
-    padding-top:14px;
-    margin-top:8px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-bottom:3px;
+  }
+  .price-block .facts-mini div strong{
+    font-size:18px;
+    font-family:'Playfair Display', serif;
   }
 
-  .gallery{
+  .assignment-note{
+    margin-top:16px;
+    font-size:14.5px;
+    color:var(--ink-soft);
+    background:#efe6d5;
+    border-left:3px solid var(--accent);
+    padding:12px 16px;
+    border-radius:2px;
+  }
+
+  /* ---------------- GALLERY ---------------- */
+  section.gallery{
+    margin-top:40px;
+    margin-bottom:12px;
+  }
+  section.gallery h2{
+    font-size:24px;
+    margin-bottom:14px;
+  }
+  .gallery-scroll{
     display:flex;
     gap:14px;
     overflow-x:auto;
-    padding-bottom:8px;
+    padding-bottom:10px;
   }
-  .gallery img{
+  .gallery-scroll img{
     height:260px;
     width:auto;
-    border-radius:6px;
+    border-radius:4px;
     border:1px solid var(--line);
     flex-shrink:0;
   }
 
-  h2.section-title{
-    font-size:24px;
+  /* ---------------- NARRATIVE ---------------- */
+  section.narrative{
+    margin-top:44px;
+    margin-bottom:12px;
+  }
+  section.narrative h2{
+    font-size:26px;
+    margin-bottom:16px;
+    border-bottom:2px solid var(--line);
+    padding-bottom:10px;
+  }
+  section.narrative p{
+    margin:0 0 14px 0;
+  }
+  section.narrative .highlight{
+    font-family:'Playfair Display', serif;
+    font-size:19px;
+    color:var(--accent-dark);
     margin-bottom:18px;
-    padding-bottom:8px;
-    border-bottom:2px solid var(--ink);
-    display:inline-block;
   }
 
-  table.terms{
+  /* ---------------- TABLES ---------------- */
+  section.terms, section.comps{
+    margin-top:44px;
+    margin-bottom:12px;
+  }
+  section.terms h2, section.comps h2{
+    font-size:26px;
+    margin-bottom:16px;
+    border-bottom:2px solid var(--line);
+    padding-bottom:10px;
+  }
+  table{
     width:100%;
     border-collapse:collapse;
     background:var(--card);
     border:1px solid var(--line);
   }
-  table.terms td{
+  table th, table td{
+    text-align:left;
     padding:12px 16px;
     border-bottom:1px solid var(--line);
-    font-size:15px;
+    font-size:15.5px;
   }
-  table.terms tr:last-child td{
+  table th{
+    width:38%;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    font-size:12.5px;
+    letter-spacing:1px;
+    font-weight:600;
+  }
+  table tr:last-child th, table tr:last-child td{
     border-bottom:none;
   }
-  table.terms td.label{
+  .comps-note{
+    margin-top:10px;
+    font-size:14px;
     color:var(--ink-soft);
-    width:38%;
-    font-weight:600;
+    font-style:italic;
   }
 
-  .narrative{
+  /* ---------------- DOCS LINK ---------------- */
+  section.docs{
+    margin-top:44px;
+    margin-bottom:12px;
+  }
+  .docs-box{
     background:var(--card);
-    border:1px solid var(--line);
+    border:1px dashed var(--accent);
     border-radius:6px;
-    padding:24px 26px;
+    padding:20px 22px;
+    font-size:15.5px;
   }
-  .narrative p{
-    margin:0 0 14px 0;
-  }
-  .narrative p:last-child{margin-bottom:0;}
-  .narrative ul{
-    margin:0 0 14px 0;
-    padding-left:20px;
-  }
-
-  table.comps{
-    width:100%;
-    border-collapse:collapse;
-    background:var(--card);
-    border:1px solid var(--line);
-  }
-  table.comps th, table.comps td{
-    text-align:left;
-    padding:11px 14px;
-    border-bottom:1px solid var(--line);
-    font-size:14.5px;
-  }
-  table.comps th{
-    background:#efe6d6;
-    text-transform:uppercase;
-    letter-spacing:.04em;
-    font-size:12px;
-    color:var(--ink-soft);
-  }
-  table.comps tr.highlight td{
-    background:#f5ead6;
+  .docs-box a{
     font-weight:600;
   }
 
-  .doc-link{
-    display:inline-block;
-    margin-top:14px;
-    font-size:14.5px;
-  }
-
-  .disclosure{
-    font-size:13px;
+  /* ---------------- DISCLOSURE ---------------- */
+  section.disclosure{
+    margin-top:40px;
+    margin-bottom:12px;
+    font-size:13.5px;
     color:var(--ink-soft);
-    background:#efe6d6;
-    border-left:3px solid var(--accent);
-    padding:14px 18px;
-    border-radius:2px;
+    border-top:1px solid var(--line);
+    padding-top:18px;
   }
 
-  .cta-band{
+  /* ---------------- CTA BAND ---------------- */
+  section.cta{
     background:var(--ink);
-    color:var(--paper);
-    padding-top:40px;
-    padding-bottom:40px;
-    margin-top:60px;
-    margin-bottom:0;
+    color:#f1ece2;
+    margin-top:56px;
+    padding-top:46px;
+    padding-bottom:46px;
   }
-  .cta-band h2{
-    color:var(--paper);
-    font-size:28px;
+  section.cta h2{
+    color:#f6f1e9;
+    font-size:30px;
     margin-bottom:10px;
   }
-  .cta-band p{
-    color:#d9d2c4;
-    margin:0 0 20px 0;
-    font-size:15.5px;
+  section.cta p{
+    color:#cfc6b3;
+    margin-bottom:22px;
+    font-size:16px;
   }
   .cta-contacts{
     display:flex;
-    gap:30px;
+    gap:32px;
     flex-wrap:wrap;
   }
-  .cta-contacts .item .label{
+  .cta-contacts div span{
+    display:block;
     font-size:12px;
     text-transform:uppercase;
-    letter-spacing:.1em;
-    color:#b8b0a0;
+    letter-spacing:1.4px;
+    color:#a99f8b;
     margin-bottom:4px;
   }
-  .cta-contacts .item .value{
-    font-family:'Fraunces', serif;
-    font-size:20px;
-    color:#fff;
+  .cta-contacts div strong{
+    font-family:'Playfair Display', serif;
+    font-size:21px;
+    color:#f6f1e9;
   }
-  .cta-contacts .item .value a{
-    color:#fff;
+  .cta-contacts a{
+    color:#f6f1e9;
     text-decoration:none;
     border-bottom:1px solid #8a5a34;
   }
 
   footer.bottom{
+    background:var(--paper);
     padding-top:22px;
-    padding-bottom:34px;
-    text-align:center;
+    padding-bottom:26px;
   }
-  footer.bottom p{
+  footer.bottom .wrap{
     font-size:12.5px;
     color:var(--ink-soft);
-    margin:0;
+    text-align:center;
   }
 </style>
 </head>
 <body>
 
-<header class="top">
+<header class="topbar">
   <div class="wrap">
-    <div class="eyebrow">Deal Code: NC-1 (Land) &nbsp;•&nbsp; Craven County, North Carolina</div>
-    <h1>1.46± Acre Wooded Residential Homesite<br>Long Creek Dr, Havelock, NC</h1>
-    <div class="sub">Paved-road parcel in a coastal water-access community area — priced below every comparable active listing on the same street.</div>
-    <div class="assignment-flag">This is a marketing offer for the <strong>assignment of a purchase &amp; sale contract</strong>, not a direct sale of real property. Buyer will acquire the contract rights held by {facts.company}, not title directly from the underlying seller.</div>
+    <div class="brand">JNA Dynamic Holdings LLC</div>
+    <div class="tag">Off-Market Assignment Opportunity</div>
   </div>
 </header>
 
-<div class="wrap">
+<section class="hero">
+  <div class="wrap">
+    <span class="deal-code">Deal Code: NC-1 (Land)</span>
+    <h1>1.46-Acre Wooded Residential Homesite</h1>
+    <div class="loc">Long Creek Dr, Havelock, Craven County, NC 28532</div>
 
-  <section class="price-block">
-    <div class="figure">
-      <div class="label">Assignment Price</div>
-      <div class="value">$27,000</div>
+    <div class="price-block">
+      <div>
+        <span class="price-label">Assignment Price</span>
+        <div class="price-main">$27,000</div>
+      </div>
+      <div class="facts-mini">
+        <div>
+          <span>Lot Size</span>
+          <strong>1.46 Acres</strong>
+        </div>
+        <div>
+          <span>Deal Type</span>
+          <strong>Land</strong>
+        </div>
+        <div>
+          <span>County</span>
+          <strong>Craven, NC</strong>
+        </div>
+      </div>
     </div>
-    <div class="figure">
-      <div class="label">Lot Size</div>
-      <div class="value small">1.46 acres</div>
-    </div>
-    <div class="figure">
-      <div class="label">Deal Type</div>
-      <div class="value small">Land</div>
-    </div>
-    <div class="price-note">
-      Note on listing narrative: the original property write-up referenced an asking figure of <strong>$31,500</strong> for this parcel when compared against neighborhood pricing (see "Off-Market Pricing Context" below). The assignment fee to acquire this contract is <strong>$27,000</strong>.
-    </div>
-  </section>
 
-  <section>
-    <h2 class="section-title">Property Overview</h2>
-    <table class="terms">
-      <tr><td class="label">Address</td><td>105 Long Creek Dr, Havelock, NC 28532</td></tr>
-      <tr><td class="label">County</td><td>Craven County, NC</td></tr>
-      <tr><td class="label">Lot Size</td><td>1.46 acres</td></tr>
-      <tr><td class="label">Property Type</td><td>Land</td></tr>
-      <tr><td class="label">Beds / Baths / Half-Bath</td><td>Not applicable — vacant land</td></tr>
-      <tr><td class="label">Sq. Ft.</td><td>Not applicable — vacant land</td></tr>
-      <tr><td class="label">Parking</td><td>Not specified</td></tr>
-      <tr><td class="label">Year Built</td><td>Not applicable — vacant land</td></tr>
-      <tr><td class="label">ARV</td><td>Not provided</td></tr>
-      <tr><td class="label">Gross Margin</td><td>Not provided</td></tr>
-      <tr><td class="label">Listing Activity</td><td>19 days on market · 234 views</td></tr>
+    <div class="assignment-note">
+      This offering is a <strong>wholesale assignment of contract</strong>. ${'JNA Dynamic Holdings LLC'} holds an equitable interest in the underlying purchase agreement and is marketing that contract position for assignment. This is not a direct sale by, and does not imply any direct contact with, the underlying property seller/owner.
+    </div>
+  </div>
+</section>
+
+<section class="narrative">
+  <div class="wrap">
+    <h2>Property Overview</h2>
+    <p class="highlight">Lowest priced off-market acreage compared to active MLS listings in Havelock, NC.</p>
+
+    <p><strong>Address:</strong> 105 Long Creek Dr, Havelock, NC 28532 — 1.46 acres</p>
+    <p><strong>Underlying listing price referenced in source materials:</strong> $31,500</p>
+
+    <p>1.46-acre wooded residential homesite located on paved Long Creek Dr, within a coastal water-access community area.</p>
+
+    <p>The lowest comparable land currently for sale is the neighboring property at 201 Long Creek Dr: 1.46 acres, listed active at $31,900. Most other land on the same street is selling for significantly more (see Comparable Sales below).</p>
+  </div>
+</section>
+
+<section class="terms">
+  <div class="wrap">
+    <h2>Deal Terms</h2>
+    <table>
+      <tr><th>Assignment Price</th><td>$27,000</td></tr>
+      <tr><th>Subject Property Address</th><td>105 Long Creek Dr, Havelock, NC 28532</td></tr>
+      <tr><th>Lot Size</th><td>1.46 acres</td></tr>
+      <tr><th>County</th><td>Craven</td></tr>
+      <tr><th>City / State</th><td>Havelock, NC</td></tr>
+      <tr><th>Deal Type</th><td>Land</td></tr>
+      <tr><th>Location Notes</th><td>Paved Long Creek Dr; coastal water-access community area</td></tr>
+      <tr><th>Underlying Listing Price (per source materials)</th><td>$31,500</td></tr>
     </table>
-  </section>
+  </div>
+</section>
 
-  <section>
-    <h2 class="section-title">Deal Terms</h2>
-    <table class="terms">
-      <tr><td class="label">Assignment / Contract Price</td><td>$27,000</td></tr>
-      <tr><td class="label">Deal Type</td><td>Land — Assignment of Contract</td></tr>
-      <tr><td class="label">Location</td><td>Havelock, Craven County, NC 28532</td></tr>
-      <tr><td class="label">Photos &amp; Full Deal Overview</td><td><a href="https://drive.google.com/drive/folders/1h7VtwUMKHrSeGrfaix8oUJXp8x3VKE3d?usp=sharing" target="_blank" rel="noopener">View shared Google Drive folder</a></td></tr>
-      <tr><td class="label">Contact</td><td>{facts.company} — {facts.contactPhone} — {facts.contactEmail}</td></tr>
-    </table>
-  </section>
-
-  <section>
-    <h2 class="section-title">Description</h2>
-    <div class="narrative">
-      <p>This off-market land parcel is the lowest priced off-market acreage compared to active MLS listings in Havelock, NC.</p>
-      <p><strong>Address:</strong> 105 Long Creek Dr, Havelock, NC 28532 — 1.46 acres.</p>
-      <p><strong>1.46 ACRE WOODED RESIDENTIAL HOMESITE | PAVED LONG CREEK DR | COASTAL WATER-ACCESS COMMUNITY AREA</strong></p>
-      <p>Full pictures and deal overview are available via the shared Google Drive folder linked above and in the deal terms table.</p>
-    </div>
-  </section>
-
-  <section>
-    <h2 class="section-title">Off-Market Pricing Context</h2>
-    <table class="comps">
+<section class="comps">
+  <div class="wrap">
+    <h2>Comparable Sales &amp; Listings on Long Creek Dr</h2>
+    <table>
       <tr>
-        <th>Property</th>
+        <th>Address</th>
         <th>Lot Size</th>
-        <th>Price</th>
-        <th>Status</th>
-      </tr>
-      <tr class="highlight">
-        <td>105 Long Creek Dr (this parcel)</td>
-        <td>1.46 acres</td>
-        <td>$31,500 (listing narrative) / $27,000 assignment price</td>
-        <td>Off-Market</td>
+        <th>Price / Status</th>
       </tr>
       <tr>
-        <td>201 Long Creek Dr (neighboring, lowest comparable)</td>
+        <td>201 Long Creek Dr (neighboring property)</td>
         <td>1.46 acres</td>
-        <td>$31,900</td>
-        <td>Active</td>
+        <td>$31,900 — ACTIVE</td>
       </tr>
       <tr>
         <td>208 Long Creek Dr</td>
         <td>1.00 acre</td>
         <td>$50,000</td>
-        <td>—</td>
       </tr>
       <tr>
         <td>210 Long Creek Dr</td>
         <td>1.00 acre</td>
         <td>$55,000</td>
-        <td>—</td>
       </tr>
     </table>
-    <div class="doc-link">Source photos and full deal overview: <a href="https://drive.google.com/drive/folders/1h7VtwUMKHrSeGrfaix8oUJXp8x3VKE3d?usp=sharing" target="_blank" rel="noopener">Google Drive folder</a></div>
-  </section>
+    <p class="comps-note">This subject 1.46-acre parcel is offered at a substantial discount to the lowest comparable active listing and to other recent land pricing on the same street.</p>
+  </div>
+</section>
 
-  <section>
-    <div class="disclosure">
-      Disclosure: This marketing page describes an <strong>assignment of contract</strong>. {facts.company} holds an equitable/contractual interest in the subject property and is marketing the assignment of that contract for a fee. This is not an offer to sell real property directly, and no representation is made of direct contact with, or authority from, the underlying property owner. All acreage, pricing, and comparable figures are as represented in the source deal materials and have not been independently verified; buyers should perform their own due diligence, including title, survey, zoning, utility access, and any applicable HOA or community covenants for the coastal water-access community area referenced above.
-    </div>
-  </section>
-
-</div>
-
-<div class="cta-band">
+<section class="docs">
   <div class="wrap">
-    <h2>Interested in NC-1 (Land)?</h2>
-    <p>Reach out directly to discuss the assignment of contract for this 1.46± acre Havelock, NC homesite.</p>
+    <h2 style="font-family:'Playfair Display', serif; font-size:24px; margin-bottom:14px; border-bottom:2px solid var(--line); padding-bottom:10px;">Photos &amp; Deal Overview</h2>
+    <div class="docs-box">
+      Full pictures and deal overview documentation for this property are available at the link below:<br>
+      <a href="https://drive.google.com/drive/folders/1h7VtwUMKHrSeGrfaix8oUJXp8x3VKE3d?usp=sharing" target="_blank" rel="noopener">View Photos &amp; Deal Overview Folder</a>
+    </div>
+  </div>
+</section>
+
+<section class="disclosure">
+  <div class="wrap">
+    <p>Disclosure: This is a marketing page for an assignment of contract. ${'JNA Dynamic Holdings LLC'} is the equitable contract holder marketing its interest for assignment and is not the titled owner of the underlying property. All acreage, pricing, and comparable-sale figures are as represented in the original source materials and have not been independently verified by ${'JNA Dynamic Holdings LLC'}. Buyers should perform their own due diligence, including title, survey, and municipal/utility verification, prior to entering into any agreement.</p>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <h2>Interested in This Assignment?</h2>
+    <p>Reach out directly to lock up this contract before it's gone.</p>
     <div class="cta-contacts">
-      <div class="item">
-        <div class="label">Company</div>
-        <div class="value">JNA Dynamic Holdings LLC</div>
+      <div>
+        <span>Call / Text</span>
+        <strong><a href="tel:5206336437">520-633-6437</a></strong>
       </div>
-      <div class="item">
-        <div class="label">Phone</div>
-        <div class="value"><a href="tel:5206336437">520-633-6437</a></div>
+      <div>
+        <span>Email</span>
+        <strong><a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a></strong>
       </div>
-      <div class="item">
-        <div class="label">Email</div>
-        <div class="value"><a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a></div>
+      <div>
+        <span>Company</span>
+        <strong>JNA Dynamic Holdings LLC</strong>
       </div>
     </div>
   </div>
-</div>
+</section>
 
 <footer class="bottom">
   <div class="wrap">
-    <p>© JNA Dynamic Holdings LLC. This is a marketing summary of an assignable contract, not a real estate listing offered directly for sale by the underlying owner. All figures sourced from deal materials provided by {facts.company}.</p>
+    &copy; 2024 JNA Dynamic Holdings LLC. This is a marketing communication for an assignable purchase contract, not an offer of real property for sale. All information deemed reliable but not guaranteed.
   </div>
 </footer>
 
