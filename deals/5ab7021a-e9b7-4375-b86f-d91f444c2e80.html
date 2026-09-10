@@ -3,160 +3,210 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Brunswick Plantation Golf Community Homesite — Calabash, NC | JNA Dynamic Holdings LLC</title>
+<title>Brunswick Plantation Golf Community Homesite — 0.30± Acre Land | JNA Dynamic Holdings LLC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#f6f1e9;
-    --ink:#2b2622;
-    --muted:#6b6259;
-    --line:#ddd3c4;
-    --accent:#8a5a3c;
-    --card:#fffdfa;
+    --paper-deep:#efe7d8;
+    --ink:#2b2620;
+    --ink-soft:#5a5248;
+    --gold:#a9822f;
+    --line:#d9cdb5;
+    --card:#fffdf9;
   }
   *{box-sizing:border-box;}
   body{
     margin:0;
     background:var(--paper);
     color:var(--ink);
-    font-family:'Source Sans 3', sans-serif;
+    font-family:'Inter',sans-serif;
     font-size:16px;
-    line-height:1.55;
+    line-height:1.6;
   }
   h1,h2,h3{
-    font-family:'Playfair Display', serif;
+    font-family:'Playfair Display',serif;
     font-weight:600;
     color:var(--ink);
+    margin:0;
   }
   .wrap{
-    max-width:900px;
+    max-width:920px;
     margin:0 auto;
-    padding-left:24px;
-    padding-right:24px;
+    padding:0 24px;
   }
+  a{color:var(--gold);}
+
   header.top{
+    background:var(--paper-deep);
     border-bottom:1px solid var(--line);
     padding-top:28px;
-    padding-bottom:20px;
+    padding-bottom:28px;
   }
-  .brand{
+  .kicker{
     text-transform:uppercase;
-    letter-spacing:0.14em;
-    font-size:13px;
-    color:var(--muted);
-    margin-bottom:6px;
+    letter-spacing:.14em;
+    font-size:12.5px;
+    color:var(--gold);
+    font-weight:700;
+    margin-bottom:10px;
   }
-  .deal-code{
-    display:inline-block;
-    font-size:12px;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    color:var(--accent);
-    border:1px solid var(--accent);
-    padding:3px 10px;
-    border-radius:20px;
-    margin-bottom:14px;
+  header.top h1{
+    font-size:34px;
+    line-height:1.25;
+    margin-bottom:12px;
   }
-  h1.title{
-    font-size:36px;
-    margin-top:0;
-    margin-bottom:8px;
-    line-height:1.15;
+  .loc-line{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 14px;
+    align-items:baseline;
+    font-size:15.5px;
+    color:var(--ink-soft);
   }
-  .location-line{
-    font-size:18px;
-    color:var(--muted);
-    margin-top:0;
-    margin-bottom:4px;
-  }
+  .loc-line strong{color:var(--ink);}
   .address-note{
+    margin-top:10px;
     font-size:14px;
-    color:var(--accent);
     font-style:italic;
-    margin-top:6px;
-    margin-bottom:0;
+    color:var(--ink-soft);
+    background:#fff;
+    display:inline-block;
+    padding:6px 12px;
+    border:1px solid var(--line);
+    border-radius:4px;
   }
-  section.price-block{
+
+  section{
+    padding-top:36px;
+    padding-bottom:36px;
+    border-bottom:1px solid var(--line);
+  }
+  section:last-of-type{border-bottom:none;}
+
+  .price-block{
     background:var(--card);
     border:1px solid var(--line);
-    border-radius:10px;
-    padding:24px;
-    margin-top:26px;
-    margin-bottom:26px;
+    border-radius:8px;
+    padding:26px 28px;
     display:flex;
     flex-wrap:wrap;
     gap:28px;
     align-items:center;
+    justify-content:space-between;
   }
-  .price-figure .label{
+  .price-main .label{
     text-transform:uppercase;
-    letter-spacing:0.1em;
+    letter-spacing:.1em;
     font-size:12px;
-    color:var(--muted);
-    margin-bottom:4px;
+    color:var(--ink-soft);
+    margin-bottom:6px;
   }
-  .price-figure .value{
-    font-family:'Playfair Display', serif;
-    font-size:42px;
+  .price-main .amount{
+    font-family:'Playfair Display',serif;
+    font-size:44px;
     font-weight:700;
     color:var(--ink);
   }
   .price-sub{
     font-size:14px;
-    color:var(--muted);
-    max-width:420px;
+    color:var(--ink-soft);
+    max-width:340px;
   }
-  section.gallery{
-    margin-top:10px;
-    margin-bottom:32px;
+  .price-sub .comp{
+    font-weight:700;
+    color:var(--ink);
   }
-  .gallery h2{
-    font-size:20px;
-    margin-top:0;
-    margin-bottom:10px;
+
+  .gallery-note{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    margin-bottom:14px;
   }
-  .scroller{
+  .gallery{
     display:flex;
-    gap:12px;
+    gap:14px;
     overflow-x:auto;
     padding-bottom:10px;
-    scrollbar-width:thin;
+    -webkit-overflow-scrolling:touch;
   }
-  .scroller img{
-    height:220px;
+  .gallery img{
+    height:230px;
     width:auto;
-    border-radius:8px;
+    border-radius:6px;
     border:1px solid var(--line);
-    flex-shrink:0;
+    flex:0 0 auto;
     object-fit:cover;
   }
-  .more-photos{
-    display:inline-block;
-    margin-top:10px;
-    font-size:14px;
-    color:var(--accent);
-    text-decoration:underline;
+
+  h2.section-title{
+    font-size:24px;
+    margin-bottom:18px;
+    color:var(--ink);
   }
-  section.narrative{
-    margin-top:10px;
-    margin-bottom:32px;
+  .subhead{
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    color:var(--gold);
+    font-weight:700;
+    margin-bottom:6px;
   }
-  section.narrative p{
-    margin-top:0;
-    margin-bottom:14px;
+
+  ul.clean{
+    margin:0;
+    padding:0;
+    list-style:none;
   }
-  section.terms{
-    margin-top:10px;
-    margin-bottom:32px;
+  ul.clean li{
+    padding:8px 0 8px 20px;
+    position:relative;
+    border-bottom:1px dashed var(--line);
+    font-size:15px;
   }
-  section.terms h2{
-    font-size:22px;
-    margin-top:0;
-    margin-bottom:14px;
+  ul.clean li:last-child{border-bottom:none;}
+  ul.clean li::before{
+    content:"—";
+    position:absolute;
+    left:0;
+    color:var(--gold);
   }
-  table.deal-table{
+
+  .two-col{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:28px;
+  }
+  @media (max-width:700px){
+    .two-col{grid-template-columns:1fr;}
+  }
+
+  .comp-cards{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+  }
+  .comp-card{
+    flex:1 1 240px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:20px;
+  }
+  .comp-card h3{
+    font-size:17px;
+    margin-bottom:8px;
+  }
+  .comp-card .figure{
+    font-size:26px;
+    font-weight:700;
+    font-family:'Playfair Display',serif;
+    margin-top:6px;
+  }
+
+  table.terms{
     width:100%;
     border-collapse:collapse;
     background:var(--card);
@@ -164,119 +214,119 @@
     border-radius:8px;
     overflow:hidden;
   }
-  table.deal-table tr{
-    border-bottom:1px solid var(--line);
+  table.terms tr{border-bottom:1px solid var(--line);}
+  table.terms tr:last-child{border-bottom:none;}
+  table.terms td{
+    padding:12px 18px;
+    font-size:15px;
+    vertical-align:top;
   }
-  table.deal-table tr:last-child{
+  table.terms td.label{
+    width:44%;
+    color:var(--ink-soft);
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    font-size:12.5px;
+  }
+
+  .disclosure-box{
+    background:var(--paper-deep);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:20px 22px;
+    font-size:13.5px;
+    color:var(--ink-soft);
+  }
+  .disclosure-box p{margin-top:0;margin-bottom:12px;}
+  .disclosure-box p:last-child{margin-bottom:0;}
+
+  .cta-band{
+    background:var(--ink);
+    color:var(--paper);
+    padding-top:48px;
+    padding-bottom:48px;
     border-bottom:none;
   }
-  table.deal-table td{
-    padding:12px 16px;
+  .cta-band h2{
+    color:var(--paper);
+    font-size:28px;
+    margin-bottom:14px;
+  }
+  .cta-band p{
+    color:#d8d0c1;
     font-size:15px;
+    max-width:600px;
+    margin-bottom:22px;
   }
-  table.deal-table td.k{
-    color:var(--muted);
-    width:42%;
-    font-weight:600;
+  .cta-contacts{
+    display:flex;
+    gap:26px;
+    flex-wrap:wrap;
+    font-size:17px;
   }
-  section.comp{
-    background:#efe6d8;
-    border:1px solid var(--line);
-    border-radius:10px;
-    padding:20px 24px;
-    margin-top:10px;
-    margin-bottom:32px;
+  .cta-contacts a{
+    color:var(--paper);
+    font-weight:700;
+    text-decoration:none;
+    border-bottom:2px solid var(--gold);
+    padding-bottom:2px;
   }
-  section.comp h3{
-    font-size:18px;
-    margin-top:0;
-    margin-bottom:8px;
+  .cta-company{
+    margin-top:22px;
+    font-family:'Playfair Display',serif;
+    font-size:19px;
+    letter-spacing:.02em;
   }
-  section.disclosures{
-    margin-top:10px;
-    margin-bottom:32px;
-    font-size:13.5px;
-    color:var(--muted);
+
+  footer.legal{
+    background:var(--paper-deep);
+    padding-top:26px;
+    padding-bottom:34px;
   }
-  section.disclosures p{
+  footer.legal p{
+    font-size:12.5px;
+    color:var(--ink-soft);
     margin-top:0;
     margin-bottom:10px;
   }
-  section.cta{
-    background:var(--ink);
-    color:var(--paper);
-    padding-top:40px;
-    padding-bottom:40px;
-    margin-top:10px;
-  }
-  section.cta h2{
-    color:var(--paper);
-    font-size:28px;
-    margin-top:0;
-    margin-bottom:12px;
-  }
-  section.cta p{
-    color:#d8d0c4;
-    margin-top:0;
-    margin-bottom:22px;
-    max-width:520px;
-  }
-  .cta-links{
-    display:flex;
-    flex-wrap:wrap;
-    gap:16px;
-  }
-  .cta-links a{
-    display:inline-block;
-    background:var(--accent);
-    color:#fff;
-    text-decoration:none;
-    padding:12px 22px;
-    border-radius:6px;
-    font-weight:600;
-    font-size:15px;
-  }
-  .cta-links a.secondary{
-    background:transparent;
-    border:1px solid #a89a86;
-    color:var(--paper);
-  }
-  footer.bottom{
-    padding-top:20px;
-    padding-bottom:30px;
-    font-size:12.5px;
-    color:var(--muted);
-    text-align:center;
-  }
+  footer.legal p:last-child{margin-bottom:0;}
 </style>
 </head>
 <body>
 
 <header class="top">
   <div class="wrap">
-    <div class="brand">JNA Dynamic Holdings LLC</div>
-    <span class="deal-code">Deal Code: NC - 3 (Land)</span>
-    <h1 class="title">Brunswick Plantation Golf Community Homesite</h1>
-    <p class="location-line">Calabash, Brunswick County, NC 28467</p>
-    <p class="address-note">Address available upon request — contact us for the full property address.</p>
+    <div class="kicker">Deal Code: NC - 3 (Land) &nbsp;·&nbsp; Wholesale Assignment of Contract</div>
+    <h1>Brunswick Plantation Golf Community Homesite<br>0.30± Acre Residential Lot</h1>
+    <div class="loc-line">
+      <span><strong>Calabash, NC</strong></span>
+      <span>Brunswick County</span>
+      <span>Brunswick Plantation</span>
+    </div>
+    <div class="address-note">Address available upon request — contact us for the full parcel address.</div>
   </div>
 </header>
 
-<div class="wrap">
-
-  <section class="price-block">
-    <div class="price-figure">
-      <div class="label">Assignment Price</div>
-      <div class="value">$42,500</div>
+<section>
+  <div class="wrap">
+    <div class="price-block">
+      <div class="price-main">
+        <div class="label">Asking Price</div>
+        <div class="amount">$42,500</div>
+      </div>
+      <div class="price-sub">
+        A nearby floodway-designated lot across the fairway in the same community reportedly sold for approximately
+        <span class="comp">$40,000</span> — establishing a close market reference point for this subject parcel.
+      </div>
     </div>
-    <div class="price-sub">
-      This is an assignment of contract. JNA Dynamic Holdings LLC holds an equitable interest in the underlying purchase contract with the property owner and is marketing that contract for assignment; this is not a direct sale by, or on behalf of, the property owner, and buyers will not be contacting the underlying seller directly.
-    </div>
-  </section>
+  </div>
+</section>
 
-  <section class="gallery">
-    <h2>Photos</h2>
-    <div class="scroller">
+<section>
+  <div class="wrap">
+    <div class="gallery-note">Property Photos</div>
+    <div class="gallery">
       <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/1.jpg" alt="Brunswick Plantation homesite photo 1">
       <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/2.jpg" alt="Brunswick Plantation homesite photo 2">
       <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/3.jpg" alt="Brunswick Plantation homesite photo 3">
@@ -290,55 +340,203 @@
       <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/11.jpg" alt="Brunswick Plantation homesite photo 11">
       <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/12.jpg" alt="Brunswick Plantation homesite photo 12">
     </div>
-  </section>
+  </div>
+</section>
 
-  <section class="narrative">
-    <h2>Overview</h2>
-    <p>A 0.30 acre homesite in the Brunswick Plantation golf community in Calabash, NC. The lot carries a floodway consideration that buyers should factor into their due diligence and any development plans.</p>
-    <p>A nearby lot across the fairway, with a similar floodway consideration, reportedly sold for approximately $40,000 — offered here for comparison alongside the current $42,500 assignment price.</p>
-  </section>
-
-  <section class="comp">
-    <h3>Comparable Sale</h3>
-    <p style="margin-bottom:0;">A nearby homesite across the fairway with a similar floodway consideration reportedly sold for approximately <strong>$40,000</strong>.</p>
-  </section>
-
-  <section class="terms">
-    <h2>Deal Terms &amp; Property Details</h2>
-    <table class="deal-table">
-      <tr><td class="k">Assignment Price</td><td>$42,500</td></tr>
-      <tr><td class="k">Deal Type</td><td>Land</td></tr>
-      <tr><td class="k">Property Type</td><td>Land</td></tr>
-      <tr><td class="k">Lot Size</td><td>0.30 acres</td></tr>
-      <tr><td class="k">City / State</td><td>Calabash, NC</td></tr>
-      <tr><td class="k">County</td><td>Brunswick County</td></tr>
-      <tr><td class="k">ZIP</td><td>28467</td></tr>
-      <tr><td class="k">Community</td><td>Brunswick Plantation (golf community)</td></tr>
-      <tr><td class="k">Nearby Comparable Sale</td><td>Approximately $40,000 (similar floodway lot, across the fairway)</td></tr>
-    </table>
-  </section>
-
-  <section class="disclosures">
-    <p>This offering is an assignment of contract. JNA Dynamic Holdings LLC has an equitable interest in the underlying purchase agreement and is assigning that contractual interest; this is not a listing of the property for direct sale by its owner, and interested parties should not attempt to contact the underlying seller directly.</p>
-    <p>All figures, measurements, and details on this page — including lot size, price, and the referenced comparable sale — have not been independently verified by JNA Dynamic Holdings LLC and should be confirmed by the buyer during due diligence.</p>
-  </section>
-
-</div>
-
-<section class="cta">
+<section>
   <div class="wrap">
-    <h2>Interested in this homesite?</h2>
-    <p>Reach out for the full property address, additional photos, and assignment paperwork. This deal moves on a first-ready-buyer basis.</p>
-    <div class="cta-links">
-      <a href="tel:520-633-6437">Call/Text 520-633-6437</a>
-      <a class="secondary" href="mailto:montanoemmanuel@gmail.com">Email montanoemmanuel@gmail.com</a>
+    <h2 class="section-title">Property Snapshot</h2>
+    <ul class="clean">
+      <li>0.30± acre residential homesite</li>
+      <li>Located within Brunswick Plantation, an established golf community</li>
+      <li>Brunswick County, North Carolina</li>
+      <li>Property type: vacant residential land</li>
+      <li>Reported AE floodway designation</li>
+      <li>Comparable floodway lot across the fairway reportedly sold for approximately $40,000</li>
+      <li>Builders continue to acquire select lots within the community despite flood-related designations</li>
+      <li>Subject asking $42,500</li>
+      <li>Buyer responsible for full flood, engineering, and buildability review</li>
+      <li>Property sold as-is</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Here Is What We Have</h2>
+    <p>This is an approximately 0.30-acre residential homesite located inside Brunswick Plantation, an established golf community in Brunswick County, North Carolina.</p>
+    <p>The primary diligence item is the parcel's reported <strong>AE floodway designation</strong>. That designation should be fully evaluated by any prospective buyer before construction assumptions are made.</p>
+    <p>The reason this property is still worth evaluating is the immediate market evidence: a floodway-designated lot across the fairway reportedly sold for approximately $40,000. The subject is being offered at $42,500 — placing the asking price very close to a reported comparable sale involving another floodway lot within the same community.</p>
+    <p>Additionally, certain builders have continued purchasing lots within Brunswick Plantation despite flood-related designations, demonstrating that these properties are not automatically unusable. However, every parcel requires individual engineering, elevation, floodway, and building-envelope review.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Why This Lot Makes Sense</h2>
+    <p>The underwriting here should be based on actual floodway-lot activity rather than comparing the subject to fully unconstrained lots. A nearby lot across the fairway with a similar floodway consideration reportedly sold for approximately $40,000, against a subject asking price of $42,500 — creating a clear market reference point for a buyer's initial underwriting.</p>
+    <p>The property also benefits from being located inside an established residential golf community where builders and homeowners continue to evaluate and acquire land.</p>
+    <p>The opportunity is not that the floodway designation should be ignored. The opportunity is that the market has demonstrated that certain floodway-designated lots within Brunswick Plantation can still attract buyers when pricing, engineering, and site conditions make sense.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="comp-cards">
+      <div class="comp-card">
+        <div class="subhead">Reported Comparable Sale</div>
+        <h3>Floodway Lot Across Fairway</h3>
+        <p>Similar community setting, reported floodway consideration.</p>
+        <div class="figure">$40,000</div>
+      </div>
+      <div class="comp-card">
+        <div class="subhead">Subject Property</div>
+        <h3>0.30± Acre Homesite</h3>
+        <p>Brunswick Plantation, Brunswick County, NC.</p>
+        <div class="figure">$42,500</div>
+      </div>
+    </div>
+    <p style="margin-top:18px;font-size:13.5px;color:var(--ink-soft);">The comparable sale should be independently verified by the buyer before being relied upon for underwriting.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Floodway Diligence</h2>
+    <p>The subject is reported to have an <strong>AE floodway designation</strong>. This is the most important diligence item. Buyer must independently determine:</p>
+    <ul class="clean">
+      <li>Exact FEMA designation</li>
+      <li>Floodway boundary</li>
+      <li>Base flood elevation</li>
+      <li>Required finished-floor elevation</li>
+      <li>Lowest-floor requirements</li>
+      <li>Foundation requirements</li>
+      <li>Flood-resistant construction standards</li>
+      <li>Whether fill is permitted</li>
+      <li>No-rise certification requirements</li>
+      <li>Engineering requirements</li>
+      <li>Building envelope</li>
+      <li>Driveway / access elevations</li>
+      <li>Potential CAMA requirements, if applicable</li>
+      <li>Flood insurance requirements</li>
+      <li>County building requirements</li>
+      <li>Any additional state or federal restrictions</li>
+    </ul>
+    <p style="margin-top:16px;">No representation is made that a conventional slab-on-grade home can be constructed on the property.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap two-col">
+    <div>
+      <h2 class="section-title">Builder Play</h2>
+      <p>For a builder experienced with coastal Brunswick County or elevated-home construction, this lot deserves individual underwriting. The play is straightforward:</p>
+      <ul class="clean">
+        <li>Acquire at $42,500</li>
+        <li>Complete floodway, survey, elevation, engineering, utility, and building-envelope diligence</li>
+        <li>Determine the appropriate foundation and finished-floor elevation</li>
+        <li>Advance the property toward a permitted residential build if feasible</li>
+      </ul>
+      <p style="margin-top:14px;">A builder experienced with flood-designated parcels may be able to evaluate this opportunity more efficiently than a buyer unfamiliar with coastal construction.</p>
+    </div>
+    <div>
+      <h2 class="section-title">Custom Home Play</h2>
+      <p>A future homeowner interested in Brunswick Plantation can evaluate the property for a custom residence designed specifically around the site's elevation and flood requirements.</p>
+      <p>The community setting may support an elevated or engineered residential product, subject to architectural and governmental approval.</p>
     </div>
   </div>
 </section>
 
-<footer class="bottom">
+<section>
   <div class="wrap">
-    JNA Dynamic Holdings LLC — Assignment of Contract Opportunity — Calabash, Brunswick County, NC
+    <h2 class="section-title">Community Context</h2>
+    <p>Brunswick Plantation offers an established residential setting with golf-course development and existing homes throughout the community. Buyer should independently verify:</p>
+    <ul class="clean">
+      <li>HOA / POA fees</li>
+      <li>Architectural guidelines</li>
+      <li>Minimum home size</li>
+      <li>Approved builders</li>
+      <li>Construction standards</li>
+      <li>Golf-course setbacks</li>
+      <li>Rental restrictions</li>
+      <li>Road maintenance</li>
+      <li>Community assessments</li>
+      <li>Any additional restrictions</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Utilities</h2>
+    <p>Buyer must independently determine the exact utility setup for the parcel, including:</p>
+    <ul class="clean">
+      <li>Water</li>
+      <li>Sewer</li>
+      <li>Electricity</li>
+      <li>Tap status</li>
+      <li>Meter status</li>
+      <li>Utility fees</li>
+      <li>Impact fees</li>
+      <li>Connection costs</li>
+      <li>Capacity and service availability</li>
+    </ul>
+    <p style="margin-top:14px;">No representation is made that all utility connections are currently installed or paid.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Buyer Due Diligence Notice</h2>
+    <p>Buyer must independently verify zoning, survey boundaries, exact acreage, flood zone, floodway limits, base flood elevation, no-rise requirements, engineering, fill limitations, building envelope, setbacks, foundation requirements, HOA restrictions, utilities, water, sewer, electric service, drainage, soils, wetlands, CAMA requirements if applicable, title, deed restrictions, development costs, and all Brunswick County development requirements prior to closing.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Deal Terms</h2>
+    <table class="terms">
+      <tr><td class="label">Purchase Price</td><td>$42,500</td></tr>
+      <tr><td class="label">Lot Size</td><td>0.30± acres</td></tr>
+      <tr><td class="label">County</td><td>Brunswick County, North Carolina</td></tr>
+      <tr><td class="label">Community</td><td>Brunswick Plantation</td></tr>
+      <tr><td class="label">Property Type</td><td>Vacant residential land</td></tr>
+      <tr><td class="label">Reported Flood Designation</td><td>AE Floodway</td></tr>
+      <tr><td class="label">Reported Comparable Floodway Sale</td><td>Approximately $40,000</td></tr>
+      <tr><td class="label">Financing</td><td>Cash or hard money only</td></tr>
+      <tr><td class="label">Transaction Type</td><td>Assignment of contract</td></tr>
+      <tr><td class="label">Closing Costs</td><td>Buyer pays closing costs</td></tr>
+      <tr><td class="label">Condition</td><td>Property sold as-is</td></tr>
+      <tr><td class="label">Proof of Funds</td><td>Required</td></tr>
+      <tr><td class="label">Offer Process</td><td>First come, first served — no auction, no highest and best</td></tr>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="disclosure-box">
+      <p><strong>This is a wholesale assignment of contract.</strong> JNA Dynamic Holdings LLC holds equitable interest in the subject transaction pursuant to a legally binding purchase contract and memorandum executed with the seller, giving JNA Dynamic Holdings LLC contractual and equitable rights in the transaction. The end buyer will receive an assignment of contract. JNA Dynamic Holdings LLC does not represent the seller and is not acting as a real estate broker. Do not contact the owner/seller directly without explicit written consent from JNA Dynamic Holdings LLC. Any attempt to circumvent JNA Dynamic Holdings LLC or renegotiate directly with the seller may result in enforcement of contractual and legal rights.</p>
+      <p>All flood, engineering, elevation, utility, zoning, buildability, HOA, and development information must be independently verified by buyer prior to closing. Figures, acreage, and reported comparable sale amounts referenced on this page have not been independently verified by JNA Dynamic Holdings LLC and should be confirmed by buyer during due diligence.</p>
+    </div>
+  </div>
+</section>
+
+<div class="cta-band">
+  <div class="wrap">
+    <h2>0.30± Acres · Brunswick Plantation · AE Floodway Reported</h2>
+    <p>Floodway lot across the fairway reportedly sold around $40,000. Subject offered at $42,500. Cash or hard money only — first come, first served, no auction, no highest and best.</p>
+    <div class="cta-contacts">
+      <a href="tel:5206336437">520-633-6437</a>
+      <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
+    </div>
+    <div class="cta-company">JNA Dynamic Holdings LLC</div>
+  </div>
+</div>
+
+<footer class="legal">
+  <div class="wrap">
+    <p>This offering is a wholesale assignment of contract. JNA Dynamic Holdings LLC has an executed contractual and equitable interest in this transaction and is not the property owner. This is not an offer to sell real estate directly; it is an offer to assign contractual rights. All figures, acreage, flood designations, and reported comparable sale data are believed accurate but have not been independently verified by JNA Dynamic Holdings LLC and must be independently confirmed by buyer prior to closing.</p>
   </div>
 </footer>
 
