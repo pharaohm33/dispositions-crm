@@ -3,30 +3,31 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MO-1 (SFH) — St. Louis, MO Wholesale Assignment | JNA Dynamic Holdings LLC</title>
+<title>St. Louis, MO 63147 — Single-Family Assignment Opportunity | JNA Dynamic Holdings LLC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; }
   body {
     margin: 0;
-    background: #f6f1e9;
+    background-color: #f6f1e9;
     color: #2b2620;
-    font-family: 'Source Sans Pro', sans-serif;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 17px;
     line-height: 1.55;
   }
   h1, h2, h3 {
     font-family: 'Playfair Display', serif;
-    color: #1f1a14;
     font-weight: 600;
+    color: #1f1b15;
   }
   .wrap {
-    max-width: 880px;
+    max-width: 980px;
     margin: 0 auto;
     padding: 0 24px;
   }
   header.top {
-    background: #1f1a14;
+    background-color: #23201b;
     color: #f6f1e9;
     padding-top: 14px;
     padding-bottom: 14px;
@@ -39,219 +40,189 @@
   }
   header.top .brand {
     font-family: 'Playfair Display', serif;
-    font-size: 1.2rem;
-    letter-spacing: 0.03em;
+    font-size: 20px;
+    letter-spacing: 0.5px;
   }
   header.top .tag {
-    font-size: 0.85rem;
-    color: #d9cdb8;
+    font-size: 13px;
+    color: #cfc6b4;
   }
 
-  section.hero {
-    margin-top: 44px;
+  .hero {
+    margin-top: 46px;
     margin-bottom: 10px;
   }
-  .deal-code {
-    display: inline-block;
-    background: #e7dcc5;
-    color: #5b4a2f;
-    font-size: 0.8rem;
-    letter-spacing: 0.08em;
+  .hero .eyebrow {
     text-transform: uppercase;
-    padding: 5px 12px;
-    border-radius: 3px;
-    margin-bottom: 14px;
+    letter-spacing: 2px;
+    font-size: 13px;
+    color: #8a5a2b;
+    font-weight: 600;
+    margin-bottom: 10px;
   }
-  h1.title {
-    font-size: 2.4rem;
+  .hero h1 {
+    font-size: 40px;
     margin: 0 0 8px 0;
   }
-  .location-line {
-    font-size: 1.05rem;
-    color: #4a4235;
+  .hero .location {
+    font-size: 18px;
+    color: #4a4436;
     margin-bottom: 6px;
   }
-  .address-note {
-    font-size: 0.95rem;
-    color: #8a5a2c;
-    font-style: italic;
-    margin-bottom: 4px;
-  }
-  .assignment-note {
-    font-size: 0.9rem;
-    color: #6b6152;
-    max-width: 640px;
+  .addr-note {
+    display: inline-block;
+    background: #efe6d3;
+    border: 1px solid #d8c9a3;
+    color: #5c4a24;
+    padding: 8px 14px;
+    border-radius: 4px;
+    font-size: 14.5px;
+    margin-top: 6px;
+    margin-bottom: 6px;
   }
 
-  section.price-block {
+  .price-block {
+    background: #fffdf9;
+    border: 1px solid #e3d8c1;
+    border-radius: 6px;
+    padding: 26px 30px;
     margin-top: 28px;
     margin-bottom: 28px;
-    background: #fffaf0;
-    border: 1px solid #e6dcc6;
-    border-radius: 8px;
-    padding: 26px 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
   }
-  .price-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 18px;
-    text-align: left;
+  .price-block .item {
+    min-width: 140px;
   }
-  .price-item .label {
-    font-size: 0.78rem;
+  .price-block .label {
+    font-size: 12.5px;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: #8a7c62;
+    letter-spacing: 1.5px;
+    color: #8a7c5e;
     margin-bottom: 4px;
   }
-  .price-item .value {
+  .price-block .value {
     font-family: 'Playfair Display', serif;
-    font-size: 1.6rem;
-    color: #1f1a14;
+    font-size: 28px;
+    color: #1f1b15;
   }
-  .price-item.primary .value {
-    color: #8a5a2c;
+  .price-block .value.main {
+    color: #7a3b12;
   }
-  .win-now {
-    margin-top: 16px;
-    padding-top: 14px;
-    border-top: 1px dashed #ddceb0;
-    font-size: 0.95rem;
-    color: #4a4235;
-  }
-  .win-now strong { color: #8a5a2c; }
 
-  section.gallery {
-    margin-top: 10px;
+  .gallery-section {
+    margin-top: 34px;
     margin-bottom: 34px;
   }
-  .gallery h2 {
-    font-size: 1.3rem;
+  .gallery-section h2 {
+    font-size: 22px;
     margin-bottom: 12px;
   }
-  .scroller {
+  .gallery {
     display: flex;
     gap: 12px;
     overflow-x: auto;
     padding-bottom: 10px;
-    scroll-snap-type: x mandatory;
   }
-  .scroller img {
-    height: 240px;
+  .gallery img {
+    height: 230px;
     width: auto;
     flex: 0 0 auto;
-    border-radius: 6px;
-    scroll-snap-align: start;
-    border: 1px solid #e6dcc6;
-    background: #eee;
+    border-radius: 5px;
+    border: 1px solid #e3d8c1;
+    object-fit: cover;
   }
 
-  section.details {
-    margin-top: 10px;
-    margin-bottom: 34px;
+  section.block {
+    margin-top: 40px;
+    margin-bottom: 40px;
   }
-  section.details h2 {
-    font-size: 1.4rem;
-    margin-bottom: 14px;
-    border-bottom: 2px solid #1f1a14;
+  section.block h2 {
+    font-size: 24px;
+    border-bottom: 2px solid #d8c9a3;
     padding-bottom: 8px;
+    margin-bottom: 18px;
   }
+
   table.terms {
     width: 100%;
     border-collapse: collapse;
-    background: #fffaf0;
-    border: 1px solid #e6dcc6;
+    background: #fffdf9;
+    border: 1px solid #e3d8c1;
   }
-  table.terms tr {
-    border-bottom: 1px solid #eee2c9;
-  }
-  table.terms tr:last-child { border-bottom: none; }
+  table.terms tr:nth-child(even) { background: #f4ecdb; }
   table.terms td {
     padding: 11px 16px;
-    font-size: 0.95rem;
+    font-size: 15.5px;
+    border-bottom: 1px solid #e9ddc2;
   }
   table.terms td.k {
-    color: #6b6152;
-    width: 45%;
-  }
-  table.terms td.v {
-    color: #1f1a14;
+    color: #6b5f45;
+    width: 40%;
     font-weight: 600;
   }
 
-  section.narrative {
-    margin-top: 10px;
-    margin-bottom: 34px;
-  }
-  section.narrative h2 {
-    font-size: 1.4rem;
-    margin-bottom: 14px;
-  }
-  section.narrative p {
-    margin: 0 0 12px 0;
-  }
-  .doc-note {
-    font-size: 0.9rem;
-    color: #8a7c62;
-    background: #f0e8d6;
-    border-radius: 6px;
-    padding: 12px 16px;
-    margin-top: 14px;
-  }
-
-  section.disclaimer {
-    margin-top: 10px;
-    margin-bottom: 34px;
-    font-size: 0.85rem;
-    color: #8a7c62;
-    border-top: 1px solid #e6dcc6;
-    padding-top: 16px;
-  }
-
-  footer.cta {
-    background: #1f1a14;
-    color: #f6f1e9;
-    margin-top: 20px;
-    padding-top: 50px;
-    padding-bottom: 50px;
-  }
-  footer.cta h2 {
-    color: #f6f1e9;
-    font-size: 1.9rem;
-    margin: 0 0 10px 0;
-  }
-  footer.cta p {
-    color: #d9cdb8;
-    margin: 0 0 22px 0;
-    max-width: 560px;
-  }
-  .contact-row {
+  .two-col {
     display: flex;
-    gap: 28px;
+    gap: 40px;
     flex-wrap: wrap;
   }
-  .contact-item {
-    background: #2b2620;
-    border: 1px solid #4a4235;
-    border-radius: 6px;
-    padding: 14px 20px;
+  .two-col > div {
+    flex: 1 1 300px;
   }
-  .contact-item .label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: #a9987a;
-    margin-bottom: 4px;
+
+  .notes p {
+    margin: 0 0 12px 0;
   }
-  .contact-item .value {
-    font-size: 1.05rem;
-    font-weight: 600;
+
+  .disclaimer {
+    font-size: 13.5px;
+    color: #756a52;
+    background: #efe6d3;
+    border: 1px solid #d8c9a3;
+    border-radius: 4px;
+    padding: 16px 18px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+  }
+
+  .cta {
+    background-color: #23201b;
     color: #f6f1e9;
+    padding-top: 44px;
+    padding-bottom: 44px;
+    margin-top: 20px;
   }
-  .company-line {
-    margin-top: 22px;
-    font-size: 0.9rem;
-    color: #a9987a;
+  .cta h2 {
+    color: #f6f1e9;
+    font-size: 30px;
+    margin-bottom: 14px;
+  }
+  .cta p {
+    font-size: 16px;
+    color: #d8cfba;
+    margin-bottom: 22px;
+  }
+  .cta .contacts {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+  }
+  .cta a {
+    color: #f0d9a8;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 18px;
+  }
+  .cta a:hover { text-decoration: underline; }
+
+  footer.bottom {
+    text-align: center;
+    font-size: 12.5px;
+    color: #8a7c5e;
+    padding-top: 18px;
+    padding-bottom: 24px;
   }
 </style>
 </head>
@@ -260,124 +231,136 @@
 <header class="top">
   <div class="wrap">
     <div class="brand">JNA Dynamic Holdings LLC</div>
-    <div class="tag">Wholesale Assignment Opportunities</div>
+    <div class="tag">Off-Market Investment Opportunities</div>
   </div>
 </header>
 
 <div class="wrap">
 
-  <section class="hero">
-    <span class="deal-code">Deal MO-1 (SFH)</span>
-    <h1 class="title">Single-Family Rehab Opportunity</h1>
-    <div class="location-line">St. Louis, MO 63147</div>
-    <div class="address-note">Address available upon request — contact us for the full street address.</div>
-    <div class="assignment-note">This offering is an assignment of contract, not a direct sale of the property. Buyer will be closing on an assigned purchase agreement; no direct contact with the underlying seller/owner is implied or provided.</div>
-  </section>
+  <div class="hero">
+    <div class="eyebrow">Deal Code: MO-1 (SFH)</div>
+    <h1>Single-Family Value-Add Opportunity</h1>
+    <div class="location">St. Louis, MO 63147</div>
+    <div class="addr-note">Address available upon request — reach out below and we'll send the full property address.</div>
+  </div>
 
-  <section class="price-block">
-    <div class="price-grid">
-      <div class="price-item primary">
-        <div class="label">Assignment Price</div>
-        <div class="value">$65,000</div>
+  <div class="price-block">
+    <div class="item">
+      <div class="label">Assignment Price</div>
+      <div class="value main">$65,000</div>
+    </div>
+    <div class="item">
+      <div class="label">After Repair Value (ARV)</div>
+      <div class="value">$135,000</div>
+    </div>
+    <div class="item">
+      <div class="label">Estimated Gross Margin</div>
+      <div class="value">$70,000</div>
+    </div>
+    <div class="item">
+      <div class="label">Repair Estimate</div>
+      <div class="value">$15,000 – $20,000</div>
+    </div>
+  </div>
+
+  <div class="gallery-section">
+    <h2>Property Photos</h2>
+    <div class="gallery">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/1.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 1">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/2.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 2">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/3.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 3">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/4.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 4">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/5.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 5">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/6.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 6">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/7.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 7">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/8.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 8">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/9.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 9">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/10.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 10">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/11.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 11">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/12.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 12">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/13.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 13">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/14.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 14">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/15.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 15">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/16.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 16">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/17.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 17">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/18.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 18">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/19.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 19">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/20.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 20">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/21.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 21">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/22.jpg" alt="Single-family property in St. Louis, MO 63147 - photo 22">
+    </div>
+  </div>
+
+  <section class="block">
+    <h2>Property Overview</h2>
+    <div class="two-col">
+      <div>
+        <table class="terms">
+          <tr><td class="k">Property Type</td><td>Single-Family</td></tr>
+          <tr><td class="k">Bedrooms</td><td>3</td></tr>
+          <tr><td class="k">Bathrooms</td><td>2</td></tr>
+          <tr><td class="k">Half-Bath</td><td>0</td></tr>
+          <tr><td class="k">Square Footage</td><td>1,184 sq. ft.</td></tr>
+          <tr><td class="k">Lot Size</td><td>3,045 sq. ft.</td></tr>
+          <tr><td class="k">Year Built</td><td>1939</td></tr>
+          <tr><td class="k">Parking</td><td>Driveway</td></tr>
+        </table>
       </div>
-      <div class="price-item">
-        <div class="label">ARV</div>
-        <div class="value">$135,000</div>
-      </div>
-      <div class="price-item">
-        <div class="label">Gross Margin</div>
-        <div class="value">$70,000</div>
-      </div>
-      <div class="price-item">
-        <div class="label">Repair Estimate</div>
-        <div class="value">$15,000 – $20,000</div>
+      <div>
+        <table class="terms">
+          <tr><td class="k">Property Condition</td><td>Light Rehab</td></tr>
+          <tr><td class="k">Occupancy</td><td>Vacant</td></tr>
+          <tr><td class="k">Roof Age</td><td>Unknown</td></tr>
+          <tr><td class="k">Heating System</td><td>Baseboard</td></tr>
+          <tr><td class="k">Heating Age</td><td>Unknown</td></tr>
+          <tr><td class="k">Air Conditioning</td><td>Central AC</td></tr>
+          <tr><td class="k">Foundation Type</td><td>Full basement</td></tr>
+          <tr><td class="k">Foundation Condition</td><td>Good</td></tr>
+        </table>
       </div>
     </div>
-    <div class="win-now">"Win it now" price: <strong>$75,000</strong> — or submit an offer below list.</div>
   </section>
 
-  <section class="gallery">
-    <h2>Photo Gallery</h2>
-    <div class="scroller">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/22.jpg" alt="Property photo 22, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/21.jpg" alt="Property photo 21, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/20.jpg" alt="Property photo 20, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/19.jpg" alt="Property photo 19, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/18.jpg" alt="Property photo 18, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/17.jpg" alt="Property photo 17, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/16.jpg" alt="Property photo 16, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/15.jpg" alt="Property photo 15, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/14.jpg" alt="Property photo 14, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/13.jpg" alt="Property photo 13, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/12.jpg" alt="Property photo 12, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/11.jpg" alt="Property photo 11, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/10.jpg" alt="Property photo 10, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/9.jpg" alt="Property photo 9, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/8.jpg" alt="Property photo 8, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/7.jpg" alt="Property photo 7, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/6.jpg" alt="Property photo 6, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/5.jpg" alt="Property photo 5, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/4.jpg" alt="Property photo 4, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/3.jpg" alt="Property photo 3, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/2.jpg" alt="Property photo 2, St. Louis, MO 63147">
-      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/1.jpg" alt="Property photo 1, St. Louis, MO 63147">
-    </div>
-  </section>
-
-  <section class="details">
-    <h2>Property & Deal Terms</h2>
+  <section class="block">
+    <h2>Deal Terms &amp; Sale History</h2>
     <table class="terms">
-      <tr><td class="k">Property Type</td><td class="v">Single-Family</td></tr>
-      <tr><td class="k">Deal Type</td><td class="v">Land / Assignment of Contract</td></tr>
-      <tr><td class="k">Bedrooms</td><td class="v">3</td></tr>
-      <tr><td class="k">Bathrooms</td><td class="v">2 full, 0 half</td></tr>
-      <tr><td class="k">Square Footage</td><td class="v">1,184 sq ft</td></tr>
-      <tr><td class="k">Lot Size</td><td class="v">3,045 sq ft</td></tr>
-      <tr><td class="k">Year Built</td><td class="v">1939</td></tr>
-      <tr><td class="k">Parking</td><td class="v">Driveway</td></tr>
-      <tr><td class="k">Property Condition</td><td class="v">Light Rehab</td></tr>
-      <tr><td class="k">Occupancy</td><td class="v">Vacant</td></tr>
-      <tr><td class="k">Heating System</td><td class="v">Baseboard</td></tr>
-      <tr><td class="k">Air Conditioning</td><td class="v">Central AC</td></tr>
-      <tr><td class="k">Foundation Type</td><td class="v">Full basement</td></tr>
-      <tr><td class="k">Foundation Condition</td><td class="v">Good</td></tr>
-      <tr><td class="k">Repair Estimate</td><td class="v">$15,000.00 – $20,000.00</td></tr>
-      <tr><td class="k">Assignment Price</td><td class="v">$65,000</td></tr>
-      <tr><td class="k">ARV</td><td class="v">$135,000</td></tr>
-      <tr><td class="k">Gross Margin</td><td class="v">$70,000</td></tr>
-      <tr><td class="k">Win-It-Now Price</td><td class="v">$75,000</td></tr>
-      <tr><td class="k">Last Sale Price</td><td class="v">$126,500 (sold 11/08/2023)</td></tr>
+      <tr><td class="k">Assignment Price</td><td>$65,000</td></tr>
+      <tr><td class="k">After Repair Value (ARV)</td><td>$135,000</td></tr>
+      <tr><td class="k">Estimated Gross Margin</td><td>$70,000</td></tr>
+      <tr><td class="k">Repair Estimate</td><td>$15,000.00 – $20,000.00</td></tr>
+      <tr><td class="k">Deal Type</td><td>Assignment of Contract</td></tr>
+      <tr><td class="k">Most Recent Sale</td><td>Sold for $126,500 on 11/08/2023</td></tr>
+      <tr><td class="k">Comparable Sales</td><td>Comparable sales report available upon request</td></tr>
     </table>
   </section>
 
-  <section class="narrative">
-    <h2>Overview</h2>
-    <p>This 3-bedroom, 2-bath single-family home totals 1,184 square feet on a 3,045 sq ft lot in St. Louis, MO 63147, and was built in 1939. The property is currently vacant and classified as a light rehab, with driveway parking, a full basement in good condition, central AC, and baseboard heating (age unknown; roof age unknown).</p>
-    <p>The property last sold for $126,500 on 11/08/2023. Repair estimate is $15,000.00 – $20,000.00, positioning the deal against an ARV of $135,000 with a gross margin of $70,000 at the $65,000 assignment price. A "win it now" price of $75,000 is also available, or interested buyers may submit an offer.</p>
-    <div class="doc-note">A full comp report and additional photos/documents for this deal are available upon request. Full street address available upon request.</div>
+  <section class="block notes">
+    <h2>Deal Notes</h2>
+    <p>This 3-bedroom, 2-bath single-family home offers 1,184 sq. ft. of living space on a 3,045 sq. ft. lot in St. Louis, MO 63147. Built in 1939, the property features a full basement in good condition, baseboard heating, and central air conditioning. The home is currently vacant and is being offered in light-rehab condition, presenting a straightforward value-add opportunity for an investor.</p>
+    <p>The property last sold for $126,500 on 11/08/2023, and is now available at a significant discount to its projected after-repair value.</p>
+    <p>This offering is an assignment of contract. JNA Dynamic Holdings LLC holds an equitable interest in the underlying purchase contract with the property owner and is marketing that contract position for assignment; this is not a direct sale by the property owner, and buyers will not be contracting directly with the underlying seller.</p>
   </section>
 
-  <section class="disclaimer">
-    <p>This is a marketing summary of an assignment of contract opportunity offered by JNA Dynamic Holdings LLC. This is not a direct sale by, and does not imply direct contact with, the underlying property seller/owner. All figures (price, ARV, repair estimate, gross margin, and prior sale price) are provided as-is from available deal information and are not guaranteed; buyers should perform independent due diligence, including their own inspection, title review, and repair estimates, prior to entering any agreement.</p>
-  </section>
+  <div class="disclaimer">
+    All figures, measurements, condition notes, and financial estimates on this page are believed to be accurate but have not been independently verified by JNA Dynamic Holdings LLC. Buyers are encouraged to perform their own due diligence, including independent inspections and title review, prior to entering any transaction.
+  </div>
 
 </div>
 
-<footer class="cta">
+<div class="cta">
   <div class="wrap">
-    <h2>Interested in MO-1 (SFH)?</h2>
-    <p>Reach out today for the full property address, comp report, and additional documentation on this St. Louis, MO assignment opportunity.</p>
-    <div class="contact-row">
-      <div class="contact-item">
-        <div class="label">Phone</div>
-        <div class="value">520-633-6437</div>
-      </div>
-      <div class="contact-item">
-        <div class="label">Email</div>
-        <div class="value">montanoemmanuel@gmail.com</div>
-      </div>
+    <h2>Interested in This Assignment?</h2>
+    <p>Contact us for the full property address, comparable sales report, and next steps on securing this contract.</p>
+    <div class="contacts">
+      <a href="tel:520-633-6437">Call/Text: 520-633-6437</a>
+      <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
     </div>
-    <div class="company-line">JNA Dynamic Holdings LLC — this offering is an assignment of contract, not a direct sale.</div>
+  </div>
+</div>
+
+<footer class="bottom">
+  <div class="wrap">
+    © JNA Dynamic Holdings LLC. This is a marketing summary of an assignable purchase contract, not an offer of real property for sale.
   </div>
 </footer>
 
