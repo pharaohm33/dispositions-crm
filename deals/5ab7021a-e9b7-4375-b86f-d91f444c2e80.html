@@ -1,502 +1,344 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brunswick Plantation Golf Community Homesite | Calabash, NC — Assignment of Contract</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brunswick Plantation Golf Community Homesite — Calabash, NC | JNA Dynamic Holdings LLC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-
-  * { box-sizing: border-box; }
-
-  html, body {
-    margin: 0;
-    padding: 0;
-    background-color: #f6f1e9;
-    color: #2b2620;
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    line-height: 1.55;
+  :root{
+    --paper:#f6f1e9;
+    --ink:#2b2622;
+    --muted:#6b6259;
+    --line:#ddd3c4;
+    --accent:#8a5a3c;
+    --card:#fffdfa;
   }
-
-  h1, h2, h3 {
-    font-family: 'Source Serif 4', serif;
-    font-weight: 600;
-    color: #201c17;
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Source Sans 3', sans-serif;
+    font-size:16px;
+    line-height:1.55;
   }
-
-  .wrap {
-    max-width: 960px;
-    margin: 0 auto;
-    padding-left: 24px;
-    padding-right: 24px;
+  h1,h2,h3{
+    font-family:'Playfair Display', serif;
+    font-weight:600;
+    color:var(--ink);
   }
-
-  header.top {
-    background-color: #201c17;
-    color: #f6f1e9;
-    padding-top: 22px;
-    padding-bottom: 22px;
+  .wrap{
+    max-width:900px;
+    margin:0 auto;
+    padding-left:24px;
+    padding-right:24px;
   }
-
-  header.top .eyebrow {
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-size: 12px;
-    color: #cbb896;
-    margin-top: 0;
-    margin-bottom: 6px;
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding-top:28px;
+    padding-bottom:20px;
   }
-
-  header.top h1 {
-    font-size: 28px;
-    margin-top: 0;
-    margin-bottom: 4px;
+  .brand{
+    text-transform:uppercase;
+    letter-spacing:0.14em;
+    font-size:13px;
+    color:var(--muted);
+    margin-bottom:6px;
   }
-
-  header.top .sub {
-    color: #d9d2c4;
-    font-size: 14px;
-    margin-top: 0;
-    margin-bottom: 0;
+  .deal-code{
+    display:inline-block;
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--accent);
+    border:1px solid var(--accent);
+    padding:3px 10px;
+    border-radius:20px;
+    margin-bottom:14px;
   }
-
-  .disclosure-strip {
-    background-color: #e8dcc4;
-    border-top: 1px solid #d8c9a3;
-    border-bottom: 1px solid #d8c9a3;
-    padding-top: 12px;
-    padding-bottom: 12px;
+  h1.title{
+    font-size:36px;
+    margin-top:0;
+    margin-bottom:8px;
+    line-height:1.15;
   }
-
-  .disclosure-strip p {
-    margin: 0;
-    font-size: 13px;
-    color: #4a4032;
-    text-align: center;
+  .location-line{
+    font-size:18px;
+    color:var(--muted);
+    margin-top:0;
+    margin-bottom:4px;
   }
-
-  section.gallery-section {
-    padding-top: 32px;
-    padding-bottom: 8px;
+  .address-note{
+    font-size:14px;
+    color:var(--accent);
+    font-style:italic;
+    margin-top:6px;
+    margin-bottom:0;
   }
-
-  section.gallery-section h2 {
-    font-size: 15px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #6b5f4c;
-    margin-top: 0;
-    margin-bottom: 14px;
+  section.price-block{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:24px;
+    margin-top:26px;
+    margin-bottom:26px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    align-items:center;
   }
-
-  .gallery-scroll {
-    display: flex;
-    overflow-x: auto;
-    gap: 14px;
-    padding-bottom: 12px;
+  .price-figure .label{
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    font-size:12px;
+    color:var(--muted);
+    margin-bottom:4px;
   }
-
-  .gallery-scroll img {
-    height: 240px;
-    width: auto;
-    flex-shrink: 0;
-    border-radius: 4px;
-    object-fit: cover;
-    border: 1px solid #ddd0b3;
+  .price-figure .value{
+    font-family:'Playfair Display', serif;
+    font-size:42px;
+    font-weight:700;
+    color:var(--ink);
   }
-
-  section.price-block {
-    padding-top: 30px;
-    padding-bottom: 30px;
+  .price-sub{
+    font-size:14px;
+    color:var(--muted);
+    max-width:420px;
   }
-
-  .price-card {
-    background-color: #ffffff;
-    border: 1px solid #e2d6ba;
-    border-radius: 6px;
-    padding: 28px 30px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 26px;
-    align-items: baseline;
-    justify-content: space-between;
+  section.gallery{
+    margin-top:10px;
+    margin-bottom:32px;
   }
-
-  .price-card .main-price .label {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: #8a7c60;
-    margin-top: 0;
-    margin-bottom: 4px;
+  .gallery h2{
+    font-size:20px;
+    margin-top:0;
+    margin-bottom:10px;
   }
-
-  .price-card .main-price .value {
-    font-size: 42px;
-    font-family: 'Source Serif 4', serif;
-    color: #201c17;
-    margin-top: 0;
-    margin-bottom: 0;
+  .scroller{
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    padding-bottom:10px;
+    scrollbar-width:thin;
   }
-
-  .price-card .stat {
-    text-align: right;
+  .scroller img{
+    height:220px;
+    width:auto;
+    border-radius:8px;
+    border:1px solid var(--line);
+    flex-shrink:0;
+    object-fit:cover;
   }
-
-  .price-card .stat .label {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #8a7c60;
-    margin-top: 0;
-    margin-bottom: 4px;
+  .more-photos{
+    display:inline-block;
+    margin-top:10px;
+    font-size:14px;
+    color:var(--accent);
+    text-decoration:underline;
   }
-
-  .price-card .stat .value {
-    font-size: 24px;
-    font-family: 'Source Serif 4', serif;
-    color: #201c17;
-    margin-top: 0;
-    margin-bottom: 0;
+  section.narrative{
+    margin-top:10px;
+    margin-bottom:32px;
   }
-
-  section.body-copy {
-    padding-top: 10px;
-    padding-bottom: 10px;
+  section.narrative p{
+    margin-top:0;
+    margin-bottom:14px;
   }
-
-  section.body-copy h2 {
-    font-size: 22px;
-    margin-top: 0;
-    margin-bottom: 12px;
+  section.terms{
+    margin-top:10px;
+    margin-bottom:32px;
   }
-
-  section.body-copy p {
-    margin-top: 0;
-    margin-bottom: 14px;
-    color: #3a342b;
+  section.terms h2{
+    font-size:22px;
+    margin-top:0;
+    margin-bottom:14px;
   }
-
-  .comp-callout {
-    background-color: #eee6d2;
-    border-left: 4px solid #b89b5e;
-    padding: 16px 20px;
-    margin-top: 6px;
-    margin-bottom: 6px;
+  table.deal-table{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden;
   }
-
-  .comp-callout p {
-    margin-top: 0;
-    margin-bottom: 0;
+  table.deal-table tr{
+    border-bottom:1px solid var(--line);
   }
-
-  .comp-callout .comp-value {
-    font-family: 'Source Serif 4', serif;
-    font-size: 26px;
-    color: #5c4b1f;
+  table.deal-table tr:last-child{
+    border-bottom:none;
   }
-
-  section.terms {
-    padding-top: 26px;
-    padding-bottom: 26px;
+  table.deal-table td{
+    padding:12px 16px;
+    font-size:15px;
   }
-
-  section.terms h2 {
-    font-size: 22px;
-    margin-top: 0;
-    margin-bottom: 16px;
+  table.deal-table td.k{
+    color:var(--muted);
+    width:42%;
+    font-weight:600;
   }
-
-  table.terms-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #ffffff;
-    border: 1px solid #e2d6ba;
+  section.comp{
+    background:#efe6d8;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:20px 24px;
+    margin-top:10px;
+    margin-bottom:32px;
   }
-
-  table.terms-table th, table.terms-table td {
-    text-align: left;
-    padding: 12px 16px;
-    border-bottom: 1px solid #eee2c4;
-    font-size: 15px;
+  section.comp h3{
+    font-size:18px;
+    margin-top:0;
+    margin-bottom:8px;
   }
-
-  table.terms-table th {
-    width: 42%;
-    color: #6b5f4c;
-    font-weight: 600;
-    background-color: #faf5e8;
+  section.disclosures{
+    margin-top:10px;
+    margin-bottom:32px;
+    font-size:13.5px;
+    color:var(--muted);
   }
-
-  table.terms-table tr:last-child th, table.terms-table tr:last-child td {
-    border-bottom: none;
+  section.disclosures p{
+    margin-top:0;
+    margin-bottom:10px;
   }
-
-  section.additional {
-    padding-top: 8px;
-    padding-bottom: 26px;
+  section.cta{
+    background:var(--ink);
+    color:var(--paper);
+    padding-top:40px;
+    padding-bottom:40px;
+    margin-top:10px;
   }
-
-  section.additional h3 {
-    font-size: 17px;
-    margin-top: 0;
-    margin-bottom: 10px;
+  section.cta h2{
+    color:var(--paper);
+    font-size:28px;
+    margin-top:0;
+    margin-bottom:12px;
   }
-
-  ul.plain-list {
-    padding-left: 20px;
-    margin-top: 0;
-    margin-bottom: 20px;
+  section.cta p{
+    color:#d8d0c4;
+    margin-top:0;
+    margin-bottom:22px;
+    max-width:520px;
   }
-
-  ul.plain-list li {
-    margin-bottom: 6px;
-    color: #3a342b;
+  .cta-links{
+    display:flex;
+    flex-wrap:wrap;
+    gap:16px;
   }
-
-  section.assignment-notice {
-    background-color: #fbf7ee;
-    border-top: 1px solid #e2d6ba;
-    border-bottom: 1px solid #e2d6ba;
-    padding-top: 22px;
-    padding-bottom: 22px;
+  .cta-links a{
+    display:inline-block;
+    background:var(--accent);
+    color:#fff;
+    text-decoration:none;
+    padding:12px 22px;
+    border-radius:6px;
+    font-weight:600;
+    font-size:15px;
   }
-
-  section.assignment-notice h3 {
-    font-size: 16px;
-    margin-top: 0;
-    margin-bottom: 8px;
+  .cta-links a.secondary{
+    background:transparent;
+    border:1px solid #a89a86;
+    color:var(--paper);
   }
-
-  section.assignment-notice p {
-    font-size: 14px;
-    color: #4a4032;
-    margin-top: 0;
-    margin-bottom: 0;
+  footer.bottom{
+    padding-top:20px;
+    padding-bottom:30px;
+    font-size:12.5px;
+    color:var(--muted);
+    text-align:center;
   }
-
-  section.cta-band {
-    background-color: #201c17;
-    color: #f6f1e9;
-    padding-top: 40px;
-    padding-bottom: 40px;
-  }
-
-  section.cta-band h2 {
-    color: #f6f1e9;
-    font-size: 26px;
-    margin-top: 0;
-    margin-bottom: 10px;
-  }
-
-  section.cta-band p.lead {
-    color: #d9d2c4;
-    margin-top: 0;
-    margin-bottom: 22px;
-    font-size: 15px;
-  }
-
-  .cta-contacts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
-  }
-
-  .cta-contacts .item .k {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #cbb896;
-    margin-top: 0;
-    margin-bottom: 4px;
-  }
-
-  .cta-contacts .item .v {
-    font-size: 19px;
-    font-family: 'Source Serif 4', serif;
-    color: #ffffff;
-    margin-top: 0;
-    margin-bottom: 0;
-  }
-
-  .cta-contacts .item .v a {
-    color: #ffffff;
-    text-decoration: none;
-    border-bottom: 1px solid #6b5f4c;
-  }
-
-  footer.foot {
-    padding-top: 22px;
-    padding-bottom: 22px;
-  }
-
-  footer.foot p {
-    font-size: 12px;
-    color: #8a7c60;
-    text-align: center;
-    margin-top: 0;
-    margin-bottom: 0;
-  }
-
 </style>
 </head>
 <body>
 
 <header class="top">
   <div class="wrap">
-    <p class="eyebrow">Deal Code: NC - 3 (Land) &nbsp;•&nbsp; Brunswick County, North Carolina</p>
-    <h1>Brunswick Plantation Golf Community Homesite</h1>
-    <p class="sub">Calabash, NC 28467 &nbsp;|&nbsp; 0.30-Acre Residential Lot &nbsp;|&nbsp; Offered via Assignment of Contract &nbsp;|&nbsp; Full address available upon request</p>
+    <div class="brand">JNA Dynamic Holdings LLC</div>
+    <span class="deal-code">Deal Code: NC - 3 (Land)</span>
+    <h1 class="title">Brunswick Plantation Golf Community Homesite</h1>
+    <p class="location-line">Calabash, Brunswick County, NC 28467</p>
+    <p class="address-note">Address available upon request — contact us for the full property address.</p>
   </div>
 </header>
 
-<div class="disclosure-strip">
-  <div class="wrap">
-    <p>This offering is an assignment of contract. The seller of record is not named and is not to be contacted directly — all inquiries and offers are handled exclusively through JNA Dynamic Holdings LLC below.</p>
-  </div>
+<div class="wrap">
+
+  <section class="price-block">
+    <div class="price-figure">
+      <div class="label">Assignment Price</div>
+      <div class="value">$42,500</div>
+    </div>
+    <div class="price-sub">
+      This is an assignment of contract. JNA Dynamic Holdings LLC holds an equitable interest in the underlying purchase contract with the property owner and is marketing that contract for assignment; this is not a direct sale by, or on behalf of, the property owner, and buyers will not be contacting the underlying seller directly.
+    </div>
+  </section>
+
+  <section class="gallery">
+    <h2>Photos</h2>
+    <div class="scroller">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/1.jpg" alt="Brunswick Plantation homesite photo 1">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/2.jpg" alt="Brunswick Plantation homesite photo 2">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/3.jpg" alt="Brunswick Plantation homesite photo 3">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/4.jpg" alt="Brunswick Plantation homesite photo 4">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/5.jpg" alt="Brunswick Plantation homesite photo 5">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/6.jpg" alt="Brunswick Plantation homesite photo 6">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/7.jpg" alt="Brunswick Plantation homesite photo 7">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/8.jpg" alt="Brunswick Plantation homesite photo 8">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/9.jpg" alt="Brunswick Plantation homesite photo 9">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/10.jpg" alt="Brunswick Plantation homesite photo 10">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/11.jpg" alt="Brunswick Plantation homesite photo 11">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/12.jpg" alt="Brunswick Plantation homesite photo 12">
+    </div>
+  </section>
+
+  <section class="narrative">
+    <h2>Overview</h2>
+    <p>A 0.30 acre homesite in the Brunswick Plantation golf community in Calabash, NC. The lot carries a floodway consideration that buyers should factor into their due diligence and any development plans.</p>
+    <p>A nearby lot across the fairway, with a similar floodway consideration, reportedly sold for approximately $40,000 — offered here for comparison alongside the current $42,500 assignment price.</p>
+  </section>
+
+  <section class="comp">
+    <h3>Comparable Sale</h3>
+    <p style="margin-bottom:0;">A nearby homesite across the fairway with a similar floodway consideration reportedly sold for approximately <strong>$40,000</strong>.</p>
+  </section>
+
+  <section class="terms">
+    <h2>Deal Terms &amp; Property Details</h2>
+    <table class="deal-table">
+      <tr><td class="k">Assignment Price</td><td>$42,500</td></tr>
+      <tr><td class="k">Deal Type</td><td>Land</td></tr>
+      <tr><td class="k">Property Type</td><td>Land</td></tr>
+      <tr><td class="k">Lot Size</td><td>0.30 acres</td></tr>
+      <tr><td class="k">City / State</td><td>Calabash, NC</td></tr>
+      <tr><td class="k">County</td><td>Brunswick County</td></tr>
+      <tr><td class="k">ZIP</td><td>28467</td></tr>
+      <tr><td class="k">Community</td><td>Brunswick Plantation (golf community)</td></tr>
+      <tr><td class="k">Nearby Comparable Sale</td><td>Approximately $40,000 (similar floodway lot, across the fairway)</td></tr>
+    </table>
+  </section>
+
+  <section class="disclosures">
+    <p>This offering is an assignment of contract. JNA Dynamic Holdings LLC has an equitable interest in the underlying purchase agreement and is assigning that contractual interest; this is not a listing of the property for direct sale by its owner, and interested parties should not attempt to contact the underlying seller directly.</p>
+    <p>All figures, measurements, and details on this page — including lot size, price, and the referenced comparable sale — have not been independently verified by JNA Dynamic Holdings LLC and should be confirmed by the buyer during due diligence.</p>
+  </section>
+
 </div>
 
-<section class="gallery-section">
+<section class="cta">
   <div class="wrap">
-    <h2>Property Photos</h2>
-    <div class="gallery-scroll">
-      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/1.jpg" alt="Lot photo 1">
-      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/2.jpg" alt="Lot photo 2">
-      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/3.jpg" alt="Lot photo 3">
-      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/4.jpg" alt="Lot photo 4">
-      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/5.jpg" alt="Lot photo 5">
-      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/6.jpg" alt="Lot photo 6">
-      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/7.jpg" alt="Lot photo 7">
-      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/8.jpg" alt="Lot photo 8">
-      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/9.jpg" alt="Lot photo 9">
-      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/10.jpg" alt="Lot photo 10">
-      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/11.jpg" alt="Lot photo 11">
-      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/12.jpg" alt="Lot photo 12">
+    <h2>Interested in this homesite?</h2>
+    <p>Reach out for the full property address, additional photos, and assignment paperwork. This deal moves on a first-ready-buyer basis.</p>
+    <div class="cta-links">
+      <a href="tel:520-633-6437">Call/Text 520-633-6437</a>
+      <a class="secondary" href="mailto:montanoemmanuel@gmail.com">Email montanoemmanuel@gmail.com</a>
     </div>
   </div>
 </section>
 
-<section class="price-block">
+<footer class="bottom">
   <div class="wrap">
-    <div class="price-card">
-      <div class="main-price">
-        <p class="label">Assignment Price</p>
-        <p class="value">$42,500</p>
-      </div>
-      <div class="stat">
-        <p class="label">Nearby Comp Sale (Similar Floodway Lot)</p>
-        <p class="value">$40,000</p>
-      </div>
-      <div class="stat">
-        <p class="label">Lot Size</p>
-        <p class="value">0.30 Acres</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="body-copy">
-  <div class="wrap">
-    <h2>Overview</h2>
-    <p>Brunswick Plantation, NC — a 0.30-acre golf community homesite located within Brunswick Plantation in Calabash, Brunswick County, North Carolina. This is a floodway-designated lot, and a nearby lot across the fairway with a similar floodway consideration reportedly sold for approximately $40,000.</p>
-
-    <div class="comp-callout">
-      <p>Comparable sale: a nearby lot across the fairway with a similar floodway consideration reportedly sold for approximately</p>
-      <p class="comp-value">$40,000</p>
-    </div>
-  </div>
-</section>
-
-<section class="terms">
-  <div class="wrap">
-    <h2>Deal Terms</h2>
-    <table class="terms-table">
-      <tbody>
-        <tr>
-          <th>Deal Code</th>
-          <td>NC - 3 (Land)</td>
-        </tr>
-        <tr>
-          <th>Address</th>
-          <td>Calabash, NC 28467 (full address released upon inquiry)</td>
-        </tr>
-        <tr>
-          <th>County</th>
-          <td>Brunswick</td>
-        </tr>
-        <tr>
-          <th>Property Type</th>
-          <td>Land</td>
-        </tr>
-        <tr>
-          <th>Deal Type</th>
-          <td>Land</td>
-        </tr>
-        <tr>
-          <th>Lot Size</th>
-          <td>0.30 acres</td>
-        </tr>
-        <tr>
-          <th>Assignment Price</th>
-          <td>$42,500</td>
-        </tr>
-        <tr>
-          <th>Comparable Sale (nearby floodway lot)</th>
-          <td>Approximately $40,000</td>
-        </tr>
-        <tr>
-          <th>Transaction Structure</th>
-          <td>Assignment of Contract</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<section class="additional">
-  <div class="wrap">
-    <h3>Additional Listed Details</h3>
-    <ul class="plain-list">
-      <li>Type: Land</li>
-      <li>Lot size: 0.30 acres</li>
-    </ul>
-  </div>
-</section>
-
-<section class="assignment-notice">
-  <div class="wrap">
-    <h3>Important Disclosure</h3>
-    <p>This is a marketing page for an assignment of contract, not a direct sale of real property by the underlying owner. JNA Dynamic Holdings LLC holds an equitable/contractual interest and is offering assignment of that contract. All communications, offers, and due diligence requests must go through JNA Dynamic Holdings LLC at the contact details below — do not attempt to contact the underlying seller directly.</p>
-  </div>
-</section>
-
-<section class="cta-band">
-  <div class="wrap">
-    <h2>Interested in This Homesite?</h2>
-    <p class="lead">Reach out today to request the full address, documents, and due diligence materials for this Brunswick Plantation lot assignment.</p>
-    <div class="cta-contacts">
-      <div class="item">
-        <p class="k">Phone</p>
-        <p class="v"><a href="tel:5206336437">520-633-6437</a></p>
-      </div>
-      <div class="item">
-        <p class="k">Email</p>
-        <p class="v"><a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a></p>
-      </div>
-      <div class="item">
-        <p class="k">Company</p>
-        <p class="v">JNA Dynamic Holdings LLC</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer class="foot">
-  <div class="wrap">
-    <p>© JNA Dynamic Holdings LLC. This listing is for an assignment of contract and is subject to prior sale, price change, or withdrawal without notice.</p>
+    JNA Dynamic Holdings LLC — Assignment of Contract Opportunity — Calabash, Brunswick County, NC
   </div>
 </footer>
 
