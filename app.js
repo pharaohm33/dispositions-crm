@@ -2400,6 +2400,47 @@ document.getElementById("sync-all-deal-pricing-btn").addEventListener("click", a
   await loadAdminDeals();
 });
 
+// Full re-pull, no gating at all -- ignores LastAutoPriceSyncAt and
+// whether the price changed, so every active deal's Source Link
+// description gets re-fetched and its page rebuilt under whatever the
+// current generateDealPageHtml prompt says. Meant for catching every deal
+// up after a formatting/prompt change, not routine upkeep.
+document.getElementById("regenerate-all-pages-btn").addEventListener("click", async function () {
+  const btn = this;
+  const resultEl = document.getElementById("regenerate-all-pages-result");
+  if (btn.disabled) return;
+  if (!confirm("This re-pulls the source description and rebuilds the public page for every active deal with a Source Link, regardless of price or recent syncs. This can take a while for a large portfolio. Continue?")) return;
+  btn.disabled = true;
+
+  resultEl.textContent = " Finding all active deals with a Source Link…";
+  const all = await api("adminGetAllActiveDealIdsWithSourceLink", {});
+  if (!all.ok) { btn.disabled = false; resultEl.textContent = " " + (all.error || "Could not start."); showToast(all.error || "Could not start.", true); return; }
+
+  const dealIds = all.dealIds;
+  if (dealIds.length === 0) {
+    btn.disabled = false;
+    resultEl.textContent = " No active deals have a Source Link set.";
+    return;
+  }
+
+  let checkedCount = 0;
+  const errors = [];
+  for (let i = 0; i < dealIds.length; i += PRICE_SYNC_BATCH_SIZE) {
+    const batch = dealIds.slice(i, i + PRICE_SYNC_BATCH_SIZE);
+    resultEl.textContent = " Regenerating " + Math.min(i + PRICE_SYNC_BATCH_SIZE, dealIds.length) + " of " + dealIds.length + "…";
+    const res = await api("adminSyncDealPricingBatch", { dealIds: batch, force: true });
+    if (!res.ok) { errors.push(res.error || "A batch failed."); continue; }
+    checkedCount += res.checkedCount;
+    errors.push.apply(errors, res.errors);
+  }
+
+  btn.disabled = false;
+  resultEl.textContent = " Regenerated " + checkedCount + " of " + dealIds.length + " deal page(s)." +
+    (errors.length > 0 ? " " + errors.length + " couldn't be rebuilt: " + errors.slice(0, 5).join("; ") + (errors.length > 5 ? " …" : "") : "");
+  showToast("Regenerated " + checkedCount + " deal page(s).");
+  await loadAdminDeals();
+});
+
 function openDealModal() {
   document.getElementById("deal-code-input").value = "";
   document.getElementById("deal-address-input").value = "";

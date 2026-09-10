@@ -122,6 +122,16 @@ instead of redoing everything. Manual actions (a single-deal Sync Price
 click, or Create Deal Artifact Page) never count toward that skip window —
 only a previous bulk auto-run does.
 
+**Regenerate All Deal Pages From Source** (above the deals table) — the
+catch-up tool. Same batching as Sync All Pricing, but ignores the 3-hour
+skip AND the "price unchanged" skip entirely (`body.force`) — every active
+deal with a Source Link gets its description re-pulled and its page fully
+rebuilt under whatever `generateDealPageHtml`'s current prompt says. Use
+this once after changing the prompt/formatting rules so every existing
+page picks up the change, not just ones that happen to get a price update
+next. Not meant for routine use — it costs one Claude call + one GitHub
+commit per deal every time, unlike Sync All Pricing's cheap no-op skip.
+
 ## 4. Deploy as a Web App
 
 1. Back in the editor, click **Deploy → New deployment**.

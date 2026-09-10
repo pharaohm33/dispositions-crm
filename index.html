@@ -617,6 +617,11 @@
       <button class="btn secondary small" id="sync-all-deal-pricing-btn">Sync All Pricing From Source Links</button>
       <span class="small-muted" id="sync-all-deal-pricing-result"></span>
     </div>
+    <div class="nav-row" style="justify-content:flex-start; margin-bottom:10px; flex-wrap:wrap;">
+      <button class="btn secondary small" id="regenerate-all-pages-btn">Regenerate All Deal Pages From Source</button>
+      <span class="small-muted" id="regenerate-all-pages-result"></span>
+    </div>
+    <p class="small-muted" style="margin-top:-4px; margin-bottom:10px;">Re-pulls every active deal's Source Link description and rebuilds its public page under the current formatting rules, regardless of whether the price changed or it was synced recently. Use this after a prompt/formatting update; routine upkeep should use Sync All Pricing above instead.</p>
     <table class="crm-table">
       <thead><tr><th>Deal Code</th><th>Address</th><th>Asset Type</th><th>Asking Price</th><th>Status</th><th>Coverage</th><th>Access</th></tr></thead>
       <tbody id="admin-deals-tbody"></tbody>

@@ -291,6 +291,8 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminGetDealsPendingPriceSync));
       case 'adminSyncDealPricingBatch':
         return jsonOut(withAdminSession(body, adminSyncDealPricingBatch));
+      case 'adminGetAllActiveDealIdsWithSourceLink':
+        return jsonOut(withAdminSession(body, adminGetAllActiveDealIdsWithSourceLink));
       case 'adminCreateDealArtifactPage':
         return jsonOut(withAdminSession(body, adminCreateDealArtifactPage));
       case 'adminGetReps':
@@ -1740,9 +1742,13 @@ function generateDealPageHtml(deal, sourceListingText, photoPaths, morePhotosLin
     'opposite of the "keep everything" rule above, which governs facts that ARE present in ' +
     'sourceListingText. "Cleaned up" means reformatted for presentation, never truncated or thinned ' +
     'out -- every disclosed fact still appears somewhere; only genuinely-missing fields are omitted, ' +
-    'silently, with no placeholder marking the gap.) One narrow exception: writing "0" for a real, ' +
-    'known zero (e.g. a land parcel truly has 0 bedrooms) is a disclosed fact, not a placeholder, and ' +
-    'should be kept.\n\n' +
+    'silently, with no placeholder marking the gap.) This applies to structure-only fields on a land/' +
+    'vacant-lot deal too -- Beds, Baths, Half-Bath, Sq. Ft., Year Built, Parking, and similar do not ' +
+    'apply to unimproved land at all. Omit those fields ENTIRELY for a land/lot deal; do not write ' +
+    '"0," "0 (raw land)," "N/A," or any other stand-in for them -- a field that doesn\'t apply gets no ' +
+    'row, same as a field that\'s simply undisclosed. Only write "0" for a field that is a real, ' +
+    'disclosed fact for a property that DOES have a structure (e.g. a house with a disclosed 0 half-' +
+    'baths).\n\n' +
     'This is an assignment of contract, not a direct sale -- the page must say so, and must not name ' +
     'or imply direct contact with the underlying seller/owner.\n\n' +
     'Deal facts (JSON):\n' + JSON.stringify(facts, null, 2) + '\n\n' +
@@ -1895,8 +1901,12 @@ function adminSyncDealPricing(body) {
   // match alone used to mean "nothing to do," which silently skipped page
   // creation forever for any deal whose price simply happened to already be
   // correct when added. Now this also builds the page any time one doesn't
-  // exist yet, even with no price change to report.
-  if (!priceChanged && match['PublicPageUrl']) {
+  // exist yet, even with no price change to report. body.force skips this
+  // gate entirely and always regenerates -- used by the "Regenerate All
+  // Deal Pages" catch-up action to re-pull the source description and
+  // rebuild every page under the current prompt rules, not just ones with
+  // a price change or no page yet.
+  if (!priceChanged && match['PublicPageUrl'] && !body.force) {
     return { ok: true, priceFound: true, priceChanged: false, oldPrice: match['Price'], newPrice: match['Price'] };
   }
 
@@ -1974,10 +1984,26 @@ function adminGetDealsPendingPriceSync(body) {
   };
 }
 
+// Every non-Sold/non-Dead deal with a Source Link, no recency or price-match
+// filtering at all -- used by the "Regenerate All Deal Pages" catch-up
+// action, which needs to touch literally every active deal regardless of
+// whether it was just synced or its price hasn't moved. The routine bulk
+// price sync uses getDealsPendingAutoPriceSync instead, which does filter
+// by recency -- this is deliberately the unfiltered version.
+function adminGetAllActiveDealIdsWithSourceLink(body) {
+  const sheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const dealIds = sheetToObjects(sheet)
+    .filter(function (d) { return d['SourceLink'] && d['Status'] !== 'Sold' && d['Status'] !== 'Dead'; })
+    .map(function (d) { return d['DealID']; });
+  return { ok: true, dealIds: dealIds };
+}
+
 // Step 2 of the bulk flow: syncs pricing for exactly the dealIds given
 // (a small batch, chosen by the caller) and stamps LastAutoPriceSyncAt on
 // each one that was actually checked -- see the comment above for why that
 // field, specifically, is what gates the next bulk run's skip logic.
+// body.force is passed straight through to adminSyncDealPricing so the
+// Regenerate All flow can force a full rebuild even with no price change.
 function adminSyncDealPricingBatch(body) {
   const dealIds = Array.isArray(body.dealIds) ? body.dealIds : [];
   if (dealIds.length === 0) return { ok: false, error: 'Missing dealIds.' };
@@ -1999,7 +2025,7 @@ function adminSyncDealPricingBatch(body) {
     if (i > 0) Utilities.sleep(PRICE_SYNC_BATCH_DELAY_MS);
     const label = (dealsByIdAtStart[dealId] && (dealsByIdAtStart[dealId]['DealCode'] || dealsByIdAtStart[dealId]['Address'])) || dealId;
     checkedCount++;
-    const result = adminSyncDealPricing({ dealId: dealId });
+    const result = adminSyncDealPricing({ dealId: dealId, force: !!body.force });
     if (!result.ok) { errors.push(label + ': ' + result.error); return; }
     if (result.pageError) errors.push(label + ': price updated but page publish failed: ' + result.pageError);
     if (result.priceChanged) changedCount++;
