@@ -1082,6 +1082,31 @@ function adminAddDeal(body) {
 
   const assignedCount = applyDealAssignMode(dealId, d.assetCategory, body.assignMode, now);
 
+  // Build the public page right away when a Source Link is given, so
+  // "ensuring it always does this for all deals going forward" doesn't
+  // depend on the price ever changing or admin remembering to run Create
+  // Deal Artifact Page -- see the matching change in adminSyncDealPricing,
+  // which also now builds a missing page even on an unchanged price. Best
+  // effort only: a Claude/GitHub hiccup here must never block the deal
+  // itself from being created, so this is swallowed into pageGenError
+  // rather than failing the whole call. No photos get published from
+  // here (no Pictures Link to work from yet) -- admin can add those via
+  // Create Deal Artifact Page whenever they're ready.
+  let publicPageUrl = '';
+  let pageGenError = '';
+  if (d.sourceLink) {
+    try {
+      const newMatch = sheetToObjects(sheet).find(function (r) { return r['DealID'] === dealId; });
+      if (newMatch) {
+        publicPageUrl = regenerateAndPublishDealPage(newMatch);
+        sheet.getRange(newMatch._row, getColumnIndex(sheet, 'PublicPageUrl')).setValue(publicPageUrl);
+        sheet.getRange(newMatch._row, getColumnIndex(sheet, 'LastPriceSyncAt')).setValue(now);
+      }
+    } catch (err) {
+      pageGenError = String(err);
+    }
+  }
+
   // Auto-draft the "new deal" email in beehiiv rather than auto-sending it
   // -- beehiiv's recipient-targeting fields for a Create Post API call
   // aren't reliably documented, and guessing wrong risks emailing the
@@ -1095,7 +1120,7 @@ function adminAddDeal(body) {
     dealDraftHtml(d, dealTypes)
   );
 
-  return { ok: true, dealId: dealId, assignedCount: assignedCount, beehiivDraftUrl: draftUrl };
+  return { ok: true, dealId: dealId, assignedCount: assignedCount, beehiivDraftUrl: draftUrl, publicPageUrl: publicPageUrl, pageGenError: pageGenError };
 }
 
 // Plain, readable HTML for the auto-drafted "new deal" email -- deliberately
@@ -1701,11 +1726,25 @@ function generateDealPageHtml(deal, sourceListingText, photoPaths, morePhotosLin
     'photo set" -- as a normal <a href="MOREPHOTOSLINK_VALUE" target="_blank" rel="noopener"> pointing ' +
     'at that exact URL. Do not describe morePhotosLink\'s destination as a marketplace, listing, or ' +
     'external site -- it\'s just "more photos," consistent with the no-sourcing-disclosure rule above. ' +
-    'When morePhotosLink is empty, do not add any such link.\n\n' +
+    'When morePhotosLink is empty, do not add any such link. Never invent ANY other link, either -- ' +
+    'the only href values allowed anywhere in the output are: tel:/mailto: built from facts.contactPhone ' +
+    '/facts.contactEmail, morePhotosLink (only when non-empty), and photoPaths image srcs. Do not write ' +
+    'an href to claude.ai, a Google Drive/Docs URL not given above, or any other URL you were not ' +
+    'explicitly given -- if you want to reference "more documents" or "additional photos" and no link ' +
+    'was provided for it, say so in plain text with no href at all rather than fabricating one.\n\n' +
     'Do not fabricate any figures beyond what is given below -- if a field is blank and not mentioned ' +
-    'in sourceListingText, omit that row rather than inventing a number. This is an assignment of ' +
-    'contract, not a direct sale -- the page must say so, and must not name or imply direct contact ' +
-    'with the underlying seller/owner.\n\n' +
+    'in sourceListingText, OMIT THAT ROW/FIELD ENTIRELY. Never write a placeholder value in its place -- ' +
+    'no "N/A," "—," "-," "Not disclosed," "Not specified," "Not provided," "Not applicable," "TBD," ' +
+    '"Unknown," or anything similar. A field that isn\'t in the data doesn\'t exist on this page; it ' +
+    'doesn\'t get a row that says so. (This only applies to genuinely undisclosed fields -- it is the ' +
+    'opposite of the "keep everything" rule above, which governs facts that ARE present in ' +
+    'sourceListingText. "Cleaned up" means reformatted for presentation, never truncated or thinned ' +
+    'out -- every disclosed fact still appears somewhere; only genuinely-missing fields are omitted, ' +
+    'silently, with no placeholder marking the gap.) One narrow exception: writing "0" for a real, ' +
+    'known zero (e.g. a land parcel truly has 0 bedrooms) is a disclosed fact, not a placeholder, and ' +
+    'should be kept.\n\n' +
+    'This is an assignment of contract, not a direct sale -- the page must say so, and must not name ' +
+    'or imply direct contact with the underlying seller/owner.\n\n' +
     'Deal facts (JSON):\n' + JSON.stringify(facts, null, 2) + '\n\n' +
     'photoPaths (JSON):\n' + JSON.stringify(photoPaths || []) + '\n\n' +
     'morePhotosLink:\n' + (morePhotosLink || '(none)') + '\n\n' +
@@ -1849,14 +1888,24 @@ function adminSyncDealPricing(body) {
   if (priceCheck.price === null) {
     return { ok: true, priceFound: false, priceChanged: false, oldPrice: match['Price'], newPrice: match['Price'] };
   }
-  if (priceCheck.price === match['Price']) {
+
+  const priceChanged = priceCheck.price !== match['Price'];
+  // Every deal with a Source Link is meant to have a public page -- see
+  // "ensuring it always does this for all deals going forward." A price
+  // match alone used to mean "nothing to do," which silently skipped page
+  // creation forever for any deal whose price simply happened to already be
+  // correct when added. Now this also builds the page any time one doesn't
+  // exist yet, even with no price change to report.
+  if (!priceChanged && match['PublicPageUrl']) {
     return { ok: true, priceFound: true, priceChanged: false, oldPrice: match['Price'], newPrice: match['Price'] };
   }
 
   const oldPrice = match['Price'];
-  sheet.getRange(match._row, getColumnIndex(sheet, 'Price')).setValue(priceCheck.price);
-  sheet.getRange(match._row, getColumnIndex(sheet, 'UpdatedAt')).setValue(now);
-  match['Price'] = priceCheck.price;
+  if (priceChanged) {
+    sheet.getRange(match._row, getColumnIndex(sheet, 'Price')).setValue(priceCheck.price);
+    sheet.getRange(match._row, getColumnIndex(sheet, 'UpdatedAt')).setValue(now);
+    match['Price'] = priceCheck.price;
+  }
 
   let pageUrl = match['PublicPageUrl'] || '';
   try {
@@ -1865,10 +1914,10 @@ function adminSyncDealPricing(body) {
   } catch (err) {
     // Price is already saved above even if the page regen/publish fails --
     // don't leave Price stale just because Claude or GitHub hiccuped.
-    return { ok: true, priceFound: true, priceChanged: true, oldPrice: oldPrice, newPrice: priceCheck.price, pageUrl: pageUrl, pageError: String(err) };
+    return { ok: true, priceFound: true, priceChanged: priceChanged, oldPrice: oldPrice, newPrice: priceCheck.price, pageUrl: pageUrl, pageError: String(err) };
   }
 
-  return { ok: true, priceFound: true, priceChanged: true, oldPrice: oldPrice, newPrice: priceCheck.price, pageUrl: pageUrl };
+  return { ok: true, priceFound: true, priceChanged: priceChanged, oldPrice: oldPrice, newPrice: priceCheck.price, pageUrl: pageUrl };
 }
 
 // Bulk pricing sync, split across small client-driven batches instead of

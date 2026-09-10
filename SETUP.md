@@ -53,8 +53,28 @@ Every deal with a Source Link gets a permanent public page at
 `https://sendmybuyer.com/deals/<DealID>.html` — keyed by the deal's internal
 ID (never its Deal Code or a timestamp) and overwritten in place every time
 it's regenerated, so a link already sent to a buyer just shows whatever is
-current the next time they open it. Nothing ever needs to be reissued. Two
-admin-panel actions produce/update it:
+current the next time they open it. Nothing ever needs to be reissued.
+
+This is guaranteed, not opt-in: **adminAddDeal** now builds the page
+immediately when a new deal is saved with a Source Link (best-effort — a
+Claude/GitHub hiccup here never blocks the deal from being created), and
+**adminSyncDealPricing** builds a missing page even when the price check
+comes back unchanged, instead of only building/updating on a price change.
+Between those two, every deal that has a Source Link ends up with a page
+without anyone needing to remember to click Create Deal Artifact Page —
+that action is now really about photos and forced full rebuilds, not the
+only path to a page existing at all.
+
+The page content itself always comes from the Source Link's full listing
+text (`fetchSourceListingText`), reformatted by Claude per the rules in
+`generateDealPageHtml` — every disclosed fact kept (cleaning up means
+reformatting, never trimming real information), the underlying property's
+address always redacted in favor of "available upon request," every
+contact in the source swapped for JNA Dynamic Holdings LLC's own contact
+info, and any field the source simply doesn't disclose left out entirely —
+never shown as "N/A," "—," "Not specified," or similar placeholder text.
+
+Two admin-panel actions produce/update the page:
 
 **Create Deal Artifact Page** (per deal, under Private Admin Notes) — the
 full build. Give it a **Pictures Link** (a Google Drive folder or single

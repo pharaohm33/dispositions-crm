@@ -2489,7 +2489,10 @@ document.getElementById("deal-modal-save").addEventListener("click", async funct
   }
   document.getElementById("deal-modal").hidden = true;
   await loadAdminDeals();
-  showToast(assignMode ? "Deal added and assigned to " + res.assignedCount + " rep(s)." : "Deal added.");
+  let msg = assignMode ? "Deal added and assigned to " + res.assignedCount + " rep(s)." : "Deal added.";
+  if (res.publicPageUrl) msg += " Public page published.";
+  else if (res.pageGenError) msg += " Public page could not be built yet (" + res.pageGenError + ") — try Create Deal Artifact Page from the deal detail once Script Properties are set.";
+  showToast(msg, !!res.pageGenError && !res.publicPageUrl && !!data.sourceLink);
 });
 
 async function openAdminDealDetail(dealId) {
