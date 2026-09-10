@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lockwood Folly Golf Community Homesite — Supply, NC | Brunswick County Land</title>
+<title>Lockwood Folly Golf Community Homesite — Brunswick County, NC | JNA Dynamic Holdings LLC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -11,306 +11,386 @@
   * { box-sizing: border-box; }
   body {
     margin: 0;
-    padding: 0;
-    background-color: #f6f1e9;
-    color: #2c2620;
+    background: #f6f1e9;
+    color: #2b2622;
     font-family: 'Source Sans 3', sans-serif;
-    font-size: 17px;
-    line-height: 1.55;
+    line-height: 1.6;
   }
   h1, h2, h3 {
     font-family: 'Playfair Display', serif;
-    font-weight: 600;
-    color: #201b16;
+    color: #211d19;
   }
   .wrap {
-    max-width: 880px;
+    max-width: 960px;
     margin: 0 auto;
-    padding-left: 24px;
-    padding-right: 24px;
+    padding: 0 24px;
   }
-
-  /* HERO */
-  .hero {
-    background-color: #26221d;
-    color: #f3ece0;
-    padding-top: 40px;
-    padding-bottom: 34px;
+  header.top {
+    background: #211d19;
+    color: #f6f1e9;
+    padding-top: 28px;
+    padding-bottom: 28px;
   }
-  .eyebrow {
+  header.top .tag {
+    letter-spacing: 2px;
     text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-size: 13px;
+    font-size: 12px;
     color: #cbb98a;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
-  .hero h1 {
-    color: #f8f4ec;
-    font-size: 40px;
+  header.top h1 {
+    font-size: 34px;
     margin-top: 0;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
+    color: #f8f4ec;
   }
-  .hero .loc {
-    font-size: 18px;
-    color: #e6dcc8;
-    margin-bottom: 6px;
+  header.top .loc {
+    font-size: 17px;
+    margin-bottom: 4px;
   }
-  .addr-note {
-    font-size: 15px;
-    color: #d8c896;
+  header.top .addr-note {
+    font-size: 14px;
+    color: #e4dcc6;
     font-style: italic;
-    margin-top: 4px;
+    margin-top: 10px;
     margin-bottom: 0;
   }
 
-  /* PRICE BLOCK */
   .price-band {
-    background-color: #fffdf9;
-    border-top: 1px solid #e4dcc9;
-    border-bottom: 1px solid #e4dcc9;
-    padding-top: 26px;
-    padding-bottom: 26px;
+    background: #fffaf1;
+    border-bottom: 1px solid #e2d7bf;
+    border-top: 4px solid #8a6d3b;
+    padding-top: 22px;
+    padding-bottom: 22px;
   }
-  .price-grid {
+  .price-band .price-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 28px;
     align-items: baseline;
+    gap: 20px;
   }
-  .price-main .label {
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-size: 12.5px;
-    color: #8a7a56;
-    margin-bottom: 4px;
-  }
-  .price-main .num {
+  .price-band .price {
     font-family: 'Playfair Display', serif;
     font-size: 44px;
-    color: #201b16;
     font-weight: 700;
+    color: #6b4e1e;
   }
-  .price-sub .label {
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-size: 12.5px;
-    color: #8a7a56;
-    margin-bottom: 4px;
+  .price-band .price-sub {
+    font-size: 15px;
+    color: #5a4f42;
   }
-  .price-sub .num {
-    font-family: 'Playfair Display', serif;
-    font-size: 26px;
-    color: #4a4030;
-  }
-  .assignment-note {
-    margin-top: 18px;
-    margin-bottom: 0;
-    font-size: 14.5px;
-    color: #6b5f47;
-    border-left: 3px solid #cbb98a;
-    padding-left: 12px;
+  .price-band .asis {
+    font-size: 15px;
+    color: #5a4f42;
+    margin-top: 6px;
   }
 
-  /* GALLERY */
   .gallery-section {
-    padding-top: 34px;
-    padding-bottom: 10px;
+    margin-top: 30px;
+    margin-bottom: 30px;
   }
-  .gallery-section h2 {
-    font-size: 22px;
-    margin-top: 0;
-    margin-bottom: 12px;
-  }
-  .gallery-scroll {
+  .gallery {
     display: flex;
     gap: 12px;
     overflow-x: auto;
-    padding-bottom: 14px;
+    padding-bottom: 10px;
   }
-  .gallery-scroll img {
+  .gallery img {
     height: 230px;
     width: auto;
-    flex: 0 0 auto;
     border-radius: 4px;
-    border: 1px solid #e4dcc9;
-    object-fit: cover;
+    flex: 0 0 auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .more-photos {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+  .more-photos a {
+    color: #6b4e1e;
+    font-weight: 600;
   }
 
-  /* SECTIONS */
-  section.block {
-    padding-top: 30px;
-    padding-bottom: 30px;
-    border-top: 1px solid #e8e0cd;
+  section {
+    margin-top: 36px;
+    margin-bottom: 36px;
   }
-  section.block h2 {
+  section h2 {
     font-size: 24px;
-    margin-top: 0;
-    margin-bottom: 16px;
+    border-bottom: 2px solid #cbb98a;
+    padding-bottom: 8px;
+    margin-bottom: 18px;
   }
-  p {
-    margin-top: 0;
-    margin-bottom: 12px;
+  section h3 {
+    font-size: 18px;
+    margin-top: 22px;
+    margin-bottom: 8px;
+    color: #4a3c22;
   }
+
+  ul.clean {
+    padding-left: 20px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+  ul.clean li { margin-bottom: 6px; }
 
   table.terms {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 6px;
+    background: #fffaf1;
+    border: 1px solid #e2d7bf;
   }
   table.terms td {
-    padding: 11px 6px;
-    border-bottom: 1px solid #e8e0cd;
-    font-size: 16px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e9e0cc;
+    font-size: 15px;
+    vertical-align: top;
   }
-  table.terms td.k {
-    color: #7a6e54;
-    width: 42%;
-  }
-  table.terms td.v {
-    color: #201b16;
+  table.terms tr:last-child td { border-bottom: none; }
+  table.terms td.label {
     font-weight: 600;
+    color: #4a3c22;
+    width: 45%;
   }
 
-  ul.features {
-    padding-left: 20px;
-    margin-top: 0;
-    margin-bottom: 0;
+  .snapshot-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 30px;
   }
-  ul.features li {
-    margin-bottom: 8px;
+  .snapshot-grid div {
+    background: #fffaf1;
+    border: 1px solid #e2d7bf;
+    padding: 10px 14px;
+    font-size: 14.5px;
+    border-radius: 4px;
   }
 
-  .disclaimer {
-    font-size: 13.5px;
-    color: #8a7f68;
+  .note-box {
+    background: #f1e9d6;
+    border-left: 4px solid #8a6d3b;
+    padding: 16px 18px;
+    font-size: 14.5px;
     margin-top: 14px;
-    margin-bottom: 0;
+    margin-bottom: 14px;
   }
 
-  /* CTA */
   .cta-band {
-    background-color: #26221d;
-    color: #f3ece0;
+    background: #211d19;
+    color: #f6f1e9;
     padding-top: 40px;
     padding-bottom: 40px;
+    margin-top: 46px;
   }
   .cta-band h2 {
     color: #f8f4ec;
+    border-bottom: none;
     font-size: 28px;
-    margin-top: 0;
     margin-bottom: 10px;
   }
-  .cta-band p {
-    color: #d9d0bc;
-    margin-bottom: 20px;
+  .cta-band p { color: #ddd4bf; }
+  .cta-contact {
+    margin-top: 18px;
+    font-size: 18px;
   }
-  .cta-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-  .cta-links a {
-    display: inline-block;
-    background-color: #cbb98a;
-    color: #201b16;
+  .cta-contact a {
+    color: #f0d99a;
     text-decoration: none;
     font-weight: 600;
-    padding: 12px 22px;
-    border-radius: 3px;
-    font-size: 16px;
   }
-  .foot-note {
-    font-size: 13px;
-    color: #a89a78;
-    margin-top: 26px;
-    margin-bottom: 0;
+
+  footer.disclaimer {
+    background: #ece4d2;
+    border-top: 1px solid #d9cba7;
+    padding-top: 26px;
+    padding-bottom: 40px;
+  }
+  footer.disclaimer p {
+    font-size: 12.5px;
+    color: #55493a;
+    margin-top: 0;
+    margin-bottom: 10px;
   }
 </style>
 </head>
 <body>
 
-  <div class="hero">
-    <div class="wrap">
-      <div class="eyebrow">Deal Code: NC - 2 (Land) &nbsp;·&nbsp; Assignment of Contract</div>
-      <h1>Lockwood Folly Golf Community Homesite</h1>
-      <div class="loc">Supply, Brunswick County, North Carolina 28462</div>
-      <div class="addr-note">Address available upon request — contact us and we'll send the full property address.</div>
+<header class="top">
+  <div class="wrap">
+    <div class="tag">Wholesale Assignment Opportunity &middot; Deal Code: NC - 2 (Land)</div>
+    <h1>Lockwood Folly Golf Community Homesite</h1>
+    <div class="loc">Supply, North Carolina &middot; Brunswick County</div>
+    <div class="addr-note">Address available upon request — contact us below and we'll send the full parcel details.</div>
+  </div>
+</header>
+
+<div class="price-band">
+  <div class="wrap">
+    <div class="price-row">
+      <div class="price">$54,900</div>
+      <div class="price-sub">Asking price &middot; 0.27&plusmn; acre residential homesite</div>
+    </div>
+    <div class="asis">As-is value: $67,000 &mdash; based on a neighboring lot currently marketed around that figure by a builder who reportedly acquired it for approximately $57,000. That positions this offering approximately $12,100 below the neighboring current asking price and below that builder's reported acquisition basis.</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="gallery-section">
+    <div class="gallery">
+      <img src="/deals/43d46e37-bbdb-48fc-81d5-48ab7a81932a/photos/1.jpg" alt="Lockwood Folly homesite photo 1">
+      <img src="/deals/43d46e37-bbdb-48fc-81d5-48ab7a81932a/photos/2.jpg" alt="Lockwood Folly homesite photo 2">
+      <img src="/deals/43d46e37-bbdb-48fc-81d5-48ab7a81932a/photos/3.jpg" alt="Lockwood Folly homesite photo 3">
+      <img src="/deals/43d46e37-bbdb-48fc-81d5-48ab7a81932a/photos/4.jpg" alt="Lockwood Folly homesite photo 4">
+      <img src="/deals/43d46e37-bbdb-48fc-81d5-48ab7a81932a/photos/5.jpg" alt="Lockwood Folly homesite photo 5">
+      <img src="/deals/43d46e37-bbdb-48fc-81d5-48ab7a81932a/photos/6.jpg" alt="Lockwood Folly homesite photo 6">
+      <img src="/deals/43d46e37-bbdb-48fc-81d5-48ab7a81932a/photos/7.jpg" alt="Lockwood Folly homesite photo 7">
+      <img src="/deals/43d46e37-bbdb-48fc-81d5-48ab7a81932a/photos/8.jpg" alt="Lockwood Folly homesite photo 8">
+      <img src="/deals/43d46e37-bbdb-48fc-81d5-48ab7a81932a/photos/9.jpg" alt="Lockwood Folly homesite photo 9">
     </div>
   </div>
 
-  <div class="price-band">
-    <div class="wrap">
-      <div class="price-grid">
-        <div class="price-main">
-          <div class="label">Assignment Price</div>
-          <div class="num">$54,900</div>
-        </div>
-        <div class="price-sub">
-          <div class="label">As-Is Value</div>
-          <div class="num">$67,000</div>
-        </div>
-      </div>
-      <p class="assignment-note">This offering is an assignment of contract. JNA Dynamic Holdings LLC holds an equitable interest in this property under contract with the current owner and is marketing that contract position for assignment; this is not a direct sale by the underlying seller, and buyers will not be contracting directly with the property owner.</p>
-    </div>
-  </div>
+  <section>
+    <h2>Here Is What We Have</h2>
+    <p>This is an approximately 0.27-acre residential homesite located inside the established Lockwood Folly golf community in Brunswick County, North Carolina.</p>
+    <p>The property offers an opportunity to acquire land within a developed golf-community setting at a price positioned below immediate neighboring market activity.</p>
+    <p>Available property information indicates no known mapped flood zone or wetlands affecting the parcel, subject to independent buyer verification.</p>
+    <p>The strongest part of this opportunity is the immediate neighboring land support. A neighboring lot is currently being marketed at approximately $67,000 by a builder who reportedly acquired that property for approximately $57,000.</p>
+    <p>The subject is being offered at $54,900 — approximately $12,100 below the neighboring current asking price and below the reported acquisition basis of that neighboring builder-owned lot.</p>
+    <p>For a buyer who understands Lockwood Folly and is comfortable with the community's current construction requirements, this creates an attractive residential land basis inside an established golf-course community.</p>
+  </section>
 
-  <div class="wrap gallery-section">
-    <h2>Photos</h2>
-    <div class="gallery-scroll">
-      <img src="/deals/43d46e37-bbdb-48fc-81d5-48ab7a81932a/photos/1.jpg" alt="Lockwood Folly Golf Community homesite photo 1">
-      <img src="/deals/43d46e37-bbdb-48fc-81d5-48ab7a81932a/photos/2.jpg" alt="Lockwood Folly Golf Community homesite photo 2">
-      <img src="/deals/43d46e37-bbdb-48fc-81d5-48ab7a81932a/photos/3.jpg" alt="Lockwood Folly Golf Community homesite photo 3">
-      <img src="/deals/43d46e37-bbdb-48fc-81d5-48ab7a81932a/photos/4.jpg" alt="Lockwood Folly Golf Community homesite photo 4">
-      <img src="/deals/43d46e37-bbdb-48fc-81d5-48ab7a81932a/photos/5.jpg" alt="Lockwood Folly Golf Community homesite photo 5">
-      <img src="/deals/43d46e37-bbdb-48fc-81d5-48ab7a81932a/photos/6.jpg" alt="Lockwood Folly Golf Community homesite photo 6">
-      <img src="/deals/43d46e37-bbdb-48fc-81d5-48ab7a81932a/photos/7.jpg" alt="Lockwood Folly Golf Community homesite photo 7">
-      <img src="/deals/43d46e37-bbdb-48fc-81d5-48ab7a81932a/photos/8.jpg" alt="Lockwood Folly Golf Community homesite photo 8">
-      <img src="/deals/43d46e37-bbdb-48fc-81d5-48ab7a81932a/photos/9.jpg" alt="Lockwood Folly Golf Community homesite photo 9">
-    </div>
-  </div>
+  <section>
+    <h2>The Numbers</h2>
+    <ul class="clean">
+      <li>Asking Price: $54,900</li>
+      <li>Lot Size: 0.27&plusmn; Acres</li>
+      <li>County: Brunswick County</li>
+      <li>Community: Lockwood Folly</li>
+      <li>Property Type: Vacant Residential Land</li>
+      <li>No mapped flood zone reported — buyer to verify</li>
+      <li>No wetlands reported — buyer to verify</li>
+      <li>Cash or Hard Money Only</li>
+      <li>Assignment of Contract</li>
+    </ul>
+  </section>
 
-  <section class="block">
-    <div class="wrap">
-      <h2>Overview</h2>
-      <p>A 0.27-acre homesite located within the Lockwood Folly golf community in Supply, Brunswick County, North Carolina. No flood zone or wetlands have been reported on the parcel. This is a vacant residential lot opportunity for a buyer looking to build in an established golf-course community.</p>
-      <ul class="features">
-        <li>Brunswick County, Supply, NC 28462</li>
-        <li>Lockwood Folly golf community homesite</li>
-        <li>Lot size: 0.27 acres</li>
-        <li>No flood zone reported</li>
-        <li>No wetlands reported</li>
+  <section>
+    <h2>Property Snapshot</h2>
+    <div class="snapshot-grid">
+      <div>0.27&plusmn; Acre Residential Homesite</div>
+      <div>Lockwood Folly Golf Community</div>
+      <div>Brunswick County, North Carolina</div>
+      <div>Established Residential Surroundings</div>
+      <div>Golf-Community Setting</div>
+      <div>Neighboring Lot Currently Marketed Around $67,000</div>
+      <div>Subject Asking $54,900</div>
+      <div>No Mapped Flood Zone Reported</div>
+      <div>No Wetlands Reported</div>
+      <div>Buyer Responsible for Full Buildability Verification</div>
+      <div>Property Sold As-Is</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Why This Lot Makes Sense</h2>
+    <p>The pricing story is straightforward. A neighboring lot is currently being marketed around $67,000. The subject is being offered at $54,900. That gives the buyer an immediate pricing advantage relative to visible neighboring inventory.</p>
+    <p>The surrounding community already contains established residential development, allowing a buyer to evaluate the property based on an existing neighborhood rather than undeveloped raw acreage.</p>
+    <p>For an owner-builder, custom-home buyer, or investor comfortable with the community's construction requirements, this provides a lower-cost entry point into Lockwood Folly.</p>
+  </section>
+
+  <section>
+    <h2>Important Community Construction Note</h2>
+    <div class="note-box">
+      <p>Lockwood Folly has reportedly implemented restrictions affecting certain speculative home construction. Because community rules can change and may vary based on builder status, ownership structure, architectural approval, or intended use, buyer must independently confirm all current construction requirements before closing.</p>
+      <p><strong>Buyer should specifically verify:</strong></p>
+      <ul class="clean">
+        <li>Spec-Home Restrictions</li>
+        <li>Owner-Builder Requirements</li>
+        <li>Approved Builder Requirements</li>
+        <li>Architectural Review</li>
+        <li>Minimum Home Size</li>
+        <li>Exterior Design Standards</li>
+        <li>Construction Timelines</li>
+        <li>HOA / POA Approval</li>
+        <li>Rental Restrictions, If Any</li>
+        <li>Setbacks</li>
+        <li>Any Additional Community Development Standards</li>
       </ul>
+      <p>No representation is made that unrestricted speculative construction is currently permitted.</p>
     </div>
   </section>
 
-  <section class="block">
-    <div class="wrap">
-      <h2>Deal Terms</h2>
-      <table class="terms">
-        <tr><td class="k">Deal Type</td><td class="v">Land</td></tr>
-        <tr><td class="k">Location</td><td class="v">Supply, Brunswick County, NC 28462</td></tr>
-        <tr><td class="k">Lot Size</td><td class="v">0.27 Acres</td></tr>
-        <tr><td class="k">Flood Zone</td><td class="v">None reported</td></tr>
-        <tr><td class="k">Wetlands</td><td class="v">None reported</td></tr>
-        <tr><td class="k">Assignment Price</td><td class="v">$54,900</td></tr>
-        <tr><td class="k">As-Is Value</td><td class="v">$67,000</td></tr>
-        <tr><td class="k">Transaction Type</td><td class="v">Assignment of Contract</td></tr>
-      </table>
-      <p class="disclaimer">Figures above have not been independently verified by JNA Dynamic Holdings LLC. Buyers should perform their own due diligence, including title, survey, flood, and wetlands verification, prior to entering any agreement.</p>
+  <section>
+    <h2>Investment Angles</h2>
+    <h3>Custom Home / Owner-Builder Play</h3>
+    <p>For a future homeowner or custom-home buyer, the lot provides an opportunity to control a homesite within an established Brunswick County golf community at a land basis below visible neighboring inventory. The buyer can complete architectural, utility, survey, and building-envelope diligence and pursue a custom residential build subject to community and county approval.</p>
+    <h3>Builder Play</h3>
+    <p>A builder already familiar with Lockwood Folly should confirm the community's current rules regarding speculative construction and determine whether a buyer-directed custom build, presold home, or other permitted construction structure is viable. The key advantage is entering the lot below immediate neighboring asking-price levels.</p>
+    <h3>Land-Hold Play</h3>
+    <p>An investor can acquire the property and hold a residential lot inside an established community while monitoring future builder demand, community construction policies, and surrounding lot activity. Because the property is already located inside a developed golf community, the investment thesis is different from holding remote, undeveloped acreage.</p>
+  </section>
+
+  <section>
+    <h2>Flood / Wetlands</h2>
+    <p>Available property information currently indicates:</p>
+    <ul class="clean">
+      <li>No Mapped Flood Zone Reported</li>
+      <li>No Wetlands Reported</li>
+    </ul>
+    <p>Buyer must independently verify: FEMA Flood Zone, Wetlands, Drainage, Stormwater, Soils, Topography, Building Envelope, and any Environmental Restrictions.</p>
+    <p>No representation is made that the entire parcel is automatically buildable without further diligence.</p>
+  </section>
+
+  <section>
+    <h2>Utilities</h2>
+    <p>Buyer must independently verify the exact utility configuration, including: Water, Sewer or Septic, Electricity, Tap Fees, Meter Fees, Utility Connection Costs, Capacity, and Any Offsite Improvements.</p>
+    <p>No representation is made that utility taps, meters, or other connections have already been installed or paid.</p>
+  </section>
+
+  <section>
+    <h2>Buyer Due Diligence Notice</h2>
+    <p>Buyer must independently verify zoning, permitted use, survey boundaries, exact acreage, setbacks, building envelope, HOA / POA requirements, architectural restrictions, current spec-home restrictions, utilities, water, sewer or septic, flood zone, wetlands, drainage, soils, road access, title, deed restrictions, development costs, and all Brunswick County and community requirements prior to closing.</p>
+  </section>
+
+  <section>
+    <h2>Deal Terms</h2>
+    <table class="terms">
+      <tr><td class="label">Purchase Price</td><td>$54,900</td></tr>
+      <tr><td class="label">Lot Size</td><td>0.27&plusmn; Acre Residential Homesite</td></tr>
+      <tr><td class="label">Financing</td><td>Cash or Hard Money Only</td></tr>
+      <tr><td class="label">Transaction Type</td><td>Assignment of Contract</td></tr>
+      <tr><td class="label">Closing Costs</td><td>Buyer Pays Closing Costs</td></tr>
+      <tr><td class="label">Condition</td><td>Property Sold As-Is</td></tr>
+      <tr><td class="label">Proof of Funds</td><td>Required</td></tr>
+      <tr><td class="label">Process</td><td>First Come, First Served — No Auction, No Highest and Best</td></tr>
+    </table>
+    <div class="note-box">
+      <p>This is a wholesale assignment. JNA Dynamic Holdings LLC holds equitable interest in the subject transaction pursuant to an executed purchase contract and memorandum with the seller. The end buyer will receive an assignment of contract. JNA Dynamic Holdings LLC does not represent the seller and is not acting as a real estate broker.</p>
+      <p>All zoning, community restrictions, utility, flood, wetlands, buildability, and development information must be independently verified by buyer prior to closing.</p>
     </div>
   </section>
 
-  <div class="cta-band">
-    <div class="wrap">
-      <h2>Interested in this homesite?</h2>
-      <p>Reach out today for the full property address, contract details, and to move forward on this assignment of contract opportunity in the Lockwood Folly golf community.</p>
-      <div class="cta-links">
-        <a href="tel:5206336437">Call 520-633-6437</a>
-        <a href="mailto:montanoemmanuel@gmail.com">Email montanoemmanuel@gmail.com</a>
-      </div>
-      <p class="foot-note">JNA Dynamic Holdings LLC — this listing represents an assignable contract interest, not a direct sale by the property owner.</p>
+</div>
+
+<div class="cta-band">
+  <div class="wrap">
+    <h2>0.27&plusmn; Acres. Lockwood Folly. No Mapped Flood Zone or Wetlands Reported.</h2>
+    <p>Neighboring lot marketed around $67,000. Subject offered at $54,900. Cash or hard money only — first come, first served.</p>
+    <div class="cta-contact">
+      <a href="tel:5206336437">520-633-6437</a> &nbsp;|&nbsp; <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
     </div>
+    <p style="margin-top:14px; font-size:15px; color:#e4dcc6;">JNA Dynamic Holdings LLC</p>
   </div>
+</div>
+
+<footer class="disclaimer">
+  <div class="wrap">
+    <p><strong>Disclaimer:</strong> This is an assignment of contract. A legally binding purchase contract and memorandum have been executed with the seller, giving JNA Dynamic Holdings LLC contractual and equitable rights in the transaction. JNA Dynamic Holdings LLC does not represent the seller and is not acting as a real estate broker. Do not contact the owner/seller without our explicit written consent. Any attempt to circumvent JNA Dynamic Holdings LLC or renegotiate directly with the seller may result in enforcement of our contractual and legal rights.</p>
+    <p>All figures, acreage, pricing, and disclosures on this page are believed accurate but have not been independently verified by JNA Dynamic Holdings LLC. Buyer is responsible for all independent due diligence prior to closing.</p>
+  </div>
+</footer>
 
 </body>
 </html>
