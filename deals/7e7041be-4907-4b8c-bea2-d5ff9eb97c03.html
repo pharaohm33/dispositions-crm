@@ -3,342 +3,561 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Land Assignment Opportunity — Lewisville, NC (Forsyth County)</title>
+<title>Lewisville, NC — 1.09± Acre RS-9 Residential Development Parcel | JNA Dynamic Holdings LLC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: #f5f0e8;
-    color: #2a2521;
-    font-family: 'Source Sans Pro', sans-serif;
-    line-height: 1.55;
+  :root{
+    --paper:#f6f1e9;
+    --ink:#26221c;
+    --accent:#8a5a34;
+    --line:#ddd2bf;
+    --card:#fffdf9;
   }
-  h1, h2, h3 {
-    font-family: 'Playfair Display', serif;
-    color: #1f1b17;
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    line-height:1.6;
   }
-  .wrap {
-    max-width: 900px;
-    margin: 0 auto;
-    padding-left: 24px;
-    padding-right: 24px;
+  h1,h2,h3{
+    font-family:'Playfair Display',serif;
+    font-weight:600;
+    color:var(--ink);
+    margin:0;
+  }
+  .wrap{
+    max-width:900px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding-top:36px;
+    padding-bottom:28px;
+    margin-bottom:32px;
+  }
+  .kicker{
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    font-size:.75rem;
+    color:var(--accent);
+    font-weight:600;
+    margin-bottom:10px;
+  }
+  h1.headline{
+    font-size:2.1rem;
+    line-height:1.25;
+    margin-bottom:14px;
+  }
+  .location-line{
+    font-size:1.05rem;
+    color:#4a4335;
+    margin-bottom:6px;
+  }
+  .address-note{
+    font-size:.92rem;
+    font-style:italic;
+    color:#6b5f4a;
+    margin-top:6px;
+  }
+  .price-block{
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    align-items:flex-end;
+    margin-top:22px;
+    padding:20px 22px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:6px;
+  }
+  .price-block .price{
+    font-family:'Playfair Display',serif;
+    font-size:2.4rem;
+    font-weight:700;
+    color:var(--accent);
+  }
+  .price-block .sub{
+    font-size:.85rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:#6b5f4a;
+    margin-bottom:4px;
+  }
+  .price-figures{
+    display:flex;
+    gap:36px;
+    flex-wrap:wrap;
+  }
+  .figure-item .num{
+    font-size:1.3rem;
+    font-weight:700;
+    color:var(--ink);
+    font-family:'Playfair Display',serif;
+  }
+  section{
+    margin-top:44px;
+    margin-bottom:44px;
+  }
+  section h2{
+    font-size:1.5rem;
+    margin-bottom:16px;
+    border-bottom:2px solid var(--accent);
+    display:inline-block;
+    padding-bottom:4px;
+  }
+  section h3{
+    font-size:1.1rem;
+    margin-top:22px;
+    margin-bottom:10px;
+    color:var(--accent);
+  }
+  p{margin:0 0 12px 0;}
+  ul{padding-left:22px;margin:0 0 14px 0;}
+  li{margin-bottom:6px;}
+
+  .gallery{
+    display:flex;
+    gap:14px;
+    overflow-x:auto;
+    padding-bottom:10px;
+    margin-top:16px;
+    margin-bottom:10px;
+  }
+  .gallery img{
+    height:260px;
+    width:auto;
+    flex:0 0 auto;
+    border-radius:6px;
+    border:1px solid var(--line);
+    object-fit:cover;
+  }
+  .more-photos{
+    display:inline-block;
+    margin-top:4px;
+    font-size:.88rem;
+    color:var(--accent);
+    text-decoration:underline;
   }
 
-  header.top {
-    background: #fbf8f2;
-    border-bottom: 1px solid #e2d8c6;
-    padding-top: 28px;
-    padding-bottom: 28px;
+  table{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--card);
+    border:1px solid var(--line);
   }
-  .eyebrow {
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-size: 13px;
-    color: #8a6d3b;
-    font-weight: 600;
-    margin-top: 0;
-    margin-bottom: 10px;
+  table caption{
+    text-align:left;
+    font-weight:600;
+    padding:10px 12px;
+    background:#efe6d6;
+    border-bottom:1px solid var(--line);
   }
-  h1.headline {
-    font-size: 38px;
-    margin-top: 0;
-    margin-bottom: 12px;
+  th,td{
+    text-align:left;
+    padding:10px 14px;
+    border-bottom:1px solid var(--line);
+    font-size:.95rem;
+    vertical-align:top;
   }
-  .location-line {
-    font-size: 18px;
-    color: #4a4038;
-    margin-top: 0;
-    margin-bottom: 8px;
+  tr:last-child th, tr:last-child td{
+    border-bottom:none;
   }
-  .address-note {
-    font-size: 15px;
-    font-style: italic;
-    color: #6b5a3f;
-    background: #f1e8d6;
-    display: inline-block;
-    padding: 8px 14px;
-    border-radius: 4px;
-    margin-top: 6px;
-    margin-bottom: 0;
+  th{
+    width:42%;
+    color:#544a38;
+    font-weight:600;
   }
 
-  .price-block {
-    background: #241f1a;
-    color: #f5f0e8;
-    padding-top: 26px;
-    padding-bottom: 26px;
+  .snapshot-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px 24px;
   }
-  .price-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 32px;
-  }
-  .price-item {
-    min-width: 160px;
-  }
-  .price-item .label {
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-size: 12px;
-    color: #c9b98a;
-    margin-bottom: 4px;
-  }
-  .price-item .value {
-    font-family: 'Playfair Display', serif;
-    font-size: 30px;
-    font-weight: 600;
+  .snapshot-grid ul{margin:0;}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:18px 20px;
+    margin-top:14px;
   }
 
-  section {
-    margin-top: 44px;
-    margin-bottom: 44px;
+  .lot-compare{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-top:14px;
+  }
+  .lot-compare .box{
+    flex:1 1 240px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:16px 18px;
+  }
+  .lot-compare .box .label{
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:#6b5f4a;
+    margin-bottom:6px;
+  }
+  .lot-compare .box .value{
+    font-family:'Playfair Display',serif;
+    font-size:1.3rem;
+    font-weight:700;
   }
 
-  h2.section-title {
-    font-size: 26px;
-    border-bottom: 2px solid #cbb98a;
-    padding-bottom: 8px;
-    margin-top: 0;
-    margin-bottom: 20px;
+  .disclaimer{
+    font-size:.82rem;
+    color:#6b5f4a;
+    background:#efe6d6;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:16px 18px;
+    margin-top:18px;
   }
 
-  .gallery {
-    display: flex;
-    gap: 14px;
-    overflow-x: auto;
-    padding-bottom: 10px;
+  .cta-band{
+    background:var(--ink);
+    color:var(--paper);
+    margin-top:0;
+    margin-bottom:0;
+    padding:48px 0;
   }
-  .gallery img {
-    height: 260px;
-    width: auto;
-    border-radius: 6px;
-    flex-shrink: 0;
-    border: 1px solid #ddd0b5;
+  .cta-band .wrap{
+    text-align:center;
   }
-  .more-photos {
-    display: inline-block;
-    margin-top: 12px;
-    font-size: 14px;
-    color: #8a6d3b;
-    text-decoration: underline;
+  .cta-band h2{
+    color:var(--paper);
+    border-bottom:none;
+    font-size:1.8rem;
   }
-
-  .desc-text {
-    font-size: 17px;
-    white-space: pre-line;
+  .cta-band p{
+    color:#e3dccd;
+    max-width:640px;
+    margin:12px auto 22px auto;
   }
-
-  table.terms {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 16px;
+  .cta-contacts{
+    display:flex;
+    justify-content:center;
+    gap:28px;
+    flex-wrap:wrap;
+    margin-top:10px;
   }
-  table.terms tr {
-    border-bottom: 1px solid #e2d8c6;
+  .cta-contacts a{
+    color:var(--paper);
+    background:var(--accent);
+    text-decoration:none;
+    padding:12px 22px;
+    border-radius:4px;
+    font-weight:600;
+    font-size:.95rem;
   }
-  table.terms td {
-    padding-top: 12px;
-    padding-bottom: 12px;
+  footer.legal{
+    padding:28px 0 50px 0;
   }
-  table.terms td.term-label {
-    color: #6b5a3f;
-    width: 45%;
-    font-weight: 600;
-  }
-  table.terms td.term-value {
-    text-align: right;
-  }
-
-  .assignment-note {
-    background: #f1e8d6;
-    border-left: 4px solid #8a6d3b;
-    padding: 16px 20px;
-    font-size: 15px;
-    color: #4a4038;
-  }
-
-  .disclaimer {
-    font-size: 13px;
-    color: #7a6f60;
-  }
-
-  .cta-band {
-    background: #2f2418;
-    color: #f5f0e8;
-    padding-top: 40px;
-    padding-bottom: 40px;
-    text-align: center;
-  }
-  .cta-band h2 {
-    color: #f5f0e8;
-    font-size: 30px;
-    margin-top: 0;
-    margin-bottom: 12px;
-  }
-  .cta-band p {
-    font-size: 17px;
-    color: #ddd0b5;
-    margin-top: 0;
-    margin-bottom: 22px;
-  }
-  .cta-contacts {
-    font-size: 20px;
-    font-family: 'Playfair Display', serif;
-  }
-  .cta-contacts a {
-    color: #f5f0e8;
-    text-decoration: none;
-    border-bottom: 1px solid #c9b98a;
-  }
-  .cta-contacts span.sep {
-    color: #8a7a5c;
-    margin-left: 14px;
-    margin-right: 14px;
-  }
-
-  footer.bottom {
-    padding-top: 22px;
-    padding-bottom: 30px;
-    text-align: center;
-    font-size: 13px;
-    color: #8a7a5c;
+  footer.legal .wrap{
+    font-size:.78rem;
+    color:#6b5f4a;
   }
 </style>
 </head>
 <body>
 
-<header class="top">
-  <div class="wrap">
-    <p class="eyebrow">Deal Code: NC - 1 (Land) &middot; Assignment of Contract</p>
-    <h1 class="headline">Buildable Residential Land Site — Two Home-Site Potential</h1>
-    <p class="location-line">Lewisville, Forsyth County, North Carolina 27023</p>
-    <p class="address-note">Address available upon request — contact us for the full property address.</p>
-  </div>
-</header>
+<div class="wrap">
+  <header class="top">
+    <div class="kicker">Wholesale Assignment · Land Development Opportunity</div>
+    <h1 class="headline">1.09± Acre Residential Development Parcel — RS-9 Zoning, Potential 2-Lot Split</h1>
+    <div class="location-line">Lewisville, North Carolina &nbsp;·&nbsp; Forsyth County</div>
+    <div class="address-note">Address available upon request — contact us for the full parcel address.</div>
 
-<div class="price-block">
-  <div class="wrap">
-    <div class="price-grid">
-      <div class="price-item">
-        <div class="label">Assignment Price</div>
-        <div class="value">$34,900</div>
+    <div class="price-block">
+      <div>
+        <div class="sub">Asking Price</div>
+        <div class="price">$34,900</div>
       </div>
-      <div class="price-item">
-        <div class="label">ARV (Post-Build)</div>
-        <div class="value">$700,000</div>
-      </div>
-      <div class="price-item">
-        <div class="label">As-Is Value</div>
-        <div class="value">$60,000</div>
-      </div>
-      <div class="price-item">
-        <div class="label">Lot Size</div>
-        <div class="value">1.09 Acres</div>
+      <div class="price-figures">
+        <div class="figure-item">
+          <div class="num">$700,000</div>
+          <div class="sub">Est. Post-Build Value (2 Homesites)</div>
+        </div>
+        <div class="figure-item">
+          <div class="num">$60,000</div>
+          <div class="sub">As-Is Land Value</div>
+        </div>
+        <div class="figure-item">
+          <div class="num">1.09±</div>
+          <div class="sub">Acres / ~47,480 SF</div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
-
-<div class="wrap">
+  </header>
 
   <section class="gallery-section">
-    <h2 class="section-title">Photos</h2>
+    <h2>Property Photos</h2>
     <div class="gallery">
-      <img src="/deals/7e7041be-4907-4b8c-bea2-d5ff9eb97c03/photos/1.jpg" alt="Land parcel view 1, Lewisville, NC">
-      <img src="/deals/7e7041be-4907-4b8c-bea2-d5ff9eb97c03/photos/2.jpg" alt="Land parcel view 2, Lewisville, NC">
-      <img src="/deals/7e7041be-4907-4b8c-bea2-d5ff9eb97c03/photos/3.jpg" alt="Land parcel view 3, Lewisville, NC">
-      <img src="/deals/7e7041be-4907-4b8c-bea2-d5ff9eb97c03/photos/4.jpg" alt="Land parcel view 4, Lewisville, NC">
-      <img src="/deals/7e7041be-4907-4b8c-bea2-d5ff9eb97c03/photos/5.jpg" alt="Land parcel view 5, Lewisville, NC">
+      <img src="/deals/7e7041be-4907-4b8c-bea2-d5ff9eb97c03/photos/1.jpg" alt="Lewisville NC RS-9 residential development parcel photo 1">
+      <img src="/deals/7e7041be-4907-4b8c-bea2-d5ff9eb97c03/photos/2.jpg" alt="Lewisville NC RS-9 residential development parcel photo 2">
+      <img src="/deals/7e7041be-4907-4b8c-bea2-d5ff9eb97c03/photos/3.jpg" alt="Lewisville NC RS-9 residential development parcel photo 3">
+      <img src="/deals/7e7041be-4907-4b8c-bea2-d5ff9eb97c03/photos/4.jpg" alt="Lewisville NC RS-9 residential development parcel photo 4">
+      <img src="/deals/7e7041be-4907-4b8c-bea2-d5ff9eb97c03/photos/5.jpg" alt="Lewisville NC RS-9 residential development parcel photo 5">
     </div>
   </section>
 
-  <section class="overview">
-    <h2 class="section-title">Overview</h2>
-    <p class="desc-text">RS-9 Zoning — Residential Single Family.
-Build 2 home sites with average post-build value of $350,000 each.</p>
+  <section>
+    <h2>What We Have</h2>
+    <p>This is an approximately 1.09-acre / 47,480-square-foot residential development parcel located on Grinnell Street in the Town of Lewisville, North Carolina. The property is not located within a subdivision and is currently zoned RS-9 — Residential Single-Family.</p>
+    <p>The primary upside is the potential to divide the existing parcel into two residential homesites. Lewisville's RS-9 zoning generally requires a minimum zoning lot area of 9,000 square feet and a minimum lot width of 65 feet. At approximately 47,480 square feet, the subject contains substantially more gross land area than would be required for two minimum-size RS-9 lots.</p>
+    <p>The property is being sold as one parcel. No representation is being made that two separate legal or independently buildable parcels currently exist. Buyer must independently confirm frontage, legal access, subdivision approval, floodplain conditions, utility connections, setbacks, drainage, and the final configuration of any proposed two-lot split.</p>
+    <p>Public water and sewer serve the immediate Grinnell Street area, creating an important development advantage over sites requiring individual wells and septic systems.</p>
+    <p>The subject is being offered at <strong>$34,900</strong>. If a two-lot configuration is ultimately approved, that represents an illustrative raw-land basis of <strong>$29,950 per potential homesite</strong>. This calculation is provided solely as an underwriting illustration — the property has not been represented as two existing legal lots.</p>
   </section>
 
-  <section class="details">
-    <h2 class="section-title">Property Details</h2>
-    <table class="terms">
-      <tr>
-        <td class="term-label">Type</td>
-        <td class="term-value">Land</td>
-      </tr>
-      <tr>
-        <td class="term-label">Zoning</td>
-        <td class="term-value">RS-9 — Residential Single Family</td>
-      </tr>
-      <tr>
-        <td class="term-label">Lot Size</td>
-        <td class="term-value">1.09 Acres</td>
-      </tr>
-      <tr>
-        <td class="term-label">Build Potential</td>
-        <td class="term-value">2 Home Sites</td>
-      </tr>
-      <tr>
-        <td class="term-label">Average Post-Build Value (per site)</td>
-        <td class="term-value">$350,000</td>
-      </tr>
-      <tr>
-        <td class="term-label">County</td>
-        <td class="term-value">Forsyth County, NC</td>
-      </tr>
+  <section>
+    <h2>The Numbers</h2>
+    <table>
+      <tr><th>Asking Price</th><td>$34,900</td></tr>
+      <tr><th>Total Lot Size</th><td>1.09± Acres</td></tr>
+      <tr><th>Land Area</th><td>Approximately 47,480 SF</td></tr>
+      <tr><th>Zoning</th><td>RS-9 — Residential Single-Family</td></tr>
+      <tr><th>Current Configuration</th><td>One Parcel</td></tr>
+      <tr><th>Potential Development</th><td>2 Residential Lots — Buyer to Verify</td></tr>
+      <tr><th>Location</th><td>Grinnell Street area (address available upon request)</td></tr>
+      <tr><th>City</th><td>Lewisville</td></tr>
+      <tr><th>County</th><td>Forsyth County, North Carolina</td></tr>
+      <tr><th>Public Water</th><td>Serves immediate area — buyer to verify connection</td></tr>
+      <tr><th>Public Sewer</th><td>Serves immediate area — buyer to verify connection</td></tr>
+      <tr><th>Reported FEMA Flood Designation</th><td>AE — buyer to verify</td></tr>
+      <tr><th>Financing</th><td>Cash or Hard Money Only</td></tr>
+      <tr><th>Transaction Type</th><td>Assignment of Contract</td></tr>
+      <tr><th>Estimated Post-Build Value</th><td>$700,000 (approx. $350,000 average per homesite, 2 homesites)</td></tr>
+      <tr><th>As-Is Land Value</th><td>$60,000</td></tr>
     </table>
   </section>
 
-  <section class="deal-terms">
-    <h2 class="section-title">Deal Terms</h2>
-    <table class="terms">
-      <tr>
-        <td class="term-label">Assignment Price</td>
-        <td class="term-value">$34,900</td>
-      </tr>
-      <tr>
-        <td class="term-label">ARV (Post-Build, Combined)</td>
-        <td class="term-value">$700,000</td>
-      </tr>
-      <tr>
-        <td class="term-label">As-Is Value</td>
-        <td class="term-value">$60,000</td>
-      </tr>
-      <tr>
-        <td class="term-label">Deal Type</td>
-        <td class="term-value">Land</td>
-      </tr>
+  <section>
+    <h2>Property Snapshot</h2>
+    <div class="card">
+      <div class="snapshot-grid">
+        <ul>
+          <li>1.09± Acre Residential Development Parcel</li>
+          <li>Approximately 47,480 SF</li>
+          <li>RS-9 Residential Zoning</li>
+          <li>Town of Lewisville</li>
+          <li>Forsyth County, North Carolina</li>
+        </ul>
+        <ul>
+          <li>One Existing Parcel</li>
+          <li>Potential Two-Lot Residential Split</li>
+          <li>Public Water &amp; Sewer Serving Immediate Area</li>
+          <li>Not Located Within a Subdivision</li>
+          <li>Property Sold As-Is</li>
+        </ul>
+      </div>
+      <p style="margin-top:12px;">Buyer responsible for final subdivision &amp; buildability verification.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Why This Property Makes Sense</h2>
+    <p>The value here comes from controlling more than one acre of RS-9 residential land inside an established Lewisville residential pocket. The site is not limited to the economics of a single small homesite — its acreage creates the potential for a buyer to pursue two residential exits from one acquisition, subject to final Town approval and site diligence.</p>
+    <p>RS-9 zoning generally requires only 9,000 square feet of minimum lot area. The subject contains approximately 47,480 SF, giving the parcel substantial gross-area capacity for a two-lot concept. The key remaining questions are frontage, lot width, floodplain, drainage, access, utility placement, and final plat approval.</p>
+    <p>For a small builder or developer willing to complete that work, this is a manageable infill-development opportunity rather than a large subdivision project.</p>
+  </section>
+
+  <section>
+    <h2>Two-Lot Development Potential</h2>
+    <div class="lot-compare">
+      <div class="box">
+        <div class="label">Current Configuration</div>
+        <div class="value">One 1.09± Acre Parcel</div>
+      </div>
+      <div class="box">
+        <div class="label">Potential Configuration</div>
+        <div class="value">Two Residential Homesites</div>
+      </div>
+      <div class="box">
+        <div class="label">Asking Price</div>
+        <div class="value">$34,900</div>
+      </div>
+      <div class="box">
+        <div class="label">Illustrative Basis If 2 Lots Approved</div>
+        <div class="value">$29,950 / Homesite</div>
+      </div>
+    </div>
+    <p style="margin-top:16px;">This calculation is provided solely as an underwriting illustration. The property has not been represented as two existing legal lots. Buyer must independently confirm that the parcel can be divided into two independently buildable homesites.</p>
+  </section>
+
+  <section>
+    <h2>RS-9 Zoning</h2>
+    <p>The property is reported as zoned RS-9 — Residential Single-Family. Lewisville's current RS-9 dimensional standards generally provide for:</p>
+    <table>
+      <tr><th>Minimum Lot Area</th><td>9,000 SF</td></tr>
+      <tr><th>Minimum Lot Width</th><td>65 FT</td></tr>
+      <tr><th>Front Setback</th><td>20 FT</td></tr>
+      <tr><th>Rear Setback</th><td>25 FT</td></tr>
+      <tr><th>Side Setback</th><td>7 FT</td></tr>
+      <tr><th>Maximum Height</th><td>40 FT</td></tr>
     </table>
-    <p class="assignment-note" style="margin-top:20px;">
-      This offering is an assignment of contract. JNA Dynamic Holdings LLC holds an equitable interest in the underlying purchase agreement with the property owner and is marketing that contract position for assignment; this is not a direct sale by, or on behalf of, the underlying seller, and buyers will not be contacting the property owner directly.
-    </p>
+    <p style="margin-top:12px;">Final development remains subject to the Town of Lewisville's subdivision ordinance, frontage requirements, easements, utilities, floodplain conditions, and all applicable development standards.</p>
   </section>
 
-  <section class="disclaimer-section">
-    <p class="disclaimer">
-      All figures, measurements, and details above (including lot size, zoning designation, valuations, and build potential) have not been independently verified by JNA Dynamic Holdings LLC and should be confirmed by the buyer during due diligence.
-    </p>
+  <section>
+    <h2>Builder Play</h2>
+    <ul>
+      <li>Acquire the full 1.09-acre parcel for $34,900.</li>
+      <li>Confirm the proposed two-lot layout.</li>
+      <li>Verify water and sewer connections.</li>
+      <li>Complete survey, subdivision, floodplain, drainage, and utility diligence.</li>
+      <li>Advance the parcel through the required Town review.</li>
+      <li>If two buildable homesites are approved, develop two single-family residences or sell the approved lots individually.</li>
+    </ul>
+    <p>The advantage is the ability to spread the land acquisition cost across two potential residential builds.</p>
   </section>
 
+  <section>
+    <h2>Small Development Play</h2>
+    <p>This opportunity is well suited for a builder or investor looking for a smaller-scale residential project without taking on a major subdivision. The buyer can focus diligence on:</p>
+    <ul>
+      <li>Survey</li>
+      <li>Two-Lot Layout</li>
+      <li>Road Frontage</li>
+      <li>Lot Width</li>
+      <li>Water Connections</li>
+      <li>Sewer Connections</li>
+      <li>Floodplain</li>
+      <li>Drainage</li>
+      <li>Building Envelopes</li>
+      <li>Subdivision Approval</li>
+    </ul>
+    <p>Rather than acquiring dozens of lots, the buyer is evaluating a simple two-home infill strategy inside an existing residential market.</p>
+  </section>
+
+  <section>
+    <h2>Finished-Home Market Context</h2>
+    <p>Grinnell Street and the immediate Lewisville area already contain established single-family residential development. A nearby home on Grinnell Street (address available on request) — 3 Bedrooms, 2 Bathrooms, approximately 1,687 SF — sold in January 2026 for approximately $285,000.</p>
+    <p>Other surrounding Lewisville residential sales extend into the $300,000s and $400,000s depending on home size, age, lot, and condition. These sales provide useful context for a builder evaluating potential finished-home exits, but buyer should independently determine the appropriate new-construction product and resale value.</p>
+  </section>
+
+  <section>
+    <h2>Utilities</h2>
+    <p>Public water and public sewer serve properties in the immediate Grinnell Street area. Buyer must independently confirm the exact configuration for the subject parcel, including:</p>
+    <ul>
+      <li>Water Main Location</li>
+      <li>Sewer Main Location</li>
+      <li>Available Capacity</li>
+      <li>Number of Connections Allowed</li>
+      <li>Water Tap Fees</li>
+      <li>Sewer Tap Fees</li>
+      <li>Meter Requirements</li>
+      <li>Utility Easements</li>
+      <li>Extension Requirements</li>
+      <li>Connection Costs</li>
+      <li>Development Fees</li>
+    </ul>
+    <p>No representation is made that two separate water or sewer taps have already been installed or paid.</p>
+  </section>
+
+  <section>
+    <h2>Flood / Drainage Diligence</h2>
+    <p>Public-record data currently identifies the parcel with a reported AE flood designation. This should be treated as a primary diligence item. Buyer must independently verify:</p>
+    <ul>
+      <li>Current FEMA Flood Map</li>
+      <li>Exact AE Boundary</li>
+      <li>Base Flood Elevation</li>
+      <li>Building Envelope</li>
+      <li>Finished-Floor Requirements</li>
+      <li>Fill Requirements or Limitations</li>
+      <li>Floodplain Development Permits</li>
+      <li>Drainage</li>
+      <li>Stormwater</li>
+      <li>Driveway Location</li>
+      <li>Utility Placement</li>
+    </ul>
+    <p>Whether both proposed lots contain independently usable building envelopes must be verified before relying upon the two-lot development concept.</p>
+  </section>
+
+  <section>
+    <h2>Subdivision Diligence</h2>
+    <p>The proposed two-lot concept remains subject to final approval. Buyer should independently confirm:</p>
+    <ul>
+      <li>Boundary Survey</li>
+      <li>Road Frontage</li>
+      <li>Minimum Lot Width</li>
+      <li>Minimum Lot Area</li>
+      <li>Legal Access</li>
+      <li>Subdivision Plat</li>
+      <li>Utility Easements</li>
+      <li>Drainage Easements</li>
+      <li>Floodplain</li>
+      <li>Building Setbacks</li>
+      <li>Water and Sewer Availability</li>
+      <li>Town of Lewisville Review</li>
+      <li>Forsyth County Recording Requirements</li>
+      <li>Any Applicable Engineering Requirements</li>
+    </ul>
+    <p>No representation is made that subdivision approval has already been obtained.</p>
+  </section>
+
+  <section>
+    <h2>Exit Strategies</h2>
+    <ul>
+      <li><strong>Two-Home Builder Play:</strong> Subdivide the parcel into two approved homesites and construct two single-family residences.</li>
+      <li><strong>Finished-Lot Play:</strong> Complete the subdivision and utility diligence, then sell the two approved lots to builders or retail buyers.</li>
+      <li><strong>Build One / Sell One:</strong> Develop one approved homesite while selling or holding the second.</li>
+      <li><strong>Entitlement Play:</strong> Complete survey, subdivision, utility, and floodplain work and remarket a more advanced two-lot development package.</li>
+      <li><strong>Buy and Hold:</strong> Control 1.09 acres of RS-9 residential land inside Lewisville while pursuing future development approvals.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Buyer Due Diligence Notice</h2>
+    <p>Buyer must independently verify zoning, permitted use, exact acreage, survey boundaries, subdivision potential, whether two lots can actually be created, minimum lot area, minimum lot width, road frontage, legal access, building envelopes, setbacks, utilities, water, sewer, tap availability, connection costs, flood zone, base flood elevation, drainage, stormwater, soils, easements, title, development fees, plat requirements, building permits, and all Town of Lewisville and Forsyth County requirements prior to closing.</p>
+    <p>The property is currently being sold as one approximately 1.09-acre parcel. References to two potential residential lots are based on the parcel's reported acreage and RS-9 zoning and should not be interpreted as confirmation that two separate legal parcels currently exist or that two building permits are guaranteed.</p>
+  </section>
+
+  <section>
+    <h2>Deal Terms</h2>
+    <table>
+      <tr><th>Purchase Price</th><td>$34,900</td></tr>
+      <tr><th>Parcel</th><td>One 1.09± Acre Parcel</td></tr>
+      <tr><th>Zoning</th><td>RS-9 Residential</td></tr>
+      <tr><th>Development Potential</th><td>Potential Two-Lot Development — Buyer to Verify</td></tr>
+      <tr><th>Financing</th><td>Cash or Hard Money Only</td></tr>
+      <tr><th>Transaction Type</th><td>Assignment of Contract</td></tr>
+      <tr><th>Closing Costs</th><td>Buyer Pays Closing Costs</td></tr>
+      <tr><th>Condition</th><td>Property Sold As-Is</td></tr>
+      <tr><th>Proof of Funds</th><td>Required</td></tr>
+      <tr><th>Terms</th><td>First Come, First Served — No Auction, No Highest &amp; Best</td></tr>
+    </table>
+    <div class="disclaimer">
+      This is a wholesale assignment. JNA Dynamic Holdings LLC holds equitable interest in the subject transaction under an executed purchase contract and memorandum with the seller, giving it contractual and equitable rights in the transaction. The end buyer will receive an assignment of contract. JNA Dynamic Holdings LLC does not represent the seller and is not acting as a real estate broker; buyer should not attempt to contact the underlying property owner directly. All subdivision, zoning, utility, floodplain, drainage, buildability, and development information must be independently verified by buyer prior to closing, and none of the figures on this page have been independently verified by JNA Dynamic Holdings LLC.
+    </div>
+  </section>
 </div>
 
 <div class="cta-band">
   <div class="wrap">
-    <h2>Ready to Move on This Assignment?</h2>
-    <p>Reach out today for the full property address, contract details, and assignment terms.</p>
+    <h2>1.09 Acres. Approximately 47,480 SF. RS-9 Zoning. Potential Two-Lot Residential Split.</h2>
+    <p>Public water &amp; sewer in the immediate area. Asking $34,900. Cash or hard money only — first come, first served. Contact JNA Dynamic Holdings LLC today to receive the full property address and remaining due-diligence documents.</p>
     <div class="cta-contacts">
-      <a href="tel:520-633-6437">520-633-6437</a>
-      <span class="sep">|</span>
-      <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
+      <a href="tel:520-633-6437">Call 520-633-6437</a>
+      <a href="mailto:montanoemmanuel@gmail.com">Email montanoemmanuel@gmail.com</a>
     </div>
   </div>
 </div>
 
-<footer class="bottom">
+<footer class="legal">
   <div class="wrap">
-    <p>JNA Dynamic Holdings LLC</p>
+    DISCLAIMER: This is an assignment of contract. A legally binding purchase contract and memorandum have been executed with the seller, giving JNA Dynamic Holdings LLC contractual and equitable rights in the transaction. JNA Dynamic Holdings LLC does not represent the seller and is not acting as a real estate broker. Do not contact the owner/seller without explicit written consent from JNA Dynamic Holdings LLC. Any attempt to circumvent JNA Dynamic Holdings LLC or renegotiate directly with the seller may result in enforcement of contractual and legal rights. Figures presented have not been independently verified by JNA Dynamic Holdings LLC and should be confirmed by buyer prior to closing.
   </div>
 </footer>
 
