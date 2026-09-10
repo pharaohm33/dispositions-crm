@@ -3,367 +3,344 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NC - 1 (Land) | Lewisville, Forsyth County, NC | JNA Dynamic Holdings LLC</title>
+<title>Land Assignment Opportunity — Lewisville, NC (Forsyth County)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; }
-  html, body {
+  body {
     margin: 0;
-    padding: 0;
-    background-color: #f6f1e9;
-    color: #2c2620;
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    line-height: 1.6;
+    background: #f5f0e8;
+    color: #2a2521;
+    font-family: 'Source Sans Pro', sans-serif;
+    line-height: 1.55;
   }
-  h1, h2, h3, .display {
-    font-family: 'Source Serif 4', serif;
-    font-weight: 600;
-    color: #201b15;
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    color: #1f1b17;
   }
   .wrap {
-    max-width: 880px;
+    max-width: 900px;
     margin: 0 auto;
     padding-left: 24px;
     padding-right: 24px;
   }
 
-  /* ---------- Top bar ---------- */
-  .topbar {
-    background-color: #201b15;
-    color: #f6f1e9;
-    padding-top: 14px;
-    padding-bottom: 14px;
+  header.top {
+    background: #fbf8f2;
+    border-bottom: 1px solid #e2d8c6;
+    padding-top: 28px;
+    padding-bottom: 28px;
   }
-  .topbar .wrap {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .topbar .brand {
-    font-family: 'Source Serif 4', serif;
-    font-size: 1.15rem;
-    letter-spacing: 0.02em;
-  }
-  .topbar .tag {
-    font-size: 0.85rem;
-    color: #cbbfa9;
-  }
-
-  /* ---------- Hero ---------- */
-  .hero {
-    padding-top: 48px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid #ded3bf;
-  }
-  .kicker {
+  .eyebrow {
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    font-size: 13px;
     color: #8a6d3b;
     font-weight: 600;
+    margin-top: 0;
     margin-bottom: 10px;
   }
-  h1.display {
-    font-size: 2.5rem;
+  h1.headline {
+    font-size: 38px;
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+  .location-line {
+    font-size: 18px;
+    color: #4a4038;
     margin-top: 0;
     margin-bottom: 8px;
   }
-  .location-line {
-    font-size: 1.1rem;
-    color: #4a4136;
-    margin-top: 0;
-    margin-bottom: 14px;
-  }
   .address-note {
+    font-size: 15px;
+    font-style: italic;
+    color: #6b5a3f;
+    background: #f1e8d6;
     display: inline-block;
-    background-color: #efe4cf;
-    border: 1px solid #d8c6a1;
-    color: #5a4720;
-    font-size: 0.92rem;
     padding: 8px 14px;
     border-radius: 4px;
+    margin-top: 6px;
+    margin-bottom: 0;
+  }
+
+  .price-block {
+    background: #241f1a;
+    color: #f5f0e8;
+    padding-top: 26px;
+    padding-bottom: 26px;
+  }
+  .price-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+  }
+  .price-item {
+    min-width: 160px;
+  }
+  .price-item .label {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 12px;
+    color: #c9b98a;
+    margin-bottom: 4px;
+  }
+  .price-item .value {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    font-weight: 600;
+  }
+
+  section {
+    margin-top: 44px;
+    margin-bottom: 44px;
+  }
+
+  h2.section-title {
+    font-size: 26px;
+    border-bottom: 2px solid #cbb98a;
+    padding-bottom: 8px;
     margin-top: 0;
     margin-bottom: 20px;
   }
 
-  /* ---------- Price block ---------- */
-  .price-block {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 28px;
-    background-color: #ffffff;
-    border: 1px solid #e4d9c4;
-    border-radius: 6px;
-    padding: 24px 28px;
-    margin-top: 8px;
-    margin-bottom: 8px;
-  }
-  .price-item .label {
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #8a7a5c;
-    margin-bottom: 4px;
-  }
-  .price-item .value {
-    font-family: 'Source Serif 4', serif;
-    font-size: 1.7rem;
-    color: #201b15;
-  }
-  .price-item.main .value {
-    color: #8a3b1f;
-  }
-
-  /* ---------- Gallery ---------- */
-  .gallery-section {
-    padding-top: 36px;
-    padding-bottom: 12px;
-  }
   .gallery {
     display: flex;
     gap: 14px;
     overflow-x: auto;
-    padding-bottom: 12px;
-    -webkit-overflow-scrolling: touch;
+    padding-bottom: 10px;
   }
   .gallery img {
-    height: 300px;
+    height: 260px;
     width: auto;
-    flex: 0 0 auto;
     border-radius: 6px;
-    object-fit: cover;
-    border: 1px solid #e4d9c4;
+    flex-shrink: 0;
+    border: 1px solid #ddd0b5;
+  }
+  .more-photos {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 14px;
+    color: #8a6d3b;
+    text-decoration: underline;
   }
 
-  /* ---------- Section generic ---------- */
-  section.block {
-    padding-top: 36px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #e4d9c4;
-  }
-  section.block:last-of-type {
-    border-bottom: none;
-  }
-  h2.section-title {
-    font-size: 1.5rem;
-    margin-top: 0;
-    margin-bottom: 16px;
+  .desc-text {
+    font-size: 17px;
+    white-space: pre-line;
   }
 
-  .description p {
-    margin-top: 0;
-    margin-bottom: 14px;
-    color: #3a3327;
-  }
-
-  /* ---------- Terms table ---------- */
   table.terms {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 8px;
-    margin-bottom: 8px;
+    font-size: 16px;
   }
   table.terms tr {
-    border-bottom: 1px solid #e4d9c4;
+    border-bottom: 1px solid #e2d8c6;
   }
   table.terms td {
-    padding: 12px 6px;
-    font-size: 0.98rem;
+    padding-top: 12px;
+    padding-bottom: 12px;
   }
-  table.terms td.k {
-    color: #7a6c50;
-    width: 42%;
+  table.terms td.term-label {
+    color: #6b5a3f;
+    width: 45%;
+    font-weight: 600;
   }
-  table.terms td.v {
-    color: #201b15;
-    font-weight: 500;
+  table.terms td.term-value {
     text-align: right;
   }
 
-  .disclosure-box {
-    background-color: #efe4cf;
-    border: 1px solid #d8c6a1;
-    border-radius: 6px;
-    padding: 18px 20px;
-    font-size: 0.9rem;
-    color: #4a3f26;
-    margin-top: 10px;
-    margin-bottom: 10px;
-  }
-  .disclosure-box p {
-    margin-top: 0;
-    margin-bottom: 10px;
-  }
-  .disclosure-box p:last-child {
-    margin-bottom: 0;
+  .assignment-note {
+    background: #f1e8d6;
+    border-left: 4px solid #8a6d3b;
+    padding: 16px 20px;
+    font-size: 15px;
+    color: #4a4038;
   }
 
-  /* ---------- CTA band ---------- */
+  .disclaimer {
+    font-size: 13px;
+    color: #7a6f60;
+  }
+
   .cta-band {
-    background-color: #201b15;
-    color: #f6f1e9;
-    padding-top: 44px;
-    padding-bottom: 44px;
-    margin-top: 20px;
+    background: #2f2418;
+    color: #f5f0e8;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    text-align: center;
   }
   .cta-band h2 {
-    color: #f6f1e9;
-    font-size: 2rem;
+    color: #f5f0e8;
+    font-size: 30px;
     margin-top: 0;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
   }
   .cta-band p {
-    color: #d8cdb8;
+    font-size: 17px;
+    color: #ddd0b5;
     margin-top: 0;
     margin-bottom: 22px;
-    font-size: 1.02rem;
   }
   .cta-contacts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 24px;
+    font-size: 20px;
+    font-family: 'Playfair Display', serif;
   }
-  .cta-contacts .item {
-    background-color: #322a1f;
-    border: 1px solid #4a3f2c;
-    border-radius: 6px;
-    padding: 14px 20px;
+  .cta-contacts a {
+    color: #f5f0e8;
+    text-decoration: none;
+    border-bottom: 1px solid #c9b98a;
   }
-  .cta-contacts .label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #b8a985;
-    margin-bottom: 4px;
-  }
-  .cta-contacts .value {
-    font-size: 1.1rem;
-    color: #f6f1e9;
-    font-family: 'Source Serif 4', serif;
+  .cta-contacts span.sep {
+    color: #8a7a5c;
+    margin-left: 14px;
+    margin-right: 14px;
   }
 
-  footer.foot {
+  footer.bottom {
+    padding-top: 22px;
+    padding-bottom: 30px;
     text-align: center;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    font-size: 0.82rem;
-    color: #9a8c6c;
+    font-size: 13px;
+    color: #8a7a5c;
   }
 </style>
 </head>
 <body>
 
-  <div class="topbar">
-    <div class="wrap">
-      <div class="brand">JNA Dynamic Holdings LLC</div>
-      <div class="tag">Wholesale Assignment Opportunity</div>
-    </div>
+<header class="top">
+  <div class="wrap">
+    <p class="eyebrow">Deal Code: NC - 1 (Land) &middot; Assignment of Contract</p>
+    <h1 class="headline">Buildable Residential Land Site — Two Home-Site Potential</h1>
+    <p class="location-line">Lewisville, Forsyth County, North Carolina 27023</p>
+    <p class="address-note">Address available upon request — contact us for the full property address.</p>
   </div>
+</header>
 
-  <div class="hero">
-    <div class="wrap">
-      <div class="kicker">Deal Code: NC - 1 (Land)</div>
-      <h1 class="display">Buildable Residential Land &mdash; Lewisville, NC</h1>
-      <p class="location-line">Lewisville, Forsyth County, North Carolina 27023</p>
-      <div class="address-note">Address available upon request &mdash; contact us for the full property address.</div>
-
-      <div class="price-block">
-        <div class="price-item main">
-          <div class="label">Assignment Price</div>
-          <div class="value">$34,900</div>
-        </div>
-        <div class="price-item">
-          <div class="label">After Repair / Post-Build Value</div>
-          <div class="value">$700,000</div>
-        </div>
-        <div class="price-item">
-          <div class="label">As-Is Value</div>
-          <div class="value">$60,000</div>
-        </div>
+<div class="price-block">
+  <div class="wrap">
+    <div class="price-grid">
+      <div class="price-item">
+        <div class="label">Assignment Price</div>
+        <div class="value">$34,900</div>
+      </div>
+      <div class="price-item">
+        <div class="label">ARV (Post-Build)</div>
+        <div class="value">$700,000</div>
+      </div>
+      <div class="price-item">
+        <div class="label">As-Is Value</div>
+        <div class="value">$60,000</div>
+      </div>
+      <div class="price-item">
+        <div class="label">Lot Size</div>
+        <div class="value">1.09 Acres</div>
       </div>
     </div>
   </div>
+</div>
 
-  <div class="gallery-section">
-    <div class="wrap">
-      <div class="gallery">
-        <img src="/deals/7e7041be-4907-4b8c-bea2-d5ff9eb97c03/photos/1.jpg" alt="Lewisville, NC land parcel view 1">
-        <img src="/deals/7e7041be-4907-4b8c-bea2-d5ff9eb97c03/photos/2.jpg" alt="Lewisville, NC land parcel view 2">
-        <img src="/deals/7e7041be-4907-4b8c-bea2-d5ff9eb97c03/photos/3.jpg" alt="Lewisville, NC land parcel view 3">
-        <img src="/deals/7e7041be-4907-4b8c-bea2-d5ff9eb97c03/photos/4.jpg" alt="Lewisville, NC land parcel view 4">
-        <img src="/deals/7e7041be-4907-4b8c-bea2-d5ff9eb97c03/photos/5.jpg" alt="Lewisville, NC land parcel view 5">
-      </div>
-    </div>
-  </div>
+<div class="wrap">
 
-  <section class="block description">
-    <div class="wrap">
-      <h2 class="section-title">Overview</h2>
-      <p>A 1.09-acre residential land parcel zoned RS-9 (Residential Single Family) in Lewisville, Forsyth County, North Carolina. The lot size supports a two-lot subdivision, allowing a buyer to build two separate home sites, each with an average projected post-build value of approximately $350,000 &mdash; for a combined estimated after-repair value of $700,000.</p>
-      <p>This is a land deal with no existing structure: no beds, baths, or square footage apply to the current condition of the property.</p>
+  <section class="gallery-section">
+    <h2 class="section-title">Photos</h2>
+    <div class="gallery">
+      <img src="/deals/7e7041be-4907-4b8c-bea2-d5ff9eb97c03/photos/1.jpg" alt="Land parcel view 1, Lewisville, NC">
+      <img src="/deals/7e7041be-4907-4b8c-bea2-d5ff9eb97c03/photos/2.jpg" alt="Land parcel view 2, Lewisville, NC">
+      <img src="/deals/7e7041be-4907-4b8c-bea2-d5ff9eb97c03/photos/3.jpg" alt="Land parcel view 3, Lewisville, NC">
+      <img src="/deals/7e7041be-4907-4b8c-bea2-d5ff9eb97c03/photos/4.jpg" alt="Land parcel view 4, Lewisville, NC">
+      <img src="/deals/7e7041be-4907-4b8c-bea2-d5ff9eb97c03/photos/5.jpg" alt="Land parcel view 5, Lewisville, NC">
     </div>
   </section>
 
-  <section class="block">
-    <div class="wrap">
-      <h2 class="section-title">Deal Terms</h2>
-      <table class="terms">
-        <tr><td class="k">Deal Code</td><td class="v">NC - 1 (Land)</td></tr>
-        <tr><td class="k">Property Type</td><td class="v">Land</td></tr>
-        <tr><td class="k">Zoning</td><td class="v">RS-9 &mdash; Residential Single Family</td></tr>
-        <tr><td class="k">Lot Size</td><td class="v">1.09 acres</td></tr>
-        <tr><td class="k">City / State</td><td class="v">Lewisville, NC</td></tr>
-        <tr><td class="k">County</td><td class="v">Forsyth</td></tr>
-        <tr><td class="k">ZIP</td><td class="v">27023</td></tr>
-        <tr><td class="k">Assignment Price</td><td class="v">$34,900</td></tr>
-        <tr><td class="k">As-Is Value</td><td class="v">$60,000</td></tr>
-        <tr><td class="k">Estimated Post-Build Value (ARV)</td><td class="v">$700,000</td></tr>
-        <tr><td class="k">Build Plan</td><td class="v">2 home sites, ~$350,000 avg. post-build value each</td></tr>
-      </table>
-    </div>
+  <section class="overview">
+    <h2 class="section-title">Overview</h2>
+    <p class="desc-text">RS-9 Zoning — Residential Single Family.
+Build 2 home sites with average post-build value of $350,000 each.</p>
   </section>
 
-  <section class="block">
-    <div class="wrap">
-      <h2 class="section-title">Disclosures</h2>
-      <div class="disclosure-box">
-        <p>This offering is an assignment of contract. JNA Dynamic Holdings LLC holds an equitable interest in the underlying purchase agreement via contract with the property owner and is marketing that contract position for assignment; this is not a direct sale by, and does not involve direct contact with, the underlying seller/owner.</p>
-        <p>All figures, measurements, zoning designations, and value estimates presented on this page &mdash; including price, lot size, as-is value, and projected ARV/post-build value &mdash; have not been independently verified by JNA Dynamic Holdings LLC. Buyers should perform their own due diligence, including verification with Forsyth County zoning and records offices, before making an offer.</p>
-      </div>
-    </div>
+  <section class="details">
+    <h2 class="section-title">Property Details</h2>
+    <table class="terms">
+      <tr>
+        <td class="term-label">Type</td>
+        <td class="term-value">Land</td>
+      </tr>
+      <tr>
+        <td class="term-label">Zoning</td>
+        <td class="term-value">RS-9 — Residential Single Family</td>
+      </tr>
+      <tr>
+        <td class="term-label">Lot Size</td>
+        <td class="term-value">1.09 Acres</td>
+      </tr>
+      <tr>
+        <td class="term-label">Build Potential</td>
+        <td class="term-value">2 Home Sites</td>
+      </tr>
+      <tr>
+        <td class="term-label">Average Post-Build Value (per site)</td>
+        <td class="term-value">$350,000</td>
+      </tr>
+      <tr>
+        <td class="term-label">County</td>
+        <td class="term-value">Forsyth County, NC</td>
+      </tr>
+    </table>
   </section>
 
-  <div class="cta-band">
-    <div class="wrap">
-      <h2>Interested in this parcel?</h2>
-      <p>Reach out today to receive the full property address, contract details, and documentation for this assignment opportunity.</p>
-      <div class="cta-contacts">
-        <div class="item">
-          <div class="label">Phone</div>
-          <div class="value">520-633-6437</div>
-        </div>
-        <div class="item">
-          <div class="label">Email</div>
-          <div class="value">montanoemmanuel@gmail.com</div>
-        </div>
-        <div class="item">
-          <div class="label">Company</div>
-          <div class="value">JNA Dynamic Holdings LLC</div>
-        </div>
-      </div>
+  <section class="deal-terms">
+    <h2 class="section-title">Deal Terms</h2>
+    <table class="terms">
+      <tr>
+        <td class="term-label">Assignment Price</td>
+        <td class="term-value">$34,900</td>
+      </tr>
+      <tr>
+        <td class="term-label">ARV (Post-Build, Combined)</td>
+        <td class="term-value">$700,000</td>
+      </tr>
+      <tr>
+        <td class="term-label">As-Is Value</td>
+        <td class="term-value">$60,000</td>
+      </tr>
+      <tr>
+        <td class="term-label">Deal Type</td>
+        <td class="term-value">Land</td>
+      </tr>
+    </table>
+    <p class="assignment-note" style="margin-top:20px;">
+      This offering is an assignment of contract. JNA Dynamic Holdings LLC holds an equitable interest in the underlying purchase agreement with the property owner and is marketing that contract position for assignment; this is not a direct sale by, or on behalf of, the underlying seller, and buyers will not be contacting the property owner directly.
+    </p>
+  </section>
+
+  <section class="disclaimer-section">
+    <p class="disclaimer">
+      All figures, measurements, and details above (including lot size, zoning designation, valuations, and build potential) have not been independently verified by JNA Dynamic Holdings LLC and should be confirmed by the buyer during due diligence.
+    </p>
+  </section>
+
+</div>
+
+<div class="cta-band">
+  <div class="wrap">
+    <h2>Ready to Move on This Assignment?</h2>
+    <p>Reach out today for the full property address, contract details, and assignment terms.</p>
+    <div class="cta-contacts">
+      <a href="tel:520-633-6437">520-633-6437</a>
+      <span class="sep">|</span>
+      <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
     </div>
   </div>
+</div>
 
-  <footer class="foot">
-    <div class="wrap">
-      &copy; JNA Dynamic Holdings LLC. All information deemed reliable but not guaranteed.
-    </div>
-  </footer>
+<footer class="bottom">
+  <div class="wrap">
+    <p>JNA Dynamic Holdings LLC</p>
+  </div>
+</footer>
 
 </body>
 </html>
