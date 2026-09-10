@@ -3,353 +3,476 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>1.10 Acre Residential Infill Homesite — Marietta, GA | JNA Dynamic Holdings LLC</title>
+<title>Marietta, GA — 1.10± Acre Residential Infill Homesite | JNA Dynamic Holdings LLC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#f6f1e9;
+    --paper:#f7f2ea;
     --ink:#2b2620;
-    --ink-soft:#5c5348;
-    --line:#ddd3c2;
+    --ink-soft:#5c554a;
+    --line:#ddd3c1;
     --accent:#8a5a34;
-    --accent-dark:#6d4527;
+    --card:#fffdf9;
   }
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
   body{
+    margin:0;
     background:var(--paper);
     color:var(--ink);
     font-family:'Source Sans 3', sans-serif;
-    font-size:16px;
     line-height:1.55;
   }
   h1,h2,h3{
     font-family:'Playfair Display', serif;
-    color:var(--ink);
     font-weight:600;
-    margin:0;
+    color:var(--ink);
   }
   .wrap{
     max-width:960px;
     margin:0 auto;
     padding:0 24px;
   }
-  a{color:var(--accent-dark);}
-
-  header.top{
-    padding-top:40px;
-    padding-bottom:24px;
+  .topbar{
+    background:var(--ink);
+    color:#f3ece0;
+    padding-top:12px;
+    padding-bottom:12px;
+  }
+  .topbar .wrap{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .topbar .brand{
+    font-family:'Playfair Display', serif;
+    font-size:1.05rem;
+    letter-spacing:0.03em;
+  }
+  .topbar .code{
+    font-size:0.85rem;
+    color:#cbbfa8;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+  }
+  header.hero{
+    padding-top:46px;
+    padding-bottom:30px;
     border-bottom:1px solid var(--line);
   }
   .eyebrow{
     text-transform:uppercase;
-    letter-spacing:.14em;
-    font-size:.78rem;
-    color:var(--accent-dark);
+    letter-spacing:0.14em;
+    font-size:0.8rem;
+    color:var(--accent);
     font-weight:600;
     margin-bottom:10px;
   }
   h1.title{
-    font-size:2.3rem;
-    line-height:1.2;
-    margin-bottom:12px;
+    font-size:2.1rem;
+    margin-top:0;
+    margin-bottom:14px;
+    line-height:1.25;
   }
-  .loc-line{
+  .location-line{
     font-size:1.05rem;
     color:var(--ink-soft);
+    margin-top:0;
     margin-bottom:6px;
   }
-  .addr-note{
-    display:inline-block;
-    background:#efe6d6;
-    border:1px solid var(--line);
-    padding:8px 14px;
-    border-radius:4px;
-    font-size:.92rem;
+  .address-note{
+    font-size:0.95rem;
+    font-style:italic;
     color:var(--ink-soft);
-    margin-top:8px;
+    margin-top:0;
+    margin-bottom:24px;
+  }
+  .price-block{
+    display:flex;
+    gap:32px;
+    flex-wrap:wrap;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:22px 26px;
+    margin-top:10px;
+  }
+  .price-item .label{
+    text-transform:uppercase;
+    font-size:0.72rem;
+    letter-spacing:0.1em;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .price-item .value{
+    font-family:'Playfair Display', serif;
+    font-size:1.7rem;
+    color:var(--ink);
+  }
+  .price-item .value.small{
+    font-size:1.2rem;
   }
 
   section{
-    padding-top:36px;
-    padding-bottom:36px;
+    padding-top:38px;
+    padding-bottom:38px;
     border-bottom:1px solid var(--line);
   }
-  section:last-of-type{border-bottom:none;}
-
-  .price-block{
-    display:flex;
-    flex-wrap:wrap;
-    gap:32px;
-    align-items:baseline;
+  section:last-of-type{
+    border-bottom:none;
   }
-  .price-main .label{
-    text-transform:uppercase;
-    letter-spacing:.1em;
-    font-size:.78rem;
-    color:var(--ink-soft);
-    margin-bottom:4px;
-  }
-  .price-main .value{
-    font-family:'Playfair Display', serif;
-    font-size:2.6rem;
-    color:var(--accent-dark);
-    font-weight:700;
-  }
-  .price-sub .label{
-    text-transform:uppercase;
-    letter-spacing:.1em;
-    font-size:.78rem;
-    color:var(--ink-soft);
-    margin-bottom:4px;
-  }
-  .price-sub .value{
-    font-family:'Playfair Display', serif;
-    font-size:1.4rem;
-    color:var(--ink);
+  h2.section-title{
+    font-size:1.5rem;
+    margin-top:0;
+    margin-bottom:20px;
   }
 
-  .gallery-heading{
-    font-size:1.4rem;
-    margin-bottom:14px;
-  }
   .gallery{
     display:flex;
-    gap:14px;
+    gap:12px;
     overflow-x:auto;
-    padding-bottom:12px;
+    padding-bottom:10px;
     -webkit-overflow-scrolling:touch;
   }
   .gallery img{
     height:230px;
     width:auto;
-    border-radius:6px;
+    border-radius:5px;
     border:1px solid var(--line);
-    flex:0 0 auto;
+    flex-shrink:0;
   }
   .more-photos{
-    margin-top:10px;
-    font-size:.92rem;
+    display:inline-block;
+    margin-top:12px;
+    font-size:0.9rem;
+    color:var(--accent);
+    text-decoration:underline;
   }
 
-  h2.section-title{
-    font-size:1.5rem;
-    margin-bottom:18px;
+  ul.snapshot{
+    columns:2;
+    column-gap:36px;
+    padding-left:0;
+    list-style:none;
+    margin:0;
   }
-
-  .desc-text{
-    font-size:1.05rem;
-    color:var(--ink-soft);
-    max-width:70ch;
+  ul.snapshot li{
+    margin-bottom:10px;
+    padding-left:18px;
+    position:relative;
+    break-inside:avoid;
+  }
+  ul.snapshot li::before{
+    content:"—";
+    position:absolute;
+    left:0;
+    color:var(--accent);
   }
 
   table.terms{
     width:100%;
     border-collapse:collapse;
-    font-size:.98rem;
-  }
-  table.terms tr{
-    border-bottom:1px solid var(--line);
+    background:var(--card);
+    border:1px solid var(--line);
   }
   table.terms td{
-    padding:12px 8px;
-    vertical-align:top;
+    padding:11px 16px;
+    border-bottom:1px solid var(--line);
+    font-size:0.96rem;
+  }
+  table.terms tr:last-child td{
+    border-bottom:none;
   }
   table.terms td.k{
     color:var(--ink-soft);
-    width:42%;
+    width:44%;
     font-weight:600;
   }
-  table.terms td.v{
+
+  .subhead{
+    font-family:'Playfair Display', serif;
+    font-size:1.1rem;
+    margin-top:22px;
+    margin-bottom:10px;
+    color:var(--ink);
+  }
+  .subhead:first-child{
+    margin-top:0;
+  }
+  ul.plain{
+    margin-top:0;
+    margin-bottom:14px;
+    padding-left:20px;
+  }
+  ul.plain li{
+    margin-bottom:5px;
+  }
+  p{
+    margin-top:0;
+    margin-bottom:14px;
     color:var(--ink);
   }
 
-  ul.facts-list{
-    margin:0;
-    padding-left:20px;
-    color:var(--ink-soft);
+  .exit-item{
+    margin-bottom:16px;
   }
-  ul.facts-list li{
-    margin-bottom:8px;
-  }
-
-  .disclosure{
-    font-size:.88rem;
-    color:var(--ink-soft);
-    background:#efe6d6;
-    border:1px solid var(--line);
-    padding:16px 18px;
-    border-radius:6px;
-    margin-top:20px;
+  .exit-item .name{
+    font-weight:700;
+    color:var(--ink);
   }
 
   .cta-band{
-    background:var(--accent-dark);
-    color:#fdf8ef;
+    background:var(--ink);
+    color:#f3ece0;
+    padding-top:44px;
+    padding-bottom:44px;
     border-bottom:none;
   }
   .cta-band h2{
-    color:#fdf8ef;
-    font-size:1.8rem;
-    margin-bottom:10px;
+    color:#f3ece0;
+    font-size:1.7rem;
+    margin-top:0;
+    margin-bottom:12px;
   }
   .cta-band p{
-    color:#e9dcc7;
-    margin-bottom:18px;
-    max-width:60ch;
+    color:#d9cfbd;
+    margin-bottom:22px;
   }
   .cta-contacts{
     display:flex;
+    gap:28px;
     flex-wrap:wrap;
-    gap:24px;
   }
   .cta-contacts a{
-    color:#fdf8ef;
-    font-weight:600;
+    color:#f3ece0;
+    font-size:1.15rem;
     text-decoration:none;
-    border-bottom:1px solid #e9dcc7;
+    border-bottom:1px solid #a68a63;
     padding-bottom:2px;
-    font-size:1.1rem;
   }
 
-  footer.foot{
-    padding-top:24px;
+  .disclaimer{
+    background:var(--paper);
+    padding-top:26px;
     padding-bottom:40px;
-    font-size:.82rem;
+  }
+  .disclaimer p{
+    font-size:0.85rem;
     color:var(--ink-soft);
+    margin-bottom:10px;
   }
 </style>
 </head>
 <body>
 
-<header class="top">
-  <div class="wrap">
-    <div class="eyebrow">Deal Code: GA-1 (Land) &mdash; Assignment of Contract</div>
-    <h1 class="title">1.10-Acre Residential Infill Homesite</h1>
-    <div class="loc-line">Marietta, Cobb County, Georgia 30008</div>
-    <div class="addr-note">Address available upon request &mdash; contact us for the full property address.</div>
+  <div class="topbar">
+    <div class="wrap">
+      <div class="brand">JNA Dynamic Holdings LLC</div>
+      <div class="code">Deal Code: GA-1 (Land)</div>
+    </div>
   </div>
-</header>
 
-<section>
-  <div class="wrap">
-    <div class="price-block">
-      <div class="price-main">
-        <div class="label">Assignment Price</div>
-        <div class="value">$46,999</div>
+  <header class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Wholesale Assignment · Land</div>
+      <h1 class="title">Marietta, GA — 1.10± Acre Residential Infill Homesite</h1>
+      <p class="location-line">Marietta, Georgia · Cobb County — R-2 Zoning · Public Water</p>
+      <p class="address-note">Address available upon request — the exact property location is provided to qualified buyers upon contact.</p>
+
+      <div class="price-block">
+        <div class="price-item">
+          <div class="label">Asking Price</div>
+          <div class="value">$46,999</div>
+        </div>
+        <div class="price-item">
+          <div class="label">Recent Comparable Market Exposure</div>
+          <div class="value small">$63,900 – $99,900</div>
+        </div>
+        <div class="price-item">
+          <div class="label">Lot Size</div>
+          <div class="value small">1.10± Acres</div>
+        </div>
       </div>
-      <div class="price-sub">
-        <div class="label">Estimated As-Is Value</div>
-        <div class="value">$63,900 &ndash; $99,900</div>
+    </div>
+  </header>
+
+  <section>
+    <div class="wrap">
+      <h2 class="section-title">Photos</h2>
+      <div class="gallery">
+        <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/1.jpg" alt="Marietta, GA residential infill homesite photo 1">
+        <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/2.jpg" alt="Marietta, GA residential infill homesite photo 2">
+        <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/3.jpg" alt="Marietta, GA residential infill homesite photo 3">
+        <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/4.jpg" alt="Marietta, GA residential infill homesite photo 4">
+        <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/5.jpg" alt="Marietta, GA residential infill homesite photo 5">
+        <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/6.jpg" alt="Marietta, GA residential infill homesite photo 6">
+        <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/7.jpg" alt="Marietta, GA residential infill homesite photo 7">
+        <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/8.jpg" alt="Marietta, GA residential infill homesite photo 8">
+        <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/9.jpg" alt="Marietta, GA residential infill homesite photo 9">
+        <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/10.jpg" alt="Marietta, GA residential infill homesite photo 10">
+        <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/11.jpg" alt="Marietta, GA residential infill homesite photo 11">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2 class="section-title">Property Snapshot</h2>
+      <ul class="snapshot">
+        <li>1.10± Acres</li>
+        <li>Marietta City Limits</li>
+        <li>R-2 Residential Zoning</li>
+        <li>Public Water at Street</li>
+        <li>Public Sewer Infrastructure Reported Nearby</li>
+        <li>Wooded Infill Parcel</li>
+        <li>Established Residential Surroundings</li>
+        <li>Approximately Two Miles From Downtown Marietta</li>
+        <li>Recent Public Market Exposure at $99,900</li>
+        <li>Current Ask Only $46,999</li>
+        <li>Buyer Responsible for Full Development Due Diligence</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2 class="section-title">The Numbers</h2>
+      <table class="terms">
+        <tr><td class="k">Asking Price</td><td>$46,999</td></tr>
+        <tr><td class="k">Lot Size</td><td>1.10± Acres</td></tr>
+        <tr><td class="k">Property Type</td><td>Vacant Residential Land</td></tr>
+        <tr><td class="k">Zoning</td><td>R-2 Residential — Buyer to Verify</td></tr>
+        <tr><td class="k">Municipality</td><td>City of Marietta</td></tr>
+        <tr><td class="k">County</td><td>Cobb</td></tr>
+        <tr><td class="k">Public Water</td><td>Reported at Street</td></tr>
+        <tr><td class="k">Public Sewer</td><td>Reported Approximately Within 500 Ft.</td></tr>
+        <tr><td class="k">Sewer Connection</td><td>Reported to Require Extension / Access From Sandtown Road</td></tr>
+        <tr><td class="k">Location</td><td>Approximately 2 Miles From Downtown Marietta</td></tr>
+        <tr><td class="k">Site</td><td>Wooded Residential Infill</td></tr>
+        <tr><td class="k">Terms</td><td>Cash or Hard Money</td></tr>
+        <tr><td class="k">Transaction Type</td><td>Assignment of Contract</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2 class="section-title">Water &amp; Sewer</h2>
+
+      <div class="subhead">Public Water</div>
+      <p>Public water is reported at the street. Buyer should independently verify:</p>
+      <ul class="plain">
+        <li>Main location</li>
+        <li>Available tap</li>
+        <li>Meter requirements</li>
+        <li>Capacity</li>
+        <li>Connection fees</li>
+      </ul>
+
+      <div class="subhead">Public Sewer</div>
+      <p>Public sewer is reported approximately within 500 feet of the parcel. Prior property marketing indicated that Marietta Water &amp; Sewer expected a sewer connection to be made from the Sandtown Road side of the property. That sewer connection is the primary development item a builder needs to underwrite. No representation is made that sewer is currently stubbed directly onto the property. Buyer must independently determine:</p>
+      <ul class="plain">
+        <li>Exact sewer main location</li>
+        <li>Extension distance</li>
+        <li>Gravity vs. pump requirements</li>
+        <li>Easement requirements</li>
+        <li>Tap fees</li>
+        <li>Engineering</li>
+        <li>Right-of-way requirements</li>
+        <li>Total connection cost</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2 class="section-title">Site Diligence</h2>
+      <p>Because this is a larger wooded infill parcel, buyer should independently verify:</p>
+      <ul class="plain">
+        <li>Streams</li>
+        <li>Stream buffers</li>
+        <li>Drainage</li>
+        <li>Utility easements</li>
+        <li>Access easements</li>
+        <li>Topography</li>
+        <li>Soils</li>
+        <li>Wetlands</li>
+        <li>Tree clearing</li>
+        <li>Building envelope</li>
+        <li>R-2 setbacks</li>
+        <li>Single-family buildability</li>
+      </ul>
+      <p>Anticipated development-side line items for a builder to price include utility work, clearing, grading, site preparation, permitting, and builder profit. A land tour covering the site is also available on request.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2 class="section-title">Market Context</h2>
+      <p>This is an approximately 1.10-acre residential infill parcel inside Marietta city limits, positioned roughly two miles from Downtown Marietta. This is not remote rural acreage — it is a residential opportunity inside an established metro-Atlanta infill market, with public water infrastructure and public sewer infrastructure reported nearby.</p>
+      <p>There is also fresh residential-land liquidity in the 30008 market: a residential lot of approximately 8,451 SF closed for approximately $63,900. That property is substantially smaller than the subject and is not a direct size-adjusted comp, but it provides additional evidence that buyers are actively closing residential infill dirt in this ZIP code. There was also prior public market exposure on the subject parcel itself at $99,900.</p>
+      <p>The subject offers 1.10± acres for $46,999 as a builder play. The primary exit is a single-family infill build. At this price, the buyer has considerably more flexibility to absorb the major unknown: sewer. The ideal buyer should quickly price sewer extension, water connection, clearing, grading, building pad, driveway, stormwater / drainage, and permitting. If sewer costs are manageable, the combination of 1.10 acres, residential zoning, Marietta city location, and a $46,999 land basis becomes compelling.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2 class="section-title">Exit Strategies</h2>
+      <div class="exit-item"><span class="name">Spec Builder Play:</span> Complete sewer and site-development diligence and develop a single-family residence appropriate for the surrounding Marietta market.</div>
+      <div class="exit-item"><span class="name">Custom Home Play:</span> Utilize the larger 1.10-acre site for a custom residence subject to zoning and engineering requirements.</div>
+      <div class="exit-item"><span class="name">Value-Add Land Play:</span> Confirm sewer pricing, obtain utility documentation, survey the property, establish the building envelope, and remarket with major diligence questions already answered.</div>
+      <div class="exit-item"><span class="name">Buy &amp; Hold:</span> Control more than an acre of residentially zoned Marietta land at a substantially reduced entry price.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2 class="section-title">Deal Terms</h2>
+      <table class="terms">
+        <tr><td class="k">Purchase Price</td><td>$46,999</td></tr>
+        <tr><td class="k">Financing</td><td>Cash or Hard Money</td></tr>
+        <tr><td class="k">Transaction Structure</td><td>Assignment of Contract</td></tr>
+        <tr><td class="k">Closing Costs</td><td>Buyer Pays Closing Costs</td></tr>
+        <tr><td class="k">Condition</td><td>Property Sold As-Is</td></tr>
+        <tr><td class="k">Proof of Funds</td><td>Required</td></tr>
+        <tr><td class="k">Offer Process</td><td>First Come, First Served — No Auction, No Highest and Best</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2 class="section-title">Buyer Due Diligence Notice</h2>
+      <p>Buyer must independently verify exact zoning, permitted use, survey boundaries, acreage, legal access, setbacks, building envelope, public-water availability, water-tap costs, public-sewer availability, sewer-main location, sewer-extension costs, utility easements, access easements, stream buffers, wetlands, flood conditions, drainage, topography, soils, clearing costs, permitting requirements, title conditions, and all development expenses prior to closing.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2 class="section-title">Assignment &amp; Disclosure</h2>
+      <p>This is a wholesale assignment. JNA Dynamic Holdings LLC holds equitable interest in the subject transaction under a contract with the underlying property owner. The end buyer will receive an assignment of contract, not a direct conveyance from JNA Dynamic Holdings LLC.</p>
+    </div>
+  </section>
+
+  <div class="cta-band">
+    <div class="wrap">
+      <h2>1.10 Acres. R-2 Residential. Marietta City Limits.</h2>
+      <p>Public water, sewer reported nearby, prior public market exposure at $99,900 — now offered at $46,999. Cash or hard money. Assignment of contract. First come, first served — contact us today to receive the full address and diligence package.</p>
+      <div class="cta-contacts">
+        <a href="tel:5206336437">520-633-6437</a>
+        <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
       </div>
     </div>
   </div>
-</section>
 
-<section>
-  <div class="wrap">
-    <h2 class="gallery-heading">Property Photos</h2>
-    <div class="gallery">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/1.jpg" alt="Vacant residential lot in Marietta, GA">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/2.jpg" alt="Vacant residential lot in Marietta, GA">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/3.jpg" alt="Vacant residential lot in Marietta, GA">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/4.jpg" alt="Vacant residential lot in Marietta, GA">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/5.jpg" alt="Vacant residential lot in Marietta, GA">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/6.jpg" alt="Vacant residential lot in Marietta, GA">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/7.jpg" alt="Vacant residential lot in Marietta, GA">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/8.jpg" alt="Vacant residential lot in Marietta, GA">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/9.jpg" alt="Vacant residential lot in Marietta, GA">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/10.jpg" alt="Vacant residential lot in Marietta, GA">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/11.jpg" alt="Vacant residential lot in Marietta, GA">
+  <div class="disclaimer">
+    <div class="wrap">
+      <p>JNA Dynamic Holdings LLC has not independently verified all figures, measurements, zoning classifications, utility representations, or other details presented on this page and makes no warranty as to their accuracy. Buyer is responsible for independently confirming all information prior to entering into any agreement or closing on this property.</p>
     </div>
   </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <h2 class="section-title">Overview</h2>
-    <p class="desc-text">
-      Marietta, GA &mdash; a 1.10 acre residential infill homesite zoned R-2, served by public water. A clean, ready-to-build lot in an established Cobb County location, offered as an assignment of contract.
-    </p>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <h2 class="section-title">Property Facts</h2>
-    <ul class="facts-list">
-      <li>Type: Land</li>
-      <li>Lot Size: 1.10 acres</li>
-      <li>Zoning: R-2 (Residential)</li>
-      <li>Water: Public water available</li>
-      <li>County: Cobb</li>
-      <li>City / State: Marietta, GA</li>
-    </ul>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <h2 class="section-title">Deal Terms</h2>
-    <table class="terms">
-      <tr>
-        <td class="k">Assignment Price</td>
-        <td class="v">$46,999</td>
-      </tr>
-      <tr>
-        <td class="k">Estimated As-Is Value</td>
-        <td class="v">$63,900 &ndash; $99,900</td>
-      </tr>
-      <tr>
-        <td class="k">Deal Type</td>
-        <td class="v">Land</td>
-      </tr>
-      <tr>
-        <td class="k">Lot Size</td>
-        <td class="v">1.10 acres</td>
-      </tr>
-      <tr>
-        <td class="k">Zoning</td>
-        <td class="v">R-2 (Residential)</td>
-      </tr>
-      <tr>
-        <td class="k">Utilities</td>
-        <td class="v">Public water</td>
-      </tr>
-      <tr>
-        <td class="k">Location</td>
-        <td class="v">Marietta, Cobb County, GA 30008</td>
-      </tr>
-      <tr>
-        <td class="k">Contract Type</td>
-        <td class="v">Assignment of contract</td>
-      </tr>
-    </table>
-
-    <div class="disclosure">
-      This offering is an assignment of contract. JNA Dynamic Holdings LLC holds an equitable interest in the underlying purchase contract with the property owner and is marketing the assignment of that contract; this is not a direct sale by, and does not imply direct contact with, the underlying seller/owner. All figures, measurements, and details on this page have not been independently verified by JNA Dynamic Holdings LLC and should be confirmed by the buyer during due diligence.
-    </div>
-  </div>
-</section>
-
-<section class="cta-band">
-  <div class="wrap">
-    <h2>Interested in This Lot?</h2>
-    <p>Reach out today for the full property address, additional documentation, and to discuss terms on this assignment of contract.</p>
-    <div class="cta-contacts">
-      <a href="tel:5206336437">520-633-6437</a>
-      <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
-    </div>
-  </div>
-</section>
-
-<footer class="foot">
-  <div class="wrap">
-    &copy; 2024 JNA Dynamic Holdings LLC. All rights reserved.
-  </div>
-</footer>
 
 </body>
 </html>
