@@ -1529,24 +1529,74 @@ function checkSourceLinkPrice(url) {
   return { ok: true, price: null };
 }
 
-// Fetches a source listing page and reduces it to plain visible text --
-// strips <script>/<style>/<svg> blocks entirely, strips remaining tags,
-// decodes the handful of entities that show up in real listing copy, and
-// collapses whitespace. This is a regex approximation, not a real HTML
-// parser (Apps Script has none built in) -- good enough to hand a listing's
-// full copy to Claude as source material, not good enough to trust for
-// anything that needs exact fidelity. Capped at 20,000 characters so one
-// bloated page can't blow out the prompt; that easily covers a normal
-// InvestorLift listing's full body copy.
-function fetchSourceListingText(url) {
-  const res = fetchSourceUrlWithRetry(url);
-  if (res.getResponseCode() < 200 || res.getResponseCode() >= 300) throw new Error('Source link returned HTTP ' + res.getResponseCode() + '.');
-  let html = res.getContentText();
-  html = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<svg[\s\S]*?<\/svg>/gi, ' ');
+// Reduces one already-extracted HTML fragment to plain text -- strips
+// tags, decodes the handful of entities that show up in real listing
+// copy, collapses whitespace. This is a regex approximation, not a real
+// HTML parser (Apps Script has none built in) -- good enough to hand
+// listing copy to Claude as source material, not good enough to trust for
+// anything that needs exact fidelity.
+function htmlFragmentToPlainText(html) {
   let text = html.replace(/<(br|p|div|li|tr|h[1-6])[^>]*>/gi, '\n').replace(/<[^>]+>/g, ' ');
   text = text.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&#39;|&rsquo;/g, "'").replace(/&quot;|&ldquo;|&rdquo;/g, '"').replace(/&mdash;/g, '—').replace(/&ndash;/g, '–');
   text = text.replace(/[ \t]+/g, ' ').replace(/\n\s*\n+/g, '\n').split('\n').map(function (l) { return l.trim(); }).filter(Boolean).join('\n');
-  return text.slice(0, 20000);
+  return text;
+}
+
+// Recursively finds the longest string in a parsed JSON value that looks
+// like an HTML-formatted rich-text field (contains a "<p" tag) -- used to
+// pull InvestorLift's actual listing description out of its Nuxt data
+// payload, which is a flat array of mixed strings/numbers/nested arrays
+// (Nuxt's "devalue" serialization format). The real description is by far
+// the longest such string on the page, so "longest wins" reliably picks
+// it out without needing to understand devalue's reference format.
+function findLongestHtmlString(node) {
+  let best = '';
+  function walk(n) {
+    if (typeof n === 'string') {
+      if (n.indexOf('<p') !== -1 && n.length > best.length) best = n;
+    } else if (Array.isArray(n)) {
+      for (let i = 0; i < n.length; i++) walk(n[i]);
+    }
+  }
+  walk(node);
+  return best;
+}
+
+// Fetches a source listing page and returns its actual listing
+// description as plain text. Capped at 20,000 characters so one bloated
+// page can't blow out the prompt; that easily covers a normal listing's
+// full body copy.
+//
+// InvestorLift specifically renders its listing description ONLY into a
+// client-hydrated component -- confirmed by fetching a live listing and
+// diffing the raw response with vs. without its <script> tags: every
+// phrase from the visible "Overview" section only appears inside one
+// script tag (id="__NUXT_DATA__", a Nuxt SSR data payload), nowhere else
+// in the response. The plain rendered HTML body contains no real listing
+// text at all -- stripping all <script> tags before extracting text (the
+// original approach here) was silently throwing away the only place the
+// content exists, which is why generated pages were coming out thin
+// despite the fetch itself succeeding. Falls back to the old
+// strip-scripts-and-extract-body-text approach for any other source site,
+// or if InvestorLift's markup ever changes shape.
+function fetchSourceListingText(url) {
+  const res = fetchSourceUrlWithRetry(url);
+  if (res.getResponseCode() < 200 || res.getResponseCode() >= 300) throw new Error('Source link returned HTTP ' + res.getResponseCode() + '.');
+  const html = res.getContentText();
+
+  const nuxtMatch = html.match(/<script[^>]*\bid="__NUXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
+  if (nuxtMatch) {
+    try {
+      const descriptionHtml = findLongestHtmlString(JSON.parse(nuxtMatch[1]));
+      if (descriptionHtml) return htmlFragmentToPlainText(descriptionHtml).slice(0, 20000);
+    } catch (err) {
+      // Payload didn't parse as expected -- fall through to the generic
+      // approach below instead of failing the whole fetch over it.
+    }
+  }
+
+  const stripped = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<svg[\s\S]*?<\/svg>/gi, ' ');
+  return htmlFragmentToPlainText(stripped).slice(0, 20000);
 }
 
 // Extracts a Drive folder or file id out of any of the URL shapes Drive's
