@@ -1500,7 +1500,7 @@ const PRICE_MARKER_PATTERNS = [
 // later with zero code change). Not retried for other non-2xx codes,
 // which usually mean something more persistent (404, 5xx).
 function fetchSourceUrlWithRetry(url) {
-  const retryDelaysMs = [0, 2000, 4000];
+  const retryDelaysMs = [0, 3000, 6000];
   let res;
   for (let i = 0; i < retryDelaysMs.length; i++) {
     if (retryDelaysMs[i] > 0) Utilities.sleep(retryDelaysMs[i]);
@@ -1969,7 +1969,7 @@ function adminSyncDealPricing(body) {
 // it by hand recently -- only a previous auto-run counts toward the
 // auto-run's own skip window.
 const RECENT_AUTO_SYNC_SKIP_MS = 3 * 60 * 60 * 1000;
-const PRICE_SYNC_BATCH_DELAY_MS = 600;
+const PRICE_SYNC_BATCH_DELAY_MS = 1500;
 
 function getDealsPendingAutoPriceSync(sheet) {
   const now = new Date();
