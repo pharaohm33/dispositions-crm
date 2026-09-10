@@ -1492,6 +1492,24 @@ const PRICE_MARKER_PATTERNS = [
   /Asking Price:?\s*\$([\d,]+)/i
 ];
 
+// Retries a source-link fetch specifically on a 403 -- InvestorLift's
+// anti-bot protection intermittently blocks an automated request to a
+// listing URL even with the browser-shaped User-Agent below, and a short
+// retry with backoff clears it more often than not (confirmed: a
+// Regenerate All run that 403'd on 4 deals succeeded on 2 of them moments
+// later with zero code change). Not retried for other non-2xx codes,
+// which usually mean something more persistent (404, 5xx).
+function fetchSourceUrlWithRetry(url) {
+  const retryDelaysMs = [0, 2000, 4000];
+  let res;
+  for (let i = 0; i < retryDelaysMs.length; i++) {
+    if (retryDelaysMs[i] > 0) Utilities.sleep(retryDelaysMs[i]);
+    res = UrlFetchApp.fetch(url, { headers: { 'User-Agent': LIVE_CHECK_USER_AGENT }, muteHttpExceptions: true, followRedirects: true });
+    if (res.getResponseCode() !== 403) break;
+  }
+  return res;
+}
+
 // Fetches one deal's Source Link and reports the asking price found there,
 // as a plain "$1,234,567" string matching how Price is stored/displayed
 // everywhere else in this app (see formatAdminMoney on the front end).
@@ -1500,7 +1518,7 @@ const PRICE_MARKER_PATTERNS = [
 // confirm a price today" outcome, not a hard failure, and callers should
 // treat it as "leave Price alone" rather than blank it out.
 function checkSourceLinkPrice(url) {
-  const res = UrlFetchApp.fetch(url, { headers: { 'User-Agent': LIVE_CHECK_USER_AGENT }, muteHttpExceptions: true, followRedirects: true });
+  const res = fetchSourceUrlWithRetry(url);
   const code = res.getResponseCode();
   if (code < 200 || code >= 300) return { ok: false, error: 'Source link returned HTTP ' + code + '.' };
   const html = res.getContentText();
@@ -1521,7 +1539,7 @@ function checkSourceLinkPrice(url) {
 // bloated page can't blow out the prompt; that easily covers a normal
 // InvestorLift listing's full body copy.
 function fetchSourceListingText(url) {
-  const res = UrlFetchApp.fetch(url, { headers: { 'User-Agent': LIVE_CHECK_USER_AGENT }, muteHttpExceptions: true, followRedirects: true });
+  const res = fetchSourceUrlWithRetry(url);
   if (res.getResponseCode() < 200 || res.getResponseCode() >= 300) throw new Error('Source link returned HTTP ' + res.getResponseCode() + '.');
   let html = res.getContentText();
   html = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<svg[\s\S]*?<\/svg>/gi, ' ');
