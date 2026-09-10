@@ -3,482 +3,320 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ranch Estate | 38 Acres + 2 Homes + 7-Acre Stocked Bass Lake — Poolville, TX | JNA Dynamic Holdings LLC</title>
+<title>Poolville, TX Ranch Estate — 38± Acres, Two Homes, Stocked Bass Lake | JNA Dynamic Holdings LLC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; }
-  html, body {
+  body {
     margin: 0;
-    padding: 0;
-    background-color: #f4efe7;
-    color: #2b2621;
-    font-family: 'Source Sans 3', sans-serif;
-    font-size: 17px;
+    background: #f4ede3;
+    color: #2b2622;
+    font-family: 'Inter', Arial, sans-serif;
     line-height: 1.6;
   }
-  h1, h2, h3, .display {
-    font-family: 'Playfair Display', serif;
-    font-weight: 600;
-    color: #201b16;
-  }
-  a { color: #7a3b1e; }
   .wrap {
-    max-width: 980px;
+    max-width: 880px;
     margin: 0 auto;
-    padding-left: 24px;
-    padding-right: 24px;
+    padding: 0 24px;
   }
-
-  header.topbar {
-    background-color: #201b16;
-    color: #f4efe7;
-    padding-top: 14px;
-    padding-bottom: 14px;
+  h1, h2, h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 600;
+    color: #241f1b;
   }
-  header.topbar .wrap {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
+  header.hero {
+    background: #2b2622;
+    color: #f4ede3;
+    padding-top: 48px;
+    padding-bottom: 48px;
   }
-  header.topbar .brand {
-    font-family: 'Playfair Display', serif;
-    font-size: 20px;
-    letter-spacing: 0.02em;
-  }
-  header.topbar .tagline {
-    font-size: 13px;
-    color: #cbb99f;
-    letter-spacing: 0.06em;
+  header.hero .eyebrow {
     text-transform: uppercase;
-  }
-
-  section.hero {
-    margin-top: 46px;
+    letter-spacing: 0.14em;
+    font-size: 12px;
+    color: #cbb896;
     margin-bottom: 10px;
   }
-  section.hero .eyebrow {
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-size: 13px;
-    color: #7a3b1e;
-    font-weight: 600;
+  header.hero h1 {
+    color: #f8f3ea;
+    font-size: 34px;
+    margin-top: 0;
+    margin-bottom: 14px;
+    line-height: 1.25;
   }
-  section.hero h1 {
-    font-size: 40px;
-    line-height: 1.15;
-    margin-top: 10px;
-    margin-bottom: 12px;
-  }
-  section.hero .loc-line {
-    font-size: 18px;
-    color: #4a4239;
+  header.hero .location {
+    font-size: 17px;
     margin-top: 0;
     margin-bottom: 6px;
   }
-  .addr-note {
-    display: inline-block;
-    background-color: #efe2c9;
-    border: 1px solid #d8c39a;
-    color: #5a3d16;
-    font-size: 14.5px;
-    font-weight: 600;
-    padding: 9px 16px;
-    border-radius: 4px;
-    margin-top: 10px;
-    margin-bottom: 4px;
+  header.hero .address-note {
+    font-size: 14px;
+    color: #e7dcc7;
+    margin-top: 0;
+    margin-bottom: 0;
+    font-style: italic;
   }
-
-  section.priceblock {
-    margin-top: 30px;
-    margin-bottom: 30px;
-    background-color: #fffdf9;
-    border: 1px solid #e3d7c1;
-    border-radius: 8px;
-    padding: 26px 30px;
+  .price-band {
+    background: #fffaf1;
+    border: 1px solid #e3d5bd;
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-top: 28px;
+    margin-bottom: 0;
     display: flex;
     flex-wrap: wrap;
-    gap: 30px;
-    align-items: center;
-    justify-content: space-between;
+    gap: 28px;
   }
-  section.priceblock .price-main .label {
+  .price-block { min-width: 200px; }
+  .price-block .label {
     text-transform: uppercase;
-    font-size: 12.5px;
-    letter-spacing: 0.1em;
-    color: #7a3b1e;
-    font-weight: 600;
-  }
-  section.priceblock .price-main .amount {
-    font-family: 'Playfair Display', serif;
-    font-size: 42px;
-    color: #201b16;
-    margin-top: 4px;
-  }
-  section.priceblock .price-sub {
-    font-size: 14.5px;
-    color: #4a4239;
-  }
-  section.priceblock .stat {
-    text-align: center;
-    min-width: 90px;
-  }
-  section.priceblock .stat .n {
-    font-family: 'Playfair Display', serif;
-    font-size: 24px;
-    color: #201b16;
-  }
-  section.priceblock .stat .l {
     font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #7a6a56;
+    letter-spacing: 0.1em;
+    color: #7a6f5e;
+    margin-bottom: 4px;
   }
+  .price-block .value {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: #241f1b;
+  }
+  .price-block .value.small { font-size: 22px; }
 
-  section.gallery {
-    margin-top: 34px;
-    margin-bottom: 34px;
+  section {
+    padding-top: 40px;
+    padding-bottom: 0;
   }
-  section.gallery h2 {
-    font-size: 22px;
-    margin-bottom: 12px;
-  }
+  section.gallery-section { padding-top: 36px; }
+
   .gallery-scroll {
     display: flex;
     gap: 12px;
     overflow-x: auto;
     padding-bottom: 12px;
+    scroll-snap-type: x mandatory;
   }
   .gallery-scroll img {
     height: 260px;
     width: auto;
-    border-radius: 6px;
-    border: 1px solid #e3d7c1;
-    flex-shrink: 0;
+    flex: 0 0 auto;
+    border-radius: 8px;
+    scroll-snap-align: start;
     object-fit: cover;
+    border: 1px solid #e3d5bd;
+  }
+  .more-photos {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 14px;
+    color: #7a4b2b;
+    text-decoration: underline;
   }
 
-  section.narrative {
-    margin-top: 30px;
-    margin-bottom: 34px;
-  }
-  section.narrative h2 {
+  h2.section-title {
     font-size: 24px;
-    margin-bottom: 12px;
-  }
-  section.narrative p {
+    border-bottom: 2px solid #d8c6a4;
+    padding-bottom: 10px;
     margin-top: 0;
-    margin-bottom: 14px;
-    color: #3a342c;
-  }
-  .assignment-note {
-    background-color: #f0e9dc;
-    border-left: 4px solid #7a3b1e;
-    padding: 14px 18px;
-    font-size: 15px;
-    color: #4a4239;
-    margin-top: 18px;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
   }
 
-  section.terms {
-    margin-top: 34px;
-    margin-bottom: 34px;
-  }
-  section.terms h2 {
-    font-size: 24px;
-    margin-bottom: 14px;
-  }
-  table.terms-table {
+  .narrative p { margin-top: 0; margin-bottom: 16px; font-size: 16px; }
+
+  table.terms {
     width: 100%;
     border-collapse: collapse;
-    background-color: #fffdf9;
-    border: 1px solid #e3d7c1;
+    font-size: 15px;
+    background: #fffaf1;
+    border: 1px solid #e3d5bd;
   }
-  table.terms-table th, table.terms-table td {
-    text-align: left;
-    padding: 11px 16px;
-    border-bottom: 1px solid #e9dfc9;
-    font-size: 15.5px;
-  }
-  table.terms-table th {
-    width: 42%;
-    color: #7a3b1e;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 12.5px;
-    letter-spacing: 0.06em;
-  }
-  table.terms-table tr:last-child th,
-  table.terms-table tr:last-child td {
-    border-bottom: none;
-  }
-
-  section.condition {
-    margin-top: 34px;
-    margin-bottom: 34px;
-  }
-  section.condition h2 {
-    font-size: 24px;
-    margin-bottom: 14px;
-  }
-  .cond-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-  .cond-item {
-    background-color: #fffdf9;
-    border: 1px solid #e3d7c1;
-    border-radius: 6px;
+  table.terms tr { border-bottom: 1px solid #ecdfc7; }
+  table.terms tr:last-child { border-bottom: none; }
+  table.terms td {
     padding: 12px 16px;
+    vertical-align: top;
   }
-  .cond-item .k {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: #7a6a56;
+  table.terms td.k {
+    width: 42%;
+    color: #7a6f5e;
+    font-weight: 500;
   }
-  .cond-item .v {
-    font-size: 16px;
-    color: #201b16;
-    margin-top: 3px;
-  }
-
-  section.disclaimer {
-    margin-top: 30px;
-    margin-bottom: 30px;
-    font-size: 13.5px;
-    color: #7a6a56;
-    border-top: 1px solid #e3d7c1;
-    padding-top: 18px;
+  table.terms td.v {
+    color: #241f1b;
+    font-weight: 600;
   }
 
-  section.cta {
-    background-color: #201b16;
-    color: #f4efe7;
-    padding-top: 50px;
-    padding-bottom: 50px;
-    margin-top: 20px;
+  .disclosure-box {
+    background: #efe4cf;
+    border-left: 4px solid #a9885a;
+    padding: 16px 20px;
+    margin-top: 24px;
+    margin-bottom: 0;
+    font-size: 14px;
+    color: #4a4033;
   }
-  section.cta h2 {
-    color: #f4efe7;
-    font-size: 30px;
-    margin-bottom: 10px;
+  .disclosure-box p { margin: 0 0 10px 0; }
+  .disclosure-box p:last-child { margin-bottom: 0; }
+
+  .cta-band {
+    background: #241f1b;
+    color: #f4ede3;
+    margin-top: 56px;
+    padding-top: 44px;
+    padding-bottom: 44px;
+    text-align: center;
   }
-  section.cta p {
-    color: #cbb99f;
-    font-size: 16px;
+  .cta-band h2 {
+    color: #f8f3ea;
+    font-size: 28px;
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+  .cta-band p {
+    color: #d9cdb6;
     margin-top: 0;
     margin-bottom: 22px;
+    font-size: 16px;
   }
   .cta-contacts {
     display: flex;
-    gap: 30px;
+    justify-content: center;
+    gap: 24px;
     flex-wrap: wrap;
   }
-  .cta-contacts .item .k {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #a68f6f;
-  }
-  .cta-contacts .item .v {
-    font-family: 'Playfair Display', serif;
-    font-size: 22px;
-    color: #f4efe7;
-  }
-  .cta-contacts .item a {
-    color: #f4efe7;
+  .cta-contacts a {
+    color: #f8f3ea;
+    background: #4a3d2b;
+    border: 1px solid #7a6549;
+    padding: 12px 20px;
+    border-radius: 8px;
     text-decoration: none;
-    border-bottom: 1px solid #7a3b1e;
+    font-size: 16px;
+    font-weight: 500;
   }
 
   footer.foot {
-    background-color: #17130f;
-    color: #8d8072;
+    text-align: center;
+    padding-top: 26px;
+    padding-bottom: 40px;
     font-size: 13px;
-    padding-top: 20px;
-    padding-bottom: 20px;
-  }
-
-  @media (max-width: 640px) {
-    section.hero h1 { font-size: 30px; }
-    section.priceblock { flex-direction: column; align-items: flex-start; }
-    .cond-grid { grid-template-columns: 1fr; }
+    color: #8a7d68;
   }
 </style>
 </head>
 <body>
 
-<header class="topbar">
+<header class="hero">
   <div class="wrap">
-    <div class="brand">JNA Dynamic Holdings LLC</div>
-    <div class="tagline">Off-Market Real Estate Opportunities</div>
+    <div class="eyebrow">Assignment of Contract Opportunity</div>
+    <h1>TX-1 Ranch Estate — 38± Acres, Two Homes &amp; a 7-Acre Stocked Bass Lake</h1>
+    <p class="location">Poolville, Parker County, Texas 76487</p>
+    <p class="address-note">Address available upon request — contact us for the full property address.</p>
   </div>
 </header>
 
 <div class="wrap">
-
-  <section class="hero">
-    <div class="eyebrow">Deal Code: TX-1 &middot; Land / Ranch Estate</div>
-    <h1>Ranch Estate — 38 Acres, Two Homes &amp; a 7-Acre Stocked Bass Lake</h1>
-    <p class="loc-line">Poolville, Parker County, Texas 76487</p>
-    <div class="addr-note">Address available upon request — contact us for the full property location.</div>
-  </section>
-
-  <section class="priceblock">
-    <div class="price-main">
-      <div class="label">Assignment Price</div>
-      <div class="amount">$1,500,000</div>
-      <div class="price-sub">Listed off-market at $1.5M &mdash; estimated as-is value of $2,400,000</div>
+  <div class="price-band">
+    <div class="price-block">
+      <div class="label">Asking Price</div>
+      <div class="value">$1,500,000</div>
     </div>
-    <div class="stat">
-      <div class="n">38</div>
-      <div class="l">Acres (Est.)</div>
-    </div>
-    <div class="stat">
-      <div class="n">2</div>
-      <div class="l">Homes</div>
-    </div>
-    <div class="stat">
-      <div class="n">7</div>
-      <div class="l">Acre Bass Lake</div>
-    </div>
-    <div class="stat">
-      <div class="n">3</div>
-      <div class="l">Beds</div>
-    </div>
-    <div class="stat">
-      <div class="n">4,462</div>
-      <div class="l">Sq. Ft.</div>
-    </div>
-  </section>
-
-  <section class="gallery">
-    <h2>Property Photos</h2>
-    <div class="gallery-scroll">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/1.jpg" alt="Ranch estate photo 1, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/2.jpg" alt="Ranch estate photo 2, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/3.jpg" alt="Ranch estate photo 3, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/4.jpg" alt="Ranch estate photo 4, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/5.jpg" alt="Ranch estate photo 5, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/6.jpg" alt="Ranch estate photo 6, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/7.jpg" alt="Ranch estate photo 7, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/8.jpg" alt="Ranch estate photo 8, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/9.jpg" alt="Ranch estate photo 9, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/10.jpg" alt="Ranch estate photo 10, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/11.jpg" alt="Ranch estate photo 11, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/12.jpg" alt="Ranch estate photo 12, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/13.jpg" alt="Ranch estate photo 13, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/14.jpg" alt="Ranch estate photo 14, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/15.jpg" alt="Ranch estate photo 15, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/16.jpg" alt="Ranch estate photo 16, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/17.jpg" alt="Ranch estate photo 17, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/18.jpg" alt="Ranch estate photo 18, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/19.jpg" alt="Ranch estate photo 19, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/20.jpg" alt="Ranch estate photo 20, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/21.jpg" alt="Ranch estate photo 21, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/22.jpg" alt="Ranch estate photo 22, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/23.jpg" alt="Ranch estate photo 23, Poolville TX">
-      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/24.jpg" alt="Ranch estate photo 24, Poolville TX">
-    </div>
-  </section>
-
-  <section class="narrative">
-    <h2>Overview</h2>
-    <p>
-      A rare ranch-estate assemblage in Parker County offered well below market — priced at $1,500,000 while
-      carrying an estimated as-is value of $2,400,000. The offering is anchored by a spread of approximately
-      38 acres and includes two homes plus a fully stocked, approximately 7-acre bass lake.
-    </p>
-    <p>
-      The primary residence sits on a recorded lot of 3.81 acres and offers 3 bedrooms and 4,462 square feet
-      of living space, with an attached garage for parking. The home was originally built in 1974.
-    </p>
-    <p>
-      Because this is being marketed off-market, we ask that interested parties treat the location as private —
-      the address is disclosed only to serious, one-off buyers and is available upon request; it is not to be
-      shared or posted publicly.
-    </p>
-    <div class="assignment-note">
-      This is an assignment of contract. JNA Dynamic Holdings LLC holds an equitable interest under contract
-      with the underlying property owner and is marketing that contract position for assignment — this is not
-      a direct sale by, and does not imply direct contact with, the underlying seller/owner.
-    </div>
-  </section>
-
-  <section class="terms">
-    <h2>Deal Terms</h2>
-    <table class="terms-table">
-      <tr><th>Deal Code</th><td>TX-1 — Ranch Estate, 38 Acres + 2 Homes + 7-Acre Stocked Bass Lake</td></tr>
-      <tr><th>Deal Type</th><td>Land</td></tr>
-      <tr><th>City / County / State</th><td>Poolville, Parker County, TX 76487</td></tr>
-      <tr><th>Asking Price</th><td>$1,500,000</td></tr>
-      <tr><th>Estimated As-Is Value</th><td>$2,400,000</td></tr>
-      <tr><th>Repair Estimate</th><td>Up to $1,000.00</td></tr>
-      <tr><th>Lot Size (Recorded)</th><td>3.81 acres</td></tr>
-      <tr><th>Total Estate Acreage</th><td>Approximately 38 acres, inclusive of the 7-acre stocked bass lake and two homes</td></tr>
-      <tr><th>Bedrooms</th><td>3</td></tr>
-      <tr><th>Square Footage</th><td>4,462 sq. ft.</td></tr>
-      <tr><th>Year Built</th><td>1974</td></tr>
-      <tr><th>Occupancy</th><td>Owner Occupied</td></tr>
-      <tr><th>Financing</th><td>Financing may be available for qualified buyers — inquire for details</td></tr>
-    </table>
-  </section>
-
-  <section class="condition">
-    <h2>Property Condition &amp; Systems</h2>
-    <div class="cond-grid">
-      <div class="cond-item"><div class="k">Overall Condition</div><div class="v">Light Rehab</div></div>
-      <div class="cond-item"><div class="k">Parking</div><div class="v">Attached Garage</div></div>
-      <div class="cond-item"><div class="k">Roof Age</div><div class="v">1–3 years</div></div>
-      <div class="cond-item"><div class="k">Heating System</div><div class="v">Other</div></div>
-      <div class="cond-item"><div class="k">Heating Age</div><div class="v">0–5 years</div></div>
-      <div class="cond-item"><div class="k">Air Conditioning</div><div class="v">Central AC</div></div>
-      <div class="cond-item"><div class="k">Foundation Type</div><div class="v">Slab</div></div>
-      <div class="cond-item"><div class="k">Foundation Condition</div><div class="v">Good</div></div>
-    </div>
-  </section>
-
-  <section class="disclaimer">
-    <p>
-      All figures, acreage, square footage, condition notes, and valuation estimates presented on this page have
-      not been independently verified by JNA Dynamic Holdings LLC and are subject to buyer due diligence.
-      Buyers are encouraged to conduct their own inspections, surveys, and title review prior to entering any
-      agreement. This offering is contingent upon JNA Dynamic Holdings LLC's assignable contract position with
-      the underlying property owner.
-    </p>
-  </section>
-
-</div>
-
-<section class="cta">
-  <div class="wrap">
-    <h2>Interested in This Ranch Estate?</h2>
-    <p>Reach out today for the full property address, the complete photo and document set, and to discuss terms on this off-market assignment opportunity.</p>
-    <div class="cta-contacts">
-      <div class="item">
-        <div class="k">Call or Text</div>
-        <div class="v"><a href="tel:5206336437">520-633-6437</a></div>
-      </div>
-      <div class="item">
-        <div class="k">Email</div>
-        <div class="v"><a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a></div>
-      </div>
-      <div class="item">
-        <div class="k">Company</div>
-        <div class="v">JNA Dynamic Holdings LLC</div>
-      </div>
+    <div class="price-block">
+      <div class="label">Estimated As-Is Value</div>
+      <div class="value small">$2,400,000</div>
     </div>
   </div>
-</section>
+
+  <section class="gallery-section">
+    <h2 class="section-title">Property Photos</h2>
+    <div class="gallery-scroll">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/1.jpg" alt="Poolville Texas ranch estate photo 1">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/2.jpg" alt="Poolville Texas ranch estate photo 2">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/3.jpg" alt="Poolville Texas ranch estate photo 3">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/4.jpg" alt="Poolville Texas ranch estate photo 4">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/5.jpg" alt="Poolville Texas ranch estate photo 5">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/6.jpg" alt="Poolville Texas ranch estate photo 6">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/7.jpg" alt="Poolville Texas ranch estate photo 7">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/8.jpg" alt="Poolville Texas ranch estate photo 8">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/9.jpg" alt="Poolville Texas ranch estate photo 9">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/10.jpg" alt="Poolville Texas ranch estate photo 10">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/11.jpg" alt="Poolville Texas ranch estate photo 11">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/12.jpg" alt="Poolville Texas ranch estate photo 12">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/13.jpg" alt="Poolville Texas ranch estate photo 13">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/14.jpg" alt="Poolville Texas ranch estate photo 14">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/15.jpg" alt="Poolville Texas ranch estate photo 15">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/16.jpg" alt="Poolville Texas ranch estate photo 16">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/17.jpg" alt="Poolville Texas ranch estate photo 17">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/18.jpg" alt="Poolville Texas ranch estate photo 18">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/19.jpg" alt="Poolville Texas ranch estate photo 19">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/20.jpg" alt="Poolville Texas ranch estate photo 20">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/21.jpg" alt="Poolville Texas ranch estate photo 21">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/22.jpg" alt="Poolville Texas ranch estate photo 22">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/23.jpg" alt="Poolville Texas ranch estate photo 23">
+      <img src="/deals/cda3dfef-4b35-410e-b7c1-c367335900c4/photos/24.jpg" alt="Poolville Texas ranch estate photo 24">
+    </div>
+    <p style="font-size:13px;color:#7a6f5e;margin-top:4px;">A fuller deal overview and additional photos beyond what is shown here are available upon request.</p>
+  </section>
+
+  <section>
+    <h2 class="section-title">The Opportunity</h2>
+    <div class="narrative">
+      <p>This is an off-market ranch estate offering in Poolville, Parker County, Texas, being brought to market at $1,500,000 with an estimated as-is value of $2,400,000. The property spans an estimated 38± acres and includes two homes plus a 7-acre stocked bass lake, offering a rare combination of acreage, existing improvements, and recreational water on one holding.</p>
+      <p>The primary residence on record features 3 bedrooms and approximately 4,462 square feet of living space, built in 1974, with an attached garage. Recorded lot size on the primary parcel is 3.81 acres, within the broader 38± acre estate.</p>
+      <p>This offering is being assigned via a contract with the underlying property owner — this is an assignment of contract, not a direct sale by JNA Dynamic Holdings LLC, and buyers are not being placed in direct contact with the seller. All figures, acreage, structure details, and valuation estimates on this page are provided by the underlying contract holder and have not been independently verified by JNA Dynamic Holdings LLC; buyers should perform their own due diligence.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Deal Terms &amp; Property Details</h2>
+    <table class="terms">
+      <tr><td class="k">Deal Reference</td><td class="v">TX-1 (Ranch Estate) — 38 Acres + 2 Homes + 7-Acre Stocked Bass Lake</td></tr>
+      <tr><td class="k">County</td><td class="v">Parker County, Texas</td></tr>
+      <tr><td class="k">City / State / ZIP</td><td class="v">Poolville, TX 76487</td></tr>
+      <tr><td class="k">Deal Type</td><td class="v">Land</td></tr>
+      <tr><td class="k">Bedrooms</td><td class="v">3</td></tr>
+      <tr><td class="k">Square Footage</td><td class="v">4,462 sq. ft.</td></tr>
+      <tr><td class="k">Recorded Lot Size (Primary Parcel)</td><td class="v">3.81 acres</td></tr>
+      <tr><td class="k">Total Estate Acreage</td><td class="v">38± acres</td></tr>
+      <tr><td class="k">Homes on Property</td><td class="v">2</td></tr>
+      <tr><td class="k">Lake</td><td class="v">7-acre stocked bass lake</td></tr>
+      <tr><td class="k">Year Built</td><td class="v">1974</td></tr>
+      <tr><td class="k">Parking</td><td class="v">Attached garage</td></tr>
+      <tr><td class="k">Property Condition</td><td class="v">Light rehab</td></tr>
+      <tr><td class="k">Roof Age</td><td class="v">1–3 years</td></tr>
+      <tr><td class="k">Heating System</td><td class="v">Other</td></tr>
+      <tr><td class="k">Heating Age</td><td class="v">0–5 years</td></tr>
+      <tr><td class="k">Air Conditioning</td><td class="v">Central AC</td></tr>
+      <tr><td class="k">Foundation Type</td><td class="v">Slab</td></tr>
+      <tr><td class="k">Foundation Condition</td><td class="v">Good</td></tr>
+      <tr><td class="k">Occupancy</td><td class="v">Owner occupied</td></tr>
+      <tr><td class="k">Repair Estimate</td><td class="v">Up to $1,000</td></tr>
+      <tr><td class="k">Asking Price</td><td class="v">$1,500,000</td></tr>
+      <tr><td class="k">Estimated As-Is Value</td><td class="v">$2,400,000</td></tr>
+    </table>
+
+    <div class="disclosure-box">
+      <p>This is an assignment of contract. JNA Dynamic Holdings LLC holds a contractual interest in this property via the underlying owner's contract and is marketing that contract position for assignment; this is not a direct sale by, nor direct contact with, the underlying property owner.</p>
+      <p>All figures presented above — including acreage, square footage, valuation estimates, and condition details — are provided by the underlying contract and have not been independently verified by JNA Dynamic Holdings LLC. Buyers are encouraged to perform their own independent due diligence prior to entering any agreement.</p>
+    </div>
+  </section>
+</div>
+
+<div class="cta-band">
+  <div class="wrap">
+    <h2>Interested in This Ranch Estate?</h2>
+    <p>Contact JNA Dynamic Holdings LLC for the full property address, additional documentation, and photos.</p>
+    <div class="cta-contacts">
+      <a href="tel:520-633-6437">Call/Text: 520-633-6437</a>
+      <a href="mailto:montanoemmanuel@gmail.com">Email: montanoemmanuel@gmail.com</a>
+    </div>
+  </div>
+</div>
 
 <footer class="foot">
   <div class="wrap">
-    &copy; 2024 JNA Dynamic Holdings LLC. All rights reserved. This is an assignment of contract; the underlying
-    property remains under contract with its owner of record.
+    <p>Presented by JNA Dynamic Holdings LLC. Assignment of contract opportunity — address available upon request.</p>
   </div>
 </footer>
 
