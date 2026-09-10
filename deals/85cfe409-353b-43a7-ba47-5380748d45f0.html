@@ -3,207 +3,226 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rockford, IL — 13-Home SFH Portfolio | JNA Dynamic Holdings LLC</title>
+<title>Rockford, IL Portfolio — 12 Single-Family Homes | JNA Dynamic Holdings LLC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; }
   html, body {
     margin: 0;
     padding: 0;
-    background-color: #f6f1e9;
-    color: #2c2620;
+    background: #f4efe6;
+    color: #2b2620;
     font-family: 'Inter', sans-serif;
     font-size: 16px;
     line-height: 1.55;
   }
-  h1, h2, h3 {
+  h1, h2, h3, h4 {
     font-family: 'Playfair Display', serif;
-    font-weight: 600;
-    color: #201b16;
+    color: #1c1811;
+    font-weight: 700;
     margin: 0;
   }
   .wrap {
-    max-width: 920px;
+    max-width: 980px;
     margin: 0 auto;
     padding-left: 24px;
     padding-right: 24px;
   }
-  a { color: #8a5a2b; }
+  a { color: #7a3e1d; }
 
-  header.top {
-    background-color: #201b16;
-    color: #f6f1e9;
-    padding-top: 28px;
-    padding-bottom: 28px;
+  header.hero {
+    background: #efe6d6;
+    border-bottom: 1px solid #ddd1ba;
+    padding-top: 46px;
+    padding-bottom: 40px;
   }
-  header.top .eyebrow {
+  .eyebrow {
     text-transform: uppercase;
     letter-spacing: 0.14em;
-    font-size: 12px;
-    color: #cbb896;
-    margin-bottom: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #7a3e1d;
+    margin-bottom: 10px;
   }
-  header.top h1 {
-    color: #fdfaf4;
-    font-size: 34px;
+  .hero h1 {
+    font-size: 40px;
     line-height: 1.15;
+    margin-bottom: 14px;
   }
-  header.top .loc {
-    margin-top: 10px;
-    font-size: 16px;
-    color: #e7dcc7;
+  .location-line {
+    font-size: 17px;
+    color: #4b4335;
+    margin-bottom: 6px;
   }
-  header.top .addr-note {
-    margin-top: 6px;
-    font-size: 14px;
-    color: #cbb896;
+  .addr-note {
+    font-size: 14.5px;
     font-style: italic;
+    color: #6b5e46;
+    margin-bottom: 22px;
   }
-
-  .price-band {
-    background-color: #efe6d5;
-    border-top: 1px solid #ddcda9;
-    border-bottom: 1px solid #ddcda9;
-    padding-top: 22px;
-    padding-bottom: 22px;
-  }
-  .price-grid {
+  .price-block {
     display: flex;
     flex-wrap: wrap;
     gap: 28px;
-  }
-  .price-item {
-    min-width: 150px;
+    background: #fffdf8;
+    border: 1px solid #ddd1ba;
+    border-radius: 10px;
+    padding: 22px 26px;
+    margin-top: 18px;
   }
   .price-item .label {
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    font-size: 11.5px;
-    color: #7a6c53;
+    color: #8a7c60;
     margin-bottom: 4px;
   }
   .price-item .value {
     font-family: 'Playfair Display', serif;
     font-size: 26px;
-    color: #201b16;
-  }
-  .price-item .value.big {
-    font-size: 32px;
-    color: #8a5a2b;
+    font-weight: 700;
+    color: #1c1811;
   }
 
-  section.block {
-    margin-top: 46px;
-    margin-bottom: 46px;
+  section {
+    padding-top: 42px;
+    padding-bottom: 42px;
+    border-bottom: 1px solid #e2d7c1;
   }
-  section.block h2 {
-    font-size: 24px;
-    margin-bottom: 16px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #d8c9a5;
+  section:last-of-type { border-bottom: none; }
+
+  h2.section-title {
+    font-size: 27px;
+    margin-bottom: 18px;
   }
 
   .gallery-scroll {
     display: flex;
-    overflow-x: auto;
     gap: 12px;
+    overflow-x: auto;
     padding-bottom: 10px;
-    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
   }
   .gallery-scroll img {
     height: 230px;
     width: auto;
-    flex: 0 0 auto;
-    border-radius: 4px;
+    border-radius: 8px;
+    flex-shrink: 0;
     object-fit: cover;
-    border: 1px solid #ddcda9;
+    border: 1px solid #ddd1ba;
   }
   .more-photos-link {
     display: inline-block;
-    margin-top: 10px;
+    margin-top: 12px;
     font-size: 14px;
-    text-decoration: underline;
+    font-weight: 600;
   }
 
-  .portfolio-highlights {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-    gap: 16px;
+  .snapshot-box {
+    background: #fbf5e8;
+    border: 1px solid #e0d3b4;
+    border-radius: 10px;
+    padding: 20px 24px;
   }
-  .hl-card {
-    background: #fffdf8;
-    border: 1px solid #e2d5b4;
-    border-radius: 6px;
-    padding: 16px 18px;
+  .snapshot-box h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
   }
-  .hl-card .num {
-    font-family: 'Playfair Display', serif;
-    font-size: 22px;
-    color: #8a5a2b;
-    margin-bottom: 4px;
+  .snapshot-box ul {
+    margin: 0;
+    padding-left: 18px;
   }
-  .hl-card .desc {
-    font-size: 13.5px;
-    color: #4a4136;
+  .snapshot-box li { margin-bottom: 5px; }
+
+  p.intro {
+    font-size: 16.5px;
+    color: #3a3427;
   }
 
-  table.terms {
+  table.figures {
     width: 100%;
     border-collapse: collapse;
     font-size: 15px;
-    background: #fffdf8;
   }
-  table.terms th, table.terms td {
-    text-align: left;
-    padding: 11px 14px;
-    border-bottom: 1px solid #e5d8b8;
+  table.figures td {
+    padding: 9px 6px;
+    border-bottom: 1px solid #e2d7c1;
   }
-  table.terms th {
-    width: 42%;
-    color: #6c5f47;
+  table.figures td:first-child {
+    color: #5a4f3b;
+  }
+  table.figures td:last-child {
+    text-align: right;
     font-weight: 600;
-    font-family: 'Inter', sans-serif;
-    text-transform: uppercase;
-    font-size: 12px;
-    letter-spacing: 0.05em;
-  }
-  table.terms tr:last-child th,
-  table.terms tr:last-child td {
-    border-bottom: none;
+    color: #1c1811;
   }
 
-  .note-box {
-    background: #efe6d5;
-    border-left: 4px solid #8a5a2b;
-    padding: 14px 18px;
+  .property-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .property-card {
+    background: #fffdf8;
+    border: 1px solid #ddd1ba;
+    border-radius: 10px;
+    padding: 18px 22px;
+  }
+  .property-card h3 {
+    font-size: 19px;
+    margin-bottom: 4px;
+  }
+  .property-card .tagline {
+    font-size: 13px;
+    color: #8a7c60;
+    margin-bottom: 10px;
+  }
+  .property-card .facts-line {
+    font-size: 14.5px;
+    margin-bottom: 4px;
+  }
+  .property-card .facts-line strong { color: #1c1811; }
+  .property-card .note {
+    font-size: 13.5px;
+    color: #6b5e46;
+    font-style: italic;
+    margin-top: 6px;
+  }
+
+  ul.plain, ol.plain {
+    padding-left: 20px;
+    margin: 0;
+  }
+  ul.plain li, ol.plain li {
+    margin-bottom: 8px;
+  }
+
+  .disclosure {
     font-size: 14px;
-    color: #4a4136;
-  }
-
-  .disclaimer {
-    font-size: 12.5px;
-    color: #7a6c53;
-    line-height: 1.6;
+    color: #5a4f3b;
+    background: #f3ead9;
+    border: 1px solid #e0d3b4;
+    border-radius: 8px;
+    padding: 16px 20px;
   }
 
   .cta-band {
-    background-color: #201b16;
-    color: #f6f1e9;
-    padding-top: 40px;
-    padding-bottom: 40px;
-    margin-top: 50px;
+    background: #241b12;
+    color: #f4efe6;
+    padding-top: 46px;
+    padding-bottom: 46px;
   }
   .cta-band h2 {
-    color: #fdfaf4;
-    font-size: 28px;
+    color: #f4efe6;
+    font-size: 30px;
     margin-bottom: 12px;
   }
   .cta-band p {
-    color: #e7dcc7;
-    font-size: 15px;
-    margin-bottom: 18px;
+    font-size: 16px;
+    color: #d9cfba;
+    margin-bottom: 20px;
   }
   .cta-contacts {
     display: flex;
@@ -211,194 +230,324 @@
     gap: 22px;
   }
   .cta-contacts a {
-    display: inline-block;
-    background-color: #8a5a2b;
-    color: #fdfaf4;
+    color: #f4efe6;
+    background: #7a3e1d;
+    padding: 12px 20px;
+    border-radius: 6px;
     text-decoration: none;
-    padding: 12px 22px;
-    border-radius: 4px;
+    font-weight: 600;
     font-size: 15px;
-    font-weight: 500;
   }
-  footer.bottom {
-    padding-top: 20px;
-    padding-bottom: 30px;
-    font-size: 12px;
-    color: #7a6c53;
+
+  footer {
+    background: #efe6d6;
+    padding-top: 22px;
+    padding-bottom: 22px;
+  }
+  footer p {
+    font-size: 12.5px;
+    color: #8a7c60;
+    margin: 0;
   }
 </style>
 </head>
 <body>
 
-<header class="top">
+<header class="hero">
   <div class="wrap">
-    <div class="eyebrow">JNA Dynamic Holdings LLC &middot; Assignment of Contract</div>
-    <h1>13-Home Single-Family Rental Portfolio</h1>
-    <div class="loc">Rockford, IL &middot; Winnebago County, IL 61103</div>
+    <div class="eyebrow">JNA Dynamic Holdings LLC &middot; Assignment of Contract Opportunity</div>
+    <h1>Rockford, Illinois &mdash; 12 Single-Family Home Portfolio</h1>
+    <div class="location-line">Rockford, IL &middot; Winnebago County</div>
     <div class="addr-note">Individual property addresses available upon request; contact us for the full address list.</div>
-  </div>
-</header>
 
-<div class="price-band">
-  <div class="wrap">
-    <div class="price-grid">
+    <div class="price-block">
       <div class="price-item">
-        <div class="label">Assignment Price</div>
-        <div class="value big">$1,476,923</div>
+        <div class="label">Asking Price (Portfolio)</div>
+        <div class="value">$1,476,923</div>
       </div>
       <div class="price-item">
-        <div class="label">ARV</div>
+        <div class="label">After Repair Value</div>
         <div class="value">$2,000,000</div>
       </div>
       <div class="price-item">
-        <div class="label">Gross Margin</div>
-        <div class="value">$523,077</div>
+        <div class="label">Price Per Door</div>
+        <div class="value">&asymp; $123,077</div>
       </div>
       <div class="price-item">
-        <div class="label">Repair Estimate</div>
-        <div class="value">Up to $10,000</div>
+        <div class="label">Deal Type</div>
+        <div class="value" style="font-size:18px;">Buy and Hold</div>
       </div>
     </div>
   </div>
-</div>
+</header>
 
-<div class="wrap">
-
-  <section class="block">
-    <h2>Photo Gallery</h2>
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Photos</h2>
     <div class="gallery-scroll">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/1.jpg" alt="Rockford IL portfolio property exterior">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/2.jpg" alt="Rockford IL portfolio property exterior">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/3.jpg" alt="Rockford IL portfolio property interior">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/4.jpg" alt="Rockford IL portfolio property interior">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/5.jpg" alt="Rockford IL portfolio property">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/6.jpg" alt="Rockford IL portfolio property">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/7.jpg" alt="Rockford IL portfolio property">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/8.jpg" alt="Rockford IL portfolio property">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/9.jpg" alt="Rockford IL portfolio property">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/10.jpg" alt="Rockford IL portfolio property">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/11.jpg" alt="Rockford IL portfolio property">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/12.jpg" alt="Rockford IL portfolio property">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/13.jpg" alt="Rockford IL portfolio property">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/14.jpg" alt="Rockford IL portfolio property">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/15.jpg" alt="Rockford IL portfolio property">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/16.jpg" alt="Rockford IL portfolio property">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/17.jpg" alt="Rockford IL portfolio property">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/18.jpg" alt="Rockford IL portfolio property">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/19.jpg" alt="Rockford IL portfolio property">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/20.jpg" alt="Rockford IL portfolio property">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/21.jpg" alt="Rockford IL portfolio property">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/22.jpg" alt="Rockford IL portfolio property">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/23.jpg" alt="Rockford IL portfolio property">
-      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/24.jpg" alt="Rockford IL portfolio property">
-    </div>
-  </section>
-
-  <section class="block">
-    <h2>Portfolio Overview</h2>
-    <p>This is a turnkey, cash-flowing portfolio of thirteen single-family homes located in Rockford, Winnebago County, Illinois. The portfolio is offered as an assignment of contract — <strong>JNA Dynamic Holdings LLC</strong> is assigning its existing purchase contract with the underlying property owner and is not the titled seller of the properties.</p>
-    <div class="portfolio-highlights" style="margin-top:18px;">
-      <div class="hl-card">
-        <div class="num">13</div>
-        <div class="desc">Single-family homes in the portfolio</div>
-      </div>
-      <div class="hl-card">
-        <div class="num">10 / 3</div>
-        <div class="desc">Occupied / vacant unit split</div>
-      </div>
-      <div class="hl-card">
-        <div class="num">$19,632/mo</div>
-        <div class="desc">Current gross rent roll</div>
-      </div>
-      <div class="hl-card">
-        <div class="num">≈ 8.46%</div>
-        <div class="desc">NOI yield</div>
-      </div>
-      <div class="hl-card">
-        <div class="num">$1,600,000</div>
-        <div class="desc">Portfolio value figure as provided</div>
-      </div>
-      <div class="hl-card">
-        <div class="num">≈ $123,077</div>
-        <div class="desc">Per-door pricing</div>
-      </div>
-      <div class="hl-card">
-        <div class="num">7 units</div>
-        <div class="desc">HAP-backed (Housing Assistance Payment) rental income</div>
-      </div>
-    </div>
-    <p style="margin-top:16px;">ARV across the portfolio is estimated at $2,000,000, against an assignment price of $1,476,923 — a gross margin of $523,077. This is a turnkey portfolio with an estimated combined repair figure of up to $10,000.</p>
-  </section>
-
-  <section class="block">
-    <h2>Featured Property Specifications</h2>
-    <p style="font-size:14px;color:#4a4136;margin-bottom:12px;">The specifications below reflect the details provided for one representative property within the portfolio.</p>
-    <table class="terms">
-      <tr><th>Property Type</th><td>Single-Family</td></tr>
-      <tr><th>Beds</th><td>4</td></tr>
-      <tr><th>Baths</th><td>1</td></tr>
-      <tr><th>Half-Bath</th><td>1</td></tr>
-      <tr><th>Square Footage</th><td>2,042 sq. ft.</td></tr>
-      <tr><th>Year Built</th><td>1958</td></tr>
-      <tr><th>Lot Size</th><td>0.16 acres</td></tr>
-      <tr><th>Parking</th><td>Driveway</td></tr>
-      <tr><th>Property Condition</th><td>Turn Key</td></tr>
-      <tr><th>Roof Age</th><td>1–3 years</td></tr>
-      <tr><th>Heating System</th><td>Other</td></tr>
-      <tr><th>Heating Age</th><td>0–5 years</td></tr>
-      <tr><th>Air Conditioning</th><td>Central AC</td></tr>
-      <tr><th>Foundation Type</th><td>Full basement</td></tr>
-      <tr><th>Foundation Condition</th><td>Good</td></tr>
-      <tr><th>Occupancy</th><td>Tenant Occupied</td></tr>
-    </table>
-  </section>
-
-  <section class="block">
-    <h2>Deal Terms</h2>
-    <table class="terms">
-      <tr><th>Deal Code</th><td>IL-1 (SFH Portfolio)</td></tr>
-      <tr><th>Deal Type</th><td>Portfolio &mdash; Buy and Hold</td></tr>
-      <tr><th>City / County / State</th><td>Rockford, Winnebago County, IL</td></tr>
-      <tr><th>Assignment Price</th><td>$1,476,923</td></tr>
-      <tr><th>ARV</th><td>$2,000,000</td></tr>
-      <tr><th>Gross Margin</th><td>$523,077</td></tr>
-      <tr><th>Repair Estimate</th><td>Up to $10,000</td></tr>
-      <tr><th>Occupancy</th><td>10 occupied / 3 vacant (13 total units)</td></tr>
-      <tr><th>Gross Rent Roll</th><td>$19,632/month</td></tr>
-      <tr><th>NOI Yield</th><td>≈ 8.46%</td></tr>
-      <tr><th>Per-Door Value</th><td>≈ $123,077</td></tr>
-      <tr><th>Subsidized Income</th><td>7 units with HAP-backed income</td></tr>
-    </table>
-  </section>
-
-  <section class="block">
-    <div class="note-box">
-      This offering is an assignment of contract. <strong>JNA Dynamic Holdings LLC</strong> holds an equitable interest in the underlying purchase agreement with the property owner and is marketing that contract for assignment; JNA Dynamic Holdings LLC is not the record owner of the properties, and buyers are not being connected directly with the underlying seller through this page.
-    </div>
-  </section>
-
-  <section class="block">
-    <p class="disclaimer">All figures, unit counts, occupancy status, rent amounts, condition details, and other information presented on this page have not been independently verified by JNA Dynamic Holdings LLC and should be independently confirmed by any prospective buyer during due diligence.</p>
-  </section>
-
-</div>
-
-<div class="cta-band">
-  <div class="wrap">
-    <h2>Interested in this portfolio?</h2>
-    <p>Reach out today for the full address list, additional documentation, and next steps on this assignment of contract.</p>
-    <div class="cta-contacts">
-      <a href="tel:520-633-6437">Call/Text: 520-633-6437</a>
-      <a href="mailto:montanoemmanuel@gmail.com">Email: montanoemmanuel@gmail.com</a>
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/1.jpg" alt="Rockford portfolio property photo 1">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/2.jpg" alt="Rockford portfolio property photo 2">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/3.jpg" alt="Rockford portfolio property photo 3">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/4.jpg" alt="Rockford portfolio property photo 4">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/5.jpg" alt="Rockford portfolio property photo 5">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/6.jpg" alt="Rockford portfolio property photo 6">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/7.jpg" alt="Rockford portfolio property photo 7">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/8.jpg" alt="Rockford portfolio property photo 8">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/9.jpg" alt="Rockford portfolio property photo 9">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/10.jpg" alt="Rockford portfolio property photo 10">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/11.jpg" alt="Rockford portfolio property photo 11">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/12.jpg" alt="Rockford portfolio property photo 12">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/13.jpg" alt="Rockford portfolio property photo 13">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/14.jpg" alt="Rockford portfolio property photo 14">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/15.jpg" alt="Rockford portfolio property photo 15">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/16.jpg" alt="Rockford portfolio property photo 16">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/17.jpg" alt="Rockford portfolio property photo 17">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/18.jpg" alt="Rockford portfolio property photo 18">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/19.jpg" alt="Rockford portfolio property photo 19">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/20.jpg" alt="Rockford portfolio property photo 20">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/21.jpg" alt="Rockford portfolio property photo 21">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/22.jpg" alt="Rockford portfolio property photo 22">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/23.jpg" alt="Rockford portfolio property photo 23">
+      <img src="/deals/85cfe409-353b-43a7-ba47-5380748d45f0/photos/24.jpg" alt="Rockford portfolio property photo 24">
     </div>
   </div>
-</div>
+</section>
 
-<footer class="bottom">
+<section>
   <div class="wrap">
-    &copy; JNA Dynamic Holdings LLC. All information deemed reliable but not guaranteed.
-  </div>
-</footer>
+    <p class="intro">This is not a one-off flip &mdash; this is a turnkey income portfolio in Rockford, Illinois. Twelve single-family homes, nine already producing rent, three sitting rent-ready waiting on tenants, and a rent roll already pushing nearly $19,000 a month. This is the kind of deal an investor builds a portfolio around, not chases one at a time.</p>
 
-</body>
-</html>
+    <div class="snapshot-box" style="margin-top:22px;">
+      <h3>Portfolio at a Glance</h3>
+      <ul>
+        <li>13 single-family homes / 10 occupied &middot; 3 vacant</li>
+        <li>$19,632/mo rent roll</li>
+        <li>&asymp; 8.46% NOI yield</li>
+        <li>$1,600,000 quoted portfolio value</li>
+        <li>&asymp; $123,077 per door &mdash; turnkey portfolio, 7 units with HAP-backed income</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="section-title">The Numbers</h2>
+    <table class="figures">
+      <tr><td>Asking Price</td><td>$1,476,923</td></tr>
+      <tr><td>Number of Single-Family Homes</td><td>12</td></tr>
+      <tr><td>Price Per Door (approx.)</td><td>$123,077</td></tr>
+      <tr><td>Occupied / Vacant</td><td>9 Occupied / 3 Vacant and Rent-Ready</td></tr>
+      <tr><td>Current + Pro Forma Rent</td><td>$18,886 / month</td></tr>
+      <tr><td>Annualized Rent</td><td>$226,632</td></tr>
+      <tr><td>Annual Property Taxes</td><td>$17,902.30</td></tr>
+      <tr><td>Annual Insurance</td><td>$21,664</td></tr>
+      <tr><td>Annual Water / Sewer / Gas</td><td>$10,208</td></tr>
+      <tr><td>Annual Maintenance, Vacancy &amp; Management (MVM)</td><td>$45,326.40</td></tr>
+      <tr><td>Estimated NOI</td><td>$131,531.30 / year</td></tr>
+      <tr><td>Approx. NOI Yield at Asking</td><td>8.91%</td></tr>
+      <tr><td>After Repair Value (ARV)</td><td>$2,000,000</td></tr>
+      <tr><td>Estimated Rehab Reserve</td><td>$10,000</td></tr>
+      <tr><td>HAP-Backed Occupied Properties</td><td>7 of 9 (multiple at 100% HAP)</td></tr>
+      <tr><td>Renovation Window</td><td>Majority of portfolio renovated or refreshed 2024&ndash;2026</td></tr>
+      <tr><td>Electrical</td><td>Panels updated, inspected and operational in 2025 across entire portfolio</td></tr>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Property Snapshot</h2>
+    <div class="property-grid">
+
+      <div class="property-card">
+        <h3>Property 1 &mdash; Rockford, IL</h3>
+        <div class="tagline">Address available upon request</div>
+        <div class="facts-line"><strong>3 Bed / 2 Bath</strong> &middot; 1,488 SF &middot; Built 1910</div>
+        <div class="facts-line">Rent: $1,800/mo (Tenant $900 / HAP $900) &mdash; WCHA</div>
+        <div class="facts-line">Lease through 6/30/27 &mdash; tenant in place since July 2026</div>
+        <div class="facts-line">Driveway parking, unfinished basement</div>
+        <div class="facts-line">Full interior and exterior renovation completed 2026, new roof 2026, HVAC 2 years old</div>
+        <div class="facts-line">Property taxes $1,058/yr &middot; Insurance $1,976/yr</div>
+      </div>
+
+      <div class="property-card">
+        <h3>Property 2 &mdash; Rockford, IL</h3>
+        <div class="tagline">Address available upon request</div>
+        <div class="facts-line"><strong>3 Bed / 1 Bath</strong> &middot; 1,381 SF &middot; Built 1953</div>
+        <div class="facts-line">Rent: $1,600/mo (Tenant $1,600 / HAP $0) &mdash; Market</div>
+        <div class="facts-line">Lease through 2/28/27 &mdash; tenant in place since March 2026</div>
+        <div class="facts-line">1-car attached garage, full unfinished basement</div>
+        <div class="facts-line">Full interior gut renovation completed 2025, roof 6 years, HVAC 2 years, water heater 2 years</div>
+        <div class="facts-line">Property taxes $2,203/yr &middot; Insurance $1,914/yr</div>
+      </div>
+
+      <div class="property-card">
+        <h3>Property 3 &mdash; Rockford, IL</h3>
+        <div class="tagline">Address available upon request</div>
+        <div class="facts-line"><strong>3 Bed / 1 Bath</strong> &middot; 1,154 SF &middot; Built 1934</div>
+        <div class="facts-line">Rent: $1,400/mo (Tenant $0 / HAP $1,400) &mdash; RHA</div>
+        <div class="facts-line">Month-to-month under active HAP contract &mdash; tenant in place since November 2022, 3.5+ years</div>
+        <div class="facts-line">Driveway parking, partially finished basement</div>
+        <div class="facts-line">Well-maintained original interior, new refrigerator, roof 4 years, HVAC 3 years</div>
+        <div class="facts-line">Property taxes $1,002/yr &middot; Insurance $1,776/yr</div>
+        <div class="note">Approx $200/mo potential mark-to-market upside</div>
+      </div>
+
+      <div class="property-card">
+        <h3>Property 4 &mdash; Rockford, IL</h3>
+        <div class="tagline">Address available upon request</div>
+        <div class="facts-line"><strong>3 Bed / 1 Bath</strong> &middot; 1,106 SF &middot; Built 1900</div>
+        <div class="facts-line">VACANT / RENT-READY &mdash; $1,550/mo Pro Forma</div>
+        <div class="facts-line">1-car detached garage, unfinished basement</div>
+        <div class="facts-line">Full interior and exterior renovation completed 2026, new roof 2026, new HVAC 2026</div>
+        <div class="facts-line">Property taxes $932/yr &middot; Insurance $1,756/yr</div>
+      </div>
+
+      <div class="property-card">
+        <h3>Property 5 &mdash; Rockford, IL</h3>
+        <div class="tagline">Address available upon request</div>
+        <div class="facts-line"><strong>3 Bed / 1 Bath</strong> &middot; 960 SF &middot; Built 1959</div>
+        <div class="facts-line">Rent: $1,724/mo (Tenant $165 / HAP $1,559, plus approx $52/mo other income) &mdash; RHA</div>
+        <div class="facts-line">Lease through 4/30/27 &mdash; tenant in place since April 2025</div>
+        <div class="facts-line">Ranch with attached 1-car garage</div>
+        <div class="facts-line">Interior refresh completed 2025, roof 4 years, HVAC 1 year, water heater 2 years</div>
+        <div class="facts-line">Property taxes $1,045/yr &middot; Insurance $1,549/yr</div>
+        <div class="note">Approx 90% HAP-backed</div>
+      </div>
+
+      <div class="property-card">
+        <h3>Property 6 &mdash; Rockford, IL</h3>
+        <div class="tagline">Address available upon request</div>
+        <div class="facts-line"><strong>3 Bed / 2 Bath</strong> &middot; 1,400 SF &middot; Built 1960</div>
+        <div class="facts-line">Rent: $1,650/mo (Tenant $1,650 / HAP $0) &mdash; Market</div>
+        <div class="facts-line">Lease through 6/30/27 &mdash; tenant in place since July 2026</div>
+        <div class="facts-line">2-car attached garage, unfinished basement</div>
+        <div class="facts-line">Full interior and exterior renovation completed 2026, new roof 2026, new HVAC 2026, water heater 4 years</div>
+        <div class="facts-line">Property taxes $1,791/yr &middot; Insurance $2,025/yr</div>
+      </div>
+
+      <div class="property-card">
+        <h3>Property 7 &mdash; Rockford, IL</h3>
+        <div class="tagline">Address available upon request</div>
+        <div class="facts-line"><strong>3 Bed / 1 Bath</strong> &middot; 1,121 SF &middot; Built 1900</div>
+        <div class="facts-line">VACANT / RENT-READY &mdash; $1,600/mo Pro Forma</div>
+        <div class="facts-line">Street parking, unfinished basement</div>
+        <div class="facts-line">Full interior and partial exterior renovation completed 2026, roof 2 years, new HVAC 2026, water heater 4 years</div>
+        <div class="facts-line">Property taxes $1,251/yr &middot; Insurance $1,646/yr</div>
+      </div>
+
+      <div class="property-card">
+        <h3>Property 8 &mdash; Rockford, IL</h3>
+        <div class="tagline">Address available upon request</div>
+        <div class="facts-line"><strong>4 Bed / 1.5 Bath</strong> &middot; 1,462 SF &middot; Built 1909</div>
+        <div class="facts-line">Rent: $1,700/mo (Tenant $0 / HAP $1,700) &mdash; RHA</div>
+        <div class="facts-line">Lease through 7/31/26, 12-month renewal in process with potential rent increase &mdash; tenant in place since August 2025</div>
+        <div class="facts-line">2-car detached garage, unfinished basement</div>
+        <div class="facts-line">Full interior and exterior renovation completed 2025, roof 1 year, HVAC 1 year, water heater 1 year</div>
+        <div class="facts-line">Property taxes $848/yr &middot; Insurance $1,976/yr</div>
+        <div class="note">100% HAP</div>
+      </div>
+
+      <div class="property-card">
+        <h3>Property 9 &mdash; Rockford, IL</h3>
+        <div class="tagline">Address available upon request</div>
+        <div class="facts-line"><strong>4 Bed / 1 Bath</strong> &middot; 1,388 SF &middot; Built 1920</div>
+        <div class="facts-line">Rent: $1,551/mo (Tenant $0 / HAP $1,551) &mdash; RHA</div>
+        <div class="facts-line">Lease 7/1/26 through 6/30/27 &mdash; tenant in place since July 2026</div>
+        <div class="facts-line">2-car detached garage, unfinished basement</div>
+        <div class="facts-line">Full interior and partial exterior renovation completed 2026, new roof 2026, new HVAC 2026</div>
+        <div class="facts-line">Property taxes $964/yr &middot; Insurance $1,627/yr</div>
+        <div class="note">100% HAP</div>
+      </div>
+
+      <div class="property-card">
+        <h3>Property 10 &mdash; Rockford, IL</h3>
+        <div class="tagline">Address available upon request</div>
+        <div class="facts-line"><strong>3 Bed / 1 Bath</strong> &middot; 828 SF &middot; Built 1948</div>
+        <div class="facts-line">Rent: $1,561/mo (Tenant $294 / HAP $1,267, plus approx $87/mo other income) &mdash; RHA</div>
+        <div class="facts-line">Month-to-month, original term expired January 2026 &mdash; tenant in place since January 2025</div>
+        <div class="facts-line">1-car detached garage, unfinished basement</div>
+        <div class="facts-line">Full interior gut renovation completed 2024, roof 5 years, HVAC 1.5 years, water heater 1.5 years</div>
+        <div class="facts-line">Property taxes $1,800/yr &middot; Insurance $1,621/yr</div>
+        <div class="note">Approx 81% HAP-backed</div>
+      </div>
+
+      <div class="property-card">
+        <h3>Property 11 &mdash; Rockford, IL</h3>
+        <div class="tagline">Address available upon request</div>
+        <div class="facts-line"><strong>4 Bed / 1 Bath</strong> &middot; 1,250 SF &middot; Built 1925</div>
+        <div class="facts-line">VACANT / RENT-READY, actively listed for lease &mdash; $1,550/mo Pro Forma</div>
+        <div class="facts-line">Street parking, unfinished basement</div>
+        <div class="facts-line">Full interior and partial exterior renovation completed 2026, new roof 2026, new HVAC 2026, water heater 8 years</div>
+        <div class="facts-line">Property taxes $863/yr &middot; Insurance $1,972/yr</div>
+      </div>
+
+      <div class="property-card">
+        <h3>Property 12 &mdash; Rockford, IL</h3>
+        <div class="tagline">Address available upon request</div>
+        <div class="facts-line"><strong>4 Bed / 1 Bath</strong> &middot; 1,800 SF &middot; Built 1970</div>
+        <div class="facts-line">Rent: $1,200/mo (Tenant $1,200 / HAP $0) &mdash; Market</div>
+        <div class="facts-line">Month-to-month &mdash; tenant in place since March 2023, 3+ years, no arrears</div>
+        <div class="facts-line">1-car detached garage, unfinished basement</div>
+        <div class="facts-line">Original condition, offered as the value-add component of this portfolio, priced accordingly at approx $40/sq ft</div>
+        <div class="facts-line">Roof is 8 years old with a known leak, disclosed &mdash; HVAC and water heater condition unverified</div>
+        <div class="facts-line">Property taxes $1,152/yr &middot; Insurance $1,826/yr</div>
+        <div class="note">Stable long-term tenancy at $1,200/mo, estimated post-renovation market rent approx $1,600/mo</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Rent Growth and Upside</h2>
+    <ul class="plain">
+      <li>Property 3 &mdash; approx plus $200/mo mark-to-market</li>
+      <li>Property 8 &mdash; 12-month renewal in process with potential rent increase</li>
+      <li>Property 12 &mdash; approx plus $400/mo post-renovation</li>
+      <li>Three vacant properties already rent-ready and included at pro forma rents</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Investment Highlights</h2>
+    <ul class="plain">
+      <li>Strong HAP-backed income component across the portfolio &mdash; several tenants at 100% HAP with zero tenant-paid rent portion</li>
+      <li>9 occupied properties generating income today &mdash; several tenants with 1 to 3.5+ years of tenure and no arrears</li>
+      <li>3 vacant and rent-ready properties ready to lease immediately</li>
+      <li>Extensive renovations across the portfolio &mdash; several full interior and exterior renovations completed 2024 through 2026</li>
+      <li>Numerous newer roofs, HVAC systems, and water heaters &mdash; several under 2 years old</li>
+      <li>Deposits collected and in place on occupied units</li>
+      <li>Tenant-paid gas and electric across the portfolio</li>
+      <li>Additional rent growth potential built in through mark-to-market and renewal upside</li>
+      <li>Diversification across 12 individual SFRs in one transaction</li>
+      <li>Flexibility to hold as a portfolio or sell properties individually over time</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Exit Strategies</h2>
+    <ul class="plain">
+      <li>Buy and hold for cash flow with an approx 8.91% NOI yield at asking</li>
+      <li>Break up the portfolio and sell properties individually over time</li>
+      <li>Partner or syndicate the acquisition and split the income stream</li>
+      <li>Refinance individual assets post-stabilization to pull equity while holding the rent roll</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Deal Terms</h2>
+    <table class="figures">
+      <tr><td>Asking Price</td><td>$1,476,923 for the 12-property portfolio</td></tr>
+      <tr><td>Transaction Coordination Fee</td><td>$425, paid by buyer</td></tr>
+      <tr><td>Estimated Rehab Reserve</td><td>$10,000</td></tr>
+      <tr><td>Buyer Requirement</td><td>Cash or proof of funds &mdash; move quickly to secure the portfolio</td></tr>
+      <tr><td>Due Diligence Materials</td
