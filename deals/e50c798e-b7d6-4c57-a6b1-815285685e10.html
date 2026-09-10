@@ -8,193 +8,217 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; }
-  html, body {
-    margin: 0;
-    padding: 0;
-    background: #f5f0e8;
-    color: #2b2621;
-    font-family: 'Source Sans 3', sans-serif;
-    font-size: 16px;
-    line-height: 1.55;
+  :root{
+    --paper:#f6f1e9;
+    --ink:#2b2620;
+    --ink-soft:#5c5348;
+    --line:#ddd3c2;
+    --accent:#8a5a34;
+    --accent-dark:#6d4527;
   }
-  h1, h2, h3, .display {
-    font-family: 'Playfair Display', serif;
-    font-weight: 600;
-    color: #201b16;
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Source Sans 3', sans-serif;
+    font-size:16px;
+    line-height:1.55;
   }
-  a { color: #7a4a2b; }
-  .wrap {
-    max-width: 920px;
-    margin: 0 auto;
-    padding: 0 24px;
+  h1,h2,h3{
+    font-family:'Playfair Display', serif;
+    color:var(--ink);
+    font-weight:600;
+    margin:0;
   }
-  header.top {
-    border-bottom: 1px solid #ddd2bf;
-    padding-top: 28px;
-    padding-bottom: 20px;
+  .wrap{
+    max-width:960px;
+    margin:0 auto;
+    padding:0 24px;
   }
-  .kicker {
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-size: 12.5px;
-    color: #8a6a45;
-    font-weight: 600;
-    margin-bottom: 10px;
+  a{color:var(--accent-dark);}
+
+  header.top{
+    padding-top:40px;
+    padding-bottom:24px;
+    border-bottom:1px solid var(--line);
   }
-  h1.headline {
-    font-size: 34px;
-    margin-top: 0;
-    margin-bottom: 10px;
-    line-height: 1.2;
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:.78rem;
+    color:var(--accent-dark);
+    font-weight:600;
+    margin-bottom:10px;
   }
-  .location-line {
-    font-size: 17px;
-    color: #4a4238;
-    margin-top: 0;
-    margin-bottom: 6px;
+  h1.title{
+    font-size:2.3rem;
+    line-height:1.2;
+    margin-bottom:12px;
   }
-  .addr-note {
-    font-size: 14.5px;
-    font-style: italic;
-    color: #6b5c46;
-    margin-top: 0;
-    margin-bottom: 4px;
+  .loc-line{
+    font-size:1.05rem;
+    color:var(--ink-soft);
+    margin-bottom:6px;
   }
-  .assignment-note {
-    font-size: 13.5px;
-    color: #7a6a52;
-    margin-top: 6px;
-    margin-bottom: 0;
+  .addr-note{
+    display:inline-block;
+    background:#efe6d6;
+    border:1px solid var(--line);
+    padding:8px 14px;
+    border-radius:4px;
+    font-size:.92rem;
+    color:var(--ink-soft);
+    margin-top:8px;
   }
 
-  .price-block {
-    background: #201b16;
-    color: #f5f0e8;
-    padding: 26px 30px;
-    border-radius: 4px;
-    margin-top: 26px;
-    margin-bottom: 30px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 28px;
-    align-items: baseline;
+  section{
+    padding-top:36px;
+    padding-bottom:36px;
+    border-bottom:1px solid var(--line);
   }
-  .price-block .big {
-    font-family: 'Playfair Display', serif;
-    font-size: 40px;
-    font-weight: 700;
-  }
-  .price-block .sub {
-    font-size: 14px;
-    color: #cfc3ab;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-  .price-item { display: flex; flex-direction: column; gap: 4px; }
+  section:last-of-type{border-bottom:none;}
 
-  .gallery-section { margin-top: 10px; margin-bottom: 34px; }
-  .gallery-section h2 { font-size: 15px; text-transform: uppercase; letter-spacing: 0.1em; color: #8a6a45; margin-bottom: 12px; }
-  .gallery {
-    display: flex;
-    overflow-x: auto;
-    gap: 12px;
-    padding-bottom: 10px;
-    -webkit-overflow-scrolling: touch;
+  .price-block{
+    display:flex;
+    flex-wrap:wrap;
+    gap:32px;
+    align-items:baseline;
   }
-  .gallery img {
-    height: 220px;
-    width: auto;
-    flex: 0 0 auto;
-    border-radius: 3px;
-    object-fit: cover;
-    border: 1px solid #ddd2bf;
+  .price-main .label{
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    font-size:.78rem;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .price-main .value{
+    font-family:'Playfair Display', serif;
+    font-size:2.6rem;
+    color:var(--accent-dark);
+    font-weight:700;
+  }
+  .price-sub .label{
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    font-size:.78rem;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .price-sub .value{
+    font-family:'Playfair Display', serif;
+    font-size:1.4rem;
+    color:var(--ink);
   }
 
-  section.block { margin-top: 34px; margin-bottom: 34px; }
-  section.block h2 {
-    font-size: 22px;
-    margin-bottom: 14px;
-    border-bottom: 2px solid #201b16;
-    display: inline-block;
-    padding-bottom: 4px;
+  .gallery-heading{
+    font-size:1.4rem;
+    margin-bottom:14px;
   }
-  .desc-line {
-    font-size: 17px;
-    letter-spacing: 0.01em;
-    color: #302a22;
-    font-weight: 500;
+  .gallery{
+    display:flex;
+    gap:14px;
+    overflow-x:auto;
+    padding-bottom:12px;
+    -webkit-overflow-scrolling:touch;
   }
-
-  table.terms {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
+  .gallery img{
+    height:230px;
+    width:auto;
+    border-radius:6px;
+    border:1px solid var(--line);
+    flex:0 0 auto;
   }
-  table.terms tr { border-bottom: 1px solid #ddd2bf; }
-  table.terms tr:last-child { border-bottom: none; }
-  table.terms td {
-    padding: 12px 6px;
-    font-size: 15.5px;
-    vertical-align: top;
-  }
-  table.terms td.label {
-    color: #7a6a52;
-    width: 40%;
-    font-weight: 600;
+  .more-photos{
+    margin-top:10px;
+    font-size:.92rem;
   }
 
-  .disclaimer-box {
-    background: #ece4d4;
-    border-left: 3px solid #8a6a45;
-    padding: 16px 20px;
-    font-size: 13.5px;
-    color: #4a4238;
-    margin-top: 30px;
-    margin-bottom: 10px;
-  }
-  .disclaimer-box p { margin: 0 0 8px 0; }
-  .disclaimer-box p:last-child { margin-bottom: 0; }
-
-  .cta-band {
-    background: #7a4a2b;
-    color: #f8f2e8;
-    margin-top: 40px;
-    padding-top: 40px;
-    padding-bottom: 44px;
-  }
-  .cta-band h2 {
-    color: #f8f2e8;
-    font-size: 28px;
-    margin-top: 0;
-    margin-bottom: 10px;
-  }
-  .cta-band p {
-    font-size: 15.5px;
-    color: #f1e2cf;
-    margin-top: 0;
-    margin-bottom: 20px;
-  }
-  .cta-contacts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 22px;
-  }
-  .cta-contacts a {
-    color: #f8f2e8;
-    font-family: 'Playfair Display', serif;
-    font-size: 20px;
-    font-weight: 600;
-    text-decoration: none;
-    border-bottom: 2px solid #f1c98a;
-    padding-bottom: 2px;
+  h2.section-title{
+    font-size:1.5rem;
+    margin-bottom:18px;
   }
 
-  footer.bottom {
-    text-align: center;
-    padding: 18px 24px 30px 24px;
-    font-size: 12.5px;
-    color: #9a8c73;
+  .desc-text{
+    font-size:1.05rem;
+    color:var(--ink-soft);
+    max-width:70ch;
+  }
+
+  table.terms{
+    width:100%;
+    border-collapse:collapse;
+    font-size:.98rem;
+  }
+  table.terms tr{
+    border-bottom:1px solid var(--line);
+  }
+  table.terms td{
+    padding:12px 8px;
+    vertical-align:top;
+  }
+  table.terms td.k{
+    color:var(--ink-soft);
+    width:42%;
+    font-weight:600;
+  }
+  table.terms td.v{
+    color:var(--ink);
+  }
+
+  ul.facts-list{
+    margin:0;
+    padding-left:20px;
+    color:var(--ink-soft);
+  }
+  ul.facts-list li{
+    margin-bottom:8px;
+  }
+
+  .disclosure{
+    font-size:.88rem;
+    color:var(--ink-soft);
+    background:#efe6d6;
+    border:1px solid var(--line);
+    padding:16px 18px;
+    border-radius:6px;
+    margin-top:20px;
+  }
+
+  .cta-band{
+    background:var(--accent-dark);
+    color:#fdf8ef;
+    border-bottom:none;
+  }
+  .cta-band h2{
+    color:#fdf8ef;
+    font-size:1.8rem;
+    margin-bottom:10px;
+  }
+  .cta-band p{
+    color:#e9dcc7;
+    margin-bottom:18px;
+    max-width:60ch;
+  }
+  .cta-contacts{
+    display:flex;
+    flex-wrap:wrap;
+    gap:24px;
+  }
+  .cta-contacts a{
+    color:#fdf8ef;
+    font-weight:600;
+    text-decoration:none;
+    border-bottom:1px solid #e9dcc7;
+    padding-bottom:2px;
+    font-size:1.1rem;
+  }
+
+  footer.foot{
+    padding-top:24px;
+    padding-bottom:40px;
+    font-size:.82rem;
+    color:var(--ink-soft);
   }
 </style>
 </head>
@@ -202,109 +226,128 @@
 
 <header class="top">
   <div class="wrap">
-    <div class="kicker">Land Assignment Opportunity &middot; Deal Code GA-1 (Land)</div>
-    <h1 class="headline">1.10 Acre Residential Infill Homesite</h1>
-    <p class="location-line">Marietta, Cobb County, GA 30008</p>
-    <p class="addr-note">Address available upon request — contact us for the full property address.</p>
-    <p class="assignment-note">This offering is an assignment of contract. JNA Dynamic Holdings LLC holds an equitable interest in the underlying purchase contract and is marketing that contract position; this is not a direct sale by, and does not involve direct contact with, the underlying property owner.</p>
+    <div class="eyebrow">Deal Code: GA-1 (Land) &mdash; Assignment of Contract</div>
+    <h1 class="title">1.10-Acre Residential Infill Homesite</h1>
+    <div class="loc-line">Marietta, Cobb County, Georgia 30008</div>
+    <div class="addr-note">Address available upon request &mdash; contact us for the full property address.</div>
   </div>
 </header>
 
-<div class="wrap">
-
-  <div class="price-block">
-    <div class="price-item">
-      <span class="sub">Assignment Price</span>
-      <span class="big">$46,999</span>
-    </div>
-    <div class="price-item">
-      <span class="sub">As-Is Value Range</span>
-      <span class="big" style="font-size:26px;">$63,900 – $99,900</span>
+<section>
+  <div class="wrap">
+    <div class="price-block">
+      <div class="price-main">
+        <div class="label">Assignment Price</div>
+        <div class="value">$46,999</div>
+      </div>
+      <div class="price-sub">
+        <div class="label">Estimated As-Is Value</div>
+        <div class="value">$63,900 &ndash; $99,900</div>
+      </div>
     </div>
   </div>
+</section>
 
-  <div class="gallery-section">
-    <h2>Photos</h2>
+<section>
+  <div class="wrap">
+    <h2 class="gallery-heading">Property Photos</h2>
     <div class="gallery">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/1.jpg" alt="Vacant residential lot in Marietta, GA - photo 1">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/2.jpg" alt="Vacant residential lot in Marietta, GA - photo 2">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/3.jpg" alt="Vacant residential lot in Marietta, GA - photo 3">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/4.jpg" alt="Vacant residential lot in Marietta, GA - photo 4">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/5.jpg" alt="Vacant residential lot in Marietta, GA - photo 5">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/6.jpg" alt="Vacant residential lot in Marietta, GA - photo 6">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/7.jpg" alt="Vacant residential lot in Marietta, GA - photo 7">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/8.jpg" alt="Vacant residential lot in Marietta, GA - photo 8">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/9.jpg" alt="Vacant residential lot in Marietta, GA - photo 9">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/10.jpg" alt="Vacant residential lot in Marietta, GA - photo 10">
-      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/11.jpg" alt="Vacant residential lot in Marietta, GA - photo 11">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/1.jpg" alt="Vacant residential lot in Marietta, GA">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/2.jpg" alt="Vacant residential lot in Marietta, GA">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/3.jpg" alt="Vacant residential lot in Marietta, GA">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/4.jpg" alt="Vacant residential lot in Marietta, GA">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/5.jpg" alt="Vacant residential lot in Marietta, GA">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/6.jpg" alt="Vacant residential lot in Marietta, GA">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/7.jpg" alt="Vacant residential lot in Marietta, GA">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/8.jpg" alt="Vacant residential lot in Marietta, GA">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/9.jpg" alt="Vacant residential lot in Marietta, GA">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/10.jpg" alt="Vacant residential lot in Marietta, GA">
+      <img src="/deals/e50c798e-b7d6-4c57-a6b1-815285685e10/photos/11.jpg" alt="Vacant residential lot in Marietta, GA">
     </div>
   </div>
+</section>
 
-  <section class="block">
-    <h2>Overview</h2>
-    <p class="desc-line">Marietta, GA — 1.10 acre residential infill homesite | R-2 zoning | public water available.</p>
-    <p>A 1.10-acre vacant residential lot positioned as an infill homesite in Marietta, Cobb County, Georgia. The parcel carries R-2 residential zoning and has access to public water service.</p>
-  </section>
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Overview</h2>
+    <p class="desc-text">
+      Marietta, GA &mdash; a 1.10 acre residential infill homesite zoned R-2, served by public water. A clean, ready-to-build lot in an established Cobb County location, offered as an assignment of contract.
+    </p>
+  </div>
+</section>
 
-  <section class="block">
-    <h2>Deal Terms</h2>
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Property Facts</h2>
+    <ul class="facts-list">
+      <li>Type: Land</li>
+      <li>Lot Size: 1.10 acres</li>
+      <li>Zoning: R-2 (Residential)</li>
+      <li>Water: Public water available</li>
+      <li>County: Cobb</li>
+      <li>City / State: Marietta, GA</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Deal Terms</h2>
     <table class="terms">
       <tr>
-        <td class="label">Deal Type</td>
-        <td>Land — Assignment of Contract</td>
+        <td class="k">Assignment Price</td>
+        <td class="v">$46,999</td>
       </tr>
       <tr>
-        <td class="label">Assignment Price</td>
-        <td>$46,999</td>
+        <td class="k">Estimated As-Is Value</td>
+        <td class="v">$63,900 &ndash; $99,900</td>
       </tr>
       <tr>
-        <td class="label">As-Is Value Range</td>
-        <td>$63,900 – $99,900</td>
+        <td class="k">Deal Type</td>
+        <td class="v">Land</td>
       </tr>
       <tr>
-        <td class="label">Lot Size</td>
-        <td>1.10 acres</td>
+        <td class="k">Lot Size</td>
+        <td class="v">1.10 acres</td>
       </tr>
       <tr>
-        <td class="label">Zoning</td>
-        <td>R-2 (Residential)</td>
+        <td class="k">Zoning</td>
+        <td class="v">R-2 (Residential)</td>
       </tr>
       <tr>
-        <td class="label">Utilities</td>
-        <td>Public water available</td>
+        <td class="k">Utilities</td>
+        <td class="v">Public water</td>
       </tr>
       <tr>
-        <td class="label">City / County</td>
-        <td>Marietta, Cobb County, GA</td>
+        <td class="k">Location</td>
+        <td class="v">Marietta, Cobb County, GA 30008</td>
       </tr>
       <tr>
-        <td class="label">ZIP</td>
-        <td>30008</td>
+        <td class="k">Contract Type</td>
+        <td class="v">Assignment of contract</td>
       </tr>
     </table>
-  </section>
 
-  <div class="disclaimer-box">
-    <p>This is an assignment of contract offering. JNA Dynamic Holdings LLC holds an equitable interest under an assignable purchase agreement with the underlying property owner and is marketing the right to that contract position for a fee; this is not a listing of the property for direct sale, and buyers should not attempt to contact the underlying owner directly.</p>
-    <p>All figures, measurements, zoning designations, utility information, and valuation ranges presented here have not been independently verified by JNA Dynamic Holdings LLC and should be confirmed by the buyer during due diligence prior to closing.</p>
+    <div class="disclosure">
+      This offering is an assignment of contract. JNA Dynamic Holdings LLC holds an equitable interest in the underlying purchase contract with the property owner and is marketing the assignment of that contract; this is not a direct sale by, and does not imply direct contact with, the underlying seller/owner. All figures, measurements, and details on this page have not been independently verified by JNA Dynamic Holdings LLC and should be confirmed by the buyer during due diligence.
+    </div>
   </div>
+</section>
 
-</div>
-
-<div class="cta-band">
+<section class="cta-band">
   <div class="wrap">
-    <h2>Ready to Move on This Lot?</h2>
-    <p>Reach out today to receive the full property address, contract terms, and next steps for closing on this assignment.</p>
+    <h2>Interested in This Lot?</h2>
+    <p>Reach out today for the full property address, additional documentation, and to discuss terms on this assignment of contract.</p>
     <div class="cta-contacts">
       <a href="tel:5206336437">520-633-6437</a>
       <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
     </div>
   </div>
-</div>
+</section>
 
-<footer class="bottom">
+<footer class="foot">
   <div class="wrap">
-    &copy; JNA Dynamic Holdings LLC. All rights reserved.
+    &copy; 2024 JNA Dynamic Holdings LLC. All rights reserved.
   </div>
 </footer>
 
