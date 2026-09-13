@@ -3,253 +3,236 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NC 4 — North Raleigh Townhome | Off-Market Assignment | JNA Dynamic Holdings LLC</title>
+<title>North Raleigh Townhome — Stoney Hollow | JNA Dynamic Holdings LLC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; }
-  body {
-    background-color: #f6f1e9;
-    color: #2b2621;
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    line-height: 1.6;
+  html, body {
+    margin: 0;
     padding: 0;
-    padding-top: 0;
-    padding-bottom: 0;
+    background-color: #f6f1e9;
+    color: #2b2620;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
   }
+  h1, h2, h3, .display {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    color: #23201b;
+  }
+  a { color: #7a4b23; }
   .wrap {
-    max-width: 880px;
+    max-width: 960px;
     margin: 0 auto;
     padding-left: 24px;
     padding-right: 24px;
   }
-  h1, h2, h3 {
-    font-family: 'Playfair Display', serif;
-    color: #1c1a17;
-  }
-  a { color: #7a3b1e; }
 
   header.top {
-    background-color: #1c1a17;
+    background-color: #23201b;
     color: #f6f1e9;
     padding-top: 34px;
-    padding-bottom: 30px;
+    padding-bottom: 34px;
   }
   header.top .tag {
-    letter-spacing: 3px;
     text-transform: uppercase;
+    letter-spacing: 0.14em;
     font-size: 12px;
     color: #cbb896;
     margin-bottom: 10px;
   }
   header.top h1 {
-    font-size: 40px;
-    margin-top: 6px;
-    margin-bottom: 8px;
     color: #f6f1e9;
+    font-size: 40px;
+    margin-top: 0;
+    margin-bottom: 8px;
   }
   header.top .loc {
-    font-size: 18px;
-    color: #e8ddc9;
+    font-size: 17px;
+    color: #e7ddc9;
     margin-top: 0;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
   }
   header.top .addr-note {
     font-size: 14px;
-    color: #d8c9a3;
+    color: #d8c9a6;
     font-style: italic;
-    margin-top: 10px;
+    margin-top: 6px;
     margin-bottom: 0;
   }
 
-  .price-band {
-    background-color: #eadfc9;
-    border-top: 1px solid #d9c9a3;
-    border-bottom: 1px solid #d9c9a3;
-    padding-top: 26px;
-    padding-bottom: 26px;
-  }
-  .price-grid {
+  section.price-block {
+    background-color: #fffdf9;
+    border: 1px solid #e3d8c3;
+    border-radius: 4px;
+    padding: 26px 30px;
+    margin-top: -28px;
+    margin-bottom: 40px;
     display: flex;
     flex-wrap: wrap;
+    gap: 26px;
+    align-items: baseline;
+  }
+  .price-main {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    color: #7a4b23;
+    font-weight: 700;
+  }
+  .price-sub {
+    font-size: 15px;
+    color: #5a5348;
+  }
+  .price-figs {
+    display: flex;
     gap: 30px;
-  }
-  .price-item {
-    min-width: 160px;
-  }
-  .price-item .label {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: #6b5f4d;
-    margin-bottom: 4px;
-  }
-  .price-item .value {
-    font-family: 'Playfair Display', serif;
-    font-size: 28px;
-    color: #1c1a17;
-  }
-
-  section {
-    padding-top: 34px;
-    padding-bottom: 34px;
-  }
-  section.alt {
-    background-color: #efe8da;
-  }
-
-  h2.section-title {
-    font-size: 26px;
-    margin-top: 0;
-    margin-bottom: 18px;
-    border-bottom: 2px solid #cbb896;
-    padding-bottom: 10px;
-  }
-
-  .gallery {
-    display: flex;
-    overflow-x: auto;
-    gap: 14px;
-    padding-bottom: 8px;
-  }
-  .gallery img {
-    height: 260px;
-    border-radius: 4px;
-    flex-shrink: 0;
-  }
-  .more-photos {
-    display: inline-block;
-    margin-top: 10px;
-    font-size: 14px;
-    text-decoration: underline;
-  }
-
-  table {
+    flex-wrap: wrap;
+    margin-top: 14px;
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-  }
-  table.terms td {
-    padding-top: 10px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #d9c9a3;
-    font-size: 15px;
-  }
-  table.terms td.label {
-    color: #6b5f4d;
-    width: 45%;
-    font-weight: 600;
-  }
-
-  table.comps {
-    font-size: 13.5px;
-  }
-  table.comps th, table.comps td {
-    text-align: left;
-    padding: 8px 6px;
-    border-bottom: 1px solid #d9c9a3;
-  }
-  table.comps th {
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-size: 11px;
-    color: #6b5f4d;
-  }
-
-  ul.snapshot {
-    list-style: none;
-    padding-left: 0;
-    margin-top: 10px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px 20px;
-  }
-  ul.snapshot li {
-    font-size: 15px;
-    border-left: 3px solid #cbb896;
-    padding-left: 10px;
-  }
-
-  .analyzer-list, .exit-list {
-    margin-top: 10px;
-    padding-left: 0;
-    list-style: none;
-  }
-  .analyzer-list li {
-    padding-top: 8px;
-    padding-bottom: 8px;
-    border-bottom: 1px dashed #d9c9a3;
-    display: flex;
-    justify-content: space-between;
-    font-size: 15px;
-  }
-  .analyzer-list li .k { color: #6b5f4d; }
-  .analyzer-list li .v { font-weight: 600; }
-
-  .exit-list li {
-    margin-bottom: 16px;
-    padding-left: 16px;
-    border-left: 3px solid #7a3b1e;
-  }
-  .exit-list li strong {
-    display: block;
-    font-family: 'Playfair Display', serif;
-    font-size: 17px;
-    margin-bottom: 4px;
-  }
-
-  .disclaimer {
-    font-size: 13px;
-    color: #7a6f5c;
-    margin-top: 24px;
+    border-top: 1px solid #e3d8c3;
     padding-top: 16px;
-    border-top: 1px solid #d9c9a3;
-    line-height: 1.6;
+  }
+  .price-figs div .label {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 11px;
+    color: #8a7d64;
+  }
+  .price-figs div .val {
+    font-size: 20px;
+    font-weight: 600;
+    color: #23201b;
   }
 
-  .cta-band {
-    background-color: #1c1a17;
-    color: #f6f1e9;
-    padding-top: 40px;
-    padding-bottom: 40px;
-    text-align: center;
-  }
-  .cta-band h2 {
-    color: #f6f1e9;
-    font-size: 30px;
+  section.gallery {
     margin-top: 0;
     margin-bottom: 12px;
   }
-  .cta-band p {
-    color: #d8c9a3;
+  section.gallery h2 { font-size: 22px; margin-bottom: 10px; }
+  .scroller {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+  .scroller img {
+    height: 230px;
+    width: auto;
+    flex: 0 0 auto;
+    border-radius: 3px;
+    border: 1px solid #e3d8c3;
+    object-fit: cover;
+  }
+  .more-photos {
+    margin-top: 6px;
+    margin-bottom: 34px;
+    font-size: 14px;
+  }
+
+  section.body-section {
     margin-top: 0;
-    margin-bottom: 22px;
+    margin-bottom: 40px;
+  }
+  section.body-section h2 {
+    font-size: 24px;
+    border-bottom: 2px solid #23201b;
+    padding-bottom: 8px;
+    margin-bottom: 18px;
+  }
+  section.body-section p { margin-top: 0; }
+
+  table.facts-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fffdf9;
+  }
+  table.facts-table td, table.facts-table th {
+    padding: 10px 14px;
+    border: 1px solid #e3d8c3;
+    text-align: left;
     font-size: 15px;
+    vertical-align: top;
+  }
+  table.facts-table th {
+    background-color: #efe6d4;
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+  }
+  table.facts-table td.label-cell {
+    width: 42%;
+    color: #5a5348;
+    font-weight: 600;
+  }
+
+  ul.plain-list { padding-left: 20px; margin-top: 8px; }
+  ul.plain-list li { margin-bottom: 6px; }
+
+  .exit-card {
+    background-color: #fffdf9;
+    border: 1px solid #e3d8c3;
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+  .exit-card h3 {
+    margin-top: 0;
+    margin-bottom: 6px;
+    font-size: 18px;
+  }
+  .exit-card p { margin-bottom: 0; font-size: 15px; }
+
+  .disclaimer {
+    font-size: 13px;
+    color: #6f6656;
+    background-color: #efe6d4;
+    border-left: 3px solid #a98b56;
+    padding: 14px 18px;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  .disclaimer p { margin: 0 0 8px 0; }
+  .disclaimer p:last-child { margin-bottom: 0; }
+
+  footer.cta {
+    background-color: #7a4b23;
+    color: #fbf3e4;
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+  footer.cta h2 {
+    color: #fbf3e4;
+    font-size: 30px;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  footer.cta p {
+    font-size: 16px;
+    margin-top: 0;
+    margin-bottom: 18px;
+    color: #f3e2c7;
   }
   .cta-contacts {
     display: flex;
-    justify-content: center;
-    gap: 26px;
+    gap: 30px;
     flex-wrap: wrap;
-  }
-  .cta-contacts a {
-    color: #f6f1e9;
-    background-color: #7a3b1e;
-    padding: 12px 22px;
-    border-radius: 3px;
-    text-decoration: none;
+    font-size: 19px;
     font-weight: 600;
-    font-size: 15px;
   }
-  footer.legal {
-    background-color: #12100e;
-    color: #8b8070;
-    font-size: 12px;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    text-align: center;
+  .cta-contacts a { color: #fff8ea; text-decoration: none; border-bottom: 1px solid #f3e2c7; }
+  .cta-foot-note {
+    margin-top: 22px;
+    margin-bottom: 0;
+    font-size: 13px;
+    color: #e6d3ae;
+  }
+
+  @media (max-width: 600px) {
+    header.top h1 { font-size: 30px; }
+    .price-main { font-size: 32px; }
   }
 </style>
 </head>
@@ -257,179 +240,188 @@
 
 <header class="top">
   <div class="wrap">
-    <div class="tag">Deal Code: NC 4 &nbsp;|&nbsp; Wholesale Assignment</div>
+    <div class="tag">Off-Market Wholesale Assignment &middot; Fix &amp; Flip</div>
     <h1>North Raleigh Townhome — Stoney Hollow</h1>
-    <p class="loc">Raleigh, North Carolina &nbsp;|&nbsp; Wake County &nbsp;|&nbsp; ZIP 27615</p>
-    <p class="addr-note">Address available upon request — reach out for the full address and access details.</p>
-    <a class="more-photos" href="https://drive.google.com/drive/folders/1J-ewfOmEnnuir8by3HJKFfYFsymZdcBx?usp=sharing" target="_blank" rel="noopener">View full photo set</a>
+    <p class="loc">Raleigh, North Carolina 27615 &middot; Wake County</p>
+    <p class="addr-note">Address available upon request — contact us for the full street address.</p>
   </div>
 </header>
 
-<div class="price-band">
-  <div class="wrap">
-    <div class="price-grid">
-      <div class="price-item">
-        <div class="label">Asking Price</div>
-        <div class="value">$135,000</div>
-      </div>
-      <div class="price-item">
-        <div class="label">ARV</div>
-        <div class="value">$240,000</div>
-      </div>
-      <div class="price-item">
-        <div class="label">Estimated Rehab</div>
-        <div class="value">$35,000</div>
-      </div>
-      <div class="price-item">
-        <div class="label">Gross Spread Below ARV</div>
-        <div class="value">$105,000</div>
-      </div>
+<div class="wrap">
+
+  <section class="price-block">
+    <div>
+      <div class="price-main">$135,000</div>
+      <div class="price-sub">Purchase Price (Assignment of Contract)</div>
     </div>
-  </div>
+    <div class="price-figs">
+      <div><div class="label">ARV</div><div class="val">$240,000</div></div>
+      <div><div class="label">Gross Spread Below ARV</div><div class="val">$105,000</div></div>
+      <div><div class="label">Estimated Rehab</div><div class="val">$35,000 (midpoint)</div></div>
+      <div><div class="label">Comp Range</div><div class="val">$225,000 – $280,000</div></div>
+    </div>
+  </section>
+
+  <section class="gallery">
+    <h2>Photos</h2>
+    <div class="scroller">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/1.jpg" alt="North Raleigh townhome photo 1">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/2.jpg" alt="North Raleigh townhome photo 2">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/3.jpg" alt="North Raleigh townhome photo 3">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/4.jpg" alt="North Raleigh townhome photo 4">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/5.jpg" alt="North Raleigh townhome photo 5">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/6.jpg" alt="North Raleigh townhome photo 6">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/7.jpg" alt="North Raleigh townhome photo 7">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/8.jpg" alt="North Raleigh townhome photo 8">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/9.jpg" alt="North Raleigh townhome photo 9">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/10.jpg" alt="North Raleigh townhome photo 10">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/11.jpg" alt="North Raleigh townhome photo 11">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/12.jpg" alt="North Raleigh townhome photo 12">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/13.jpg" alt="North Raleigh townhome photo 13">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/14.jpg" alt="North Raleigh townhome photo 14">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/15.jpg" alt="North Raleigh townhome photo 15">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/16.jpg" alt="North Raleigh townhome photo 16">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/17.jpg" alt="North Raleigh townhome photo 17">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/18.jpg" alt="North Raleigh townhome photo 18">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/19.jpg" alt="North Raleigh townhome photo 19">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/20.jpg" alt="North Raleigh townhome photo 20">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/21.jpg" alt="North Raleigh townhome photo 21">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/22.jpg" alt="North Raleigh townhome photo 22">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/23.jpg" alt="North Raleigh townhome photo 23">
+      <img src="/deals/a84fd3f8-85e2-4fda-b21a-a1472cc7451d/photos/24.jpg" alt="North Raleigh townhome photo 24">
+    </div>
+  </section>
+  <p class="more-photos"><a href="https://drive.google.com/drive/folders/1J-ewfOmEnnuir8by3HJKFfYFsymZdcBx?usp=sharing" target="_blank" rel="noopener">View full photo set</a></p>
+
+  <section class="body-section">
+    <h2>Here Is What We Have</h2>
+    <p>Raleigh, North Carolina. North Raleigh. Stoney Hollow. We are moving a 2 bedroom, 1.5 bath townhome at $135,000 with an ARV of $240,000 — a gross spread of $105,000 below ARV at asking price on a light to moderate rehab scope. Six comparable 2 bedroom units within 0.4 miles of the subject property have closed between $225,000 and $280,000 in the last eight months. The most recent comp closed at $275,000 on August 30, 2026. North Raleigh, 1,080 square feet, currently off market. First buyer with proof of funds locks it.</p>
+  </section>
+
+  <section class="body-section">
+    <h2>The Numbers</h2>
+    <table class="facts-table">
+      <tr><td class="label-cell">Asking Price</td><td>$135,000</td></tr>
+      <tr><td class="label-cell">ARV</td><td>$240,000</td></tr>
+      <tr><td class="label-cell">Gross Spread Below ARV</td><td>$105,000</td></tr>
+      <tr><td class="label-cell">Comp Range</td><td>$225,000 – $280,000</td></tr>
+      <tr><td class="label-cell">Average Price Per Sq Ft</td><td>$217</td></tr>
+      <tr><td class="label-cell">Estimated Rehab</td><td>$30,000 – $40,000</td></tr>
+      <tr><td class="label-cell">Estimated All-In Basis</td><td>Approx. $173,000 – $183,000</td></tr>
+      <tr><td class="label-cell">Estimated Profit</td><td>$57,000 – $67,000</td></tr>
+      <tr><td class="label-cell">70% Rule MAO Check</td><td>(0.70 &times; $240,000) − $35,000 = $133,000 — asking price of $135,000 is right at the line, with clean upside</td></tr>
+      <tr><td class="label-cell">EMD</td><td>Contact for terms</td></tr>
+      <tr><td class="label-cell">Access</td><td>By appointment only</td></tr>
+      <tr><td class="label-cell">Market Status</td><td>Currently off market</td></tr>
+    </table>
+  </section>
+
+  <section class="body-section">
+    <h2>Property Snapshot</h2>
+    <table class="facts-table">
+      <tr><td class="label-cell">Bedrooms</td><td>2</td></tr>
+      <tr><td class="label-cell">Bathrooms</td><td>1.5</td></tr>
+      <tr><td class="label-cell">Square Footage</td><td>1,080 Sq Ft</td></tr>
+      <tr><td class="label-cell">Stories</td><td>2</td></tr>
+      <tr><td class="label-cell">Year Built</td><td>1975</td></tr>
+      <tr><td class="label-cell">Property Type</td><td>Townhouse / Condo</td></tr>
+      <tr><td class="label-cell">Community</td><td>Stoney Hollow — North Raleigh</td></tr>
+      <tr><td class="label-cell">Location</td><td>Raleigh, NC 27615 — Wake County</td></tr>
+      <tr><td class="label-cell">Garage</td><td>No Garage</td></tr>
+      <tr><td class="label-cell">Pool</td><td>No Pool</td></tr>
+      <tr><td class="label-cell">Market Status</td><td>Currently off market — address released upon proof of funds</td></tr>
+      <tr><td class="label-cell">Access</td><td>By appointment only</td></tr>
+      <tr><td class="label-cell">Condition</td><td>Sold as-is — buyer responsible for full due diligence</td></tr>
+    </table>
+  </section>
+
+  <section class="body-section">
+    <h2>Why North Raleigh, and Why This Deal</h2>
+    <p>North Raleigh is one of the most consistently sought-after residential corridors in the entire Triangle. The 27615 zip code sits in the heart of a submarket where 2 bedroom comparable units have been closing between $225,000 and $280,000 in 2026 — and this property is off market at $135,000. Six comps within 0.4 miles of the subject have closed in the last eight months. The most recent comp closed at $275,000 on August 30, 2026. The ceiling comp closed at $280,000. This property is priced at $135,000 in a zip code where renovated product of this profile consistently commands $225,000 to $280,000 from a deep and active buyer pool.</p>
+    <p>At a $240,000 ARV, an estimated all-in basis of $173,000 to $183,000 leaves $57,000 to $67,000 of estimated profit before financing — solid margin on a 1,080 square foot townhome in one of the Southeast's most active residential markets. Raleigh's continued growth as a tech, healthcare, and university hub keeps demand in this corridor perpetually active, and absorption on renovated product consistently strong.</p>
+  </section>
+
+  <section class="body-section">
+    <h2>Deal Analyzer — Flip Scenario</h2>
+    <table class="facts-table">
+      <tr><td class="label-cell">Purchase Price</td><td>$135,000</td></tr>
+      <tr><td class="label-cell">Estimated Rehab</td><td>$35,000 (midpoint)</td></tr>
+      <tr><td class="label-cell">Closing Costs (Buy + Sell, approx. 6%)</td><td>$14,400</td></tr>
+      <tr><td class="label-cell">Financing (Hard Money, approx. 12% + 2 pts, 4-month hold)</td><td>Approx. $8,000 – $10,000</td></tr>
+      <tr><td class="label-cell">Total Estimated All-In</td><td>Approx. $192,400 – $194,400</td></tr>
+      <tr><td class="label-cell">ARV</td><td>$240,000</td></tr>
+      <tr><td class="label-cell">Estimated Profit</td><td>Approx. $45,600 – $47,600</td></tr>
+      <tr><td class="label-cell">Cash Invested (20% down + rehab + costs)</td><td>Approx. $56,000 – $66,000</td></tr>
+      <tr><td class="label-cell">Estimated Cash-on-Cash ROI</td><td>Approx. 70% – 85%</td></tr>
+    </table>
+    <p class="disclaimer" style="margin-top:16px;"><strong>Note:</strong> All deal analyzer figures are estimates only. Buyers are advised to conduct independent financial analysis and obtain contractor bids prior to closing. JNA Dynamic Holdings LLC makes no representations regarding projected profits or returns.</p>
+  </section>
+
+  <section class="body-section">
+    <h2>Verified ARV Comp Support — Raleigh, NC 27615</h2>
+    <p>Recent closed sales, per third-party ChatARV comp report:</p>
+    <table class="facts-table">
+      <tr><th>Comparable</th><th>Beds/Baths</th><th>Sq Ft</th><th>Built</th><th>Sold</th><th>Price</th><th>$/Sq Ft</th><th>Distance</th></tr>
+      <tr><td>English Oaks Dr</td><td>2BD/2.5BA</td><td>1,222</td><td>1984</td><td>08/30/2026</td><td>$275,000</td><td>$225</td><td>0.4 mi</td></tr>
+      <tr><td>English Oaks Dr</td><td>2BD/2.5BA</td><td>1,218</td><td>1985</td><td>06/28/2026</td><td>$240,000</td><td>$197</td><td>0.3 mi</td></tr>
+      <tr><td>Chauncey Dr</td><td>2BD/2BA</td><td>1,163</td><td>1986</td><td>01/27/2026</td><td>$280,000</td><td>$241</td><td>0.2 mi</td></tr>
+      <tr><td>Hearthstone Dr E</td><td>2BD/2BA</td><td>1,108</td><td>1975</td><td>Recent</td><td>$250,000</td><td>$243,719 adjusted</td><td>0.1 mi</td></tr>
+      <tr><td>Hearthstone Dr</td><td>2BD/2.5BA</td><td>1,152</td><td></td><td>Recent</td><td>$228,000</td><td>$207,379 adjusted</td><td>0.1 mi</td></tr>
+      <tr><td>Hearthstone Dr</td><td>2BD/1.5BA</td><td>1,105</td><td>1975</td><td>09/02/2026</td><td>$225,000</td><td>$204</td><td>0.1 mi</td></tr>
+    </table>
+    <p style="margin-top:16px;"><strong>Comp Averages (per ChatARV):</strong> Adjusted ARV $229,625 — Buyer ARV Used $240,000 &middot; Average Sq Ft 1,152 &middot; Average Price Per Sq Ft $217 &middot; Average Year Built 1984 &middot; Average Distance 0.3 Miles &middot; Average Months Since Sale 4.</p>
+    <p class="disclaimer"><strong>Note:</strong> ARV of $240,000 is buyer-supplied based on the comp set above. ChatARV adjusted ARV is $229,625. Buyers are advised to independently verify ARV and run their own comp analysis prior to closing. The $240,000 ARV is supported by a comp range of $225,000 to $280,000, with a ceiling of $280,000 within 0.2 miles of the subject.</p>
+  </section>
+
+  <section class="body-section">
+    <h2>Exit Strategies</h2>
+    <div class="exit-card">
+      <h3>Fix and Flip</h3>
+      <p>Light to moderate rehab on 1,080 sq ft in North Raleigh — list into a comp set running $225,000 to $280,000 within 0.4 miles. At $240,000 ARV and $135,000 entry, the gross spread is $105,000 before rehab and costs — one of the strongest margin positions available in the Triangle at this price point.</p>
+    </div>
+    <div class="exit-card">
+      <h3>Buy and Hold Rental</h3>
+      <p>North Raleigh rental demand from Triangle tech and university workforce is among the strongest in the Southeast — 2 bedroom renovated units in Stoney Hollow command consistent monthly rents that support strong cash-on-cash returns at a $135,000 acquisition cost.</p>
+    </div>
+    <div class="exit-card">
+      <h3>BRRRR</h3>
+      <p>Acquire at $135,000, renovate, stabilize with a tenant, and refinance against a $240,000 ARV — the equity gap creates a meaningful cash-out refinance position in one of North Carolina's most active appreciation markets.</p>
+    </div>
+  </section>
+
+  <section class="body-section">
+    <h2>Deal Terms</h2>
+    <table class="facts-table">
+      <tr><td class="label-cell">Purchase Price</td><td>$135,000</td></tr>
+      <tr><td class="label-cell">EMD</td><td>Contact for terms</td></tr>
+      <tr><td class="label-cell">Access</td><td>By appointment only</td></tr>
+      <tr><td class="label-cell">Condition</td><td>Property sold as-is</td></tr>
+      <tr><td class="label-cell">Market Status</td><td>Currently off market — address released upon proof of funds</td></tr>
+      <tr><td class="label-cell">Funding</td><td>Cash or hard money only</td></tr>
+      <tr><td class="label-cell">Priority</td><td>First come, first served</td></tr>
+    </table>
+  </section>
+
+  <section class="body-section">
+    <div class="disclaimer">
+      <p><strong>This is a wholesale assignment of contract.</strong> JNA Dynamic Holdings LLC holds equitable interest in this property under contract with the underlying property owner. The end buyer will receive an assignment of contract, not a direct purchase from the property owner. This is not an offer to sell real property.</p>
+      <p>All figures on this page, including ARV, comp values, and rehab estimates, are provided from third-party sources including ChatARV and are not guaranteed. The ARV of $240,000 is buyer-supplied and not guaranteed. Figures have not been independently verified by JNA Dynamic Holdings LLC. Buyers are advised to conduct independent due diligence, including independent inspection, contractor bids, and ARV verification, prior to executing any purchase agreement.</p>
+      <p>JNA Dynamic Holdings LLC operates in compliance with North Carolina wholesale disclosure requirements.</p>
+    </div>
+  </section>
+
 </div>
 
-<section>
+<footer class="cta">
   <div class="wrap">
-    <h2 class="section-title">Here Is What We Have</h2>
-    <p>Raleigh, North Carolina. North Raleigh. Stoney Hollow. We are moving a 2 bedroom, 1.5 bath townhome at $135,000 with an ARV of $240,000 — a gross spread of $105,000 below ARV at asking price on a light to moderate rehab scope.</p>
-    <p>Six comparable 2-bedroom units within 0.4 miles of the subject property have closed between $225,000 and $280,000 in the last eight months. The most recent comp closed at $275,000 on August 30, 2026. You are buying at $135,000. North Raleigh. 1,080 square feet. Off market. First buyer with proof of funds locks it.</p>
-  </div>
-</section>
-
-<section class="alt">
-  <div class="wrap">
-    <h2 class="section-title">Property Snapshot</h2>
-    <ul class="snapshot">
-      <li>2 Bedrooms</li>
-      <li>1.5 Bathrooms</li>
-      <li>1,080 Sq Ft</li>
-      <li>2 Stories</li>
-      <li>Year Built: 1975</li>
-      <li>Townhouse / Condo</li>
-      <li>Stoney Hollow — North Raleigh</li>
-      <li>Raleigh, NC 27615 | Wake County</li>
-      <li>No Garage</li>
-      <li>No Pool</li>
-      <li>Currently Off Market</li>
-      <li>Access By Appointment Only</li>
-      <li>Sold AS-IS — Buyer Responsible for Full Due Diligence</li>
-    </ul>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <h2 class="section-title">The Numbers</h2>
-    <table class="terms">
-      <tr><td class="label">Asking Price</td><td>$135,000</td></tr>
-      <tr><td class="label">ARV</td><td>$240,000</td></tr>
-      <tr><td class="label">Gross Spread Below ARV</td><td>$105,000</td></tr>
-      <tr><td class="label">Comp Range</td><td>$225,000 — $280,000</td></tr>
-      <tr><td class="label">Average Price Per Sq Ft</td><td>$217</td></tr>
-      <tr><td class="label">Estimated Rehab</td><td>$30,000 — $40,000</td></tr>
-      <tr><td class="label">Estimated All-In Basis</td><td>approx. $173,000 — $183,000</td></tr>
-      <tr><td class="label">Estimated Profit</td><td>$57,000 — $67,000</td></tr>
-      <tr><td class="label">70% Rule MAO Check</td><td>(0.70 × $240,000) − $35,000 = $133,000 — asking $135,000, right at the line with clean upside</td></tr>
-      <tr><td class="label">EMD</td><td>Contact for terms</td></tr>
-      <tr><td class="label">Access</td><td>By appointment only</td></tr>
-      <tr><td class="label">Market Status</td><td>Currently off market</td></tr>
-    </table>
-  </div>
-</section>
-
-<section class="alt">
-  <div class="wrap">
-    <h2 class="section-title">Why North Raleigh, Why This Deal</h2>
-    <p>North Raleigh is one of the most consistently sought-after residential corridors in the entire Triangle. The 27615 ZIP code sits in the heart of a submarket where 2-bedroom comparable units have been closing between $225,000 and $280,000 in 2026 — and this property is off market at $135,000. Six comps within 0.4 miles of the subject have closed in the last eight months. The most recent comp closed at $275,000 on August 30, 2026. The ceiling comp closed at $280,000. You are buying at $135,000 in a ZIP code where renovated product of this profile consistently commands $225,000 to $280,000 from a deep and active buyer pool.</p>
-    <p>At a $240,000 ARV, your estimated all-in basis of $173,000 to $183,000 leaves $57,000 to $67,000 of estimated profit before financing — solid margin on a 1,080 square foot townhome in one of the Southeast's most active residential markets. Raleigh's continued growth as a tech, healthcare, and university hub keeps demand in this corridor perpetually active and absorption on renovated product consistently strong.</p>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <h2 class="section-title">Deal Analyzer — Flip Scenario</h2>
-    <ul class="analyzer-list">
-      <li><span class="k">Purchase Price</span><span class="v">$135,000</span></li>
-      <li><span class="k">Estimated Rehab (midpoint)</span><span class="v">$35,000</span></li>
-      <li><span class="k">Closing Costs, Buy + Sell (approx. 6%)</span><span class="v">$14,400</span></li>
-      <li><span class="k">Financing (Hard Money, approx. 12% + 2 pts, 4-month hold)</span><span class="v">approx. $8,000 — $10,000</span></li>
-      <li><span class="k">Total Estimated All-In</span><span class="v">approx. $192,400 — $194,400</span></li>
-      <li><span class="k">ARV</span><span class="v">$240,000</span></li>
-      <li><span class="k">Estimated Profit</span><span class="v">approx. $45,600 — $47,600</span></li>
-      <li><span class="k">Cash Invested (20% down + rehab + costs)</span><span class="v">approx. $56,000 — $66,000</span></li>
-      <li><span class="k">Estimated Cash-on-Cash ROI</span><span class="v">approx. 70% — 85%</span></li>
-    </ul>
-    <p class="disclaimer">Note: all deal analyzer figures are estimates only. Buyers are advised to conduct independent financial analysis and obtain contractor bids prior to closing. JNA Dynamic Holdings LLC makes no representations regarding projected profits or returns.</p>
-  </div>
-</section>
-
-<section class="alt">
-  <div class="wrap">
-    <h2 class="section-title">Verified ARV Comp Support — Raleigh NC 27615</h2>
-    <p>Recent closed sales, ChatARV report:</p>
-    <table class="comps">
-      <tr><th>Street</th><th>Beds/Baths</th><th>Sq Ft</th><th>Built</th><th>Sold</th><th>Price</th><th>$/Sq Ft</th><th>Distance</th></tr>
-      <tr><td>English Oaks Dr, Raleigh NC</td><td>2/2.5</td><td>1,222</td><td>1984</td><td>08/30/2026</td><td>$275,000</td><td>$225</td><td>0.4 mi</td></tr>
-      <tr><td>English Oaks Dr, Raleigh NC</td><td>2/2.5</td><td>1,218</td><td>1985</td><td>06/28/2026</td><td>$240,000</td><td>$197</td><td>0.3 mi</td></tr>
-      <tr><td>Chauncey Dr, Raleigh NC</td><td>2/2</td><td>1,163</td><td>1986</td><td>01/27/2026</td><td>$280,000</td><td>$241</td><td>0.2 mi</td></tr>
-      <tr><td>Hearthstone Dr E, Raleigh NC</td><td>2/2</td><td>1,108</td><td>1975</td><td>recent</td><td>$250,000</td><td>$243,719 adj.</td><td>0.1 mi</td></tr>
-      <tr><td>Hearthstone Dr, Raleigh NC</td><td>2/2.5</td><td>1,152</td><td></td><td>recent</td><td>$228,000</td><td>$207,379 adj.</td><td>0.1 mi</td></tr>
-      <tr><td>Hearthstone Dr, Raleigh NC</td><td>2/1.5</td><td>1,105</td><td>1975</td><td>09/02/2026</td><td>$225,000</td><td>$204</td><td>0.1 mi</td></tr>
-    </table>
-    <h3 style="margin-top:24px;">Comp Averages Per ChatARV</h3>
-    <table class="terms">
-      <tr><td class="label">Adjusted ARV</td><td>$229,625</td></tr>
-      <tr><td class="label">Buyer ARV Used</td><td>$240,000</td></tr>
-      <tr><td class="label">Average Sq Ft</td><td>1,152</td></tr>
-      <tr><td class="label">Average Price Per Sq Ft</td><td>$217</td></tr>
-      <tr><td class="label">Average Year Built</td><td>1984</td></tr>
-      <tr><td class="label">Average Distance</td><td>0.3 miles</td></tr>
-      <tr><td class="label">Average Months Since Sale</td><td>4</td></tr>
-    </table>
-    <p class="disclaimer">Note: the $240,000 ARV is buyer-supplied based on the comp set above. ChatARV adjusted ARV is $229,625. Buyers are advised to independently verify ARV and run their own comp analysis prior to closing. The $240,000 ARV is supported by the comp range of $225,000 to $280,000, with a ceiling of $280,000 within 0.2 miles of the subject.</p>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <h2 class="section-title">Exit Strategies</h2>
-    <ul class="exit-list">
-      <li><strong>Fix and Flip</strong>Light to moderate rehab on 1,080 sq ft in North Raleigh — list into a comp set running $225,000 to $280,000 within 0.4 miles. At $240,000 ARV and $135,000 entry, gross spread is $105,000 before rehab and costs — one of the strongest margin positions available in the Triangle at this price point.</li>
-      <li><strong>Buy and Hold Rental</strong>North Raleigh rental demand from Triangle tech and university workforce is among the strongest in the Southeast — 2-bedroom renovated units in Stoney Hollow command consistent monthly rents that support strong cash-on-cash returns at a $135,000 acquisition cost.</li>
-      <li><strong>BRRRR</strong>Acquire at $135,000, renovate, stabilize with a tenant, and refinance against a $240,000 ARV — the equity gap creates a meaningful cash-out refinance position in one of North Carolina's most active appreciation markets.</li>
-    </ul>
-  </div>
-</section>
-
-<section class="alt">
-  <div class="wrap">
-    <h2 class="section-title">Deal Terms</h2>
-    <table class="terms">
-      <tr><td class="label">Purchase Price</td><td>$135,000</td></tr>
-      <tr><td class="label">EMD</td><td>Contact for terms</td></tr>
-      <tr><td class="label">Access</td><td>By appointment only</td></tr>
-      <tr><td class="label">Condition</td><td>Property sold as-is</td></tr>
-      <tr><td class="label">Market Status</td><td>Currently off market — address released upon proof of funds</td></tr>
-      <tr><td class="label">Financing</td><td>Cash or hard money only</td></tr>
-      <tr><td class="label">Terms</td><td>First come, first served</td></tr>
-    </table>
-    <p class="disclaimer">This is a wholesale assignment. JNA Dynamic Holdings LLC holds equitable interest in this property under contract with the property owner and is marketing its assignable rights to that contract — this is not a direct sale by, or offer on behalf of, the underlying owner. The end buyer will receive an assignment of contract, not a deed directly from JNA Dynamic Holdings LLC. All figures including ARV, comp values, and rehab estimates are provided from third-party sources including ChatARV and are not guaranteed and have not been independently verified by JNA Dynamic Holdings LLC. ARV of $240,000 is buyer-supplied and not guaranteed. Buyers are advised to conduct independent due diligence including independent inspection, contractor bids, and ARV verification prior to executing any purchase agreement. This is not an offer to sell real property. JNA Dynamic Holdings LLC operates in compliance with North Carolina wholesale disclosure requirements.</p>
-  </div>
-</section>
-
-<div class="cta-band">
-  <div class="wrap">
-    <h2>North Raleigh. Stoney Hollow. $135,000. ARV $240,000.</h2>
-    <p>2BD/1.5BA. Off market. $105,000 below ARV. Six comps within 0.4 miles at $225K–$280K. Most recent comp closed August 30, 2026. Send proof of funds now — first in wins.</p>
+    <h2>North Raleigh. Stoney Hollow. $135,000. First In Wins.</h2>
+    <p>2BD/1.5BA townhome, off market, ARV $240,000, $105,000 below ARV, with six comps within 0.4 miles closing between $225,000 and $280,000. Send proof of funds now to lock this assignment.</p>
     <div class="cta-contacts">
-      <a href="tel:5206336437">Call 520-633-6437</a>
-      <a href="mailto:montanoemmanuel@gmail.com">Email montanoemmanuel@gmail.com</a>
+      <a href="tel:5206336437">520-633-6437</a>
+      <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
     </div>
+    <p class="cta-foot-note">JNA Dynamic Holdings LLC &middot; Address available upon request — contact us for the full street address.</p>
   </div>
-</div>
-
-<footer class="legal">
-  <div class="wrap">JNA Dynamic Holdings LLC — Deal Code NC 4 — This material is not an offer to sell real property. Figures are estimates and have not been independently verified.</div>
 </footer>
 
 </body>
