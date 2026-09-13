@@ -3,372 +3,473 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>1.46± Acre Wooded Homesite — Long Creek Drive, Havelock, NC | JNA Dynamic Holdings LLC</title>
+<title>1.46± Acre Wooded Homesite — Long Creek Drive Area, Havelock, NC | JNA Dynamic Holdings LLC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --paper:#f6f1e7;
-    --ink:#2b2620;
-    --ink-soft:#5a5245;
-    --line:#ddd3c0;
-    --accent:#7a4a2b;
-    --accent-2:#3f4f3d;
-    --card:#fffdf8;
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #f6f1e7;
+    color: #2c2620;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.55;
   }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    background:var(--paper);
-    color:var(--ink);
-    font-family:'Inter',sans-serif;
-    line-height:1.6;
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    color: #201a14;
+    font-weight: 600;
   }
-  h1,h2,h3{
-    font-family:'Playfair Display',serif;
-    font-weight:600;
-    color:var(--ink);
+  .wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 28px;
   }
-  .wrap{
-    max-width:960px;
-    margin:0 auto;
-    padding-left:24px;
-    padding-right:24px;
-  }
-  a{color:var(--accent);}
+  a { color: #7a4a22; }
 
-  .topbar{
-    background:var(--ink);
-    color:var(--paper);
-    padding-top:12px;
-    padding-bottom:12px;
-    font-size:14px;
-    letter-spacing:0.04em;
+  header.top {
+    border-bottom: 1px solid #ddd2bc;
+    background: #fbf8f2;
   }
-  .topbar .wrap{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:8px;
+  header.top .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 18px;
+    padding-bottom: 18px;
   }
-  .topbar strong{font-family:'Playfair Display',serif;font-size:16px;}
-
-  header.hero{
-    padding-top:48px;
-    padding-bottom:36px;
-    border-bottom:1px solid var(--line);
+  header.top .brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    letter-spacing: 0.02em;
   }
-  .deal-code{
-    display:inline-block;
-    font-size:12px;
-    letter-spacing:0.12em;
-    text-transform:uppercase;
-    background:var(--accent-2);
-    color:var(--paper);
-    padding:4px 10px;
-    border-radius:3px;
-    margin-bottom:14px;
-  }
-  h1.title{
-    font-size:38px;
-    margin-top:0;
-    margin-bottom:12px;
-    line-height:1.15;
-  }
-  .location-line{
-    font-size:17px;
-    color:var(--ink-soft);
-    margin-top:0;
-    margin-bottom:6px;
-  }
-  .addr-note{
-    font-size:14px;
-    font-style:italic;
-    color:var(--accent);
-    margin-top:0;
-    margin-bottom:24px;
-  }
-  .price-block{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:8px;
-    padding:24px 28px;
-    display:flex;
-    flex-wrap:wrap;
-    gap:24px;
-    align-items:center;
-    justify-content:space-between;
-    margin-top:8px;
-    margin-bottom:8px;
-  }
-  .price-block .price{
-    font-family:'Playfair Display',serif;
-    font-size:42px;
-    font-weight:700;
-    margin:0;
-  }
-  .price-block .price-sub{
-    font-size:13px;
-    text-transform:uppercase;
-    letter-spacing:0.08em;
-    color:var(--ink-soft);
-    margin:0 0 4px 0;
-  }
-  .cta-buttons{
-    display:flex;
-    gap:12px;
-    flex-wrap:wrap;
-  }
-  .btn{
-    display:inline-block;
-    padding:12px 20px;
-    border-radius:4px;
-    text-decoration:none;
-    font-weight:600;
-    font-size:14px;
-    letter-spacing:0.02em;
-  }
-  .btn-primary{
-    background:var(--accent);
-    color:#fff;
-  }
-  .btn-secondary{
-    background:transparent;
-    color:var(--ink);
-    border:1px solid var(--ink);
+  header.top .code {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #7a6a4f;
+    border: 1px solid #cbb98f;
+    padding: 4px 10px;
+    border-radius: 3px;
   }
 
-  .gallery-section{
-    padding-top:28px;
-    padding-bottom:28px;
-    border-bottom:1px solid var(--line);
+  section.hero { margin-top: 44px; margin-bottom: 30px; }
+  .hero .location-line {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: #7a6a4f;
+    margin-bottom: 8px;
   }
-  .gallery{
-    display:flex;
-    gap:14px;
-    overflow-x:auto;
-    padding-bottom:10px;
-    scroll-snap-type:x mandatory;
+  .hero h1 {
+    font-size: 2.35rem;
+    margin: 0 0 14px 0;
+    max-width: 720px;
   }
-  .gallery img{
-    height:280px;
-    width:auto;
-    max-width:90vw;
-    object-fit:cover;
-    border-radius:6px;
-    scroll-snap-align:start;
-    border:1px solid var(--line);
+  .hero .address-note {
+    background: #efe6d3;
+    border-left: 3px solid #b08c4f;
+    padding: 10px 16px;
+    font-size: 0.95rem;
+    display: inline-block;
+    margin-bottom: 22px;
   }
-  .more-photos{
-    display:block;
-    font-size:14px;
-    margin-top:10px;
+  .price-block {
+    background: #201a14;
+    color: #f6f1e7;
+    padding: 26px 30px;
+    border-radius: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 18px;
+    margin-top: 6px;
+    margin-bottom: 16px;
   }
-
-  section.block{
-    padding-top:34px;
-    padding-bottom:34px;
-    border-bottom:1px solid var(--line);
+  .price-block .price {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.6rem;
+    font-weight: 700;
   }
-  section.block:last-of-type{border-bottom:none;}
-  h2.section-title{
-    font-size:24px;
-    margin-top:0;
-    margin-bottom:18px;
+  .price-block .price-sub {
+    font-size: 0.95rem;
+    color: #d9cdb0;
   }
-  p{margin-top:0;margin-bottom:14px;}
-
-  ul.bullets{
-    margin:0;
-    padding-left:20px;
-  }
-  ul.bullets li{
-    margin-bottom:8px;
-  }
-  .snapshot-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:6px 32px;
-  }
-  @media (max-width:640px){
-    .snapshot-grid{grid-template-columns:1fr;}
+  .hero .comp-line {
+    font-size: 0.98rem;
+    color: #4a4030;
+    margin-top: 4px;
   }
 
-  table{
-    width:100%;
-    border-collapse:collapse;
-    background:var(--card);
-    border:1px solid var(--line);
+  section.gallery { margin-top: 10px; margin-bottom: 40px; }
+  .gallery-scroll {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 10px;
   }
-  table caption{
-    text-align:left;
-    font-size:13px;
-    color:var(--ink-soft);
-    margin-bottom:8px;
+  .gallery-scroll img {
+    height: 280px;
+    width: auto;
+    border-radius: 6px;
+    flex-shrink: 0;
+    object-fit: cover;
+    border: 1px solid #ddd2bc;
   }
-  th,td{
-    text-align:left;
-    padding:10px 14px;
-    border-bottom:1px solid var(--line);
-    font-size:15px;
-    vertical-align:top;
-  }
-  th{
-    background:#efe7d8;
-    font-family:'Playfair Display',serif;
-    font-weight:600;
-  }
-  tr:last-child td{border-bottom:none;}
-
-  .use-cases{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:18px;
-  }
-  @media (max-width:800px){
-    .use-cases{grid-template-columns:1fr;}
-  }
-  .use-card{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:6px;
-    padding:18px;
-  }
-  .use-card h3{
-    font-size:18px;
-    margin-top:0;
-    margin-bottom:10px;
+  .more-photos {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    text-decoration: underline;
   }
 
-  .disclaimer{
-    font-size:13px;
-    color:var(--ink-soft);
-    border-top:1px dashed var(--line);
-    padding-top:16px;
-    margin-top:26px;
+  section.block { margin-top: 46px; margin-bottom: 46px; }
+  section.block h2 {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+    border-bottom: 2px solid #cbb98f;
+    padding-bottom: 8px;
+  }
+  section.block h3 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    margin-top: 22px;
+  }
+  ul.plain {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  ul.plain li {
+    padding: 7px 0;
+    border-bottom: 1px dashed #ddd2bc;
+    font-size: 0.98rem;
+  }
+  ul.plain li:last-child { border-bottom: none; }
+
+  table.data {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.97rem;
+    margin-top: 6px;
+  }
+  table.data td, table.data th {
+    padding: 10px 12px;
+    border-bottom: 1px solid #ddd2bc;
+    text-align: left;
+    vertical-align: top;
+  }
+  table.data th {
+    background: #efe6d3;
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+  }
+  table.data td.label {
+    width: 40%;
+    color: #5c4f38;
+    font-weight: 500;
   }
 
-  .cta-band{
-    background:var(--ink);
-    color:var(--paper);
-    padding-top:44px;
-    padding-bottom:44px;
+  .callout {
+    background: #efe6d3;
+    border-radius: 6px;
+    padding: 18px 20px;
+    font-size: 0.95rem;
+    margin-top: 14px;
   }
-  .cta-band h2{
-    color:var(--paper);
-    font-size:26px;
-    margin-top:0;
-    margin-bottom:14px;
+  .disclaimer-text {
+    font-size: 0.88rem;
+    color: #5c4f38;
+    margin-top: 14px;
   }
-  .cta-band p{color:#d9d2c3;}
-  .cta-band .contacts{
-    display:flex;
-    gap:24px;
-    flex-wrap:wrap;
-    margin-top:20px;
+
+  section.cta {
+    background: #201a14;
+    color: #f6f1e7;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 50px;
+    padding-bottom: 50px;
   }
-  .cta-band .contacts a{
-    color:var(--paper);
-    font-weight:600;
-    font-size:17px;
-    text-decoration:none;
-    border-bottom:2px solid var(--accent);
-    padding-bottom:2px;
+  section.cta h2 {
+    color: #f6f1e7;
+    font-size: 1.9rem;
+    margin-bottom: 10px;
   }
-  footer.foot{
-    padding-top:20px;
-    padding-bottom:20px;
-    font-size:12px;
-    color:var(--ink-soft);
+  section.cta p {
+    color: #d9cdb0;
+    font-size: 1.02rem;
+    margin-bottom: 22px;
+  }
+  .cta-contacts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+  }
+  .cta-contacts a {
+    display: inline-block;
+    background: #f6f1e7;
+    color: #201a14;
+    padding: 12px 22px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 1rem;
+  }
+
+  footer.foot {
+    background: #fbf8f2;
+    border-top: 1px solid #ddd2bc;
+  }
+  footer.foot .wrap {
+    padding-top: 26px;
+    padding-bottom: 34px;
+    font-size: 0.85rem;
+    color: #6a5c42;
   }
 </style>
 </head>
 <body>
 
-  <div class="topbar">
-    <div class="wrap">
-      <span><strong>JNA Dynamic Holdings LLC</strong></span>
-      <span>Deal Code: NC-1 (Land)</span>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">JNA Dynamic Holdings LLC</div>
+    <div class="code">Deal Code: NC-1 (Land)</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="location-line">Havelock, NC 28532 · Craven County</div>
+    <h1>1.46± Acre Wooded Residential Homesite — Long Creek Drive Area, Coastal Water-Access Community</h1>
+    <div class="address-note">Address available upon request — contact us for the full property address.</div>
+
+    <div class="price-block">
+      <div class="price">$27,000</div>
+      <div class="price-sub">Asking Price · Cash or Hard Money Only · Assignment of Contract</div>
+    </div>
+    <div class="comp-line">The closest same-street, same-size comparable — 1.46 acres — is currently marketed active at $31,900, and another reference figure for that same comparable lists $31,500. The subject is offered below both.</div>
+  </div>
+</section>
+
+<section class="gallery">
+  <div class="wrap">
+    <div class="gallery-scroll">
+      <img src="/deals/6dbadc4e-7d33-4689-a70f-802e8dacfd12/photos/1.jpg" alt="Wooded homesite in Havelock, NC">
+      <img src="/deals/6dbadc4e-7d33-4689-a70f-802e8dacfd12/photos/2.jpg" alt="Long Creek Drive area lot view">
+      <img src="/deals/6dbadc4e-7d33-4689-a70f-802e8dacfd12/photos/3.jpg" alt="Vacant residential land in Craven County">
+      <img src="/deals/6dbadc4e-7d33-4689-a70f-802e8dacfd12/photos/4.jpg" alt="Coastal North Carolina wooded lot">
+      <img src="/deals/6dbadc4e-7d33-4689-a70f-802e8dacfd12/photos/5.jpg" alt="Havelock NC land parcel">
     </div>
   </div>
+</section>
 
-  <header class="hero">
-    <div class="wrap">
-      <span class="deal-code">Land / Vacant Lot &mdash; Assignment of Contract</span>
-      <h1 class="title">1.46&plusmn; Acre Wooded Residential Homesite<br>Long Creek Drive Area</h1>
-      <p class="location-line">Havelock, Craven County, North Carolina 28532</p>
-      <p class="addr-note">Address available upon request &mdash; contact us for the full property address.</p>
+<section class="block">
+  <div class="wrap">
+    <h2>Property Snapshot</h2>
+    <ul class="plain">
+      <li>1.46± Acre Residential Homesite</li>
+      <li>Approximately 63,598 SF</li>
+      <li>Wooded Infill Lot</li>
+      <li>Established Long Creek Drive Residential Pocket</li>
+      <li>Large Homesite</li>
+      <li>Coastal North Carolina Location</li>
+      <li>Nearby Community Water Access</li>
+      <li>Paved Access Throughout Immediate Neighborhood</li>
+      <li>County Water Available on Nearby Long Creek Lots</li>
+      <li>Septic Development Pattern</li>
+      <li>Buyer Responsible for Full Due Diligence</li>
+    </ul>
+    <p class="disclaimer-text">Public property records identify the subject parcel as an existing Havelock property address, while the surrounding Long Creek Drive market includes both developed residences and vacant residential lots.</p>
+  </div>
+</section>
 
-      <div class="price-block">
-        <div>
-          <p class="price-sub">Asking Price</p>
-          <p class="price">$27,000</p>
-        </div>
-        <div class="cta-buttons">
-          <a class="btn btn-primary" href="tel:5206336437">Call 520-633-6437</a>
-          <a class="btn btn-secondary" href="mailto:montanoemmanuel@gmail.com">Email Us</a>
-        </div>
-      </div>
+<section class="block">
+  <div class="wrap">
+    <h2>The Numbers</h2>
+    <table class="data">
+      <tr><td class="label">Asking Price</td><td>$27,000</td></tr>
+      <tr><td class="label">Lot Size</td><td>1.46± Acres</td></tr>
+      <tr><td class="label">Land Area</td><td>Approximately 63,598 SF</td></tr>
+      <tr><td class="label">Property Type</td><td>Vacant Residential Land</td></tr>
+      <tr><td class="label">Site</td><td>Wooded</td></tr>
+      <tr><td class="label">County</td><td>Craven</td></tr>
+      <tr><td class="label">Road</td><td>Paved Road Environment</td></tr>
+      <tr><td class="label">Utilities</td><td>Water / septic configuration common in immediate community — buyer to verify subject</td></tr>
+      <tr><td class="label">Financing</td><td>Cash or Hard Money Only</td></tr>
+      <tr><td class="label">Contract Type</td><td>Assignment of Contract</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Why This Lot Makes Sense</h2>
+    <p>The pricing is easy to understand.</p>
+    <table class="data">
+      <tr><th>Property</th><th>Size</th><th>Price</th></tr>
+      <tr><td>Subject Property</td><td>1.46 Acres</td><td>$27,000</td></tr>
+      <tr><td>201 Long Creek Dr</td><td>1.46 Acres</td><td>$31,900 (Active)</td></tr>
+      <tr><td>208 Long Creek Dr</td><td>1.00 Acre</td><td>$50,000</td></tr>
+      <tr><td>210 Long Creek Dr</td><td>1.00 Acre</td><td>$55,000</td></tr>
+    </table>
+    <p class="disclaimer-text">You are effectively buying the same amount of land as the closest current same-street acreage competition at a slightly lower asking price. This does not mean the subject automatically carries the same value — utilities, permits, location, clearing, HOA rights, and site conditions differ between parcels. It does show that $27,000 for 1.46 wooded acres is positioned at the low end of current Long Creek Drive asking inventory.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Same-Street Land Support</h2>
+    <table class="data">
+      <tr><th>Property</th><th>Details</th></tr>
+      <tr>
+        <td class="label">201 Long Creek Dr</td>
+        <td>1.46 Acres / 63,598 SF · Wooded · Private / Paved Road · County Water · Water Tap Paid · Septic Permit on File · Electricity Available · Community Water Access · Current Ask: $27,000 (also referenced elsewhere as $31,900 active / $31,500)</td>
+      </tr>
+      <tr>
+        <td class="label">205 Long Creek Dr</td>
+        <td>1.20 Acres · Pending Around $29,000</td>
+      </tr>
+      <tr>
+        <td class="label">208 Long Creek Dr</td>
+        <td>1.00 Acre · Current Ask: $50,000</td>
+      </tr>
+      <tr>
+        <td class="label">210 Long Creek Dr</td>
+        <td>1.00 Acre · Current Ask: $55,000</td>
+      </tr>
+      <tr>
+        <td class="label">Subject Property (Long Creek Dr)</td>
+        <td>1.46± Acres / 63,598± SF · Wooded · Asking: $27,000</td>
+      </tr>
+    </table>
+    <p class="disclaimer-text">Active and pending listings are not proof of final market value. Buyer must independently evaluate differences in utilities, septic approval, HOA rights, water access, topography, clearing requirements, and buildability.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Community / Water Access Context</h2>
+    <p>Properties along this section of Long Creek Drive are marketed within the Cypress Bay residential community. Nearby Cypress Bay properties advertise:</p>
+    <ul class="plain">
+      <li>Community Boat Ramp</li>
+      <li>Boat / Day Dock Access</li>
+      <li>Small Community Beach Area</li>
+      <li>Deed or Community Water Access</li>
+      <li>County / Public Water Availability</li>
+      <li>Wooded Residential Lots</li>
+    </ul>
+    <div class="callout">
+      A 1.46-acre Long Creek Drive property currently marketed in Cypress Bay specifically advertises access to a boat dock, day dock, and small beach area, along with county water and septic documentation. Another Cypress Bay property on Long Creek Drive reports deeded water access, public water, a community ramp, and an annual HOA.
     </div>
-  </header>
+    <p class="disclaimer-text">Buyer must independently verify that the subject property is subject to the same HOA, covenants, dues, and water-access rights before relying on these community amenities.</p>
+  </div>
+</section>
 
-  <section class="gallery-section">
-    <div class="wrap">
-      <div class="gallery">
-        <img src="/deals/6dbadc4e-7d33-4689-a70f-802e8dacfd12/photos/1.jpg" alt="Wooded residential homesite in Havelock, NC">
-        <img src="/deals/6dbadc4e-7d33-4689-a70f-802e8dacfd12/photos/2.jpg" alt="Lot view along Long Creek Drive, Havelock, NC">
-        <img src="/deals/6dbadc4e-7d33-4689-a70f-802e8dacfd12/photos/3.jpg" alt="Vacant land parcel, Craven County, NC">
-        <img src="/deals/6dbadc4e-7d33-4689-a70f-802e8dacfd12/photos/4.jpg" alt="Wooded homesite acreage, Havelock area">
-        <img src="/deals/6dbadc4e-7d33-4689-a70f-802e8dacfd12/photos/5.jpg" alt="Residential lot near coastal water-access community">
-      </div>
+<section class="block">
+  <div class="wrap">
+    <h2>Utilities</h2>
+    <p>The surrounding Long Creek Drive / Cypress Bay development pattern supports:</p>
+    <ul class="plain">
+      <li>County / Public Water</li>
+      <li>Individual Septic</li>
+      <li>Electricity</li>
+    </ul>
+    <p style="margin-top:14px;">Nearby 201 Long Creek Dr reports county water, a paid water tap/meter, electricity availability, and a septic permit on file. Nearby 102 Long Creek Dr likewise reports public water availability within Cypress Bay.</p>
+    <p class="disclaimer-text">These neighboring utility records should not be interpreted as proof that the same taps, meters, septic permits, or utility connections already exist on the subject property. Buyer must independently confirm the subject's exact utility status.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Use Cases</h2>
+    <h3>Builder Play</h3>
+    <p>Acquire 1.46 wooded acres for $27,000 and complete the necessary survey, septic, utility, and building-envelope diligence for a custom single-family residence. The larger lot size gives a builder substantially more land to work with than a standard subdivision pad while keeping the project in an established residential environment.</p>
+    <h3>Custom Home Play</h3>
+    <p>For an owner-builder, the property offers:</p>
+    <ul class="plain">
+      <li>1.46 Acres</li>
+      <li>Wood Privacy</li>
+      <li>Established Residential Surroundings</li>
+      <li>Coastal North Carolina Location</li>
+      <li>Potential Community Water-Access Benefits — Subject to Verification</li>
+    </ul>
+    <p style="margin-top:10px;">The buyer can design around the wooded setting rather than purchasing a completely cleared production lot.</p>
+    <h3>Retail Land Play</h3>
+    <p>An investor can potentially increase marketability by completing:</p>
+    <ul class="plain">
+      <li>Current Survey</li>
+      <li>Septic Evaluation / Permit</li>
+      <li>Water-Tap Confirmation</li>
+      <li>Electric Confirmation</li>
+      <li>HOA / Covenant Review</li>
+      <li>Building-Envelope Analysis</li>
+    </ul>
+    <p style="margin-top:10px;">...and then remarket the property to a builder or future homeowner with a more complete diligence package.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Location Highlights</h2>
+    <ul class="plain">
+      <li>Havelock, NC 28532</li>
+      <li>Craven County</li>
+      <li>Long Creek Drive Area</li>
+      <li>Coastal North Carolina</li>
+      <li>Established Residential Area</li>
+      <li>Large Wooded Homesites</li>
+      <li>Access Toward Havelock / Cherry Point</li>
+      <li>Convenient Toward Beaufort & the Crystal Coast</li>
+    </ul>
+    <p class="disclaimer-text">The broader Havelock land market currently includes multiple residential-lot offerings throughout the 28532 area, including active Long Creek Drive inventory.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Buyer Due Diligence Notice</h2>
+    <p>Buyer must independently verify acreage, survey boundaries, zoning, permitted uses, minimum dwelling requirements, setbacks, buildable envelope, HOA membership, HOA dues, deed restrictions, community water-access rights, road ownership and maintenance, county/public water availability, water tap and meter requirements, septic suitability, septic permit status, electricity, wetlands, flood zone, drainage, soils, tree clearing, building permits, and all development costs prior to closing.</p>
+    <p>No representation is made that the subject property currently has a water tap, septic permit, utility meter, or guaranteed community water access. Nearby Long Creek Drive properties are referenced solely to demonstrate the surrounding development and utility pattern.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Deal Terms</h2>
+    <table class="data">
+      <tr><td class="label">Purchase Price</td><td>$27,000</td></tr>
+      <tr><td class="label">Financing</td><td>Cash or Hard Money Only</td></tr>
+      <tr><td class="label">Contract Type</td><td>Assignment of Contract</td></tr>
+      <tr><td class="label">Closing Costs</td><td>Buyer Pays Closing Costs</td></tr>
+      <tr><td class="label">Condition</td><td>Property Sold As-Is</td></tr>
+      <tr><td class="label">Requirement</td><td>Proof of Funds Required</td></tr>
+      <tr><td class="label">Process</td><td>First Come, First Served — No Auction, No Highest and Best</td></tr>
+    </table>
+    <div class="callout">
+      This is a wholesale assignment. JNA Dynamic Holdings LLC holds equitable interest in the subject transaction pursuant to a contract with the property owner. This is not a direct sale by the underlying seller — the end buyer will receive an assignment of contract, not a direct purchase from the property owner.
     </div>
-  </section>
+    <p class="disclaimer-text">All zoning, utility, HOA, septic, water-access, comparable-sale, buildability, and development information must be independently verified by buyer prior to closing. Figures presented here have not been independently verified by JNA Dynamic Holdings LLC.</p>
+  </div>
+</section>
 
-  <section class="block">
-    <div class="wrap">
-      <h2 class="section-title">Overview</h2>
-      <p>This is an off-market, approximately 1.46-acre (63,598-square-foot) wooded residential homesite on Long Creek Drive in Havelock, North Carolina, positioned as one of the lowest-priced acreage opportunities compared to active MLS land listings in the immediate Havelock market.</p>
-      <p>The parcel offers a substantial amount of land for a future custom residence, builder project, or long-term hold, while remaining inside an established residential pocket rather than isolated rural acreage.</p>
-      <p>At the $27,000 asking price, the subject is positioned directly against an almost identical same-street land comparable. A neighboring parcel on Long Creek Drive &mdash; also approximately 1.46 acres / 63,598 SF, wooded, with paved/private-road frontage &mdash; is currently marketed within the Cypress Bay community at $31,900 active, with reported county water, a paid water tap/meter, septic documentation on file, electricity availability, and community water access. That same comparable has also been referenced at $31,500 in earlier market positioning materials, at which point the subject was noted as roughly $400 below it; at the current $27,000 asking price, the spread against the comparable is larger still.</p>
-      <p>Beyond that immediate comp, the wider Long Creek Drive market includes both a pending 1.20-acre parcel priced around $29,000, and two 1.00-acre parcels currently asking $50,000 and $55,000, respectively &mdash; meaning the subject's 1.46 wooded acres at $27,000 sit at the low end of current same-street asking inventory. Active and pending listings are not proof of final market value; differences in utilities, septic approval, HOA rights, water access, topography, clearing requirements, and buildability all affect comparability, and buyer must independently evaluate each.</p>
-      <p>For a builder, land investor, or owner looking to create a coastal North Carolina residence, this is presented as a straightforward acreage opportunity at a defensible entry point.</p>
+<section class="cta">
+  <div class="wrap">
+    <h2>1.46± Wooded Acres · 63,598 SF · Priced Below Nearby Same-Size Inventory</h2>
+    <p>Subject asking $27,000 against a same-street, same-size comparable currently marketed at $31,900. Cash or hard money only — proof of funds required — first come, first served.</p>
+    <div class="cta-contacts">
+      <a href="tel:5206336437">Call 520-633-6437</a>
+      <a href="mailto:montanoemmanuel@gmail.com">Email montanoemmanuel@gmail.com</a>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section class="block">
-    <div class="wrap">
-      <h2 class="section-title">Property Snapshot</h2>
-      <div class="snapshot-grid">
-        <ul class="bullets">
-          <li>1.46&plusmn; Acre Residential Homesite</li>
-          <li>Approximately 63,598 SF</li>
-          <li>Wooded Infill Lot</li>
-          <li>Established Long Creek Drive Residential Pocket</li>
-          <li>Large Homesite</li>
-        </ul>
-        <ul class="bullets">
-          <li>Coastal North Carolina Location</li>
-          <li>Nearby Community Water Access</li>
-          <li>Paved Access Throughout Immediate Neighborhood</li>
-          <li>County Water Available on Nearby Long Creek Lots</li>
-          <li>Septic Development Pattern; Buyer Responsible for Full Due Diligence</li>
-        </ul>
-      </div>
-      <p style="margin-top:16px;">Public property records identify the subject parcel as an existing Havelock property address (available upon request), while the surrounding Long Creek Drive market includes both developed residences and vacant residential lots.</p>
-    </div>
-  </section>
+<footer class="foot">
+  <div class="wrap">
+    <p>JNA Dynamic Holdings LLC · Havelock, NC · Craven County. This offering is an assignment of contract; JNA Dynamic Holdings LLC holds equitable interest in the underlying contract and is not the record owner of the property. All acreage, pricing, comparable, utility, HOA, and community-amenity figures are believed accurate but have not been independently verified by JNA Dynamic Holdings LLC — buyer is responsible for full independent due diligence prior to closing. Address available upon request.</p>
+  </div>
+</footer>
 
-  <section class="block">
-    <div class="wrap">
-      <h2 class="section-title">The Numbers</h2>
-      <table>
-        <tr><th>Asking Price</th><td>$27,000</td></tr>
-        <tr><th>Lot Size</th><td>1.46&plusmn; acres</td></tr>
-        <tr><th>Land Area</th><td>Approximately 63,598 SF</td></tr>
-        <tr><th>Property Type</th><td>Vacant residential land</td></tr>
-        <tr><th>Site Condition</th><td>Wooded</td></tr>
-        <tr><th>County</th><td>Craven County, NC</td></tr>
-        <tr><th>Road</th><td>Paved road environment</td></tr>
-        <tr><th>Utilities</th><td>Water/septic configuration common in immediate
+</body>
+</html>
