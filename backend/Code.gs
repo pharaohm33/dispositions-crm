@@ -68,7 +68,20 @@ const FOLLOWUP_HOURS = 24;
 const MATCH_STATUSES = ['Active Match', 'Negotiating', 'Closing', 'Dead Match'];
 const DEFAULT_ASSET_CATEGORIES = ['Single Family', 'Condominium / Townhouse', 'Multifamily (1-4 Units)', 'Multifamily (4+ Units)', 'Fix and Flip', 'Residential Vacant Land', 'Commercial'];
 
-const REP_COLUMNS = ['Username', 'Name', 'Phone', 'Email', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'LastActive', 'PreferredCity', 'PreferredState', 'PreferredZip', 'PersonType', 'CategoryAccess', 'BulkAssignOverride', 'TargetMarket', 'BuyBoxNationwide', 'BuyBoxStates', 'BuyBoxCities', 'BuyBoxDealTypes', 'BuyBoxAssetCategories', 'BuyBoxOtherAssetClass', 'BuyBoxNotes', 'BuyBoxFinancingTypes', 'DealAreaStates', 'DealAreaCities'];
+const REP_COLUMNS = ['Username', 'Name', 'Phone', 'Email', 'PasswordHash', 'Salt', 'AllAccess', 'IsAdmin', 'Active', 'CreatedAt', 'LastActive', 'PreferredCity', 'PreferredState', 'PreferredZip', 'PersonType', 'CategoryAccess', 'BulkAssignOverride', 'TargetMarket', 'BuyBoxNationwide', 'BuyBoxStates', 'BuyBoxCities', 'BuyBoxDealTypes', 'BuyBoxAssetCategories', 'BuyBoxOtherAssetClass', 'BuyBoxNotes', 'BuyBoxFinancingTypes', 'DealAreaStates', 'DealAreaCities',
+  // Payment info for paying a rep directly (e.g. when they're unresponsive
+  // but their own uploaded buyer still closes a deal) -- deliberately NEVER
+  // raw bank account/routing numbers in a sheet cell; PaymentDriveLink
+  // points to a Doc/folder the rep controls and shares themselves,
+  // containing that detail. Admin-only, see ADMIN_ONLY_REP_FIELDS.
+  'PaymentEntityName', 'PaymentDriveLink'];
+
+// Never sent to any rep-facing response (getMyPitches, a rep's own
+// profile, anywhere else a rep session reads their own or another rep's
+// record) -- admin-only, same treatment as a buyer lead's PropertyURL. See
+// where these are stripped in publicSignup's response and any rep-facing
+// rep-list endpoint.
+const ADMIN_ONLY_REP_FIELDS = ['PaymentEntityName', 'PaymentDriveLink'];
 
 // A Buyer's self-reported purchase criteria, collected at signup (see
 // publicSignup) -- Deal Type is a fixed strategy list (does this buyer
@@ -748,7 +761,9 @@ function publicSignup(body) {
     'BuyBoxFinancingTypes': buyBoxFinancingTypes.join(', '),
     'BuyBoxNotes': String(body.buyBoxNotes || '').trim(),
     'DealAreaStates': dealAreaStates.join(', '),
-    'DealAreaCities': dealAreaCities.join(', ')
+    'DealAreaCities': dealAreaCities.join(', '),
+    'PaymentEntityName': isBuyerSignup ? '' : String(body.paymentEntityName || '').trim(),
+    'PaymentDriveLink': isBuyerSignup ? '' : String(body.paymentDriveLink || '').trim()
   });
 
   // Opt-in (Team tab setting) -- when on, a fresh signup is immediately
@@ -2387,7 +2402,10 @@ function adminGetReps(body) {
       buyBoxStates: r['BuyBoxStates'] || '', buyBoxCities: r['BuyBoxCities'] || '',
       buyBoxDealTypes: r['BuyBoxDealTypes'] || '', buyBoxAssetCategories: r['BuyBoxAssetCategories'] || '',
       buyBoxOtherAssetClass: r['BuyBoxOtherAssetClass'] || '', buyBoxFinancingTypes: r['BuyBoxFinancingTypes'] || '', buyBoxNotes: r['BuyBoxNotes'] || '',
-      dealAreaStates: r['DealAreaStates'] || '', dealAreaCities: r['DealAreaCities'] || ''
+      dealAreaStates: r['DealAreaStates'] || '', dealAreaCities: r['DealAreaCities'] || '',
+      // Admin-only -- this whole function requires withAdminSession, so
+      // it's safe to include here; never add these to any rep-facing list.
+      paymentEntityName: r['PaymentEntityName'] || '', paymentDriveLink: r['PaymentDriveLink'] || ''
     };
   });
   return { ok: true, reps: reps };
@@ -4455,6 +4473,8 @@ function adminSetRepPreferredArea(body) {
     const cities = Array.isArray(body.dealAreaCities) ? body.dealAreaCities : splitCommaList(body.dealAreaCities);
     sheet.getRange(match._row, getColumnIndex(sheet, 'DealAreaCities')).setValue(cities.join(', '));
   }
+  if (body.paymentEntityName !== undefined) sheet.getRange(match._row, getColumnIndex(sheet, 'PaymentEntityName')).setValue(body.paymentEntityName || '');
+  if (body.paymentDriveLink !== undefined) sheet.getRange(match._row, getColumnIndex(sheet, 'PaymentDriveLink')).setValue(body.paymentDriveLink || '');
   if (body.personType !== undefined) {
     // Blank is allowed here (admin clearing/not setting it for an
     // internally-added rep) even though public signup itself requires a

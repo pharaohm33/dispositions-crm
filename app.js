@@ -564,7 +564,9 @@ function collectSignupBuyBox() {
 function collectSignupDealArea() {
   return {
     dealAreaStates: document.getElementById("signup-dealarea-states").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean),
-    dealAreaCities: document.getElementById("signup-dealarea-cities").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean)
+    dealAreaCities: document.getElementById("signup-dealarea-cities").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean),
+    paymentEntityName: document.getElementById("signup-payment-entity").value.trim(),
+    paymentDriveLink: document.getElementById("signup-payment-drivelink").value.trim()
   };
 }
 
@@ -3526,6 +3528,8 @@ function openAreaModal(rep) {
   document.getElementById("area-dealarea-states").value = rep.dealAreaStates || "";
   document.getElementById("area-dealarea-cities").value = rep.dealAreaCities || "";
   document.getElementById("area-dealarea-section").hidden = rep.personType === "Buyer";
+  document.getElementById("area-payment-entity").value = rep.paymentEntityName || "";
+  document.getElementById("area-payment-drivelink").value = rep.paymentDriveLink || "";
 
   document.getElementById("area-modal").hidden = false;
   document.getElementById("area-modal-save").setAttribute("data-username", rep.username);
@@ -3557,6 +3561,8 @@ document.getElementById("area-modal-save").addEventListener("click", async funct
     targetMarket: document.getElementById("area-targetmarket-input").value.trim(),
     dealAreaStates: document.getElementById("area-dealarea-states").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean),
     dealAreaCities: document.getElementById("area-dealarea-cities").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean),
+    paymentEntityName: document.getElementById("area-payment-entity").value.trim(),
+    paymentDriveLink: document.getElementById("area-payment-drivelink").value.trim(),
     buyBox: {
       nationwide: document.getElementById("area-buybox-nationwide").checked,
       states: document.getElementById("area-buybox-states").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean),
