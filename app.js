@@ -2501,6 +2501,20 @@ document.getElementById("sync-all-deal-pricing-btn").addEventListener("click", a
 // description gets re-fetched and its page rebuilt under whatever the
 // current generateDealPageHtml prompt says. Meant for catching every deal
 // up after a formatting/prompt change, not routine upkeep.
+document.getElementById("archive-dead-pages-btn").addEventListener("click", async function () {
+  const btn = this;
+  const resultEl = document.getElementById("archive-dead-pages-result");
+  if (btn.disabled) return;
+  if (!confirm("This overwrites the public page for every Dead/Sold deal with a plain \"no longer available\" placeholder. Safe to run any time. Continue?")) return;
+  btn.disabled = true;
+  resultEl.textContent = " Archiving…";
+  const res = await api("adminArchiveAllDeadDealPages", {});
+  btn.disabled = false;
+  if (!res.ok) { resultEl.textContent = " " + (res.error || "Could not archive pages."); showToast(res.error || "Could not archive pages.", true); return; }
+  resultEl.textContent = " Archived " + res.archivedCount + " page(s)." + (res.errors.length ? " " + res.errors.length + " error(s): " + res.errors.join("; ") : "");
+  showToast("Archived " + res.archivedCount + " dead/sold deal page(s).");
+});
+
 document.getElementById("regenerate-all-pages-btn").addEventListener("click", async function () {
   const btn = this;
   const resultEl = document.getElementById("regenerate-all-pages-result");

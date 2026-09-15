@@ -427,6 +427,8 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminGiveBuyerLeadToAllReps));
       case 'adminFindDealsForBuyer':
         return jsonOut(withAdminSession(body, adminFindDealsForBuyer));
+      case 'adminArchiveAllDeadDealPages':
+        return jsonOut(withAdminSession(body, adminArchiveAllDeadDealPages));
 
       default:
         return jsonOut({ ok: false, error: 'Unknown action.' });
@@ -1497,6 +1499,29 @@ function adminCheckAllDealsLive(body) {
   });
 
   return { ok: true, checkedCount: checkedCount, markedDeadCount: markedDeadCount, errors: errors };
+}
+
+// One-time (or run-whenever) backfill for deals that were ALREADY
+// Dead/Sold before archiveDeadDealPage existed -- that hook only fires on
+// a future status change, so an old dead deal's public page would
+// otherwise go on showing stale live-looking content forever. Safe to run
+// repeatedly: re-archiving an already-archived page is a harmless no-op
+// overwrite.
+function adminArchiveAllDeadDealPages() {
+  const deals = sheetToObjects(getSheet(DEALS_SHEET, DEAL_COLUMNS)).filter(function (d) {
+    return (d['Status'] === 'Dead' || d['Status'] === 'Sold') && d['PublicPageUrl'];
+  });
+  let archivedCount = 0;
+  const errors = [];
+  deals.forEach(function (d) {
+    try {
+      publishDealPageToGithub(d['DealID'], generateDeadDealPlaceholderHtml(d));
+      archivedCount++;
+    } catch (err) {
+      errors.push((d['DealCode'] || d['Address'] || d['DealID']) + ': ' + String(err));
+    }
+  });
+  return { ok: true, archivedCount: archivedCount, errors: errors };
 }
 
 // -- Price sync + public page publishing --------------------------------
