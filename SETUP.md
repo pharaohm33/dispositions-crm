@@ -35,6 +35,8 @@ left) → scroll to **Script Properties** → **Add script property**. Add these
 | `BEEHIIV_PUBLICATION_ID` | From beehiiv → Settings → Publication (starts with `pub_`) |
 | `ANTHROPIC_API_KEY` | From [console.anthropic.com](https://console.anthropic.com) → API Keys — used to regenerate a deal's public page copy when its price syncs from the Source Link |
 | `GITHUB_TOKEN` | A GitHub personal access token with **Contents: read and write** on this repo only (fine-grained token, scoped to `dispositions-crm`) — used to publish/update `deals/<id>.html` pages that GitHub Pages then serves at sendmybuyer.com |
+| `DeepSeek_API` | From [platform.deepseek.com](https://platform.deepseek.com) → API Keys — powers Purchase Criteria analysis and AI Buyer Matches (see "AI purchase-criteria matching" in `backend/Code.gs`) |
+| `DEEPSEEK_LOW_BALANCE_THRESHOLD` | Optional — dollar amount to warn under (defaults to 5 if unset) |
 
 `GITHUB_REPO` (default `pharaohm33/dispositions-crm`) and `GITHUB_BRANCH`
 (default `main`) are optional Script Properties if you ever fork this to a
@@ -217,6 +219,20 @@ new deal to include — handy for testing.
    records the current time as a starting point rather than dumping every
    historical deal into one giant first draft. The first real digest covers
    only deals added after that point.
+
+## Optional: DeepSeek balance monitoring (time-driven trigger)
+
+Emails `ADMIN_NOTIFY_EMAIL` (at most once every 24 hours, while the balance
+stays low) if the DeepSeek balance drops under `DEEPSEEK_LOW_BALANCE_THRESHOLD`
+(default $5) — so Purchase Criteria analysis and AI Buyer Matches don't just
+quietly stop working one day with no warning. The admin panel's **DeepSeek
+AI Balance → Check AI Balance Now** button checks the real number on demand,
+no trigger needed.
+
+1. In the Apps Script editor, select **installDeepSeekBalanceCheckTrigger**
+   from the function dropdown, then click **Run**.
+2. Confirm it under **Triggers** — a daily trigger, same self-clearing
+   safety as the others above.
 
 ## Redeploying after a change
 

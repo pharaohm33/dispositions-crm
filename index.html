@@ -804,6 +804,17 @@
       <div id="buyerleads-import-result" class="small-muted"></div>
     </div>
 
+    <div class="card">
+      <div class="section-title" style="margin-top:0;">Bulk Add Buyers From Purchase Criteria (AI)</div>
+      <p class="small-muted">Paste in one or several buyer contacts as free text — names, emails, phone numbers, and whatever they told you about what they buy, in any format (a quick note, a full company spec sheet, several separated by blank lines or "***"). DeepSeek splits it into individual buyers for you to review before anything is saved — nothing is added automatically.</p>
+      <textarea id="bulk-criteria-input" style="min-height:160px;" placeholder="jmiller@tempo-construction.com&#10;Joe Miller&#10;&#10;Land has to be within 1 hour drive of Greensboro NC and 1+ acre."></textarea>
+      <div class="error-text" id="bulk-criteria-error"></div>
+      <div class="nav-row" style="justify-content:flex-end;">
+        <button class="btn primary" id="bulk-criteria-analyze-btn">Analyze With AI</button>
+      </div>
+      <div id="bulk-criteria-review" style="margin-top:12px;"></div>
+    </div>
+
     <div class="card" id="csv-merge-review-card" hidden>
       <div class="section-title" style="margin-top:0;">Possible Duplicates With New Data</div>
       <p class="small-muted">These rows matched an existing lead by phone or email. Nothing here ever overwrites anything already on file — each one only ever <em>fills in</em> a field the existing lead doesn't already have a value for. Uncheck any you don't want, then apply — anything left unchecked (or if you just dismiss this) is skipped, same as before.</p>
@@ -867,6 +878,15 @@
         <button class="btn primary" id="new-deals-digest-run-btn">Send New Deals Digest Draft Now</button>
       </div>
       <div id="new-deals-digest-result" class="small-muted"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title" style="margin-top:0;">DeepSeek AI Balance</div>
+      <p class="small-muted">Powers Purchase Criteria analysis and AI Buyer Matches. Checked automatically about once a day once the trigger's installed (see SETUP.md) — you'll get an email if it drops low, so the AI features don't just quietly stop working with no warning.</p>
+      <div class="nav-row" style="justify-content:flex-end;">
+        <button class="btn secondary" id="deepseek-balance-check-btn">Check AI Balance Now</button>
+      </div>
+      <div id="deepseek-balance-result" class="small-muted"></div>
     </div>
 
     <div class="card">

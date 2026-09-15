@@ -127,6 +127,31 @@ function dealTypeTagsHtml(dealTypesStr) {
 // normalized to isResponsive/isVip/hasClosedDeal) via the isPitch flag.
 // Closed always implies VIP (see updateBuyerLeadClosedStatus), so a closed
 // buyer only ever shows "Top VIP Closed," never a separate "VIP" pill too.
+// Small readout under the Purchase Criteria textarea on a buyer's admin
+// detail page -- shows what DeepSeek actually understood from the last
+// save, so admin can tell at a glance whether the analysis looks right
+// (and re-save with clearer wording if not) rather than trusting a black
+// box. "vague" gets called out explicitly since that's exactly the case
+// (e.g. "review all NC land deals") that should only ever produce
+// Potential Buyer Match, never a confident one.
+function purchaseCriteriaSummaryHtml(lead) {
+  if (!lead.PurchaseCriteriaRaw) return "";
+  let parsed = null;
+  try { parsed = JSON.parse(lead.PurchaseCriteriaParsed || "null"); } catch (e) {}
+  if (!parsed) return '<p class="small-muted">Not analyzed yet — save to run it through DeepSeek.</p>';
+  const bits = [];
+  if (parsed.nationwide) bits.push("Nationwide");
+  else if (parsed.states && parsed.states.length) bits.push(parsed.states.join("/"));
+  if (parsed.min_acres || parsed.max_acres) {
+    bits.push((parsed.min_acres ? parsed.min_acres + "+" : "up to " + parsed.max_acres) + " acres");
+  }
+  if (parsed.asset_types && parsed.asset_types.length) bits.push(parsed.asset_types.join(", "));
+  return '<p class="small-muted">' +
+    '<strong>' + (parsed.specificity === "vague" ? "Vague — will only ever flag as Potential Match" : "Specific") + '.</strong> ' +
+    esc(parsed.summary || bits.join(" · ")) +
+    '</p>';
+}
+
 function buyerStatusTagsHtml(obj, isPitch) {
   if (!obj) return "";
   const responsive = isPitch ? obj.isResponsive : (obj.IsResponsive === true || obj.IsResponsive === "TRUE");
@@ -2715,6 +2740,13 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
       '<div id="deal-detail-targetmarket-results" style="margin-top:8px;"></div>' +
     '</div>' +
 
+    '<div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border);">' +
+      '<div style="font-weight:600; margin-bottom:6px;">AI Buyer Matches (Purchase Criteria)</div>' +
+      '<p class="small-muted">Reads every buyer lead\'s Purchase Criteria against this deal — DeepSeek flags a confident <strong>Buyer Purchase Criteria Match</strong> or, when their stated criteria is too vague or only partly fits, a <strong>Potential Buyer Match</strong>. Separate from the self-signup Matching Buyers above; nothing here is sent automatically.</p>' +
+      '<button class="btn secondary small" id="deal-detail-find-purchase-matches-btn">Find Buyer Matches</button>' +
+      '<div id="deal-detail-purchase-matches-results" style="margin-top:8px;"></div>' +
+    '</div>' +
+
     (function () {
       // No automated buyer-notification system exists yet -- this is what
       // tells admin who to reach out to directly (or hand to a rep) for
@@ -3080,6 +3112,50 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
         openAdminDealDetail(deal.DealID);
         showToast("Assigned " + username + (document.getElementById("deal-detail-targetmarket-lock-checkbox").checked ? " and locked the deal." : "."));
       });
+    });
+  });
+
+  document.getElementById("deal-detail-find-purchase-matches-btn").addEventListener("click", async function () {
+    const btn = this;
+    const resultsEl = document.getElementById("deal-detail-purchase-matches-results");
+    if (btn.disabled) return;
+    btn.disabled = true;
+    resultsEl.innerHTML = '<p class="small-muted">Analyzing with DeepSeek…</p>';
+    const res = await api("adminFindBuyerMatches", { dealId: deal.DealID });
+    btn.disabled = false;
+    if (!res.ok) { resultsEl.innerHTML = ""; showToast(res.error || "Could not run buyer matching.", true); return; }
+
+    const sb = res.statusBreakdown;
+    const breakdownHtml = sb && sb.total > 0
+      ? '<p class="small-muted">Of ' + sb.total + ' buyer' + (sb.total === 1 ? "" : "s") + ' with purchase criteria on file: ' +
+        sb.closed + ' closed with before, ' + sb.vip + ' VIP, ' + sb.responsive + ' responsive, ' +
+        sb.unresponsive + ' unresponsive, ' + sb.notYetResponsive + ' not yet responsive.</p>'
+      : '';
+
+    if (!res.matches || res.matches.length === 0) {
+      resultsEl.innerHTML = breakdownHtml + '<p class="small-muted">No buyer\'s purchase criteria matches this deal' +
+        (sb && sb.total === 0 ? " — no buyer leads have purchase criteria saved yet (add it from a buyer's own detail page)." : ".") + '</p>';
+      return;
+    }
+
+    resultsEl.innerHTML = breakdownHtml +
+      '<div style="max-height:320px; overflow-y:auto; border:1px solid var(--border); border-radius:6px; padding:4px 10px;">' +
+        res.matches.map(function (m) {
+          const engagementTags = buyerStatusTagsHtml({
+            IsResponsive: m.isResponsive, IsVip: m.isVip, IsUnresponsive: m.isUnresponsive, HasClosedDeal: m.hasClosedDeal
+          }, false);
+          return '<div class="item-row clickable purchase-match-row" data-buyer-lead-id="' + esc(m.buyerLeadId) + '">' +
+            '<span class="status-pill ' + (m.verdict === "criteria_match" ? "status-vip-closed" : "status-vip") + '">' + esc(m.label) + '</span> ' +
+            '<strong>' + esc(m.buyerName) + '</strong>' +
+            (m.phone ? ' &middot; ' + esc(m.phone) : "") + (m.email ? ' &middot; ' + esc(m.email) : "") +
+            (m.uploadedBy ? ' ' + uploaderTagHtml(m.uploadedBy) : "") +
+            (engagementTags ? '<div style="margin-top:4px;">' + engagementTags + '</div>' : "") +
+            '<div class="small-muted" style="margin-top:2px;">' + esc(m.reason) + '</div>' +
+            '</div>';
+        }).join("") +
+      '</div>';
+    Array.from(resultsEl.querySelectorAll(".purchase-match-row")).forEach(function (row) {
+      row.addEventListener("click", function () { openAdminBuyerLeadDetail(row.getAttribute("data-buyer-lead-id")); });
     });
   });
 
@@ -4152,6 +4228,85 @@ async function loadAutoFeedSettings() {
   document.getElementById("autofeed-batchsize-input").value = res.batchSize;
 }
 
+document.getElementById("bulk-criteria-analyze-btn").addEventListener("click", async function () {
+  const btn = this;
+  const errEl = document.getElementById("bulk-criteria-error");
+  const reviewEl = document.getElementById("bulk-criteria-review");
+  const blob = document.getElementById("bulk-criteria-input").value.trim();
+  errEl.classList.remove("show");
+  if (!blob) { errEl.textContent = "Paste some text first."; errEl.classList.add("show"); return; }
+  if (btn.disabled) return;
+  btn.disabled = true;
+  btn.textContent = "Analyzing…";
+  reviewEl.innerHTML = "";
+  const res = await api("adminBulkAnalyzeBuyerCriteria", { blob: blob });
+  btn.disabled = false;
+  btn.textContent = "Analyze With AI";
+  if (!res.ok) { errEl.textContent = res.error || "Could not analyze that text."; errEl.classList.add("show"); return; }
+  if (!res.buyers || res.buyers.length === 0) {
+    reviewEl.innerHTML = '<p class="small-muted">Nothing that looked like a buyer contact was found in that text.</p>';
+    return;
+  }
+  renderBulkCriteriaReview(res.buyers);
+});
+
+// Editable review before anything saves -- AI segmentation of a messy
+// paste (like several buyers separated by "***") can misread a name or
+// miss a phone number, so this is a real edit pass, not just a confirm
+// dialog. Each buyer's full parsed object travels along in a data
+// attribute (JSON) so Save All doesn't need to re-derive it from the
+// visible fields alone.
+function renderBulkCriteriaReview(buyers) {
+  const reviewEl = document.getElementById("bulk-criteria-review");
+  reviewEl.innerHTML =
+    '<p class="small-muted">Review before saving — nothing below is in the system yet. Fix any name/email/phone AI got wrong, remove any row that\'s not really a buyer, then Save All.</p>' +
+    buyers.map(function (b, i) {
+      return '<div class="item-row bulk-criteria-row" data-index="' + i + '" data-parsed=\'' + esc(JSON.stringify(b)) + '\'>' +
+        '<div class="row3">' +
+        '<div><label class="field-label">Name</label><input type="text" class="bulk-criteria-name" value="' + esc(b.name || "") + '"></div>' +
+        '<div><label class="field-label">Email</label><input type="text" class="bulk-criteria-email" value="' + esc(b.email || "") + '"></div>' +
+        '<div><label class="field-label">Phone</label><input type="text" class="bulk-criteria-phone" value="' + esc(b.phone || "") + '"></div>' +
+        '</div>' +
+        '<p class="small-muted" style="margin-top:6px;"><strong>' + (b.specificity === "vague" ? "Vague" : "Specific") + '.</strong> ' + esc(b.summary || b.raw_criteria || "") + '</p>' +
+        '<button class="link-btn bulk-criteria-remove-btn" data-index="' + i + '">Remove this one</button>' +
+        '</div>';
+    }).join("") +
+    '<div class="nav-row" style="justify-content:flex-end; margin-top:10px;">' +
+      '<button class="btn primary" id="bulk-criteria-save-btn">Save All</button>' +
+    '</div>' +
+    '<div id="bulk-criteria-save-result" class="small-muted"></div>';
+
+  Array.from(reviewEl.querySelectorAll(".bulk-criteria-remove-btn")).forEach(function (removeBtn) {
+    removeBtn.addEventListener("click", function () {
+      removeBtn.closest(".bulk-criteria-row").remove();
+    });
+  });
+
+  document.getElementById("bulk-criteria-save-btn").addEventListener("click", async function () {
+    const saveBtn = this;
+    const resultEl = document.getElementById("bulk-criteria-save-result");
+    if (saveBtn.disabled) return;
+    const rows = Array.from(reviewEl.querySelectorAll(".bulk-criteria-row"));
+    if (rows.length === 0) { resultEl.textContent = "Nothing left to save."; return; }
+    const entries = rows.map(function (row) {
+      const parsed = JSON.parse(row.getAttribute("data-parsed"));
+      parsed.name = row.querySelector(".bulk-criteria-name").value.trim();
+      parsed.email = row.querySelector(".bulk-criteria-email").value.trim();
+      parsed.phone = row.querySelector(".bulk-criteria-phone").value.trim();
+      return parsed;
+    });
+    saveBtn.disabled = true;
+    resultEl.textContent = "Saving…";
+    const res = await api("adminSaveBulkBuyerCriteria", { entries: entries });
+    saveBtn.disabled = false;
+    if (!res.ok) { resultEl.textContent = res.error || "Could not save."; showToast(res.error || "Could not save.", true); return; }
+    document.getElementById("bulk-criteria-input").value = "";
+    reviewEl.innerHTML = "";
+    showToast(res.count + " buyer" + (res.count === 1 ? "" : "s") + " added.");
+    await loadBuyerLeadsAdmin();
+  });
+}
+
 document.getElementById("autofeed-save-btn").addEventListener("click", async function () {
   const btn = this;
   const resultEl = document.getElementById("autofeed-result");
@@ -4210,6 +4365,20 @@ document.getElementById("new-deals-digest-run-btn").addEventListener("click", as
     ? (res.dealCount + " deal(s) — Draft created — <a href=\"" + res.beehiivDraftUrl + "\" target=\"_blank\" rel=\"noopener\">open it in beehiiv</a>.")
     : (res.dealCount + " deal(s) — Draft created — check the Posts tab in beehiiv.");
   showToast("New deals digest draft created in beehiiv.");
+});
+
+document.getElementById("deepseek-balance-check-btn").addEventListener("click", async function () {
+  const btn = this;
+  const resultEl = document.getElementById("deepseek-balance-result");
+  if (btn.disabled) return;
+  btn.disabled = true;
+  resultEl.textContent = "Checking…";
+  const res = await api("adminCheckDeepSeekBalanceNow", {});
+  btn.disabled = false;
+  if (!res.ok) { resultEl.textContent = res.error || "Could not check balance."; showToast(res.error || "Could not check balance.", true); return; }
+  const b = res.balance;
+  resultEl.textContent = b.currency + " " + b.totalBalance.toFixed(2) +
+    (b.isAvailable ? " available." : " — too low to run AI features. Top up at platform.deepseek.com.");
 });
 
 // Debounces a typed-input handler so a fast typist doesn't fire a server
@@ -4726,6 +4895,14 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
       '<button class="btn secondary" id="admin-general-notes-save-btn">Save Notes</button>' +
     '</div>' +
 
+    '<div class="section-title">Purchase Criteria (AI-Analyzed)</div>' +
+    '<p class="small-muted">Paste what this buyer told you they buy, in your own words — DeepSeek reads it once and uses that read every time you click "Find Buyer Matches" on a deal. Re-save any time their criteria changes.</p>' +
+    '<textarea id="purchase-criteria-input" placeholder="e.g. Land has to be within 1 hour drive of Greensboro NC and 1+ acre.">' + esc(lead.PurchaseCriteriaRaw || "") + '</textarea>' +
+    (purchaseCriteriaSummaryHtml(lead)) +
+    '<div class="nav-row" style="justify-content:flex-end;">' +
+      '<button class="btn secondary" id="purchase-criteria-save-btn">Save &amp; Analyze</button>' +
+    '</div>' +
+
     (isDnc ? '' :
     '<div class="section-title">Give For a Deal</div>' +
     '<p class="small-muted">Works even for a deal this buyer\'s already been given for — picks a different team member, not a different lead, so more than one person can cover the same deal.</p>' +
@@ -4788,6 +4965,21 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
     await api("updateBuyerLeadNotes", { buyerLeadId: buyerLeadId, notes: document.getElementById("admin-general-notes-input").value.trim() });
     await loadBuyerLeadsAdmin();
     showToast("Notes saved.");
+  });
+
+  document.getElementById("purchase-criteria-save-btn").addEventListener("click", async function () {
+    const btn = this;
+    if (btn.disabled) return;
+    btn.disabled = true;
+    btn.textContent = "Analyzing…";
+    const rawText = document.getElementById("purchase-criteria-input").value.trim();
+    const res = await api("adminSetBuyerPurchaseCriteria", { buyerLeadId: buyerLeadId, rawText: rawText });
+    btn.disabled = false;
+    btn.textContent = "Save & Analyze";
+    if (!res.ok) { showToast(res.error || "Could not save purchase criteria.", true); return; }
+    await loadBuyerLeadsAdmin();
+    openAdminBuyerLeadDetail(buyerLeadId);
+    showToast("Purchase criteria saved.");
   });
 
   wireBuyerProfileFieldsHandlers("admin", buyerLeadId, async function () {

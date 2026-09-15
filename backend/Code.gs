@@ -17,6 +17,11 @@
  *                         near the bottom of this file. Every send actually
  *                         goes out from beehiiv, never MailApp/Gmail, so the
  *                         owner's personal email never carries the volume.
+ *   DeepSeek_API        - DeepSeek API key, used for purchase-criteria
+ *                         analysis and AI buyer matching (see "AI
+ *                         purchase-criteria matching" near the bottom).
+ *   DEEPSEEK_LOW_BALANCE_THRESHOLD - optional, dollar amount to warn under
+ *                         (see "DeepSeek balance monitoring"); defaults to 5.
  *
  * Address secrecy model: a deal's exact street Address is stripped from
  * every non-admin session by default -- reps instead identify a deal by its
@@ -157,7 +162,10 @@ const FB_COLUMNS = ['RequestID', 'DealID', 'Username', 'PostText', 'TargetGroups
 // what the buyer has told us they want to spend, if known; like
 // AssetCategories, a buyer with neither set is treated as open to any
 // price for matching purposes.
-const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'OwnershipLengthMonths', 'PropertyURL', 'PriceRangeMin', 'PriceRangeMax', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'PendingDealID', 'CreatedAt', 'UploadedBy', 'DuplicateOfBuyerLeadID', 'DealTypes', 'IsResponsive', 'IsVip', 'HasClosedDeal', 'FirstResponsiveBy', 'IsUnresponsive', 'AssignedReps'];
+const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'OwnershipLengthMonths', 'PropertyURL', 'PriceRangeMin', 'PriceRangeMax', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'PendingDealID', 'CreatedAt', 'UploadedBy', 'DuplicateOfBuyerLeadID', 'DealTypes', 'IsResponsive', 'IsVip', 'HasClosedDeal', 'FirstResponsiveBy', 'IsUnresponsive', 'AssignedReps',
+  // Free-text purchase criteria (e.g. "within 1 hour of Greensboro NC, 1+ acre") plus
+  // DeepSeek's structured read of it -- see "AI purchase-criteria matching" below.
+  'PurchaseCriteriaRaw', 'PurchaseCriteriaParsed', 'PurchaseCriteriaUpdatedAt'];
 
 // A Pitch is "give this buyer lead to this rep, to work against this one
 // specific deal." This is the only thing that creates an actionable item in
@@ -399,6 +407,16 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminSendWeeklyDigestNow));
       case 'adminSendNewDealsDigestNow':
         return jsonOut(withAdminSession(body, adminSendNewDealsDigestNow));
+      case 'adminSetBuyerPurchaseCriteria':
+        return jsonOut(withAdminSession(body, adminSetBuyerPurchaseCriteria));
+      case 'adminBulkAnalyzeBuyerCriteria':
+        return jsonOut(withAdminSession(body, adminBulkAnalyzeBuyerCriteria));
+      case 'adminSaveBulkBuyerCriteria':
+        return jsonOut(withAdminSession(body, adminSaveBulkBuyerCriteria));
+      case 'adminFindBuyerMatches':
+        return jsonOut(withAdminSession(body, adminFindBuyerMatches));
+      case 'adminCheckDeepSeekBalanceNow':
+        return jsonOut(withAdminSession(body, adminCheckDeepSeekBalanceNow));
 
       default:
         return jsonOut({ ok: false, error: 'Unknown action.' });
@@ -5012,4 +5030,355 @@ function adminSendNewDealsDigestNow() {
   const draftUrl = newDealsDigestDraft(newDeals);
   props.setProperty('LAST_NEW_DEALS_DIGEST_AT', new Date().toISOString());
   return { ok: true, dealCount: newDeals.length, beehiivDraftUrl: draftUrl };
+}
+
+// ---------- AI purchase-criteria matching (DeepSeek) ----------
+//
+// A buyer lead's purchase criteria is free text -- "Land has to be within
+// 1 hour drive of Greensboro NC and 1+ acre," a multi-page structured spec
+// like Morgan Development Co's, or nothing concrete at all ("wanted to
+// review all NC land deals"). None of that fits a simple tag filter the
+// way a self-signed-up Buyer's Buy Box does (see buildBuyBoxTags), so this
+// uses DeepSeek in two places:
+//   - adminSetBuyerPurchaseCriteria / adminSaveBulkBuyerCriteria: parse the
+//     raw text into a structured summary once, cached on the row, used for
+//     the cheap Stage 1 elimination below.
+//   - adminFindBuyerMatches: Stage 1 (no AI) throws out buyers whose parsed
+//     state/deal-type clearly can't match; Stage 2 sends only the
+//     survivors' raw text to DeepSeek for a real per-buyer verdict against
+//     this one deal -- "criteria_match" (clearly fits everything they
+//     stated), "potential_match" (their criteria was too vague to be sure,
+//     or only partially fits), or "no_match" (excluded, never shown).
+// Script Property required: DeepSeek_API (matches the name already set on
+// this project, per the project owner -- not DEEPSEEK_API_KEY).
+//
+// Every DeepSeek call is wrapped to never throw -- an outage here should
+// degrade to "AI matching unavailable right now," never break saving a
+// buyer's criteria or crash the page.
+
+function deepSeekChatJSON(systemPrompt, userPrompt) {
+  const apiKey = PropertiesService.getScriptProperties().getProperty('DeepSeek_API');
+  if (!apiKey) return null;
+  try {
+    const res = UrlFetchApp.fetch('https://api.deepseek.com/chat/completions', {
+      method: 'post',
+      contentType: 'application/json',
+      headers: { Authorization: 'Bearer ' + apiKey },
+      muteHttpExceptions: true,
+      payload: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        response_format: { type: 'json_object' },
+        temperature: 0
+      })
+    });
+    if (res.getResponseCode() >= 300) return null;
+    const body = JSON.parse(res.getContentText());
+    const content = body && body.choices && body.choices[0] && body.choices[0].message && body.choices[0].message.content;
+    return content ? JSON.parse(content) : null;
+  } catch (err) {
+    return null;
+  }
+}
+
+const PURCHASE_CRITERIA_SCHEMA_PROMPT =
+  'You extract structured real estate buyer purchase criteria from free text notes. ' +
+  'Return ONLY a JSON object with exactly these fields: ' +
+  '{"nationwide": boolean, "states": [two-letter state codes actually mentioned], ' +
+  '"counties": [county names actually mentioned], ' +
+  '"radius_notes": "any drive-time/mile radius constraint, described verbatim, or empty string", ' +
+  '"min_acres": number or null, "max_acres": number or null, ' +
+  '"min_price": number or null, "max_price": number or null, ' +
+  '"asset_types": [short free-text tags for what they buy, e.g. "Land", "Minor Subdivision", "Major Subdivision", "Single Family"], ' +
+  '"deal_types": [zero or more of exactly "Fix and Flip", "Land", "Buy and Hold" -- only ones clearly implied], ' +
+  '"specificity": "specific" if there is at least one real, checkable filter (a location plus acreage, price, or asset type), ' +
+  '"vague" if this is essentially just "send me everything in this area" with nothing concrete to check against, ' +
+  '"summary": "one plain-English sentence describing what they buy"}';
+
+function parsePurchaseCriteria(rawText) {
+  return deepSeekChatJSON(PURCHASE_CRITERIA_SCHEMA_PROMPT, rawText);
+}
+
+// Single-buyer entry point -- the "Purchase Criteria" box on a buyer
+// lead's own admin detail page.
+function adminSetBuyerPurchaseCriteria(body) {
+  const buyerLeadId = body.buyerLeadId;
+  const rawText = String(body.rawText || '').trim();
+  if (!buyerLeadId) return { ok: false, error: 'Missing buyerLeadId.' };
+
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const lead = sheetToObjects(sheet).find(function (l) { return l['BuyerLeadID'] === buyerLeadId; });
+  if (!lead) return { ok: false, error: 'Buyer lead not found.' };
+
+  const parsed = rawText ? parsePurchaseCriteria(rawText) : null;
+  if (rawText && !parsed) {
+    return { ok: false, error: 'Could not analyze that text right now (DeepSeek unavailable). The raw text was not saved -- try again.' };
+  }
+  const now = new Date().toISOString();
+  sheet.getRange(lead._row, getColumnIndex(sheet, 'PurchaseCriteriaRaw')).setValue(rawText);
+  sheet.getRange(lead._row, getColumnIndex(sheet, 'PurchaseCriteriaParsed')).setValue(parsed ? JSON.stringify(parsed) : '');
+  sheet.getRange(lead._row, getColumnIndex(sheet, 'PurchaseCriteriaUpdatedAt')).setValue(now);
+  return { ok: true, parsed: parsed };
+}
+
+const BULK_CRITERIA_SEGMENT_PROMPT =
+  'You read a block of free-form text that may describe ONE OR MORE real estate buyer/investor ' +
+  'contacts and what they buy (names, companies, emails, phone numbers, and purchase criteria -- ' +
+  'possibly separated by blank lines, "***", or similar). Split it into one entry per distinct ' +
+  'contact/company. For each one return: ' +
+  '{"name": "best-guess person or company name", "email": "or empty string", "phone": "or empty string", ' +
+  '"raw_criteria": "the complete original text describing what they buy, verbatim", ' +
+  '"nationwide": boolean, "states": [...], "counties": [...], "radius_notes": "or empty string", ' +
+  '"min_acres": number|null, "max_acres": number|null, "min_price": number|null, "max_price": number|null, ' +
+  '"asset_types": [...], "deal_types": [zero or more of exactly "Fix and Flip", "Land", "Buy and Hold"], ' +
+  '"specificity": "specific"|"vague", "summary": "one sentence"}. ' +
+  'Return ONLY JSON: {"buyers": [ ...one object per contact found... ]}. If truly nothing resembling ' +
+  'a buyer contact is found, return {"buyers": []}.';
+
+// Step 1 of the bulk tool -- analyze the pasted blob and hand back a
+// reviewable, editable list. Does NOT save anything yet (see
+// adminSaveBulkBuyerCriteria) -- AI segmentation of a messy paste can get a
+// name or phone number wrong, so admin gets a chance to fix it first.
+function adminBulkAnalyzeBuyerCriteria(body) {
+  const blob = String(body.blob || '').trim();
+  if (!blob) return { ok: false, error: 'Paste some text first.' };
+  const result = deepSeekChatJSON(BULK_CRITERIA_SEGMENT_PROMPT, blob);
+  if (!result || !Array.isArray(result.buyers)) {
+    return { ok: false, error: 'Could not analyze that text (DeepSeek unavailable, or nothing recognizable as a buyer contact). Try again, or add buyers one at a time.' };
+  }
+  return { ok: true, buyers: result.buyers };
+}
+
+// Step 2 -- admin has reviewed/edited the list from step 1; this creates
+// one new BuyerLeads row per entry. Always creates new rows rather than
+// trying to fuzzy-match existing ones -- the app already has a dedicated
+// "Scan for Duplicates" tool (Buyer Leads tab) for merging afterward, no
+// need for a second, less reliable dedup path here.
+function adminSaveBulkBuyerCriteria(body) {
+  const entries = Array.isArray(body.entries) ? body.entries : [];
+  if (!entries.length) return { ok: false, error: 'Nothing to save.' };
+
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const now = new Date().toISOString();
+  const rows = entries.map(function (e) {
+    const parsed = {
+      nationwide: !!e.nationwide,
+      states: Array.isArray(e.states) ? e.states : splitCommaList(e.states),
+      counties: Array.isArray(e.counties) ? e.counties : splitCommaList(e.counties),
+      radius_notes: e.radius_notes || '',
+      min_acres: e.min_acres === undefined ? null : e.min_acres,
+      max_acres: e.max_acres === undefined ? null : e.max_acres,
+      min_price: e.min_price === undefined ? null : e.min_price,
+      max_price: e.max_price === undefined ? null : e.max_price,
+      asset_types: Array.isArray(e.asset_types) ? e.asset_types : splitCommaList(e.asset_types),
+      deal_types: (Array.isArray(e.deal_types) ? e.deal_types : splitCommaList(e.deal_types))
+        .filter(function (t) { return BUY_BOX_DEAL_TYPES.indexOf(t) !== -1; }),
+      specificity: e.specificity === 'specific' ? 'specific' : 'vague',
+      summary: e.summary || ''
+    };
+    return {
+      'BuyerLeadID': Utilities.getUuid(),
+      'BuyerName': e.name || 'Unknown',
+      'Phone': e.phone || '',
+      'Email': e.email || '',
+      'State': parsed.states[0] || '',
+      'AssetCategories': parsed.asset_types.join(', '),
+      'DealTypes': parsed.deal_types.join(', '),
+      'GeneralNotes': e.raw_criteria || '',
+      'PurchaseCriteriaRaw': e.raw_criteria || '',
+      'PurchaseCriteriaParsed': JSON.stringify(parsed),
+      'PurchaseCriteriaUpdatedAt': now,
+      'CreatedAt': now,
+      'UploadedBy': ''
+    };
+  });
+  appendRowsByHeaders(sheet, rows);
+  return { ok: true, count: rows.length };
+}
+
+// The actual matching button on a deal's detail page.
+function adminFindBuyerMatches(body) {
+  const dealId = body.dealId;
+  if (!dealId) return { ok: false, error: 'Missing dealId.' };
+
+  const deal = sheetToObjects(getSheet(DEALS_SHEET, DEAL_COLUMNS)).find(function (d) { return d['DealID'] === dealId; });
+  if (!deal) return { ok: false, error: 'Deal not found.' };
+
+  const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const leadsWithCriteria = sheetToObjects(leadsSheet).filter(function (l) { return l['PurchaseCriteriaRaw']; });
+  // Not a new tracking system -- reuses the flags the rest of the app
+  // already maintains (IsResponsive/IsVip/IsUnresponsive/HasClosedDeal),
+  // just rolled up into one glance: of the buyers this button can even
+  // consider, how many have you actually heard back from vs never
+  // contacted at all. "Not yet responsive" is everyone left over once the
+  // other four buckets are pulled out -- it does not distinguish "never
+  // called" from "called, no answer yet," since that finer detail lives on
+  // individual Pitches/contact-log rows, not the buyer lead itself.
+  const statusBreakdown = { closed: 0, vip: 0, responsive: 0, unresponsive: 0, notYetResponsive: 0, total: leadsWithCriteria.length };
+  leadsWithCriteria.forEach(function (l) {
+    if (l['HasClosedDeal'] === true || l['HasClosedDeal'] === 'TRUE') statusBreakdown.closed++;
+    else if (l['IsVip'] === true || l['IsVip'] === 'TRUE') statusBreakdown.vip++;
+    if (l['IsResponsive'] === true || l['IsResponsive'] === 'TRUE') statusBreakdown.responsive++;
+    else if (l['IsUnresponsive'] === true || l['IsUnresponsive'] === 'TRUE') statusBreakdown.unresponsive++;
+    else if (!(l['HasClosedDeal'] === true || l['HasClosedDeal'] === 'TRUE' || l['IsVip'] === true || l['IsVip'] === 'TRUE')) statusBreakdown.notYetResponsive++;
+  });
+  if (!leadsWithCriteria.length) return { ok: true, matches: [], totalWithCriteria: 0, statusBreakdown: statusBreakdown };
+
+  // Stage 1 -- cheap, deterministic, no AI call spent on an obvious miss.
+  // A buyer whose criteria didn't parse is kept in (not excluded) and left
+  // for Stage 2 to judge from the raw text directly.
+  const dealState = normalizeText(deal['State']);
+  const dealDealTypes = splitCommaList(deal['DealTypes']).map(normalizeText);
+  const candidates = leadsWithCriteria.filter(function (l) {
+    let parsed = null;
+    try { parsed = JSON.parse(l['PurchaseCriteriaParsed'] || 'null'); } catch (e) {}
+    if (!parsed) return true;
+    if (parsed.nationwide) return true;
+    const states = (parsed.states || []).map(normalizeText);
+    if (states.length && dealState && states.indexOf(dealState) === -1) return false;
+    if (parsed.deal_types && parsed.deal_types.length && dealDealTypes.length) {
+      const overlap = parsed.deal_types.map(normalizeText).some(function (t) { return dealDealTypes.indexOf(t) !== -1; });
+      if (!overlap) return false;
+    }
+    return true;
+  });
+  if (!candidates.length) return { ok: true, matches: [], totalWithCriteria: leadsWithCriteria.length, statusBreakdown: statusBreakdown };
+
+  // Caps the single Stage 2 prompt's size -- Stage 1 already did the cheap
+  // narrowing, so this only bites if the surviving pool is still large.
+  const capped = candidates.slice(0, 40);
+  const byId = {};
+  capped.forEach(function (l) { byId[l['BuyerLeadID']] = l; });
+
+  const dealSummary = 'Deal: ' + [deal['City'], deal['State'], deal['Zip']].filter(Boolean).join(', ') +
+    (deal['County'] ? ' (' + deal['County'] + ' County)' : '') +
+    (deal['AssetCategory'] ? ' | Asset Category: ' + deal['AssetCategory'] : '') +
+    (deal['AssetType'] ? ' | Asset Type: ' + deal['AssetType'] : '') +
+    (deal['DealTypes'] ? ' | Deal Type: ' + deal['DealTypes'] : '') +
+    (deal['Price'] ? ' | Asking Price: ' + deal['Price'] : '') +
+    (deal['Description'] ? ' | Description: ' + deal['Description'] : '');
+
+  const buyersBlock = capped.map(function (l, i) {
+    return (i + 1) + '. BuyerLeadID=' + l['BuyerLeadID'] + ' -- ' + l['PurchaseCriteriaRaw'];
+  }).join('\n');
+
+  const systemPrompt =
+    'You compare ONE real estate deal against a numbered list of buyers\' stated purchase criteria. ' +
+    'For EACH buyer, decide exactly one verdict: ' +
+    '"criteria_match" (the deal clearly satisfies everything concrete they stated -- location, size, price, asset type), ' +
+    '"potential_match" (their stated criteria is too vague/incomplete to be sure either way, or the deal fits some but not all of what they stated), ' +
+    'or "no_match" (a stated requirement is clearly violated -- wrong area, wrong asset type, size or price clearly outside their range). ' +
+    'Return ONLY JSON: {"results": [{"buyerLeadId": "...", "verdict": "criteria_match"|"potential_match"|"no_match", "reason": "one short sentence"}]} ' +
+    '-- exactly one entry per buyer listed, omit none.';
+
+  const result = deepSeekChatJSON(systemPrompt, dealSummary + '\n\nBuyers:\n' + buyersBlock);
+  if (!result || !Array.isArray(result.results)) {
+    return { ok: false, error: 'AI matching is unavailable right now. Try again shortly.' };
+  }
+
+  const matches = result.results
+    .filter(function (r) { return r.verdict === 'criteria_match' || r.verdict === 'potential_match'; })
+    .map(function (r) {
+      const l = byId[r.buyerLeadId];
+      if (!l) return null;
+      return {
+        buyerLeadId: r.buyerLeadId,
+        buyerName: l['BuyerName'],
+        phone: l['Phone'],
+        email: l['Email'],
+        verdict: r.verdict,
+        label: r.verdict === 'criteria_match' ? 'Buyer Purchase Criteria Match' : 'Potential Buyer Match',
+        reason: r.reason || '',
+        // Reuses the same flags/tags shown everywhere else in the app
+        // (buyerStatusTagsHtml, uploaderTagHtml) so a match result reads
+        // consistently with the rest of the CRM instead of introducing a
+        // second, different way of describing the same buyer.
+        isResponsive: l['IsResponsive'] === true || l['IsResponsive'] === 'TRUE',
+        isVip: l['IsVip'] === true || l['IsVip'] === 'TRUE',
+        isUnresponsive: l['IsUnresponsive'] === true || l['IsUnresponsive'] === 'TRUE',
+        hasClosedDeal: l['HasClosedDeal'] === true || l['HasClosedDeal'] === 'TRUE',
+        uploadedBy: l['UploadedBy'] || ''
+      };
+    })
+    .filter(Boolean);
+
+  // Confident matches first, so the list leads with what's most actionable.
+  matches.sort(function (a, b) { return (a.verdict === 'criteria_match' ? 0 : 1) - (b.verdict === 'criteria_match' ? 0 : 1); });
+
+  return { ok: true, matches: matches, consideredCount: capped.length, totalWithCriteria: leadsWithCriteria.length, statusBreakdown: statusBreakdown };
+}
+
+// ---------- DeepSeek balance monitoring ----------
+//
+// Nothing else in this app would tell you the AI features quietly stopped
+// working because the DeepSeek balance ran out -- purchase-criteria
+// analysis and buyer matching would just start failing with no warning.
+// This checks the real balance (DeepSeek's own /user/balance endpoint) and
+// emails admin, at most once a day, while it's low -- same MailApp
+// operational-alert pattern as a new signup or new interested buyer (this
+// is you finding out your own tooling needs attention, not a subscriber-
+// facing send, so it deliberately does NOT go through beehiiv).
+//
+// Script Property (optional): DEEPSEEK_LOW_BALANCE_THRESHOLD -- dollar
+// amount to warn under; defaults to 5 if not set.
+
+function checkDeepSeekBalance() {
+  const apiKey = PropertiesService.getScriptProperties().getProperty('DeepSeek_API');
+  if (!apiKey) return null;
+  try {
+    const res = UrlFetchApp.fetch('https://api.deepseek.com/user/balance', {
+      method: 'get',
+      headers: { Authorization: 'Bearer ' + apiKey, Accept: 'application/json' },
+      muteHttpExceptions: true
+    });
+    if (res.getResponseCode() >= 300) return null;
+    const body = JSON.parse(res.getContentText());
+    const info = body && body.balance_infos && body.balance_infos[0];
+    if (!info) return null;
+    return { isAvailable: !!body.is_available, totalBalance: parseFloat(info.total_balance), currency: info.currency };
+  } catch (err) {
+    return null;
+  }
+}
+
+function maybeNotifyLowDeepSeekBalance() {
+  const props = PropertiesService.getScriptProperties();
+  const balance = checkDeepSeekBalance();
+  if (!balance) return;
+  const threshold = parseFloat(props.getProperty('DEEPSEEK_LOW_BALANCE_THRESHOLD')) || 5;
+  if (balance.isAvailable && balance.totalBalance >= threshold) return;
+
+  const lastNotifiedRaw = props.getProperty('LAST_DEEPSEEK_LOW_BALANCE_NOTICE_AT');
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  if (lastNotifiedRaw && new Date(lastNotifiedRaw) > oneDayAgo) return;
+
+  const adminEmail = props.getProperty('ADMIN_NOTIFY_EMAIL');
+  if (!adminEmail) return;
+  MailApp.sendEmail({
+    to: adminEmail,
+    subject: 'SendMyBuyer -- DeepSeek AI balance is running low',
+    body: 'Current DeepSeek balance: ' + balance.currency + ' ' + balance.totalBalance.toFixed(2) +
+      (balance.isAvailable ? '' : ' -- already too low to run. AI buyer matching and purchase-criteria analysis will fail until topped up.') +
+      '\n\nTop up at https://platform.deepseek.com/ (Billing / Top Up) so those features keep working.' +
+      '\n\nThis checks about once a day and only emails once every 24 hours while the balance stays low.'
+  });
+  props.setProperty('LAST_DEEPSEEK_LOW_BALANCE_NOTICE_AT', new Date().toISOString());
+}
+
+function installDeepSeekBalanceCheckTrigger() {
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === 'maybeNotifyLowDeepSeekBalance') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('maybeNotifyLowDeepSeekBalance').timeBased().everyDays(1).atHour(9).create();
+}
+
+// Admin-facing "check now" button -- doesn't wait on the daily trigger or
+// the 24-hour email cooldown, just reports the real current number.
+function adminCheckDeepSeekBalanceNow() {
+  const balance = checkDeepSeekBalance();
+  if (!balance) return { ok: false, error: 'Could not reach DeepSeek -- check that the DeepSeek_API script property is set correctly.' };
+  return { ok: true, balance: balance };
 }
