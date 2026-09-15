@@ -134,22 +134,41 @@ function dealTypeTagsHtml(dealTypesStr) {
 // box. "vague" gets called out explicitly since that's exactly the case
 // (e.g. "review all NC land deals") that should only ever produce
 // Potential Buyer Match, never a confident one.
+// Every field DeepSeek actually extracted, laid out so admin can verify or
+// catch a bad read (e.g. two different acreage/price tiers -- like a
+// "10-30 acres up to $900K" minor-subdivision spec vs. a separate "25-100
+// acres up to $3M" major-subdivision one -- collapsing into one flat
+// range) BEFORE trusting it. Matching itself always re-reads the full raw
+// text (see adminFindBuyerMatches), not this summary, so an imperfect
+// extraction here doesn't silently degrade match quality -- but admin
+// still has no way to catch a bad read without seeing it.
+function parsedCriteriaDetailListHtml(parsed) {
+  const rows = [];
+  rows.push(["Area", parsed.nationwide ? "Nationwide" : (parsed.states || []).join(", ") || "—"]);
+  if (parsed.counties && parsed.counties.length) rows.push(["Counties", parsed.counties.join(", ")]);
+  if (parsed.radius_notes) rows.push(["Radius/drive-time", parsed.radius_notes]);
+  if (parsed.min_acres || parsed.max_acres) {
+    rows.push(["Acreage", (parsed.min_acres ? parsed.min_acres + "+ " : "") + (parsed.max_acres ? "up to " + parsed.max_acres : "") + " acres"]);
+  }
+  if (parsed.min_price || parsed.max_price) {
+    rows.push(["Price", (parsed.min_price ? "$" + Number(parsed.min_price).toLocaleString() + "+ " : "") + (parsed.max_price ? "up to $" + Number(parsed.max_price).toLocaleString() : "")]);
+  }
+  if (parsed.asset_types && parsed.asset_types.length) rows.push(["Asset types", parsed.asset_types.join(", ")]);
+  if (parsed.deal_types && parsed.deal_types.length) rows.push(["Strategy", parsed.deal_types.join(", ")]);
+  return '<ul class="small-muted" style="margin:4px 0 0; padding-left:18px;">' +
+    rows.map(function (r) { return "<li><strong>" + esc(r[0]) + ":</strong> " + esc(r[1]) + "</li>"; }).join("") +
+    "</ul>";
+}
+
 function purchaseCriteriaSummaryHtml(lead) {
   if (!lead.PurchaseCriteriaRaw) return "";
   let parsed = null;
   try { parsed = JSON.parse(lead.PurchaseCriteriaParsed || "null"); } catch (e) {}
   if (!parsed) return '<p class="small-muted">Not analyzed yet — save to run it through DeepSeek.</p>';
-  const bits = [];
-  if (parsed.nationwide) bits.push("Nationwide");
-  else if (parsed.states && parsed.states.length) bits.push(parsed.states.join("/"));
-  if (parsed.min_acres || parsed.max_acres) {
-    bits.push((parsed.min_acres ? parsed.min_acres + "+" : "up to " + parsed.max_acres) + " acres");
-  }
-  if (parsed.asset_types && parsed.asset_types.length) bits.push(parsed.asset_types.join(", "));
   return '<p class="small-muted">' +
     '<strong>' + (parsed.specificity === "vague" ? "Vague — will only ever flag as Potential Match" : "Specific") + '.</strong> ' +
-    esc(parsed.summary || bits.join(" · ")) +
-    '</p>';
+    esc(parsed.summary || "") +
+    "</p>" + parsedCriteriaDetailListHtml(parsed);
 }
 
 function buyerStatusTagsHtml(obj, isPitch) {
@@ -4303,7 +4322,9 @@ function renderBulkCriteriaReview(buyers) {
         '<div><label class="field-label">Email</label><input type="text" class="bulk-criteria-email" value="' + esc(b.email || "") + '"></div>' +
         '<div><label class="field-label">Phone</label><input type="text" class="bulk-criteria-phone" value="' + esc(b.phone || "") + '"></div>' +
         '</div>' +
-        '<p class="small-muted" style="margin-top:6px;"><strong>' + (b.specificity === "vague" ? "Vague" : "Specific") + '.</strong> ' + esc(b.summary || b.raw_criteria || "") + '</p>' +
+        '<p class="small-muted" style="margin-top:6px;"><strong>' + (b.specificity === "vague" ? "Vague" : "Specific") + '.</strong> ' + esc(b.summary || "") + '</p>' +
+        parsedCriteriaDetailListHtml(b) +
+        '<details style="margin-top:6px;"><summary class="small-muted" style="cursor:pointer;">Original text AI read</summary><p class="small-muted">' + esc(b.raw_criteria || "") + '</p></details>' +
         '<button class="link-btn bulk-criteria-remove-btn" data-index="' + i + '">Remove this one</button>' +
         '</div>';
     }).join("") +
