@@ -1393,10 +1393,16 @@ function adminUpdateDealStatus(body) {
   const deals = sheetToObjects(sheet);
   const match = deals.find(function (d) { return d['DealID'] === body.dealId; });
   if (!match) return { ok: false, error: 'Deal not found.' };
+  const wasClosed = match['Status'] === 'Dead' || match['Status'] === 'Sold';
+  const nowClosed = body.status === 'Dead' || body.status === 'Sold';
   const statusCol = getColumnIndex(sheet, 'Status');
   sheet.getRange(match._row, statusCol).setValue(body.status);
   const updatedCol = getColumnIndex(sheet, 'UpdatedAt');
   sheet.getRange(match._row, updatedCol).setValue(new Date().toISOString());
+  // Archive/restore the public page to match -- see archiveDeadDealPage's
+  // comment for why this is an overwrite-in-place, not a delete.
+  if (nowClosed && !wasClosed) archiveDeadDealPage(match);
+  else if (!nowClosed && wasClosed) restoreDeadDealPage(match);
   return { ok: true };
 }
 
@@ -1447,11 +1453,13 @@ function adminCheckDealLive(body) {
   }
   if (!checkResult.ok) return checkResult;
 
-  if (checkResult.isDead && match['Status'] !== 'Sold' && match['Status'] !== 'Dead') {
+  const willMarkDead = checkResult.isDead && match['Status'] !== 'Sold' && match['Status'] !== 'Dead';
+  if (willMarkDead) {
     sheet.getRange(match._row, getColumnIndex(sheet, 'Status')).setValue('Dead');
     sheet.getRange(match._row, getColumnIndex(sheet, 'UpdatedAt')).setValue(new Date().toISOString());
+    archiveDeadDealPage(match);
   }
-  return { ok: true, isDead: checkResult.isDead, markedDead: checkResult.isDead && match['Status'] !== 'Sold' && match['Status'] !== 'Dead' };
+  return { ok: true, isDead: checkResult.isDead, markedDead: willMarkDead };
 }
 
 // Same check across every deal that has a Source Link and isn't already
@@ -1483,6 +1491,7 @@ function adminCheckAllDealsLive(body) {
     if (checkResult.isDead) {
       sheet.getRange(d._row, getColumnIndex(sheet, 'Status')).setValue('Dead');
       sheet.getRange(d._row, getColumnIndex(sheet, 'UpdatedAt')).setValue(new Date().toISOString());
+      archiveDeadDealPage(d);
       markedDeadCount++;
     }
   });
@@ -1722,6 +1731,61 @@ function publishDealPhotosFromDrive(dealId, picturesLink) {
 // photoPaths (relative paths already published alongside this page on
 // sendmybuyer.com, e.g. "deals/<id>/photos/1.jpg") rather than linking out,
 // when any are given.
+// A plain, static "no longer available" page for a deal that's gone
+// Dead/Sold -- overwrites the SAME deals/<dealId>.html path a buyer might
+// still have bookmarked or been texted, so the link never 404s, but never
+// shows a price/description that's no longer accurate either. This is
+// archiving, not deletion -- see archiveDeadDealPage and
+// restoreDeadDealPage, which republish real content here again if the
+// deal ever goes back to an active status.
+function generateDeadDealPlaceholderHtml(deal) {
+  return '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
+    '<title>Deal No Longer Available</title>' +
+    '<style>body{font-family:Arial,sans-serif;max-width:560px;margin:80px auto;padding:0 20px;color:#222;text-align:center;}' +
+    'h1{font-size:1.4rem;}a{color:#1a73e8;}</style></head><body>' +
+    '<h1>This deal is no longer available.</h1>' +
+    '<p>' + (deal['DealCode'] ? esc_(deal['DealCode']) + ' has closed or is no longer active.' : 'This listing has closed or is no longer active.') + '</p>' +
+    '<p><a href="https://sendmybuyer.com">See current active deals at SendMyBuyer</a></p>' +
+    '</body></html>';
+}
+
+// Minimal HTML-escape for the one or two dynamic strings on the
+// placeholder page above -- generateDealPageHtml's own output goes
+// through Claude, which doesn't need this, so this is deliberately
+// separate rather than assuming an existing shared escaper is in scope.
+function esc_(s) {
+  return String(s || '').replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+// Called whenever a deal's Status becomes Dead or Sold -- overwrites its
+// public page with the placeholder above. Only bothers if the deal ever
+// actually had a public page (PublicPageUrl set) -- no page, nothing to
+// archive. Best-effort: swallows failures so a GitHub hiccup never blocks
+// the actual status change succeeding.
+function archiveDeadDealPage(deal) {
+  if (!deal['PublicPageUrl']) return;
+  try {
+    publishDealPageToGithub(deal['DealID'], generateDeadDealPlaceholderHtml(deal));
+  } catch (err) {
+    // Swallow -- see comment above.
+  }
+}
+
+// Called when a deal moves OUT of Dead/Sold back to an active status --
+// tries to restore the real page. Only possible if there's a Source Link
+// to regenerate from; otherwise the placeholder stays up (nothing better
+// to show) until admin manually recreates the page.
+function restoreDeadDealPage(deal) {
+  if (!deal['PublicPageUrl'] || !deal['SourceLink']) return;
+  try {
+    regenerateAndPublishDealPage(deal);
+  } catch (err) {
+    // Swallow -- see comment above.
+  }
+}
+
 function generateDealPageHtml(deal, sourceListingText, photoPaths, morePhotosLink) {
   const props = PropertiesService.getScriptProperties();
   const apiKey = props.getProperty('ANTHROPIC_API_KEY');
@@ -5612,4 +5676,70 @@ function adminCheckDeepSeekBalanceNow() {
   const balance = checkDeepSeekBalance();
   if (!balance) return { ok: false, error: 'Could not reach DeepSeek -- check that the DeepSeek_API script property is set correctly.' };
   return { ok: true, balance: balance };
+}
+
+// ---------- GitHub repo storage monitoring ----------
+//
+// Dead/Sold deal pages are archived (overwritten with a placeholder, see
+// archiveDeadDealPage), never deleted, so a bookmarked or texted link
+// never breaks -- but that means the repo (which hosts every deal page
+// ever published, at sendmybuyer.com) only ever grows. This checks
+// GitHub's own reported repo size and, once it's large, emails admin to
+// ASK what retention period is acceptable for actually deleting old
+// archived pages -- nothing is ever auto-deleted.
+//
+// Script Property (optional): GITHUB_REPO_SIZE_WARN_MB -- defaults to 500.
+// Note: GitHub's repo "size" is the whole repository (full git history,
+// not just the current deal pages), so this is a reasonable proxy for
+// "getting large," not an exact measure of just the archived pages.
+
+function checkGithubRepoSizeMb() {
+  const props = PropertiesService.getScriptProperties();
+  const token = props.getProperty('GITHUB_TOKEN');
+  if (!token) return null;
+  const repo = props.getProperty('GITHUB_REPO') || 'pharaohm33/dispositions-crm';
+  try {
+    const res = UrlFetchApp.fetch('https://api.github.com/repos/' + repo, {
+      headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json' },
+      muteHttpExceptions: true
+    });
+    if (res.getResponseCode() >= 300) return null;
+    const body = JSON.parse(res.getContentText());
+    return typeof body.size === 'number' ? body.size / 1024 : null;
+  } catch (err) {
+    return null;
+  }
+}
+
+function maybeNotifyHighRepoStorage() {
+  const props = PropertiesService.getScriptProperties();
+  const sizeMb = checkGithubRepoSizeMb();
+  if (sizeMb === null) return;
+  const thresholdMb = parseFloat(props.getProperty('GITHUB_REPO_SIZE_WARN_MB')) || 500;
+  if (sizeMb < thresholdMb) return;
+
+  const lastNotifiedRaw = props.getProperty('LAST_REPO_SIZE_NOTICE_AT');
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  if (lastNotifiedRaw && new Date(lastNotifiedRaw) > sevenDaysAgo) return;
+
+  const adminEmail = props.getProperty('ADMIN_NOTIFY_EMAIL');
+  if (!adminEmail) return;
+  MailApp.sendEmail({
+    to: adminEmail,
+    subject: 'SendMyBuyer -- GitHub repo storage is getting large',
+    body: 'The dispositions-crm GitHub repo (which hosts your public deal pages at sendmybuyer.com) is now about ' +
+      Math.round(sizeMb) + ' MB.\n\n' +
+      'Dead/Sold deal pages are archived, not deleted, so old links never break -- but that means storage only grows over time. ' +
+      'Nothing will be deleted automatically. Reply and let me know: how long should an archived dead-deal page stick around ' +
+      'before it\'s safe to actually delete it (e.g. 6 months, 1 year, 2 years, or never)?\n\n' +
+      'This checks about once a day and only emails again after 7 days if storage is still high.'
+  });
+  props.setProperty('LAST_REPO_SIZE_NOTICE_AT', new Date().toISOString());
+}
+
+function installRepoSizeCheckTrigger() {
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === 'maybeNotifyHighRepoStorage') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('maybeNotifyHighRepoStorage').timeBased().everyDays(1).atHour(9).create();
 }

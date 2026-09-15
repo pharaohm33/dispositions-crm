@@ -234,6 +234,26 @@ no trigger needed.
 2. Confirm it under **Triggers** — a daily trigger, same self-clearing
    safety as the others above.
 
+## Dead/Sold deals: archived pages + optional storage monitoring (time-driven trigger)
+
+A deal's public page (`deals/<id>.html`) is automatically overwritten with a
+plain "no longer available" placeholder the moment its Status becomes Dead
+or Sold — never deleted, so an old bookmarked/texted link never breaks. If
+it later goes back to an active status and has a Source Link, the real page
+regenerates automatically; without a Source Link, the placeholder just
+stays up until you manually recreate it.
+
+Since archived pages are never deleted, the GitHub repo's size only grows
+over time. To get a heads-up email (never an automatic deletion) once that
+repo is getting large:
+
+1. In the Apps Script editor, select **installRepoSizeCheckTrigger** from
+   the function dropdown, then click **Run**.
+2. Confirm it under **Triggers** — a daily trigger, same self-clearing
+   safety as the others above.
+3. Optional Script Property `GITHUB_REPO_SIZE_WARN_MB` (default 500) sets
+   the size, in MB, that triggers the email.
+
 ## Redeploying after a change
 
 If you (or I) ever change `Code.gs`, you must redeploy for it to take effect:
