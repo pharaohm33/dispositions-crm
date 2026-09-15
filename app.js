@@ -4322,6 +4322,8 @@ function renderBulkCriteriaReview(buyers) {
         '<div><label class="field-label">Email</label><input type="text" class="bulk-criteria-email" value="' + esc(b.email || "") + '"></div>' +
         '<div><label class="field-label">Phone</label><input type="text" class="bulk-criteria-phone" value="' + esc(b.phone || "") + '"></div>' +
         '</div>' +
+        '<label class="field-label">Website</label>' +
+        '<input type="text" class="bulk-criteria-website" value="' + esc(b.website || "") + '" placeholder="https://...">' +
         '<p class="small-muted" style="margin-top:6px;"><strong>' + (b.specificity === "vague" ? "Vague" : "Specific") + '.</strong> ' + esc(b.summary || "") + '</p>' +
         parsedCriteriaDetailListHtml(b) +
         '<details style="margin-top:6px;"><summary class="small-muted" style="cursor:pointer;">Original text AI read</summary><p class="small-muted">' + esc(b.raw_criteria || "") + '</p></details>' +
@@ -4350,6 +4352,7 @@ function renderBulkCriteriaReview(buyers) {
       parsed.name = row.querySelector(".bulk-criteria-name").value.trim();
       parsed.email = row.querySelector(".bulk-criteria-email").value.trim();
       parsed.phone = row.querySelector(".bulk-criteria-phone").value.trim();
+      parsed.website = row.querySelector(".bulk-criteria-website").value.trim();
       return parsed;
     });
     saveBtn.disabled = true;
@@ -4358,8 +4361,19 @@ function renderBulkCriteriaReview(buyers) {
     saveBtn.disabled = false;
     if (!res.ok) { resultEl.textContent = res.error || "Could not save."; showToast(res.error || "Could not save.", true); return; }
     document.getElementById("bulk-criteria-input").value = "";
-    reviewEl.innerHTML = "";
     showToast(res.count + " buyer" + (res.count === 1 ? "" : "s") + " added.");
+    // Confirms exactly what's now in the system for each buyer -- not just
+    // a count -- so admin doesn't have to reopen every one individually to
+    // check a multi-tier spec (like Morgan Development Co's) actually saved
+    // the way it looked in the review step above.
+    reviewEl.innerHTML = '<p><strong>Exact Specific Info Saved and summarized as following:</strong></p>' +
+      (res.saved || []).map(function (s) {
+        return '<div class="item-row">' +
+          '<strong>' + esc(s.name) + '</strong>' +
+          (s.phone ? ' &middot; ' + esc(s.phone) : "") + (s.email ? ' &middot; ' + esc(s.email) : "") + (s.website ? ' &middot; ' + esc(s.website) : "") +
+          parsedCriteriaDetailListHtml(s.parsed) +
+          '</div>';
+      }).join("");
     await loadBuyerLeadsAdmin();
   });
 }
@@ -4830,6 +4844,8 @@ function renderBuyerProfileFields(lead, prefix) {
       '<div><label class="field-label">Email</label><input type="text" id="' + prefix + '-buyer-email-input" value="' + esc(lead.Email || "") + '" placeholder="buyer@example.com"></div>' +
       '<div><label class="field-label">County</label><input type="text" id="' + prefix + '-buyer-county-input" value="' + esc(lead.County || "") + '"></div>' +
     '</div>' +
+    '<label class="field-label">Website</label>' +
+    '<input type="text" id="' + prefix + '-buyer-website-input" value="' + esc(lead.Website || "") + '" placeholder="https://...">' +
     '<label class="field-label">Buyer Documents Drive Link <span class="small-muted">(proof of funds, signed agreements, etc.)</span></label>' +
     '<input type="text" id="' + prefix + '-buyer-drivelink-input" value="' + esc(lead.DriveLink || "") + '" placeholder="https://drive.google.com/...">' +
     '<label class="field-label">Last Known Purchase Price <span class="small-muted">(informational — an asset we found they bought, suggests a similar price range)</span></label>' +
@@ -4877,6 +4893,7 @@ function wireBuyerProfileFieldsHandlers(prefix, buyerLeadId, onSaved) {
       phone3: document.getElementById(prefix + "-buyer-phone3-input").value.trim(),
       phone3Type: document.getElementById(prefix + "-buyer-phone3type-input").value,
       email: document.getElementById(prefix + "-buyer-email-input").value.trim(),
+      website: document.getElementById(prefix + "-buyer-website-input").value.trim(),
       driveLink: document.getElementById(prefix + "-buyer-drivelink-input").value.trim(),
       county: document.getElementById(prefix + "-buyer-county-input").value.trim(),
       lastKnownPurchasePrice: document.getElementById(prefix + "-buyer-lastpurchase-input").value.trim(),

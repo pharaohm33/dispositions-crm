@@ -165,7 +165,7 @@ const FB_COLUMNS = ['RequestID', 'DealID', 'Username', 'PostText', 'TargetGroups
 const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'Phone2', 'Phone2Type', 'Phone3', 'Phone3Type', 'Email', 'City', 'State', 'Zip', 'County', 'AssetCategories', 'LastKnownPurchasePrice', 'EstimatedPropertyValue', 'PortfolioValue', 'OwnershipLengthMonths', 'PropertyURL', 'PriceRangeMin', 'PriceRangeMax', 'GeneralNotes', 'DriveLink', 'DoNotContact', 'PendingDealID', 'CreatedAt', 'UploadedBy', 'DuplicateOfBuyerLeadID', 'DealTypes', 'IsResponsive', 'IsVip', 'HasClosedDeal', 'FirstResponsiveBy', 'IsUnresponsive', 'AssignedReps',
   // Free-text purchase criteria (e.g. "within 1 hour of Greensboro NC, 1+ acre") plus
   // DeepSeek's structured read of it -- see "AI purchase-criteria matching" below.
-  'PurchaseCriteriaRaw', 'PurchaseCriteriaParsed', 'PurchaseCriteriaUpdatedAt'];
+  'PurchaseCriteriaRaw', 'PurchaseCriteriaParsed', 'PurchaseCriteriaUpdatedAt', 'Website'];
 
 // A Pitch is "give this buyer lead to this rep, to work against this one
 // specific deal." This is the only thing that creates an actionable item in
@@ -3503,7 +3503,7 @@ const BUYER_LEAD_PROFILE_FIELDS = {
   phone3: 'Phone3', phone3Type: 'Phone3Type', county: 'County', assetCategories: 'AssetCategories',
   lastKnownPurchasePrice: 'LastKnownPurchasePrice', estimatedPropertyValue: 'EstimatedPropertyValue', portfolioValue: 'PortfolioValue',
   ownershipLengthMonths: 'OwnershipLengthMonths', propertyUrl: 'PropertyURL',
-  priceRangeMin: 'PriceRangeMin', priceRangeMax: 'PriceRangeMax'
+  priceRangeMin: 'PriceRangeMin', priceRangeMax: 'PriceRangeMax', website: 'Website'
 };
 
 // The Propwire (or similar) source listing URL is admin-only -- not shown
@@ -5181,6 +5181,7 @@ const BULK_CRITERIA_SEGMENT_PROMPT =
   'possibly separated by blank lines, "***", or similar). Split it into one entry per distinct ' +
   'contact/company. For each one return: ' +
   '{"name": "best-guess person or company name", "email": "or empty string", "phone": "or empty string", ' +
+  '"website": "their company/personal website if mentioned, or empty string", ' +
   '"raw_criteria": "the complete original text describing what they buy, verbatim", ' +
   '"nationwide": boolean, "states": [...], "counties": [...], "radius_notes": "or empty string", ' +
   '"min_acres": number|null, "max_acres": number|null, "min_price": number|null, "max_price": number|null, ' +
@@ -5231,23 +5232,38 @@ function adminSaveBulkBuyerCriteria(body) {
       summary: e.summary || ''
     };
     return {
-      'BuyerLeadID': Utilities.getUuid(),
-      'BuyerName': e.name || 'Unknown',
-      'Phone': e.phone || '',
-      'Email': e.email || '',
-      'State': parsed.states[0] || '',
-      'AssetCategories': parsed.asset_types.join(', '),
-      'DealTypes': parsed.deal_types.join(', '),
-      'GeneralNotes': e.raw_criteria || '',
-      'PurchaseCriteriaRaw': e.raw_criteria || '',
-      'PurchaseCriteriaParsed': JSON.stringify(parsed),
-      'PurchaseCriteriaUpdatedAt': now,
-      'CreatedAt': now,
-      'UploadedBy': ''
+      row: {
+        'BuyerLeadID': Utilities.getUuid(),
+        'BuyerName': e.name || 'Unknown',
+        'Phone': e.phone || '',
+        'Email': e.email || '',
+        'Website': e.website || '',
+        'State': parsed.states[0] || '',
+        'AssetCategories': parsed.asset_types.join(', '),
+        'DealTypes': parsed.deal_types.join(', '),
+        'GeneralNotes': e.raw_criteria || '',
+        'PurchaseCriteriaRaw': e.raw_criteria || '',
+        'PurchaseCriteriaParsed': JSON.stringify(parsed),
+        'PurchaseCriteriaUpdatedAt': now,
+        'CreatedAt': now,
+        'UploadedBy': ''
+      },
+      parsed: parsed
     };
   });
-  appendRowsByHeaders(sheet, rows);
-  return { ok: true, count: rows.length };
+  appendRowsByHeaders(sheet, rows.map(function (r) { return r.row; }));
+
+  // Echoes back exactly what got saved for each buyer -- not just a count
+  // -- so admin can see straight away, in the UI, that (for example)
+  // Morgan Development Co's two-tier acreage/price spec actually landed
+  // correctly rather than having to reopen each buyer to check.
+  const saved = rows.map(function (r) {
+    return {
+      name: r.row['BuyerName'], email: r.row['Email'], phone: r.row['Phone'], website: r.row['Website'],
+      parsed: r.parsed
+    };
+  });
+  return { ok: true, count: rows.length, saved: saved };
 }
 
 // The actual matching button on a deal's detail page.
