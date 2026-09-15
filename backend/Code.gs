@@ -1782,10 +1782,12 @@ function generateDeadDealPlaceholderHtml(deal) {
   return '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
     '<title>Deal No Longer Available</title>' +
     '<style>body{font-family:Arial,sans-serif;max-width:560px;margin:80px auto;padding:0 20px;color:#222;text-align:center;}' +
-    'h1{font-size:1.4rem;}a{color:#1a73e8;}</style></head><body>' +
+    'h1{font-size:1.4rem;}' +
+    '.cta{display:inline-block;margin-top:20px;padding:12px 28px;background:#1a73e8;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;}' +
+    '</style></head><body>' +
     '<h1>This deal is no longer available.</h1>' +
     '<p>' + (deal['DealCode'] ? esc_(deal['DealCode']) + ' has closed or is no longer active.' : 'This listing has closed or is no longer active.') + '</p>' +
-    '<p><a href="https://sendmybuyer.com">See current active deals at SendMyBuyer</a></p>' +
+    '<a class="cta" href="https://sendmybuyer.com">See more deals</a>' +
     '</body></html>';
 }
 
