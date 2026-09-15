@@ -3667,6 +3667,51 @@ function leadVisibleToUsername(lead, username) {
 // different deals, but giving the SAME deal to two different reps for the
 // SAME buyer is blocked, since that's exactly the double-call scenario this
 // whole model exists to prevent.
+// Who else already has a claim on this buyer -- whoever privately
+// uploaded them (see leadVisibleToUsername) and/or anyone with an existing
+// open pitch on them, for any deal -- plus how long it's been since each
+// of those reps last actually did anything with this buyer. This is
+// judgment-call information surfaced to admin (see adminGiveBuyerLeadToRep's
+// confirmOverride), never an enforced rule -- admin decides. Returns null
+// when nobody else has a claim (nothing to warn about).
+function buyerOwnershipWarningInfo(lead, targetUsername) {
+  const target = String(targetUsername || '').trim().toLowerCase();
+  const uploadedBy = String(lead['UploadedBy'] || '').trim().toLowerCase();
+
+  const pitches = sheetToObjects(getSheet(PITCHES_SHEET, PITCH_COLUMNS))
+    .filter(function (p) { return p['BuyerLeadID'] === lead['BuyerLeadID'] && String(p['Username'] || '').toLowerCase() !== target; });
+
+  const otherUsernames = {};
+  if (uploadedBy && uploadedBy !== target) otherUsernames[uploadedBy] = true;
+  pitches.forEach(function (p) { otherUsernames[String(p['Username'] || '').toLowerCase()] = true; });
+  const usernames = Object.keys(otherUsernames);
+  if (!usernames.length) return null;
+
+  const contacts = sheetToObjects(getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS))
+    .filter(function (c) { return c['BuyerLeadID'] === lead['BuyerLeadID']; });
+  const reps = sheetToObjects(getSheet(REPS_SHEET, REP_COLUMNS));
+
+  const details = usernames.map(function (u) {
+    const rep = reps.find(function (r) { return String(r['Username'] || '').toLowerCase() === u; });
+    const theirContacts = contacts.filter(function (c) { return String(c['Username'] || '').toLowerCase() === u; });
+    const lastContactedAt = theirContacts.length
+      ? theirContacts.map(function (c) { return new Date(c['ContactedAt']); }).sort(function (a, b) { return b - a; })[0]
+      : null;
+    return {
+      username: u,
+      name: rep ? rep['Name'] : u,
+      isUploader: u === uploadedBy,
+      lastActivityAt: lastContactedAt ? lastContactedAt.toISOString() : null,
+      daysSinceActivity: lastContactedAt ? Math.floor((Date.now() - lastContactedAt.getTime()) / 86400000) : null
+    };
+  });
+
+  return {
+    details: details,
+    recommendation: 'Recommended: contact the rep(s) above and give them 3 days to respond before reassigning. If there\'s no response, you can contact the buyer yourself or give this buyer to someone else at your discretion.'
+  };
+}
+
 function adminGiveBuyerLeadToRep(body) {
   if (!body.buyerLeadId || !body.dealId || !body.username) return { ok: false, error: 'Missing buyerLeadId, dealId, or username.' };
   const username = String(body.username).trim().toLowerCase();
@@ -3676,8 +3721,14 @@ function adminGiveBuyerLeadToRep(body) {
     if (lead && (lead['DoNotContact'] === true || lead['DoNotContact'] === 'TRUE')) {
       return { ok: false, error: 'This buyer is marked Do Not Contact and cannot be given a new pitch.' };
     }
-    if (lead && !leadVisibleToUsername(lead, username)) {
-      return { ok: false, error: 'This buyer lead was uploaded privately by another team member and can\'t be given to anyone else.' };
+    // Blocked by default -- admin sees who else has a claim and why, and
+    // must explicitly click through (confirmOverride) to proceed anyway.
+    // Replaces the old flat, non-overridable block on a privately-uploaded
+    // lead -- ownership is now a recommendation for admin's judgment call,
+    // not a hard rule with no way past it.
+    if (lead && !body.confirmOverride) {
+      const warning = buyerOwnershipWarningInfo(lead, username);
+      if (warning) return { ok: false, needsConfirmation: true, ownership: warning };
     }
     const sheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
     const existing = sheetToObjects(sheet);

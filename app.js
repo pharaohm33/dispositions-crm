@@ -2104,6 +2104,42 @@ document.getElementById("rep-mybuyerlist-clear-selection-btn").addEventListener(
 // duplicate list reflects the removal.
 let pendingAdminDeleteBuyerLeadIds = [];
 let pendingAdminDeleteReopenId = null;
+// Reusable "someone else already has this buyer" confirmation -- shows who
+// (uploader and/or active reps), how long since each last actually did
+// anything with this buyer, and the 3-day-grace recommendation, before
+// admin can override. `onConfirmApiCall` is a function returning the
+// actual api() promise to retry WITH confirmOverride already set (the
+// caller knows its own action's exact params); `onSuccess` runs after that
+// retry actually succeeds.
+let pendingGiveOwnershipConfirm = null;
+function openGiveOwnershipWarningModal(ownership, onConfirmApiCall, onSuccess) {
+  pendingGiveOwnershipConfirm = { onConfirmApiCall: onConfirmApiCall, onSuccess: onSuccess };
+  document.getElementById("give-ownership-warning-details").innerHTML = ownership.details.map(function (d) {
+    return '<p class="small-muted"><strong>' + esc(d.name) + '</strong>' + (d.isUploader ? " (uploaded this buyer)" : " (has an open pitch)") +
+      " — " + (d.daysSinceActivity === null ? "no logged contact yet" : d.daysSinceActivity + " day(s) since last contact") + "</p>";
+  }).join("");
+  document.getElementById("give-ownership-warning-recommendation").textContent = ownership.recommendation;
+  document.getElementById("give-ownership-warning-modal").hidden = false;
+}
+
+document.getElementById("give-ownership-warning-cancel").addEventListener("click", function () {
+  document.getElementById("give-ownership-warning-modal").hidden = true;
+  pendingGiveOwnershipConfirm = null;
+});
+
+document.getElementById("give-ownership-warning-confirm").addEventListener("click", async function () {
+  const btn = this;
+  if (btn.disabled || !pendingGiveOwnershipConfirm) return;
+  btn.disabled = true;
+  const pending = pendingGiveOwnershipConfirm;
+  const res = await pending.onConfirmApiCall();
+  btn.disabled = false;
+  document.getElementById("give-ownership-warning-modal").hidden = true;
+  pendingGiveOwnershipConfirm = null;
+  if (!res.ok) { showToast(res.error || "Could not give this buyer lead.", true); return; }
+  pending.onSuccess();
+});
+
 function openDeleteBuyerLeadModal(buyerLeadIds, name, reopenBuyerLeadId) {
   pendingAdminDeleteBuyerLeadIds = buyerLeadIds;
   pendingAdminDeleteReopenId = reopenBuyerLeadId;
@@ -5102,12 +5138,18 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
       const dealId = document.getElementById("give-new-deal-select").value;
       const username = document.getElementById("give-new-rep-select").value;
       const res = await api("adminGiveBuyerLeadToRep", { buyerLeadId: buyerLeadId, dealId: dealId, username: username });
-      if (!res.ok) {
-        giveBtn.disabled = false;
-        giveBtn.textContent = "Give This Buyer Lead To";
-        showToast(res.error || "Could not give this buyer lead.", true);
+      giveBtn.disabled = false;
+      giveBtn.textContent = "Give This Buyer Lead To";
+      if (!res.ok && res.needsConfirmation) {
+        openGiveOwnershipWarningModal(res.ownership, function () {
+          return api("adminGiveBuyerLeadToRep", { buyerLeadId: buyerLeadId, dealId: dealId, username: username, confirmOverride: true });
+        }, function () {
+          openAdminBuyerLeadDetail(buyerLeadId);
+          showToast("Buyer given.");
+        });
         return;
       }
+      if (!res.ok) { showToast(res.error || "Could not give this buyer lead.", true); return; }
       openAdminBuyerLeadDetail(buyerLeadId);
       showToast("Buyer given.");
     });
