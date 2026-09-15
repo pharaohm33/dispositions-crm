@@ -298,6 +298,22 @@ function buildBuyerShareText(deal, shortenDescription) {
   return lines.join("\n");
 }
 
+// The "deal sheet" sent to a buyer who matches several deals at once --
+// Deal Code/City/State/County plus Asking Price/ARV/As-Is Value only
+// (whichever are actually set), same fields the buyer asked for. Never
+// includes the street address, matching the existing pitch SOP (Deal
+// Code/City/State/County/price to a buyer, never the address) regardless
+// of whether the admin/rep viewing this screen can see it themselves.
+function buildMultiDealShareText(matches) {
+  return matches.map(function (m) {
+    const lines = [(m.dealCode ? m.dealCode + " — " : "") + [m.city, m.state].filter(Boolean).join(", ") + (m.county ? " (" + m.county + " County)" : "")];
+    if (m.price) lines.push("Asking Price: " + formatAdminMoney(m.price));
+    if (m.arv) lines.push("ARV: " + formatAdminMoney(m.arv));
+    if (m.asIsValue) lines.push("As-Is Value: " + formatAdminMoney(m.asIsValue));
+    return lines.join("\n");
+  }).join("\n\n");
+}
+
 function formatDate(iso) {
   if (!iso) return "";
   const d = new Date(iso);
@@ -3193,24 +3209,76 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
       return;
     }
 
+    if (buyerLeadsActiveReps.length === 0) await populateBulkGiveSelects();
+    const repOptionsHtml = buyerLeadsActiveReps.map(function (r) { return '<option value="' + esc(r.username) + '">' + esc(r.name) + '</option>'; }).join("");
+
     resultsEl.innerHTML = breakdownHtml +
-      '<div style="max-height:320px; overflow-y:auto; border:1px solid var(--border); border-radius:6px; padding:4px 10px;">' +
+      '<div style="max-height:400px; overflow-y:auto; border:1px solid var(--border); border-radius:6px; padding:4px 10px;">' +
         res.matches.map(function (m) {
           const engagementTags = buyerStatusTagsHtml({
             IsResponsive: m.isResponsive, IsVip: m.isVip, IsUnresponsive: m.isUnresponsive, HasClosedDeal: m.hasClosedDeal
           }, false);
-          return '<div class="item-row clickable purchase-match-row" data-buyer-lead-id="' + esc(m.buyerLeadId) + '">' +
+          return '<div class="item-row purchase-match-row" data-buyer-lead-id="' + esc(m.buyerLeadId) + '">' +
+            '<span class="clickable purchase-match-open" data-buyer-lead-id="' + esc(m.buyerLeadId) + '">' +
             '<span class="status-pill ' + (m.verdict === "criteria_match" ? "status-vip-closed" : "status-vip") + '">' + esc(m.label) + '</span> ' +
             '<strong>' + esc(m.buyerName) + '</strong>' +
             (m.phone ? ' &middot; ' + esc(m.phone) : "") + (m.email ? ' &middot; ' + esc(m.email) : "") +
             (m.uploadedBy ? ' ' + uploaderTagHtml(m.uploadedBy) : "") +
+            '</span>' +
             (engagementTags ? '<div style="margin-top:4px;">' + engagementTags + '</div>' : "") +
             '<div class="small-muted" style="margin-top:2px;">' + esc(m.reason) + '</div>' +
+            '<div class="nav-row" style="margin-top:6px; justify-content:flex-start; gap:8px;">' +
+              '<select class="purchase-match-rep-select" style="max-width:200px;">' + repOptionsHtml + '</select>' +
+              '<button class="btn secondary small purchase-match-give-btn" data-buyer-lead-id="' + esc(m.buyerLeadId) + '">Give to Rep</button>' +
+              '<button class="btn secondary small purchase-match-give-all-btn" data-buyer-lead-id="' + esc(m.buyerLeadId) + '">Give to All Reps With Access</button>' +
+            '</div>' +
+            '<div class="small-muted purchase-match-give-result"></div>' +
             '</div>';
         }).join("") +
       '</div>';
-    Array.from(resultsEl.querySelectorAll(".purchase-match-row")).forEach(function (row) {
-      row.addEventListener("click", function () { openAdminBuyerLeadDetail(row.getAttribute("data-buyer-lead-id")); });
+
+    Array.from(resultsEl.querySelectorAll(".purchase-match-open")).forEach(function (el) {
+      el.addEventListener("click", function () { openAdminBuyerLeadDetail(el.getAttribute("data-buyer-lead-id")); });
+    });
+
+    Array.from(resultsEl.querySelectorAll(".purchase-match-give-btn")).forEach(function (giveBtn) {
+      giveBtn.addEventListener("click", async function () {
+        const row = giveBtn.closest(".purchase-match-row");
+        const buyerLeadId = giveBtn.getAttribute("data-buyer-lead-id");
+        const username = row.querySelector(".purchase-match-rep-select").value;
+        const resultEl = row.querySelector(".purchase-match-give-result");
+        if (giveBtn.disabled) return;
+        giveBtn.disabled = true;
+        const giveRes = await api("adminGiveBuyerLeadToRep", { buyerLeadId: buyerLeadId, dealId: deal.DealID, username: username, source: "ai-match" });
+        giveBtn.disabled = false;
+        if (!giveRes.ok && giveRes.needsConfirmation) {
+          openGiveOwnershipWarningModal(giveRes.ownership, function () {
+            return api("adminGiveBuyerLeadToRep", { buyerLeadId: buyerLeadId, dealId: deal.DealID, username: username, source: "ai-match", confirmOverride: true });
+          }, function () {
+            resultEl.textContent = "Given to " + username + ".";
+            showToast("Buyer given.");
+          });
+          return;
+        }
+        if (!giveRes.ok) { showToast(giveRes.error || "Could not give this buyer.", true); return; }
+        resultEl.textContent = "Given to " + username + ".";
+        showToast("Buyer given.");
+      });
+    });
+
+    Array.from(resultsEl.querySelectorAll(".purchase-match-give-all-btn")).forEach(function (giveAllBtn) {
+      giveAllBtn.addEventListener("click", async function () {
+        const row = giveAllBtn.closest(".purchase-match-row");
+        const buyerLeadId = giveAllBtn.getAttribute("data-buyer-lead-id");
+        const resultEl = row.querySelector(".purchase-match-give-result");
+        if (giveAllBtn.disabled) return;
+        giveAllBtn.disabled = true;
+        const giveRes = await api("adminGiveBuyerLeadToAllReps", { buyerLeadId: buyerLeadId, dealId: deal.DealID, source: "ai-match" });
+        giveAllBtn.disabled = false;
+        if (!giveRes.ok) { showToast(giveRes.error || "Could not give this buyer to all reps.", true); return; }
+        resultEl.textContent = "Opened to " + giveRes.givenCount + " rep(s) with access to this deal.";
+        showToast("Opened to all reps with access.");
+      });
     });
   });
 
@@ -4977,6 +5045,13 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
       '<button class="btn secondary" id="purchase-criteria-save-btn">Save &amp; Analyze</button>' +
     '</div>' +
 
+    (lead.PurchaseCriteriaRaw ?
+      '<div class="section-title">Matching Deals (Deal Sheet)</div>' +
+      '<p class="small-muted">Checks this buyer\'s criteria against every active deal — pick the ones that fit, then Copy to Send. The copied text never includes the street address, matching the normal SOP (Deal Code/City/State/County/price only).</p>' +
+      '<button class="btn secondary small" id="find-deals-for-buyer-btn">Find Matching Deals</button>' +
+      '<div id="find-deals-for-buyer-results" style="margin-top:8px;"></div>'
+      : '') +
+
     (isDnc ? '' :
     '<div class="section-title">Give For a Deal</div>' +
     '<p class="small-muted">Works even for a deal this buyer\'s already been given for — picks a different team member, not a different lead, so more than one person can cover the same deal.</p>' +
@@ -5055,6 +5130,52 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
     openAdminBuyerLeadDetail(buyerLeadId);
     showToast("Purchase criteria saved.");
   });
+
+  const findDealsBtn = document.getElementById("find-deals-for-buyer-btn");
+  if (findDealsBtn) {
+    findDealsBtn.addEventListener("click", async function () {
+      const resultsEl = document.getElementById("find-deals-for-buyer-results");
+      if (findDealsBtn.disabled) return;
+      findDealsBtn.disabled = true;
+      resultsEl.innerHTML = '<p class="small-muted">Analyzing with DeepSeek…</p>';
+      const res = await api("adminFindDealsForBuyer", { buyerLeadId: buyerLeadId });
+      findDealsBtn.disabled = false;
+      if (!res.ok) { resultsEl.innerHTML = ""; showToast(res.error || "Could not run deal matching.", true); return; }
+      if (!res.matches || res.matches.length === 0) {
+        resultsEl.innerHTML = '<p class="small-muted">No active deal matches this buyer\'s criteria right now.</p>';
+        return;
+      }
+      resultsEl.innerHTML =
+        res.matches.map(function (m, i) {
+          return '<label class="checkbox-row" style="align-items:flex-start;">' +
+            '<input type="checkbox" class="deal-sheet-checkbox" data-index="' + i + '" checked>' +
+            '<span><span class="status-pill ' + (m.verdict === "criteria_match" ? "status-vip-closed" : "status-vip") + '">' + esc(m.label) + '</span> ' +
+            '<strong>' + esc(m.dealCode || m.dealId) + '</strong> — ' + esc([m.city, m.state].filter(Boolean).join(", ")) +
+            (m.county ? " (" + esc(m.county) + " County)" : "") +
+            (m.price ? " · Asking " + esc(formatAdminMoney(m.price)) : "") +
+            (m.arv ? " · ARV " + esc(formatAdminMoney(m.arv)) : "") +
+            (m.asIsValue ? " · As-Is " + esc(formatAdminMoney(m.asIsValue)) : "") +
+            '<div class="small-muted">' + esc(m.reason) + '</div></span>' +
+            '</label>';
+        }).join("") +
+        '<div class="nav-row" style="justify-content:flex-end; margin-top:8px;">' +
+          '<button class="btn secondary small" id="deal-sheet-copy-btn">Copy Selected to Send</button>' +
+        '</div>';
+
+      document.getElementById("deal-sheet-copy-btn").addEventListener("click", async function () {
+        const selected = Array.from(resultsEl.querySelectorAll(".deal-sheet-checkbox:checked"))
+          .map(function (cb) { return res.matches[Number(cb.getAttribute("data-index"))]; });
+        if (selected.length === 0) { showToast("Select at least one deal first.", true); return; }
+        const text = buildMultiDealShareText(selected);
+        try {
+          await navigator.clipboard.writeText(text);
+          showToast("Copied — paste it into a text or email.");
+        } catch (err) {
+          showToast("Could not copy — try selecting the text manually.", true);
+        }
+      });
+    });
+  }
 
   wireBuyerProfileFieldsHandlers("admin", buyerLeadId, async function () {
     await loadBuyerLeadsAdmin();

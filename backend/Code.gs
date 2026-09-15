@@ -175,7 +175,13 @@ const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'P
 // contact history intact; withdrawing one (adminWithdrawPitch) deletes the
 // pitch row itself but never touches BuyerLeadContacts, so the record of
 // what was said stays put even after the pitch is gone.
-const PITCH_COLUMNS = ['PitchID', 'BuyerLeadID', 'DealID', 'Username', 'GivenAt'];
+// Source marks WHY a pitch exists -- 'ai-match' (came from the AI Buyer
+// Matches / Find Buyer Matches button) sorts to the top of a rep's queue,
+// ahead of pitches from a plain manual give or auto-feed, since it's the
+// most specifically-vetted lead a rep can be handed. Blank Source (every
+// pitch before this field existed, and any created some other way) is
+// treated as normal priority, same as always.
+const PITCH_COLUMNS = ['PitchID', 'BuyerLeadID', 'DealID', 'Username', 'GivenAt', 'Source'];
 
 // One row per contact attempt against a specific Pitch -- this is both the
 // call/text touchpoint log that drives computeLeadStatus's 24/48-hour SOP
@@ -417,6 +423,10 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminFindBuyerMatches));
       case 'adminCheckDeepSeekBalanceNow':
         return jsonOut(withAdminSession(body, adminCheckDeepSeekBalanceNow));
+      case 'adminGiveBuyerLeadToAllReps':
+        return jsonOut(withAdminSession(body, adminGiveBuyerLeadToAllReps));
+      case 'adminFindDealsForBuyer':
+        return jsonOut(withAdminSession(body, adminFindDealsForBuyer));
 
       default:
         return jsonOut({ ok: false, error: 'Unknown action.' });
@@ -3742,9 +3752,62 @@ function adminGiveBuyerLeadToRep(body) {
     const pitchId = Utilities.getUuid();
     appendRowByHeaders(sheet, {
       'PitchID': pitchId, 'BuyerLeadID': body.buyerLeadId, 'DealID': body.dealId,
-      'Username': username, 'GivenAt': new Date().toISOString()
+      'Username': username, 'GivenAt': new Date().toISOString(), 'Source': body.source || ''
     });
     return { ok: true, pitchId: pitchId };
+  });
+}
+
+// Every active, non-admin rep who can currently see this deal -- reuses
+// canAccessDeal exactly (a synthetic session per rep) so "who has access"
+// never drifts out of sync with the real access rules (direct assignment,
+// AllAccess, category access, Target Market area match).
+function activeRepUsernamesWithDealAccess(dealId) {
+  const reps = sheetToObjects(getSheet(REPS_SHEET, REP_COLUMNS)).filter(function (r) {
+    const active = !(r['Active'] === false || r['Active'] === 'FALSE');
+    const isAdmin = r['IsAdmin'] === true || r['IsAdmin'] === 'TRUE';
+    return active && !isAdmin;
+  });
+  return reps
+    .filter(function (r) {
+      const allAccess = r['AllAccess'] === true || r['AllAccess'] === 'TRUE';
+      return canAccessDeal({ u: String(r['Username'] || '').trim().toLowerCase(), a: false, all: allAccess }, dealId);
+    })
+    .map(function (r) { return String(r['Username'] || '').trim().toLowerCase(); });
+}
+
+// The "leave it open to whoever can see this deal" option on the AI Buyer
+// Matches panel -- creates a pitch for every rep who already has access to
+// the deal, first-come-first-served (whoever calls first gets there).
+// Skips DoNotContact and any rep who already has an open pitch on this
+// buyer for this deal, same as the single-give path; unlike that path,
+// this deliberately does NOT run the ownership-warning check -- admin
+// choosing "give to everyone with access" is itself the explicit decision
+// to open it up, there is no single other rep to warn about.
+function adminGiveBuyerLeadToAllReps(body) {
+  if (!body.buyerLeadId || !body.dealId) return { ok: false, error: 'Missing buyerLeadId or dealId.' };
+  return withLock(function () {
+    const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+    const lead = sheetToObjects(leadsSheet).find(function (l) { return l['BuyerLeadID'] === body.buyerLeadId; });
+    if (lead && (lead['DoNotContact'] === true || lead['DoNotContact'] === 'TRUE')) {
+      return { ok: false, error: 'This buyer is marked Do Not Contact and cannot be given a new pitch.' };
+    }
+    const usernames = activeRepUsernamesWithDealAccess(body.dealId).filter(function (u) {
+      return !lead || leadVisibleToUsername(lead, u);
+    });
+    if (!usernames.length) return { ok: false, error: 'No active rep currently has access to this deal.' };
+
+    const sheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+    const existing = sheetToObjects(sheet).filter(function (p) { return p['BuyerLeadID'] === body.buyerLeadId && p['DealID'] === body.dealId; });
+    const alreadyHas = {};
+    existing.forEach(function (p) { alreadyHas[String(p['Username'] || '').toLowerCase()] = true; });
+
+    const now = new Date().toISOString();
+    const toAdd = usernames.filter(function (u) { return !alreadyHas[u]; });
+    appendRowsByHeaders(sheet, toAdd.map(function (u) {
+      return { 'PitchID': Utilities.getUuid(), 'BuyerLeadID': body.buyerLeadId, 'DealID': body.dealId, 'Username': u, 'GivenAt': now, 'Source': body.source || '' };
+    }));
+    return { ok: true, givenCount: toAdd.length };
   });
 }
 
@@ -4690,6 +4753,18 @@ function getMyPitches(body, session) {
       PriceRangeMin: lead['PriceRangeMin'], PriceRangeMax: lead['PriceRangeMax'], AssetCategories: lead['AssetCategories']
     } : null;
     delete p.dealAddress; // rep-facing -- never send the deal's Address, see file header comment
+    p.isAiMatch = p['Source'] === 'ai-match';
+  });
+  // AI-sourced pitches with no response logged yet float to the top --
+  // the most specifically-vetted lead a rep can be handed, per the deal's
+  // own stated purchase criteria, so it's what they should work first.
+  // Array.prototype.sort is stable, so this only ever reorders across that
+  // one boundary -- it never scrambles the existing order within either
+  // group.
+  withStatus.sort(function (a, b) {
+    const aPriority = (a.isAiMatch && !a.hasResponded) ? 0 : 1;
+    const bPriority = (b.isAiMatch && !b.hasResponded) ? 0 : 1;
+    return aPriority - bPriority;
   });
   return { ok: true, pitches: withStatus };
 }
@@ -5376,6 +5451,95 @@ function adminFindBuyerMatches(body) {
   matches.sort(function (a, b) { return (a.verdict === 'criteria_match' ? 0 : 1) - (b.verdict === 'criteria_match' ? 0 : 1); });
 
   return { ok: true, matches: matches, consideredCount: capped.length, totalWithCriteria: leadsWithCriteria.length, statusBreakdown: statusBreakdown };
+}
+
+// The reverse of adminFindBuyerMatches -- one buyer's criteria against
+// every active deal, for the "deal sheet" a rep sends them. Address is
+// included here since this is admin-only and admin always sees it anyway
+// (see the file header's address-secrecy model) -- but the actual
+// buyer-facing text a rep copies to send NEVER includes it, matching the
+// existing SOP (pitch Deal Code/City/State/County/price, never the
+// address) -- that's enforced on the frontend's "Copy to Send" button, not
+// here, so admin's own on-screen list can still show it for reference.
+function adminFindDealsForBuyer(body) {
+  const buyerLeadId = body.buyerLeadId;
+  if (!buyerLeadId) return { ok: false, error: 'Missing buyerLeadId.' };
+
+  const lead = sheetToObjects(getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS)).find(function (l) { return l['BuyerLeadID'] === buyerLeadId; });
+  if (!lead) return { ok: false, error: 'Buyer lead not found.' };
+  if (!lead['PurchaseCriteriaRaw']) return { ok: false, error: 'This buyer has no Purchase Criteria saved yet.' };
+
+  const activeDeals = sheetToObjects(getSheet(DEALS_SHEET, DEAL_COLUMNS)).filter(dealIsActive);
+  if (!activeDeals.length) return { ok: true, matches: [] };
+
+  let buyerParsed = null;
+  try { buyerParsed = JSON.parse(lead['PurchaseCriteriaParsed'] || 'null'); } catch (e) {}
+
+  // Stage 1 -- same cheap elimination as adminFindBuyerMatches, just with
+  // buyer fixed and deals varying instead of the other way around.
+  const buyerStates = buyerParsed ? (buyerParsed.states || []).map(normalizeText) : [];
+  const buyerDealTypes = buyerParsed ? (buyerParsed.deal_types || []).map(normalizeText) : [];
+  const candidates = activeDeals.filter(function (d) {
+    if (!buyerParsed) return true;
+    if (buyerParsed.nationwide) return true;
+    const dealState = normalizeText(d['State']);
+    if (buyerStates.length && dealState && buyerStates.indexOf(dealState) === -1) return false;
+    if (buyerDealTypes.length) {
+      const dealTypes = splitCommaList(d['DealTypes']).map(normalizeText);
+      if (dealTypes.length && !dealTypes.some(function (t) { return buyerDealTypes.indexOf(t) !== -1; })) return false;
+    }
+    return true;
+  });
+  if (!candidates.length) return { ok: true, matches: [] };
+
+  const capped = candidates.slice(0, 40);
+  const byId = {};
+  capped.forEach(function (d) { byId[d['DealID']] = d; });
+
+  const dealsBlock = capped.map(function (d, i) {
+    return (i + 1) + '. DealID=' + d['DealID'] + ' -- ' +
+      [d['City'], d['State'], d['Zip']].filter(Boolean).join(', ') +
+      (d['County'] ? ' (' + d['County'] + ' County)' : '') +
+      (d['AssetCategory'] ? ' | Asset Category: ' + d['AssetCategory'] : '') +
+      (d['DealTypes'] ? ' | Deal Type: ' + d['DealTypes'] : '') +
+      (d['Price'] ? ' | Asking Price: ' + d['Price'] : '') +
+      (d['Description'] ? ' | Description: ' + d['Description'] : '');
+  }).join('\n');
+
+  const systemPrompt =
+    'You compare ONE buyer\'s stated purchase criteria against a numbered list of real estate deals. ' +
+    'For EACH deal, decide exactly one verdict: ' +
+    '"criteria_match" (this deal clearly satisfies everything concrete the buyer stated -- location, size, price, asset type), ' +
+    '"potential_match" (the buyer\'s stated criteria is too vague/incomplete to be sure either way, or this deal fits some but not all of what they stated), ' +
+    'or "no_match" (a stated requirement is clearly violated). ' +
+    'Return ONLY JSON: {"results": [{"dealId": "...", "verdict": "criteria_match"|"potential_match"|"no_match", "reason": "one short sentence"}]} ' +
+    '-- exactly one entry per deal listed, omit none.';
+
+  const result = deepSeekChatJSON(systemPrompt, 'Buyer criteria: ' + lead['PurchaseCriteriaRaw'] + '\n\nDeals:\n' + dealsBlock);
+  if (!result || !Array.isArray(result.results)) {
+    return { ok: false, error: 'AI matching is unavailable right now. Try again shortly.' };
+  }
+
+  const matches = result.results
+    .filter(function (r) { return r.verdict === 'criteria_match' || r.verdict === 'potential_match'; })
+    .map(function (r) {
+      const d = byId[r.dealId];
+      if (!d) return null;
+      return {
+        dealId: r.dealId,
+        dealCode: d['DealCode'] || '',
+        address: d['Address'] || '',
+        city: d['City'] || '', state: d['State'] || '', zip: d['Zip'] || '', county: d['County'] || '',
+        price: d['Price'] || '', arv: d['ARV'] || '', asIsValue: d['AsIsValue'] || '',
+        verdict: r.verdict,
+        label: r.verdict === 'criteria_match' ? 'Buyer Purchase Criteria Match' : 'Potential Buyer Match',
+        reason: r.reason || ''
+      };
+    })
+    .filter(Boolean);
+
+  matches.sort(function (a, b) { return (a.verdict === 'criteria_match' ? 0 : 1) - (b.verdict === 'criteria_match' ? 0 : 1); });
+  return { ok: true, matches: matches };
 }
 
 // ---------- DeepSeek balance monitoring ----------
