@@ -440,6 +440,7 @@ async function doLogin() {
   }
   setSession(res);
   showView(res);
+  maybeFireAddressRequestFromUrl();
 }
 
 /* ---------- Sign Up / Forgot Password (login screen) ---------- */
@@ -675,9 +676,31 @@ document.getElementById("signup-btn").addEventListener("click", async function (
   } else {
     showToast("Welcome! Your account is ready.");
   }
+  maybeFireAddressRequestFromUrl();
 });
 
+// Deep link from a public deal page's "Request the Address" button
+// (?requestAddress=<dealId>) -- already-logged-in returning visitors (a
+// persisted localStorage session) get the request fired immediately on
+// load; everyone else sees a banner and it fires right after they log in
+// or sign up (see the call above and the one in doLogin). Clears the query
+// param either way so a page refresh doesn't re-fire it.
+async function maybeFireAddressRequestFromUrl() {
+  const dealId = new URLSearchParams(window.location.search).get("requestAddress");
+  if (!dealId) return;
+  const session = getSession();
+  if (!session) {
+    document.getElementById("address-request-banner").hidden = false;
+    return;
+  }
+  window.history.replaceState(null, "", window.location.pathname);
+  const res = await api("publicRequestAddressAccess", { dealId: dealId });
+  if (!res.ok) { showToast(res.error || "Could not send the address request.", true); return; }
+  showToast(res.autoGranted ? "Address granted — check the deal in your Deals tab." : "Request sent — admin will grant the address shortly.");
+}
+
 showView(getSession());
+maybeFireAddressRequestFromUrl();
 
 // Shown on the login page for anyone without an account yet -- loads
 // regardless of session state since it has to render before login.
@@ -1000,6 +1023,7 @@ async function openRepDealDetail(dealId) {
       (deal.FinancingType ? '<div><strong>Financing Type:</strong> ' + esc(deal.FinancingType) + '</div>' : "") +
       (deal.Description ? '<div style="margin-top:8px;">' + esc(deal.Description) + '</div>' : "") +
       (deal.GeneralDriveLink ? '<div style="margin-top:8px;"><a href="' + esc(deal.GeneralDriveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
+      (deal.PublicPageUrl ? '<div style="margin-top:8px;"><strong>Deal Page:</strong> <a href="' + esc(deal.PublicPageUrl) + '" target="_blank" rel="noopener">' + esc(deal.PublicPageUrl) + '</a> <span class="small-muted">(share this with buyers)</span></div>' : "") +
       (!deal.Address ? '<div style="margin-top:10px;"><button class="btn secondary small" id="request-address-btn" data-deal-id="' + esc(deal.DealID) + '">Request Address Access</button>' +
         '<div class="small-muted" style="margin-top:6px;">Pitch off the general deal info first — only use this once a buyer has responded, is genuinely interested, and specifically asks you for the address. This just emails admin to ask; it does not grant it.</div></div>' : "") +
       '<div style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.08);">' +
@@ -1481,6 +1505,7 @@ function renderPitchDealInfo(deal) {
       (deal.AsIsValue ? '<div><strong>As-Is Equity:</strong> ' + formatAsIsEquity(deal.AsIsEquity) + '</div>' : "") +
       (deal.FinancingType ? '<div><strong>Financing Type:</strong> ' + esc(deal.FinancingType) + '</div>' : "") +
       (deal.GeneralDriveLink ? '<div style="margin-top:8px;"><strong>Deal Documents:</strong> <a href="' + esc(deal.GeneralDriveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
+      (deal.PublicPageUrl ? '<div style="margin-top:8px;"><strong>Deal Page:</strong> <a href="' + esc(deal.PublicPageUrl) + '" target="_blank" rel="noopener">' + esc(deal.PublicPageUrl) + '</a> <span class="small-muted">(share this with buyers)</span></div>' : "") +
       (!deal.Address ? '<div style="margin-top:10px;"><button class="btn secondary small" id="request-address-btn" data-deal-id="' + esc(deal.DealID) + '">Request Address Access</button>' +
         '<div class="small-muted" style="margin-top:6px;">Pitch off the general deal info first — only use this once a buyer has responded, is genuinely interested, and specifically asks you for the address. This just emails admin to ask; it does not grant it.</div></div>' : "") +
     '</div>' +
@@ -2600,6 +2625,7 @@ function openDealModal() {
   document.getElementById("deal-sensitive-drive-input").value = "";
   document.getElementById("deal-admin-notes-input").value = "";
   document.getElementById("deal-source-link-input").value = "";
+  document.getElementById("deal-pictureslink-input").value = "";
   document.getElementById("deal-assignmode-input").value = "";
   const statusSelect = document.getElementById("deal-status-input");
   statusSelect.innerHTML = statusOptionsCache.map(function (s) { return '<option value="' + esc(s) + '">' + esc(s) + '</option>'; }).join("");
@@ -2656,7 +2682,8 @@ document.getElementById("deal-modal-save").addEventListener("click", async funct
     generalDriveLink: document.getElementById("deal-general-drive-input").value.trim(),
     sensitiveDriveLink: document.getElementById("deal-sensitive-drive-input").value.trim(),
     adminPrivateNotes: document.getElementById("deal-admin-notes-input").value.trim(),
-    sourceLink: document.getElementById("deal-source-link-input").value.trim()
+    sourceLink: document.getElementById("deal-source-link-input").value.trim(),
+    picturesLink: document.getElementById("deal-pictureslink-input").value.trim()
   };
   const assignMode = document.getElementById("deal-assignmode-input").value;
   const res = await api("adminAddDeal", { data: data, assignMode: assignMode });
@@ -2670,7 +2697,7 @@ document.getElementById("deal-modal-save").addEventListener("click", async funct
   document.getElementById("deal-modal").hidden = true;
   await loadAdminDeals();
   let msg = assignMode ? "Deal added and assigned to " + res.assignedCount + " rep(s)." : "Deal added.";
-  if (res.publicPageUrl) msg += " Public page published.";
+  if (res.publicPageUrl) msg += " Public page published" + (res.photoCount ? " with " + res.photoCount + " photo(s)." : ".");
   else if (res.pageGenError) msg += " Public page could not be built yet (" + res.pageGenError + ") — try Create Deal Artifact Page from the deal detail once Script Properties are set.";
   showToast(msg, !!res.pageGenError && !res.publicPageUrl && !!data.sourceLink);
 });

@@ -283,6 +283,8 @@ function doPost(e) {
         return jsonOut(withSession(body, addPitchContact));
       case 'requestAddressAccess':
         return jsonOut(withSession(body, requestAddressAccess));
+      case 'publicRequestAddressAccess':
+        return jsonOut(withSession(body, publicRequestAddressAccess));
       case 'importBuyerLeads':
         return jsonOut(withSession(body, importBuyerLeads));
       case 'getMyBuyerLeads':
@@ -1162,15 +1164,27 @@ function adminAddDeal(body) {
   // which also now builds a missing page even on an unchanged price. Best
   // effort only: a Claude/GitHub hiccup here must never block the deal
   // itself from being created, so this is swallowed into pageGenError
-  // rather than failing the whole call. No photos get published from
-  // here (no Pictures Link to work from yet) -- admin can add those via
-  // Create Deal Artifact Page whenever they're ready.
+  // rather than failing the whole call. If a Pictures Link is also given,
+  // photos publish first (same as Create Deal Artifact Page does later)
+  // so the very first version of the page already has them, instead of
+  // requiring that as a separate manual step.
   let publicPageUrl = '';
   let pageGenError = '';
+  let photoCount = 0;
   if (d.sourceLink) {
     try {
       const newMatch = sheetToObjects(sheet).find(function (r) { return r['DealID'] === dealId; });
       if (newMatch) {
+        if (d.picturesLink) {
+          sheet.getRange(newMatch._row, getColumnIndex(sheet, 'ArtifactPicturesLink')).setValue(d.picturesLink);
+          const photoResult = publishDealPhotosFromDrive(dealId, d.picturesLink);
+          sheet.getRange(newMatch._row, getColumnIndex(sheet, 'ArtifactPhotoPaths')).setValue(photoResult.paths.join(','));
+          sheet.getRange(newMatch._row, getColumnIndex(sheet, 'ArtifactPhotoTotalFound')).setValue(photoResult.totalFound);
+          newMatch['ArtifactPicturesLink'] = d.picturesLink;
+          newMatch['ArtifactPhotoPaths'] = photoResult.paths.join(',');
+          newMatch['ArtifactPhotoTotalFound'] = photoResult.totalFound;
+          photoCount = photoResult.paths.length;
+        }
         publicPageUrl = regenerateAndPublishDealPage(newMatch);
         sheet.getRange(newMatch._row, getColumnIndex(sheet, 'PublicPageUrl')).setValue(publicPageUrl);
         sheet.getRange(newMatch._row, getColumnIndex(sheet, 'LastPriceSyncAt')).setValue(now);
@@ -1193,7 +1207,7 @@ function adminAddDeal(body) {
     dealDraftHtml(d, dealTypes)
   );
 
-  return { ok: true, dealId: dealId, assignedCount: assignedCount, beehiivDraftUrl: draftUrl, publicPageUrl: publicPageUrl, pageGenError: pageGenError };
+  return { ok: true, dealId: dealId, assignedCount: assignedCount, beehiivDraftUrl: draftUrl, publicPageUrl: publicPageUrl, pageGenError: pageGenError, photoCount: photoCount };
 }
 
 // Plain, readable HTML for the auto-drafted "new deal" email -- deliberately
@@ -2002,7 +2016,29 @@ function generateDealPageHtml(deal, sourceListingText, photoPaths, morePhotosLin
   if (html.toLowerCase().indexOf('<!doctype') === -1 && html.toLowerCase().indexOf('<html') === -1) {
     throw new Error('Claude did not return an HTML document.');
   }
-  return html;
+  // The real "Request the Address" mechanism is appended here in fixed
+  // code, not left to the prompt above -- Claude's copy already says an
+  // address is available on request (see the address-redaction rule
+  // above), but that's just text; this is the actual working button,
+  // deep-linking into the app's login/signup + the address-grant system
+  // (see publicRequestAddressAccess), so it behaves identically on every
+  // generated page regardless of whatever layout Claude produced.
+  const withAddressRequest = /<\/body>/i.test(html)
+    ? html.replace(/<\/body>/i, requestAddressButtonHtml(deal['DealID']) + '</body>')
+    : html + requestAddressButtonHtml(deal['DealID']);
+  return withAddressRequest;
+}
+
+function requestAddressButtonHtml(dealId) {
+  const url = 'https://sendmybuyer.com/?requestAddress=' + encodeURIComponent(dealId);
+  return '<div style="max-width:640px;margin:40px auto;padding:28px 24px;text-align:center;' +
+    'font-family:Arial,sans-serif;border-top:1px solid #ddd;">' +
+    '<p style="color:#444;margin-bottom:16px;">Addresses are shared with wholesalers who already have ' +
+    'an interested buyer for this deal, or with direct buyers reviewing this listing. Log in or create ' +
+    'a free account to request it.</p>' +
+    '<a href="' + esc_(url) + '" style="display:inline-block;padding:12px 28px;background:#1a73e8;' +
+    'color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;">Request the Address</a>' +
+    '</div>';
 }
 
 // Creates or overwrites deals/<dealId>.html in the GitHub Pages repo behind
@@ -2584,6 +2620,36 @@ function requestAddressAccess(body, session) {
       ' (' + [deal['City'], deal['State']].filter(Boolean).join(', ') + ').\n\n' +
       (body.note ? 'Note from rep: ' + body.note + '\n\n' : '') +
       'Grant or deny from that deal\'s Address Access section in the admin panel.'
+  });
+  return { ok: true };
+}
+
+// Same idea as requestAddressAccess, deliberately WITHOUT its
+// canAccessDeal gate -- this is reached from a public deal page's "Request
+// the Address" button (see requestAddressButtonHtml), so the person asking
+// very likely has no standing access to this specific deal yet (that's the
+// whole point: a wholesaler with an interested buyer, or a direct buyer,
+// who found this one listing and just signed up). Still requires being
+// logged in (withSession) -- an account is the minimum bar, but which
+// deals that account can already see is irrelevant here.
+function publicRequestAddressAccess(body, session) {
+  if (!body.dealId) return { ok: false, error: 'Missing dealId.' };
+  const deal = sheetToObjects(getSheet(DEALS_SHEET, DEAL_COLUMNS)).find(function (d) { return d['DealID'] === body.dealId; });
+  if (!deal) return { ok: false, error: 'Deal not found.' };
+
+  if (adminGetAutoDiscloseAddressSettings({}).mode === 'all_on_request') {
+    adminGrantAddressAccess({ dealId: body.dealId, username: session.u });
+    return { ok: true, autoGranted: true };
+  }
+
+  const supportEmail = getSupportEmail();
+  if (!supportEmail) return { ok: false, error: 'No support contact is set up yet -- ask admin to set the "Need Help After Signing Up?" contact email in the Team tab.' };
+  MailApp.sendEmail({
+    to: supportEmail,
+    subject: 'SendMyBuyer -- address requested from the public deal page (' + (deal['DealCode'] || deal['DealID']) + ')',
+    body: (session.n || session.u) + ' (' + session.u + ') just logged in from the public deal page and is requesting the full address for ' +
+      (deal['DealCode'] || deal['DealID']) + ' (' + [deal['City'], deal['State']].filter(Boolean).join(', ') + ').\n\n' +
+      'They may not have standing access to this specific deal yet -- grant or deny from that deal\'s Address Access section, assigning them to it first if appropriate.'
   });
   return { ok: true };
 }

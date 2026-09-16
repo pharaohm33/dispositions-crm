@@ -243,6 +243,7 @@
 
 <!-- ================= LOGIN ================= -->
 <div class="wrap" id="login-view">
+  <div class="banner info" id="address-request-banner" hidden>Log in or sign up below to request the address for the deal you were looking at.</div>
   <div class="card" id="login-form-card">
     <h2 class="step-title">Log In</h2>
     <p class="step-sub">Enter your username (or email) and password.</p>
@@ -1144,6 +1145,8 @@
     <div class="banner danger" style="margin-top:16px;">The two fields below are private &mdash; only admin ever sees them.</div>
     <label class="field-label">Source Link <span class="small-muted">(where you found this deal online)</span></label>
     <input type="text" id="deal-source-link-input" placeholder="https://...">
+    <label class="field-label">Pictures Link <span class="small-muted">(Google Drive folder/file — publishes straight to the public deal page if a Source Link is also set above)</span></label>
+    <input type="text" id="deal-pictureslink-input" placeholder="https://drive.google.com/...">
     <label class="field-label">Private Admin Notes</label>
     <textarea id="deal-admin-notes-input"></textarea>
 
