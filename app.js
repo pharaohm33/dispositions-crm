@@ -3541,8 +3541,21 @@ document.getElementById("contactdefaults-save-btn").addEventListener("click", as
   });
   btn.disabled = false;
   if (!res.ok) { resultEl.textContent = res.error || "Could not save."; showToast(res.error || "Could not save.", true); return; }
-  resultEl.textContent = "Saved — regenerate a deal's page (or Regenerate All) for this to show up on it.";
+  resultEl.textContent = "Saved — only applies to deals created from now on, never retroactively.";
   showToast("Contact template saved.");
+});
+
+document.getElementById("contactdefaults-snapshot-btn").addEventListener("click", async function () {
+  const btn = this;
+  const resultEl = document.getElementById("contactdefaults-snapshot-result");
+  if (btn.disabled) return;
+  btn.disabled = true;
+  resultEl.textContent = "Working…";
+  const res = await api("adminSnapshotContactInfoForAllDeals", {});
+  btn.disabled = false;
+  if (!res.ok) { resultEl.textContent = res.error || "Could not run this."; showToast(res.error || "Could not run this.", true); return; }
+  resultEl.textContent = "Locked in current template for " + res.updatedCount + " deal(s) that were missing it.";
+  showToast("Done.");
 });
 
 document.getElementById("autoapprove-save-btn").addEventListener("click", async function () {

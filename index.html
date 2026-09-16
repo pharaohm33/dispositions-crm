@@ -683,7 +683,7 @@
 
     <div class="card">
       <div class="section-title" style="margin-top:0;">Contact &amp; Company Template</div>
-      <p class="small-muted">Used on every generated public deal page (and the address-disclosure disclaimer inside the app) unless a specific deal overrides one of these on its own Edit Deal screen — handy if you ever run a deal under a different phone number or entity.</p>
+      <p class="small-muted">Applied to a deal only ONCE, at the moment it's created (or via the backfill button below) — every deal then keeps its own locked-in company name/phone/email permanently, even if you change this template later. That's deliberate: if you're running several companies, editing this here only ever affects deals created after the change, never mixes up which company an existing deal is already under. To change an existing deal's company/contact, edit that specific deal instead.</p>
       <label class="field-label">Company Name</label>
       <input type="text" id="contactdefaults-company-input" placeholder="JNA Dynamic Holdings LLC">
       <label class="field-label">Contact Phone</label>
@@ -694,6 +694,11 @@
         <button class="btn secondary small" id="contactdefaults-save-btn">Save</button>
       </div>
       <div id="contactdefaults-result" class="small-muted"></div>
+      <div class="nav-row" style="justify-content:flex-start; margin-top:14px; padding-top:14px; border-top:1px solid var(--border);">
+        <button class="btn secondary small" id="contactdefaults-snapshot-btn">Lock In Current Template For Deals Missing It</button>
+      </div>
+      <p class="small-muted" style="margin-top:6px;">One-time catch-up for any deal added before this locking behavior existed — never touches a deal that already has its own company/phone/email set.</p>
+      <div id="contactdefaults-snapshot-result" class="small-muted"></div>
     </div>
 
     <div class="card">

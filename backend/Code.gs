@@ -436,6 +436,8 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminGetContactDefaults));
       case 'adminSetContactDefaults':
         return jsonOut(withAdminSession(body, adminSetContactDefaults));
+      case 'adminSnapshotContactInfoForAllDeals':
+        return jsonOut(withAdminSession(body, adminSnapshotContactInfoForAllDeals));
       case 'adminRunAutoFeedNow':
         return jsonOut(withAdminSession(body, adminRunAutoFeedNow));
       case 'adminAddStatusOption':
@@ -1113,6 +1115,27 @@ function adminSetContactDefaults(body) {
   return { ok: true };
 }
 
+// One-time catch-up for deals created before contact info started
+// snapshotting at creation (see adminAddDeal) -- any deal still missing
+// one of the three fields gets today's resolved value locked into its own
+// row, right now, so it stops floating against whatever the default
+// happens to be later. Safe to run again any time: a deal that already
+// has all three set is left completely untouched.
+function adminSnapshotContactInfoForAllDeals() {
+  const sheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const deals = sheetToObjects(sheet);
+  let updatedCount = 0;
+  deals.forEach(function (d) {
+    if (d['ContactPhone'] && d['ContactEmail'] && d['CompanyName']) return;
+    const info = resolveDealContactInfo(d);
+    if (!d['ContactPhone']) sheet.getRange(d._row, getColumnIndex(sheet, 'ContactPhone')).setValue(info.phone);
+    if (!d['ContactEmail']) sheet.getRange(d._row, getColumnIndex(sheet, 'ContactEmail')).setValue(info.email);
+    if (!d['CompanyName']) sheet.getRange(d._row, getColumnIndex(sheet, 'CompanyName')).setValue(info.company);
+    updatedCount++;
+  });
+  return { ok: true, updatedCount: updatedCount };
+}
+
 function computeGrossMargin(deal) {
   const arv = parseMoney(deal['ARV']);
   const rehab = parseMoney(deal['RehabEstimate']);
@@ -1193,6 +1216,15 @@ function adminAddDeal(body) {
   // info nothing on a deal could ever be checked against.
   const dealTypes = (Array.isArray(d.dealTypes) ? d.dealTypes : splitCommaList(d.dealTypes)).filter(function (t) { return BUY_BOX_DEAL_TYPES.indexOf(t) !== -1; });
   const financingType = FINANCING_TYPES.indexOf(d.financingType) !== -1 ? d.financingType : '';
+  // Resolved and snapshotted into the deal's own row NOW, at creation --
+  // never left blank to "float" against whatever the site default happens
+  // to be later. Without this, changing the default template (e.g.
+  // switching which company you're primarily running) would silently
+  // change every OLD deal's contact info too the next time its page
+  // regenerates, mixing up which company a given deal is actually under.
+  // A blank field on the Add Deal form still means "use today's default"
+  // -- it's only resolved once, right here, then locked in.
+  const contactInfo = resolveDealContactInfo({ ContactPhone: d.contactPhone, ContactEmail: d.contactEmail, CompanyName: d.companyName });
   appendRowByHeaders(sheet, {
     'DealID': dealId, 'DealCode': d.dealCode || '', 'Address': d.address, 'City': d.city || '', 'State': d.state || '', 'Zip': d.zip || '',
     'County': d.county || '', 'MatchCities': d.matchCities || '', 'AssetType': d.assetType || '', 'AssetCategory': d.assetCategory || '',
@@ -1201,7 +1233,7 @@ function adminAddDeal(body) {
     'Description': d.description || '', 'GeneralDriveLink': d.generalDriveLink || '', 'SensitiveDriveLink': d.sensitiveDriveLink || '',
     'AdminPrivateNotes': d.adminPrivateNotes || '', 'SourceLink': d.sourceLink || '',
     'CreatedAt': now, 'UpdatedAt': now, 'DealTypes': dealTypes.join(', '), 'FinancingType': financingType,
-    'ContactPhone': d.contactPhone || '', 'ContactEmail': d.contactEmail || '', 'CompanyName': d.companyName || ''
+    'ContactPhone': contactInfo.phone, 'ContactEmail': contactInfo.email, 'CompanyName': contactInfo.company
   });
 
   const assignedCount = applyDealAssignMode(dealId, d.assetCategory, body.assignMode, now);
