@@ -1039,9 +1039,8 @@ async function openRepDealDetail(dealId) {
       (deal.AsIsValue ? '<div><strong>As-Is Value:</strong> ' + esc(formatAdminMoney(deal.AsIsValue)) + '</div>' : "") +
       (deal.AsIsValue ? '<div><strong>As-Is Equity:</strong> ' + formatAsIsEquity(deal.AsIsEquity) + '</div>' : "") +
       (deal.FinancingType ? '<div><strong>Financing Type:</strong> ' + esc(deal.FinancingType) + '</div>' : "") +
-      (deal.Description ? '<div style="margin-top:8px;">' + esc(deal.Description) + '</div>' : "") +
+      dealDescriptionWithLinkHtml(deal) +
       (deal.GeneralDriveLink ? '<div style="margin-top:8px;"><a href="' + esc(deal.GeneralDriveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
-      (deal.PublicPageUrl ? '<div style="margin-top:8px;"><strong>Deal Page:</strong> <a href="' + esc(deal.PublicPageUrl) + '" target="_blank" rel="noopener">' + esc(deal.PublicPageUrl) + '</a> <span class="small-muted">(share this with buyers)</span></div>' : "") +
       addressRevealHtml(deal) +
       (!deal.Address ? '<div style="margin-top:10px;"><button class="btn secondary small" id="request-address-btn" data-deal-id="' + esc(deal.DealID) + '">Request Address Access</button>' +
         '<div class="small-muted" style="margin-top:6px;">Pitch off the general deal info first — only use this once a buyer has responded, is genuinely interested, and specifically asks you for the address. This just emails admin to ask; it does not grant it.</div></div>' : "") +
@@ -1510,6 +1509,18 @@ function wireRequestAddressButton() {
 // deal running under a different entity shows the right name here too.
 // Wired once, globally, via the delegated listeners below -- every call
 // site gets working checkbox/button behavior for free, no per-render wiring.
+// The public deal page link, appended directly under the description
+// text itself (not a separate labeled row elsewhere on the page) -- reads
+// live off the deal record every render, so it's always current with no
+// regeneration step needed if the page URL ever changes.
+function dealDescriptionWithLinkHtml(deal) {
+  if (!deal.Description && !deal.PublicPageUrl) return "";
+  const linkHtml = deal.PublicPageUrl
+    ? '<div style="margin-top:8px;"><a href="' + esc(deal.PublicPageUrl) + '" target="_blank" rel="noopener">View full listing page</a> <span class="small-muted">(share this with buyers)</span></div>'
+    : "";
+  return '<div style="margin-top:8px;">' + (deal.Description ? esc(deal.Description) : "") + linkHtml + '</div>';
+}
+
 function addressRevealHtml(deal) {
   if (!deal.Address) return "";
   const company = esc(deal.ResolvedCompanyName || "the Disposition Manager");
@@ -1564,14 +1575,16 @@ function renderPitchDealInfo(deal) {
       (deal.AsIsValue ? '<div><strong>As-Is Equity:</strong> ' + formatAsIsEquity(deal.AsIsEquity) + '</div>' : "") +
       (deal.FinancingType ? '<div><strong>Financing Type:</strong> ' + esc(deal.FinancingType) + '</div>' : "") +
       (deal.GeneralDriveLink ? '<div style="margin-top:8px;"><strong>Deal Documents:</strong> <a href="' + esc(deal.GeneralDriveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
-      (deal.PublicPageUrl ? '<div style="margin-top:8px;"><strong>Deal Page:</strong> <a href="' + esc(deal.PublicPageUrl) + '" target="_blank" rel="noopener">' + esc(deal.PublicPageUrl) + '</a> <span class="small-muted">(share this with buyers)</span></div>' : "") +
       (!deal.Address ? '<div style="margin-top:10px;"><button class="btn secondary small" id="request-address-btn" data-deal-id="' + esc(deal.DealID) + '">Request Address Access</button>' +
         '<div class="small-muted" style="margin-top:6px;">Pitch off the general deal info first — only use this once a buyer has responded, is genuinely interested, and specifically asks you for the address. This just emails admin to ask; it does not grant it.</div></div>' : "") +
     '</div>' +
     (deal.Description
       ? '<details open style="margin-top:10px;"><summary style="cursor:pointer; font-weight:600;">Description / Notes <span class="small-muted">(click to collapse)</span></summary>' +
-        '<div style="margin-top:6px; white-space:pre-wrap;">' + esc(deal.Description) + '</div></details>'
-      : "")
+        '<div style="margin-top:6px; white-space:pre-wrap;">' + esc(deal.Description) + '</div>' +
+        (deal.PublicPageUrl ? '<div style="margin-top:8px;"><a href="' + esc(deal.PublicPageUrl) + '" target="_blank" rel="noopener">View full listing page</a> <span class="small-muted">(share this with buyers)</span></div>' : "") +
+        '</details>'
+      : (deal.PublicPageUrl ? '<div style="margin-top:10px;"><a href="' + esc(deal.PublicPageUrl) + '" target="_blank" rel="noopener">View full listing page</a> <span class="small-muted">(share this with buyers)</span></div>' : "")
+    )
   );
 }
 
