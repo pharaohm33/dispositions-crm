@@ -3,441 +3,532 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bartow, FL — Assignment Opportunity | JNA Dynamic Holdings LLC</title>
+<title>Bartow, FL — Off-Market Assignment | JNA Dynamic Holdings LLC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; }
-  html, body {
-    margin: 0;
-    padding: 0;
-    background: #f3ede3;
-    color: #2b241c;
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    line-height: 1.55;
+  :root{
+    --paper:#f6f1e9;
+    --paper2:#efe8db;
+    --ink:#221d17;
+    --ink-soft:#4a4238;
+    --line:#ddd3c1;
+    --brass:#9c7a3c;
+    --brass-dark:#7a5f2e;
+    --green:#3f5a44;
   }
-  h1, h2, h3, .serif {
-    font-family: 'Source Serif 4', serif;
-    font-weight: 600;
-    color: #201a12;
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    line-height:1.55;
   }
-  a { color: #7a3b1f; }
+  h1,h2,h3,h4{
+    font-family:'Source Serif 4', serif;
+    font-weight:600;
+    color:var(--ink);
+    margin:0;
+  }
+  .wrap{
+    max-width:960px;
+    margin:0 auto;
+    padding-left:24px;
+    padding-right:24px;
+  }
+  a{color:var(--brass-dark);}
 
-  .wrap {
-    max-width: 960px;
-    margin: 0 auto;
-    padding-left: 24px;
-    padding-right: 24px;
+  header.topbar{
+    background:var(--ink);
+    color:#f4efe4;
+    padding-top:14px;
+    padding-bottom:14px;
   }
-
-  header.topband {
-    background: #201a12;
-    color: #f3ede3;
-    padding-top: 14px;
-    padding-bottom: 14px;
+  header.topbar .wrap{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
   }
-  header.topband .brand {
-    font-family: 'Source Serif 4', serif;
-    font-size: 1.05rem;
-    letter-spacing: 0.03em;
+  header.topbar .brand{
+    font-family:'Source Serif 4', serif;
+    font-size:1.15rem;
+    letter-spacing:0.02em;
   }
-  header.topband .tag {
-    font-size: 0.8rem;
-    color: #cbb99a;
-  }
-
-  section.hero {
-    margin-top: 42px;
-    margin-bottom: 18px;
-  }
-  .dealcode {
-    display: inline-block;
-    background: #e7d9bd;
-    color: #4a3a20;
-    font-size: 0.78rem;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    padding: 5px 12px;
-    border-radius: 3px;
-    margin-bottom: 14px;
-  }
-  h1.title {
-    font-size: 2.4rem;
-    margin-top: 0;
-    margin-bottom: 6px;
-    line-height: 1.15;
-  }
-  .locline {
-    font-size: 1.05rem;
-    color: #5a4c38;
-    margin-top: 0;
-    margin-bottom: 4px;
-  }
-  .addr-note {
-    font-size: 0.92rem;
-    font-style: italic;
-    color: #7a3b1f;
-    margin-top: 6px;
-    margin-bottom: 22px;
+  header.topbar .tagline{
+    font-size:0.8rem;
+    color:#cbbfa3;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
   }
 
-  .price-block {
-    background: #fffdf8;
-    border: 1px solid #ddcda9;
-    border-radius: 8px;
-    padding: 22px 26px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 28px;
-    margin-top: 10px;
-    margin-bottom: 10px;
+  .hero{
+    padding-top:44px;
+    padding-bottom:20px;
+    border-bottom:1px solid var(--line);
   }
-  .price-item .label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: #7a6a4e;
-    margin-bottom: 4px;
+  .dealcode{
+    display:inline-block;
+    background:var(--paper2);
+    border:1px solid var(--line);
+    color:var(--brass-dark);
+    font-size:0.78rem;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:5px 12px;
+    border-radius:3px;
+    margin-bottom:14px;
   }
-  .price-item .value {
-    font-family: 'Source Serif 4', serif;
-    font-size: 1.6rem;
-    color: #201a12;
+  .hero h1{
+    font-size:2.4rem;
+    line-height:1.15;
+    margin-bottom:10px;
   }
-  .price-item .value.big {
-    font-size: 2.1rem;
-    color: #7a3b1f;
+  .hero .loc{
+    font-size:1.05rem;
+    color:var(--ink-soft);
+    margin-bottom:8px;
+  }
+  .addr-note{
+    background:#fbf6ea;
+    border:1px solid var(--brass);
+    color:var(--brass-dark);
+    font-size:0.92rem;
+    padding:10px 14px;
+    border-radius:4px;
+    display:inline-block;
+    margin-top:8px;
+    margin-bottom:8px;
+  }
+  .badges{
+    margin-top:14px;
+  }
+  .badge{
+    display:inline-block;
+    font-size:0.78rem;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    background:var(--green);
+    color:#f4efe4;
+    padding:4px 11px;
+    border-radius:20px;
+    margin-right:6px;
+    margin-bottom:6px;
   }
 
-  .gallerywrap {
-    margin-top: 26px;
-    margin-bottom: 8px;
+  .price-band{
+    background:var(--paper2);
+    border-bottom:1px solid var(--line);
+    padding-top:26px;
+    padding-bottom:26px;
   }
-  .gallery {
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    padding-bottom: 10px;
-    scroll-snap-type: x mandatory;
+  .price-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
   }
-  .gallery img {
-    height: 230px;
-    width: auto;
-    border-radius: 6px;
-    scroll-snap-align: start;
-    flex: 0 0 auto;
-    border: 1px solid #ddcda9;
+  .price-item{
+    min-width:160px;
   }
-  .more-photos {
-    margin-top: 6px;
-    margin-bottom: 30px;
-    font-size: 0.9rem;
+  .price-item .label{
+    font-size:0.78rem;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .price-item .value{
+    font-family:'Source Serif 4', serif;
+    font-size:1.7rem;
+    color:var(--ink);
+  }
+  .price-item.main .value{
+    color:var(--brass-dark);
+    font-size:2.1rem;
   }
 
-  section.block {
-    margin-top: 40px;
-    margin-bottom: 40px;
+  .gallery-section{
+    padding-top:26px;
+    padding-bottom:10px;
   }
-  section.block h2 {
-    font-size: 1.5rem;
-    border-bottom: 2px solid #d8c69f;
-    padding-bottom: 8px;
-    margin-bottom: 16px;
+  .gallery{
+    display:flex;
+    overflow-x:auto;
+    gap:12px;
+    padding-bottom:12px;
+    scroll-snap-type:x mandatory;
   }
-  p { margin-top: 0; margin-bottom: 14px; }
+  .gallery img{
+    height:230px;
+    width:auto;
+    flex:0 0 auto;
+    border-radius:6px;
+    border:1px solid var(--line);
+    scroll-snap-align:start;
+    object-fit:cover;
+  }
+  .more-photos{
+    font-size:0.9rem;
+    margin-top:6px;
+    display:inline-block;
+  }
 
-  table.facts {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fffdf8;
-    border: 1px solid #ddcda9;
+  section{
+    padding-top:36px;
+    padding-bottom:36px;
+    border-bottom:1px solid var(--line);
   }
-  table.facts th, table.facts td {
-    text-align: left;
-    padding: 10px 14px;
-    border-bottom: 1px solid #e6d9ba;
-    font-size: 0.95rem;
-    vertical-align: top;
+  section:last-of-type{
+    border-bottom:none;
   }
-  table.facts th {
-    width: 38%;
-    color: #5a4c38;
-    font-weight: 600;
+  section h2{
+    font-size:1.5rem;
+    margin-bottom:14px;
   }
-  table.facts tr:last-child th, table.facts tr:last-child td { border-bottom: none; }
+  section h3{
+    font-size:1.1rem;
+    margin-top:20px;
+    margin-bottom:8px;
+    color:var(--brass-dark);
+  }
+  p{
+    margin-top:0;
+    margin-bottom:12px;
+    color:var(--ink-soft);
+  }
 
-  .comp-card {
-    background: #fffdf8;
-    border: 1px solid #ddcda9;
-    border-radius: 6px;
-    padding: 14px 18px;
-    margin-top: 12px;
-    margin-bottom: 12px;
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:8px;
+    margin-bottom:8px;
+    font-size:0.95rem;
   }
-  .comp-card .name { font-weight: 600; color: #201a12; }
-  .comp-card .meta { font-size: 0.9rem; color: #5a4c38; }
+  table td, table th{
+    text-align:left;
+    padding:9px 8px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  table th{
+    color:var(--ink-soft);
+    font-weight:600;
+    width:40%;
+  }
 
-  ul.clean { padding-left: 20px; margin-top: 0; margin-bottom: 14px; }
-  ul.clean li { margin-bottom: 6px; }
+  .comp-card{
+    background:var(--paper2);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:14px 16px;
+    margin-top:12px;
+    margin-bottom:12px;
+  }
+  .comp-card .title{
+    font-weight:600;
+    margin-bottom:4px;
+  }
+  .comp-card .meta{
+    font-size:0.9rem;
+    color:var(--ink-soft);
+  }
 
-  .disclosure {
-    background: #eee3cd;
-    border: 1px solid #d8c69f;
-    border-radius: 6px;
-    padding: 18px 22px;
-    font-size: 0.9rem;
-    color: #4a3a20;
+  ul{
+    color:var(--ink-soft);
+    margin-top:0;
+    margin-bottom:12px;
+    padding-left:20px;
   }
-  .disclosure p:last-child { margin-bottom: 0; }
+  li{margin-bottom:6px;}
 
-  footer.cta {
-    background: #201a12;
-    color: #f3ede3;
-    padding-top: 46px;
-    padding-bottom: 46px;
-    margin-top: 60px;
+  .disclosure-box{
+    background:var(--paper2);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:16px 18px;
+    font-size:0.9rem;
+    color:var(--ink-soft);
   }
-  footer.cta h2 {
-    color: #f3ede3;
-    font-size: 1.9rem;
-    margin-top: 0;
-    margin-bottom: 10px;
-    border-bottom: none;
+  .disclosure-box p{margin-bottom:10px;}
+  .disclosure-box p:last-child{margin-bottom:0;}
+
+  .cta-band{
+    background:var(--ink);
+    color:#f4efe4;
+    padding-top:40px;
+    padding-bottom:40px;
+    border-bottom:none;
   }
-  footer.cta p {
-    color: #cbb99a;
-    font-size: 1rem;
-    margin-bottom: 24px;
+  .cta-band h2{
+    color:#f4efe4;
+    font-size:1.8rem;
+    margin-bottom:10px;
   }
-  .cta-contacts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
+  .cta-band p{
+    color:#d8cdb6;
+    max-width:620px;
   }
-  .cta-contacts a {
-    display: inline-block;
-    background: #f3ede3;
-    color: #201a12;
-    font-weight: 600;
-    padding: 12px 22px;
-    border-radius: 4px;
-    text-decoration: none;
-    font-size: 1rem;
+  .cta-links{
+    margin-top:18px;
   }
-  .fineprint {
-    color: #8a7a5c;
-    font-size: 0.8rem;
-    margin-top: 30px;
-    margin-bottom: 0;
+  .cta-links a{
+    display:inline-block;
+    background:var(--brass);
+    color:#221d17;
+    font-weight:600;
+    text-decoration:none;
+    padding:12px 20px;
+    border-radius:4px;
+    margin-right:12px;
+    margin-top:8px;
+  }
+  .cta-links a.secondary{
+    background:transparent;
+    border:1px solid #cbbfa3;
+    color:#f4efe4;
+  }
+
+  footer{
+    background:var(--ink);
+    color:#a99f8a;
+    font-size:0.8rem;
+    padding-top:18px;
+    padding-bottom:18px;
+    text-align:center;
   }
 </style>
 </head>
 <body>
 
-<header class="topband">
+<header class="topbar">
   <div class="wrap">
     <div class="brand">JNA Dynamic Holdings LLC</div>
-    <div class="tag">Assignment of Contract Opportunities</div>
+    <div class="tagline">Assignment of Contract Opportunities</div>
   </div>
 </header>
 
-<div class="wrap">
+<section class="hero">
+  <div class="wrap">
+    <span class="dealcode">FL-2 (SFH) &mdash; Lowest On Market Under Contract In Area</span>
+    <h1>Two-Story Block Build in Bartow, Florida</h1>
+    <div class="loc">Bartow, Polk County, FL 33830</div>
+    <div class="addr-note">Address available upon request &mdash; contact us for the full property address.</div>
+    <div class="badges">
+      <span class="badge">Fix and Flip</span>
+      <span class="badge">Buy and Hold</span>
+    </div>
+  </div>
+</section>
 
-  <section class="hero">
-    <span class="dealcode">FL-2 (SFH) — Lowest On Market Under Contract In Area</span>
-    <h1 class="title">Two-Story Block-Built Four Bedroom in a Street of Higher-Priced Sales</h1>
-    <p class="locline">Bartow, Polk County, Florida</p>
-    <p class="addr-note">Address available upon request — contact us for the full property address.</p>
-
-    <div class="price-block">
-      <div class="price-item">
+<section class="price-band">
+  <div class="wrap">
+    <div class="price-grid">
+      <div class="price-item main">
         <div class="label">Assignment Price</div>
-        <div class="value big">$275,000</div>
+        <div class="value">$275,000</div>
       </div>
       <div class="price-item">
-        <div class="label">Contract Asking Price</div>
-        <div class="value">$275,990</div>
-      </div>
-      <div class="price-item">
-        <div class="label">ARV</div>
+        <div class="label">After Repair Value (ARV)</div>
         <div class="value">$450,000+</div>
       </div>
       <div class="price-item">
-        <div class="label">Gross Spread</div>
-        <div class="value">$174,010+</div>
-      </div>
-      <div class="price-item">
-        <div class="label">JNA Rehab Estimate</div>
+        <div class="label">JNA Estimated Rehab</div>
         <div class="value">$15,000</div>
       </div>
+      <div class="price-item">
+        <div class="label">Gross Spread (as reported)</div>
+        <div class="value">$174,010+</div>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section class="gallerywrap">
+<section class="gallery-section">
+  <div class="wrap">
     <div class="gallery">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/1.jpg" alt="Front exterior of the Bartow, FL two-story block home">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/2.jpg" alt="Exterior view of the Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/3.jpg" alt="Front elevation of the property in Bartow, FL">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/4.jpg" alt="Driveway and garage view of the Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/5.jpg" alt="Living area interior of the Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/6.jpg" alt="Living room of the Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/7.jpg" alt="Kitchen area of the Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/8.jpg" alt="Kitchen view of the Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/9.jpg" alt="Dining area of the Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/10.jpg" alt="Bedroom of the Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/11.jpg" alt="Primary bedroom of the Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/12.jpg" alt="Bedroom two of the Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/13.jpg" alt="Bedroom three of the Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/14.jpg" alt="Bathroom of the Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/15.jpg" alt="Second bathroom of the Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/16.jpg" alt="Third bathroom of the Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/17.jpg" alt="Hallway of the Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/18.jpg" alt="Staircase of the two-story Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/19.jpg" alt="Upstairs area of the Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/20.jpg" alt="Laundry area of the Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/21.jpg" alt="Garage of the Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/22.jpg" alt="Backyard of the Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/23.jpg" alt="Side exterior of the Bartow, FL property">
-      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/24.jpg" alt="Additional exterior view of the Bartow, FL property">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/1.jpg" alt="Bartow FL property photo 1">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/2.jpg" alt="Bartow FL property photo 2">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/3.jpg" alt="Bartow FL property photo 3">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/4.jpg" alt="Bartow FL property photo 4">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/5.jpg" alt="Bartow FL property photo 5">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/6.jpg" alt="Bartow FL property photo 6">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/7.jpg" alt="Bartow FL property photo 7">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/8.jpg" alt="Bartow FL property photo 8">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/9.jpg" alt="Bartow FL property photo 9">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/10.jpg" alt="Bartow FL property photo 10">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/11.jpg" alt="Bartow FL property photo 11">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/12.jpg" alt="Bartow FL property photo 12">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/13.jpg" alt="Bartow FL property photo 13">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/14.jpg" alt="Bartow FL property photo 14">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/15.jpg" alt="Bartow FL property photo 15">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/16.jpg" alt="Bartow FL property photo 16">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/17.jpg" alt="Bartow FL property photo 17">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/18.jpg" alt="Bartow FL property photo 18">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/19.jpg" alt="Bartow FL property photo 19">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/20.jpg" alt="Bartow FL property photo 20">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/21.jpg" alt="Bartow FL property photo 21">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/22.jpg" alt="Bartow FL property photo 22">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/23.jpg" alt="Bartow FL property photo 23">
+      <img src="/deals/5f711f75-332d-4439-90a3-f44b0e378240/photos/24.jpg" alt="Bartow FL property photo 24">
     </div>
-    <div class="more-photos">
-      <a href="https://drive.google.com/drive/folders/1dycOXmwl3N_OX_pactbHmNIINko4Jcq6?usp=sharing" target="_blank" rel="noopener">View full photo set</a>
-    </div>
-  </section>
+    <a class="more-photos" href="https://drive.google.com/drive/folders/1dycOXmwl3N_OX_pactbHmNIINko4Jcq6?usp=sharing" target="_blank" rel="noopener">View all photos &rarr;</a>
+  </div>
+</section>
 
-  <section class="block">
-    <h2>The Pitch</h2>
-    <p>This is a 2013 block build, two stories, 2,907 square feet, four bedrooms, three bathrooms, two-car garage, brand-new 2026 HVAC, and the seller reports it is mostly move-in ready. We are asking $275,990 on the underlying contract — that is $95 a square foot on a house that is thirteen years old.</p>
-    <p>A comparable home on the same street, a 2014 build with 2,454 square feet, closed at $485,000 in May of this year and went pending in 13 days. That house is 453 square feet smaller than this one. Another comparable home further down the same street, 2,360 square feet, closed at $405,000 the following month — also smaller. Same street, same builder era, same block construction.</p>
-    <p>This is the largest of the three homes at the lowest price by a margin that is not close.</p>
-  </section>
+<section>
+  <div class="wrap">
+    <h2>Overview</h2>
+    <p>This is a 2013 block build, two stories, 2,907 square feet, four bedrooms, three bathrooms, two-car garage, with a brand-new 2026 HVAC system, and the seller reports it is mostly move-in ready. The subject is being offered at $275,000 as an assignment of contract price, which the underlying deal documents originally listed at $275,990 &mdash; roughly $95 per square foot on a house that is thirteen years old.</p>
+    <p>Two doors down on the same street, a 2014 build with 2,454 square feet closed at $485,000 this year in 13 days on market. That home is 453 square feet smaller than the subject. In the other direction, a 2,360-square-foot home on the same street closed at $405,000, also smaller than the subject. Same street, same builder era, same block construction &mdash; this is the largest of the three homes, offered at the lowest price by a wide margin.</p>
+  </div>
+</section>
 
-  <section class="block">
+<section>
+  <div class="wrap">
     <h2>The Numbers</h2>
-    <table class="facts">
-      <tr><th>Contract Asking Price</th><td>$275,990</td></tr>
+    <table>
+      <tr><th>Asking Price (as reported in deal file)</th><td>$275,990</td></tr>
+      <tr><th>Assignment Price</th><td>$275,000</td></tr>
       <tr><th>ARV</th><td>$450,000+</td></tr>
       <tr><th>Gross Spread</th><td>$174,010+</td></tr>
-      <tr><th>Price per Sq. Ft. at Asking</th><td>$95</td></tr>
-      <tr><th>ARV per Sq. Ft.</th><td>$155</td></tr>
-      <tr><th>Comparable Average Price per Sq. Ft.</th><td>$185 to $186</td></tr>
-      <tr><th>Adjusted ARV per Comp Report</th><td>$436,411 (range $414,590–$458,232)</td></tr>
-      <tr><th>Rehab Estimate</th><td>No rehab estimate was provided by the seller; buyer to run their own scope and numbers. JNA's internal working estimate is $15,000.</td></tr>
+      <tr><th>Price per sqft at asking</th><td>$95</td></tr>
+      <tr><th>ARV per sqft</th><td>$155</td></tr>
+      <tr><th>Comparable average price per sqft</th><td>$185 to $186</td></tr>
+      <tr><th>Adjusted ARV per comp report</th><td>$436,411 (range $414,590 &ndash; $458,232)</td></tr>
     </table>
-  </section>
+    <p>No formal rehab estimate was provided by the seller; buyer is expected to run their own scope and numbers. JNA Dynamic Holdings LLC's own working estimate for cosmetic scope is $15,000, subject to buyer's independent inspection.</p>
+  </div>
+</section>
 
-  <section class="block">
+<section>
+  <div class="wrap">
     <h2>Property Snapshot</h2>
-    <table class="facts">
-      <tr><th>Location</th><td>Bartow, Polk County, FL 33830 — address available on request</td></tr>
+    <table>
+      <tr><th>City / State / ZIP</th><td>Bartow, FL 33830</td></tr>
+      <tr><th>County</th><td>Polk</td></tr>
       <tr><th>Beds / Baths</th><td>4 Bed / 3 Bath</td></tr>
       <tr><th>Parking</th><td>2-Car Garage</td></tr>
-      <tr><th>Square Feet (per tax records)</th><td>2,907</td></tr>
-      <tr><th>Lot Size</th><td>8,054 sq ft</td></tr>
+      <tr><th>Square Feet (per tax records)</th><td>2,907 sqft</td></tr>
+      <tr><th>Lot Size</th><td>8,054 sqft</td></tr>
       <tr><th>Year Built</th><td>2013</td></tr>
       <tr><th>Construction</th><td>Block, 2-Story</td></tr>
-      <tr><th>Flood Zone</th><td>X — not in a flood zone</td></tr>
+      <tr><th>Flood Zone</th><td>X &mdash; not in a flood zone</td></tr>
       <tr><th>HOA</th><td>$21 per month</td></tr>
       <tr><th>Occupancy</th><td>Vacant</td></tr>
-      <tr><th>Post-Possession</th><td>Vacant at close, no holdback</td></tr>
+      <tr><th>Post Possession</th><td>Vacant at close, no holdback</td></tr>
     </table>
-  </section>
+  </div>
+</section>
 
-  <section class="block">
-    <h2>Condition — Seller Reported</h2>
-    <table class="facts">
+<section>
+  <div class="wrap">
+    <h2>Condition &mdash; Seller Reported</h2>
+    <table>
       <tr><th>HVAC</th><td>2026, new</td></tr>
       <tr><th>Electrical</th><td>Reported in good condition</td></tr>
       <tr><th>Plumbing</th><td>Reported in good condition</td></tr>
       <tr><th>Roof</th><td>Age unknown. Seller and agent report it visibly appears to be in good condition. Age has not been verified and no documentation has been provided.</td></tr>
       <tr><th>Overall</th><td>Seller reports the property is mostly move-in ready with not much work required.</td></tr>
     </table>
-    <p style="margin-top:16px;">All condition information above is seller and agent reported. JNA Dynamic Holdings LLC makes no representation as to condition, age, or remaining useful life of any system or component. On a 2013 build, the original roof would be approaching thirteen years old — buyers should have a roofer inspect during the due diligence period and price accordingly. That is not a knock on the deal; it is how you protect your number.</p>
-  </section>
+    <p>All condition information above is seller and agent reported. JNA Dynamic Holdings LLC makes no representation as to condition, age, or remaining useful life of any system or component. On a 2013 build, the original roof would be approaching thirteen years old &mdash; buyers should have a roofer evaluate it during the inspection period and price the deal accordingly.</p>
+  </div>
+</section>
 
-  <section class="block">
-    <h2>Closed Comps — Same Street</h2>
+<section>
+  <div class="wrap">
+    <h2>Closed Comparables</h2>
+    <h3>Same Street</h3>
     <div class="comp-card">
-      <div class="name">Wind Meadows Drive, Bartow — Sold $485,000 on 05/08/2026</div>
-      <div class="meta">4 Bed / 3 Bath / 2,454 sq ft / 8,276 sq ft lot / Built 2014 / 13 days on market / Pool / Garage / 0.2 mi from subject</div>
+      <div class="title">Wind Meadows Drive, Bartow &mdash; Sold $485,000 on 05/08/2026</div>
+      <div class="meta">4 Bed / 3 Bath / 2,454 sqft / 8,276 sqft lot / Built 2014 / 13 days on market / Pool / Garage / 0.2 mi from subject</div>
     </div>
     <div class="comp-card">
-      <div class="name">Wind Meadows Drive, Bartow — Sold $405,000 on 08/20/2026</div>
-      <div class="meta">4 Bed / 3 Bath / 2,360 sq ft / Built 2014 / No pool / Garage / 0.1 mi from subject</div>
+      <div class="title">Wind Meadows Drive, Bartow &mdash; Sold $405,000 on 08/20/2026</div>
+      <div class="meta">4 Bed / 3 Bath / 2,360 sqft / Built 2014 / No pool / Garage / 0.1 mi from subject</div>
     </div>
-    <p>Both are on Wind Meadows Drive. Both are four bed, three bath. Both are 2014 builds. Both are smaller than the subject.</p>
-  </section>
+    <p>Both comps sit on the same street as the subject. Both are four bed, three bath, 2014 builds, and both are smaller than the subject property.</p>
 
-  <section class="block">
-    <h2>Closed Comps — New Construction, Lakeland 33813</h2>
+    <h3>New Construction &mdash; Lakeland, FL 33813</h3>
     <div class="comp-card">
-      <div class="name">Maggie Loop, Lakeland — Sold $555,000 on 07/15/2026</div>
-      <div class="meta">5 Bed / 3 Bath / 3,130 sq ft / 10,454 sq ft lot / Built 2026 / 49 days on market</div>
+      <div class="title">Maggie Loop, Lakeland &mdash; Sold $555,000 on 07/15/2026</div>
+      <div class="meta">5 Bed / 3 Bath / 3,130 sqft / 10,454 sqft lot / Built 2026 / 49 days on market</div>
     </div>
     <div class="comp-card">
-      <div class="name">Maggie Loop, Lakeland — Sold $494,900 on 05/07/2026</div>
-      <div class="meta">4 Bed / 3 Bath / 2,675 sq ft / 10,019 sq ft lot / Built 2026 / 206 days on market</div>
+      <div class="title">Maggie Loop, Lakeland &mdash; Sold $494,900 on 05/07/2026</div>
+      <div class="meta">4 Bed / 3 Bath / 2,675 sqft / 10,019 sqft lot / Built 2026 / 206 days on market</div>
     </div>
-    <p>These two are 2026 new construction in Lakeland, not Bartow, and they are carrying the top of the range. Weight them how you see fit — the Wind Meadows pair is the cleaner read on this specific street.</p>
-  </section>
+    <p>These two comps are 2026 new construction in Lakeland, not Bartow, and represent the top of the comparable range. The Wind Meadows Drive pair is considered the cleaner read on this specific street; buyers should weight the comp set as they see fit.</p>
+  </div>
+</section>
 
-  <section class="block">
+<section>
+  <div class="wrap">
     <h2>How the ARV Pencils</h2>
-    <p>Run it on price per foot and the picture gets simple. The comp set is trading between $172 and $198 a square foot. The reports put the average at $185 to $186 a foot. At 2,907 square feet, even $160 a foot puts this house at $465,000.</p>
-    <p>We are calling the ARV $450,000+, which is $155 a foot — below every comp on this list on a per-foot basis, and the number we are asking buyers to underwrite against.</p>
-    <p>One honest note on the $485,000 same-street comp: that house has a pool and the subject does not. The comp report adjusts for the pool and still lands the adjusted value at $456,995. Even after removing the pool adjustment, that comp prints above our stated ARV, and it is 453 square feet smaller than the subject.</p>
-    <p>The subject is the largest house in this comp set. Buyer to run their own comps and confirm their own ARV.</p>
-  </section>
+    <p>Run on price per foot, the comp set is trading between $172 and $198 per square foot, with reports putting the average at $185 to $186 per square foot. At 2,907 square feet, even $160 a foot puts this house at $465,000.</p>
+    <p>JNA Dynamic Holdings LLC is calling the ARV $450,000+, which works out to $155 per square foot &mdash; below every comp on this list on a per-foot basis, and the number we are asking buyers to underwrite against.</p>
+    <p>One honest note on the $485,000 same-street comp: that home has a pool and the subject does not. The comp report adjusts for the pool and still lands the adjusted value at $456,995. Even after removing the pool premium, that comp prints above the stated ARV here, despite being 453 square feet smaller than the subject.</p>
+    <p>The subject is the largest house in this comp set. Buyer is expected to run their own comps and confirm their own ARV.</p>
+  </div>
+</section>
 
-  <section class="block">
+<section>
+  <div class="wrap">
     <h2>Exit Strategies</h2>
-    <ul class="clean">
-      <li><strong>Fix and Flip:</strong> Buy at $275,990 into a $450,000+ ARV with a light scope on late-model block construction; the last comparable on this street went pending in 13 days.</li>
+    <ul>
+      <li><strong>Fix and Flip:</strong> Buy at $275,000 into a $450,000+ ARV with a light scope on late-model block construction; the last comparable on this street went pending in 13 days.</li>
       <li><strong>Buy and Hold:</strong> Four bed, three bath, 2,907 square feet, new HVAC, $21 monthly HOA, in a Polk County corridor absorbing steady rental demand from Lakeland and Tampa spillover.</li>
       <li><strong>BRRRR:</strong> Light cosmetic refresh, lease, refinance against a $450,000+ ARV.</li>
-      <li><strong>Retail Resale:</strong> A 2013 block, two-story, four bed / three bath home with a two-car garage is exactly what a conventional-financed buyer in Bartow is shopping for.</li>
+      <li><strong>Retail Resale:</strong> 2013 block, two-story, four bed / three bath with a two-car garage is exactly what a conventionally financed buyer in Bartow is shopping for.</li>
     </ul>
-  </section>
+  </div>
+</section>
 
-  <section class="block">
+<section>
+  <div class="wrap">
     <h2>Deal Terms</h2>
-    <table class="facts">
-      <tr><th>Contract Asking Price</th><td>$275,990</td></tr>
+    <table>
+      <tr><th>Assignment Price</th><td>$275,000</td></tr>
       <tr><th>EMD</th><td>$5,000, non-refundable</td></tr>
       <tr><th>COE</th><td>On or before October 1, 2026</td></tr>
       <tr><th>Title</th><td>Albatross Title</td></tr>
       <tr><th>Access</th><td>By appointment</td></tr>
       <tr><th>Occupancy</th><td>Vacant, delivered vacant at close with no holdback</td></tr>
-      <tr><th>Deal Structure</th><td>Direct deal, no daisy chains</td></tr>
+      <tr><th>Assignment Structure</th><td>Direct deal, no daisy chains</td></tr>
       <tr><th>Transaction Coordination Fee</th><td>$425, paid by buyer</td></tr>
       <tr><th>Closing Costs</th><td>Buyer and seller each responsible for their own closing costs</td></tr>
       <tr><th>Funding</th><td>Cash or hard money only</td></tr>
       <tr><th>Additional Materials</th><td>Photos and full comp report available on request</td></tr>
     </table>
-  </section>
-
-  <section class="block">
-    <h2>Wholesale Disclosure</h2>
-    <div class="disclosure">
-      <p>This is an assignment of contract, not a direct sale of real property. JNA Dynamic Holdings LLC is not the record owner of this property. We hold, or are in the process of holding, an equitable interest in the property under a purchase and sale agreement with the underlying seller, and we are marketing that equitable interest for assignment. We are not a licensed real estate brokerage and are not acting as an agent for the seller. Earnest money on an assignment of contract is non-refundable. Florida law requires disclosure that the interest being offered is an equitable interest in a real estate contract and not the real property itself.</p>
-      <p>All data presented above is gathered from comparable sales reports, tax records, and public/seller-provided sources. Figures have not been independently verified by JNA Dynamic Holdings LLC. Buyer is responsible for their own due diligence on condition, square footage, bedroom and bathroom count, roof age, permit history, HOA documents, title, liens, zoning, and value.</p>
-    </div>
-  </section>
-
-</div>
-
-<footer class="cta">
-  <div class="wrap">
-    <h2>Two Doors Down Closed at $485,000 — Smaller.</h2>
-    <p>One door the other way closed at $405,000 last month — also smaller. This is the biggest house on the block at $95 a foot with a new HVAC in it. The comps are not a projection here — call us.</p>
-    <div class="cta-contacts">
-      <a href="tel:5206336437">Call/Text: 520-633-6437</a>
-      <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
-    </div>
-    <p class="fineprint">JNA Dynamic Holdings LLC — This is an assignment of contract, not a listing. All figures above are believed reliable but have not been independently verified by JNA Dynamic Holdings LLC. Buyer to perform independent due diligence prior to executing any agreement.</p>
   </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Wholesale &amp; Assignment Disclosure</h2>
+    <div class="disclosure-box">
+      <p>This is an assignment of contract, not a direct sale or a real estate listing. JNA Dynamic Holdings LLC is not the record owner of this property. We hold, or are in the process of holding, an equitable interest in the property under a purchase and sale agreement with the underlying seller, and we are marketing that equitable interest for assignment. JNA Dynamic Holdings LLC is not a licensed real estate brokerage and is not acting as an agent for the seller, and buyers should not expect or attempt direct contact with the underlying seller or owner. Earnest money on an assignment of contract is non-refundable. Florida law requires disclosure that the interest being offered is an equitable interest in a real estate contract and not the real property itself.</p>
+      <p>All figures on this page are gathered from comparable sales reports, tax records, public data sources, and information provided by the seller and their representatives. None of these figures have been independently verified by JNA Dynamic Holdings LLC. Buyers are responsible for performing their own due diligence on condition, square footage, bedroom and bathroom count, roof age, permit history, HOA documents, title, liens, zoning, and value.</p>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band" style="border-bottom:none;">
+  <div class="wrap">
+    <h2>The Comps Are Not a Projection Here</h2>
+    <p>A comparable two doors down closed at $485,000 in thirteen days, and it was smaller than this house. Another comp one door the other way closed at $405,000 recently, also smaller. This is the biggest home on the block at $95 a foot with a new HVAC already in it. Contact us today to receive the full property address, additional documentation, and the full comp report.</p>
+    <div class="cta-links">
+      <a href="tel:5206336437">Call / Text: 520-633-6437</a>
+      <a class="secondary" href="mailto:montanoemmanuel@gmail.com">Email: montanoemmanuel@gmail.com</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">JNA Dynamic Holdings LLC &mdash; This offering is an assignment of an equitable contract interest, not a listing of real property. Individual property address available upon request.</div>
 </footer>
 
 </body>
