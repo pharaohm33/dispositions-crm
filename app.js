@@ -881,26 +881,20 @@ function renderRepDeals() {
   const container = document.getElementById("rep-deals-container");
   const empty = document.getElementById("rep-deals-empty");
 
-  // A Buyer's list is pre-narrowed to their own buy box (see
-  // dealMatchesBuyBox) before any of the manual search/status/category
-  // filters below even apply. If they have real criteria set but nothing
-  // currently matches, fall back to showing everything with a banner
-  // explaining why, rather than an empty list -- once something does
-  // match, only the matches show, no banner.
+  // A Buyer sees every active deal, same as anyone else -- their own Buy
+  // Box only pulls a "Matches Your Buy Box" section to the top (see
+  // dealMatchesBuyBox), it never hides anything. Nothing here changes for
+  // a rep (non-Buyer) session.
   const session = getSession() || {};
   const buyBoxBanner = document.getElementById("rep-deals-buybox-banner");
-  let baseDeals = repDeals;
+  let buyerMatchIds = null;
   if (session.personType === "Buyer" && session.buyBox) {
     const bb = session.buyBox;
     const hasCriteria = bb.nationwide || (bb.states || []).length > 0 || (bb.cities || []).length > 0 || (bb.assetCategories || []).length > 0 || bb.otherAssetClass || (bb.dealTypes || []).length > 0;
     if (hasCriteria) {
-      const matches = repDeals.filter(function (d) { return dealMatchesBuyBox(d, bb); });
-      if (matches.length === 0 && repDeals.length > 0) {
-        if (buyBoxBanner) buyBoxBanner.hidden = false;
-      } else {
-        if (buyBoxBanner) buyBoxBanner.hidden = true;
-        baseDeals = matches;
-      }
+      buyerMatchIds = {};
+      repDeals.filter(function (d) { return dealMatchesBuyBox(d, bb); }).forEach(function (d) { buyerMatchIds[d.DealID] = true; });
+      if (buyBoxBanner) buyBoxBanner.hidden = Object.keys(buyerMatchIds).length > 0 || repDeals.length === 0;
     } else if (buyBoxBanner) {
       buyBoxBanner.hidden = true;
     }
@@ -908,7 +902,7 @@ function renderRepDeals() {
     buyBoxBanner.hidden = true;
   }
 
-  const filtered = baseDeals.filter(function (d) {
+  const filtered = repDeals.filter(function (d) {
     if (q && ![d.DealCode, d.City, d.State, d.County, d.AssetType].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; })) return false;
     if (statusFilter === REP_DEALS_ACTIVE_FILTER_VALUE) { if (d.Status === "Dead" || d.Status === "Sold") return false; }
     else if (statusFilter && d.Status !== statusFilter) return false;
@@ -928,7 +922,23 @@ function renderRepDeals() {
       String(a.County || "").localeCompare(String(b.County || ""));
   });
   empty.hidden = filtered.length > 0;
-  container.innerHTML = filtered.map(function (d) {
+
+  if (buyerMatchIds && Object.keys(buyerMatchIds).length > 0) {
+    const matches = filtered.filter(function (d) { return buyerMatchIds[d.DealID]; });
+    const rest = filtered.filter(function (d) { return !buyerMatchIds[d.DealID]; });
+    container.innerHTML =
+      '<div class="section-title" style="margin-top:0;">Matches Your Buy Box (' + matches.length + ')</div>' +
+      matches.map(dealCardHtml).join("") +
+      (rest.length > 0 ? '<div class="section-title">All Deals</div>' + rest.map(dealCardHtml).join("") : "");
+  } else {
+    container.innerHTML = filtered.map(dealCardHtml).join("");
+  }
+  Array.from(container.querySelectorAll(".deal-card")).forEach(function (card) {
+    card.addEventListener("click", function () { openRepDealDetail(card.getAttribute("data-deal-id")); });
+  });
+}
+
+function dealCardHtml(d) {
     // Deal Code stays visible here no matter what -- it's the one label
     // that also shows on this buyer's Buyer Leads / Pitches tab (which
     // never shows the address, disclosed or not), so it's what actually
@@ -968,10 +978,6 @@ function renderRepDeals() {
       ' <span class="status-pill ' + statusClass(d.Status) + '">' + esc(d.Status || "") + '</span>' +
       (d.addressGranted ? ' <span class="status-pill status-active-match">Address disclosed</span>' : "") + '</div>' +
       '</div>';
-  }).join("");
-  Array.from(container.querySelectorAll(".deal-card")).forEach(function (card) {
-    card.addEventListener("click", function () { openRepDealDetail(card.getAttribute("data-deal-id")); });
-  });
 }
 
 async function openRepDealDetail(dealId) {

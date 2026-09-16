@@ -2030,14 +2030,20 @@ function generateDealPageHtml(deal, sourceListingText, photoPaths, morePhotosLin
 }
 
 function requestAddressButtonHtml(dealId) {
-  const url = 'https://sendmybuyer.com/?requestAddress=' + encodeURIComponent(dealId);
+  const requestUrl = 'https://sendmybuyer.com/?requestAddress=' + encodeURIComponent(dealId);
+  const homeUrl = 'https://sendmybuyer.com';
   return '<div style="max-width:640px;margin:40px auto;padding:28px 24px;text-align:center;' +
     'font-family:Arial,sans-serif;border-top:1px solid #ddd;">' +
     '<p style="color:#444;margin-bottom:16px;">Addresses are shared with wholesalers who already have ' +
     'an interested buyer for this deal, or with direct buyers reviewing this listing. Log in or create ' +
     'a free account to request it.</p>' +
-    '<a href="' + esc_(url) + '" style="display:inline-block;padding:12px 28px;background:#1a73e8;' +
+    '<a href="' + esc_(requestUrl) + '" style="display:inline-block;padding:12px 28px;background:#1a73e8;' +
     'color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;">Request the Address</a>' +
+    '<p style="margin-top:16px;"><a href="' + esc_(homeUrl) + '" style="color:#1a73e8;">Log in</a>' +
+    ' &nbsp;&middot;&nbsp; <a href="' + esc_(homeUrl) + '" style="color:#1a73e8;">Browse all deals</a></p>' +
+    '<p style="color:#888;font-size:0.9em;margin-top:20px;">Interested in this deal? This listing isn\'t ' +
+    'searchable once you leave — <strong>save or bookmark this page\'s link</strong> before heading to the ' +
+    'home page, so you can find your way back to it.</p>' +
     '</div>';
 }
 
