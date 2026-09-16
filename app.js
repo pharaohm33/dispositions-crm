@@ -17,13 +17,40 @@ async function api(action, payload) {
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(body)
     });
+    let json;
     try {
-      return await res.json();
+      json = await res.json();
     } catch (parseErr) {
       return { ok: false, error: "Server returned an unexpected response (not JSON). The Apps Script deployment may be down or out of date -- ask admin to check it." };
     }
+    // Sliding 1-hour inactivity window: every successful authenticated call
+    // comes back with a freshly re-signed token (see withSession/
+    // withAdminSession) -- swap it in so the clock keeps resetting while
+    // someone's actually using the app. If a request instead comes back
+    // sessionExpired (the LAST-issued token's hour finally passed with no
+    // activity), log out to a clear screen immediately rather than leaving
+    // a broken page up that looks like it's still logged in.
+    if (json._token && session) {
+      session.token = json._token;
+      setSession(session);
+    } else if (json.sessionExpired) {
+      forceLogout("You were logged out after an hour of inactivity. Please log in again.");
+    }
+    return json;
   } catch (networkErr) {
     return { ok: false, error: "Could not reach the server. Check your connection and try again." };
+  }
+}
+
+// Central "kick back to the login screen" -- used for the inactivity
+// timeout above, and safe to call from anywhere else that needs it.
+function forceLogout(message) {
+  adminActingAsRep = false;
+  setSession(null);
+  showView(null);
+  if (message) {
+    const errorEl = document.getElementById("login-error");
+    if (errorEl) { errorEl.textContent = message; errorEl.classList.add("show"); }
   }
 }
 

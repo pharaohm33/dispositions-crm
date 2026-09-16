@@ -62,7 +62,16 @@ const BUYER_LEAD_CONTACTS_SHEET = 'BuyerLeadContacts';
 const ADDRESS_GRANTS_SHEET = 'AddressGrants';
 const ADDRESS_GRANT_COLUMNS = ['DealID', 'Username', 'GrantedAt'];
 const ASSET_CATEGORIES_SHEET = 'AssetCategories';
-const SESSION_HOURS = 12;
+// This is an IDLE timeout, not a fixed session length -- withSession/
+// withAdminSession re-sign a fresh token (a new exp, SESSION_HOURS from
+// now) on every successful authenticated call, and the frontend swaps in
+// that refreshed token for its next request (see api()'s handling of
+// res._token). So as long as someone keeps actually using the app, their
+// session never expires; stop for a full hour and the last-issued token's
+// exp passes, the next attempted action fails with sessionExpired, and the
+// frontend logs them out to a clear "logged out due to inactivity" screen
+// instead of leaving a broken page up that looks like it's still working.
+const SESSION_HOURS = 1;
 const DEFAULT_STATUSES = ['Active', 'Under Contract', 'Sold', 'Dead', 'On Hold'];
 const FOLLOWUP_HOURS = 24;
 const MATCH_STATUSES = ['Active Match', 'Negotiating', 'Closing', 'Dead Match'];
@@ -584,10 +593,25 @@ function parseSessionToken(token) {
   return payload;
 }
 
+// Re-signs a token with the same identity, a fresh 1-hour exp -- called on
+// every successful authenticated request (see withSession/withAdminSession)
+// so an active session's clock keeps resetting. Rebuilt from the session
+// payload directly rather than a Reps sheet row, since by this point
+// there's no reason to re-fetch the rep just to re-sign their own claims.
+function refreshSessionToken(session) {
+  const secret = PropertiesService.getScriptProperties().getProperty('SESSION_SECRET');
+  const payload = { u: session.u, n: session.n, a: session.a, all: session.all, exp: Date.now() + SESSION_HOURS * 60 * 60 * 1000 };
+  const payloadStr = Utilities.base64EncodeWebSafe(JSON.stringify(payload));
+  const sig = hmacHex(payloadStr, secret);
+  return payloadStr + '.' + sig;
+}
+
 function withSession(body, fn) {
   const session = parseSessionToken(body.token);
-  if (!session) return { ok: false, error: 'Session expired or invalid. Please log in again.' };
-  return fn(body, session);
+  if (!session) return { ok: false, error: 'Session expired or invalid. Please log in again.', sessionExpired: true };
+  const result = fn(body, session);
+  if (result && result.ok) result._token = refreshSessionToken(session);
+  return result;
 }
 
 // Serializes read-check-then-write operations (like "give this buyer a
@@ -609,9 +633,11 @@ function withLock(fn) {
 
 function withAdminSession(body, fn) {
   const session = parseSessionToken(body.token);
-  if (!session) return { ok: false, error: 'Session expired or invalid. Please log in again.' };
+  if (!session) return { ok: false, error: 'Session expired or invalid. Please log in again.', sessionExpired: true };
   if (!session.a) return { ok: false, error: 'Admin access required.' };
-  return fn(body, session);
+  const result = fn(body, session);
+  if (result && result.ok) result._token = refreshSessionToken(session);
+  return result;
 }
 
 function login(body) {
