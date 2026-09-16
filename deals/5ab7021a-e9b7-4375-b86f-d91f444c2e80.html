@@ -3,199 +3,168 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Brunswick Plantation Homesite — Calabash, NC | JNA Dynamic Holdings LLC</title>
+<title>Brunswick Plantation Golf Community Homesite — 0.30± Acres | Calabash, NC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#f6f1e9;
-    --ink:#2a241c;
-    --line:#d9cfbf;
-    --accent:#8a5a3b;
-    --accent-dark:#5c3a24;
+    --paper-dark:#efe7d8;
+    --ink:#2b2621;
+    --ink-soft:#5a5148;
+    --line:#d8cdb9;
+    --accent:#8a5a34;
+    --accent-dark:#5f3d21;
+    --cream:#fffdfa;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
     background:var(--paper);
     color:var(--ink);
-    font-family:'Inter',sans-serif;
-    line-height:1.6;
+    font-family:'Source Sans 3',sans-serif;
     font-size:16px;
+    line-height:1.6;
   }
-  h1,h2,h3{
+  h1,h2,h3,h4{
     font-family:'Playfair Display',serif;
-    color:var(--accent-dark);
-    letter-spacing:0.2px;
+    color:var(--ink);
+    margin:0;
   }
   .wrap{
-    max-width:920px;
+    max-width:960px;
     margin:0 auto;
     padding:0 24px;
   }
   a{color:var(--accent-dark);}
 
-  .topbar{
-    background:var(--accent-dark);
-    color:#f6f1e9;
-    padding:10px 0;
-    font-size:13px;
-    letter-spacing:0.6px;
-    text-transform:uppercase;
-  }
-  .topbar .wrap{
-    display:flex;
-    justify-content:space-between;
-    flex-wrap:wrap;
-    gap:6px;
-  }
-
-  header.hero{
-    padding-top:44px;
-    padding-bottom:28px;
+  header.top{
+    background:linear-gradient(180deg,var(--paper-dark),var(--paper));
     border-bottom:1px solid var(--line);
-    margin-bottom:32px;
+    padding-top:40px;
+    padding-bottom:32px;
   }
-  .deal-code{
-    display:inline-block;
-    background:var(--accent);
-    color:#fff;
-    font-size:12px;
-    letter-spacing:1px;
+  .eyebrow{
     text-transform:uppercase;
-    padding:4px 10px;
-    border-radius:3px;
+    letter-spacing:.14em;
+    font-size:.78rem;
+    color:var(--accent-dark);
+    font-weight:600;
+    margin-bottom:10px;
+  }
+  h1.title{
+    font-size:2.4rem;
+    font-weight:700;
+    line-height:1.15;
     margin-bottom:14px;
   }
-  h1.headline{
-    font-size:2.3rem;
-    margin:0 0 10px 0;
-    line-height:1.15;
-  }
-  .location-line{
+  .loc-line{
     font-size:1.05rem;
-    color:#4b4235;
+    color:var(--ink-soft);
     margin-bottom:6px;
   }
-  .address-note{
-    font-size:0.95rem;
-    font-style:italic;
+  .addr-note{
+    font-size:.92rem;
     color:var(--accent-dark);
-    margin-bottom:24px;
+    font-style:italic;
+    margin-bottom:22px;
   }
 
   .price-block{
     display:flex;
     flex-wrap:wrap;
-    gap:28px;
+    gap:20px;
     align-items:flex-end;
-    background:#fffaf1;
+    background:var(--cream);
     border:1px solid var(--line);
-    border-radius:8px;
+    border-radius:10px;
     padding:22px 26px;
+    margin-top:8px;
   }
-  .price-block .price{
+  .price-main .label{
+    text-transform:uppercase;
+    font-size:.75rem;
+    letter-spacing:.1em;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .price-main .amount{
     font-family:'Playfair Display',serif;
     font-size:2.6rem;
+    font-weight:800;
     color:var(--accent-dark);
-    font-weight:700;
+    line-height:1;
   }
-  .price-block .price-label{
-    font-size:0.8rem;
+  .price-sub{
+    display:flex;
+    gap:26px;
+    flex-wrap:wrap;
+  }
+  .price-sub div{
+    font-size:.92rem;
+  }
+  .price-sub .k{
+    color:var(--ink-soft);
     text-transform:uppercase;
-    letter-spacing:1px;
-    color:#7a6f5c;
+    letter-spacing:.06em;
+    font-size:.72rem;
     display:block;
     margin-bottom:2px;
   }
-  .price-sub{
-    font-size:0.95rem;
-    color:#4b4235;
+
+  section{
+    padding-top:38px;
+    padding-bottom:38px;
+    border-bottom:1px solid var(--line);
+  }
+  section:last-of-type{border-bottom:none;}
+
+  h2.section-title{
+    font-size:1.5rem;
+    font-weight:700;
+    margin-bottom:18px;
+    color:var(--accent-dark);
   }
 
-  .gallery-section{
-    margin-bottom:40px;
-  }
-  .gallery{
+  .gallery-scroll{
     display:flex;
-    gap:12px;
+    gap:14px;
     overflow-x:auto;
     padding-bottom:10px;
-    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
   }
-  .gallery img{
+  .gallery-scroll img{
     height:230px;
     width:auto;
-    border-radius:6px;
-    flex-shrink:0;
-    scroll-snap-align:start;
+    border-radius:8px;
     border:1px solid var(--line);
+    object-fit:cover;
+    flex:0 0 auto;
   }
   .more-photos{
     display:inline-block;
-    margin-top:10px;
-    font-size:0.9rem;
+    margin-top:14px;
+    font-size:.9rem;
     text-decoration:underline;
   }
 
-  section{
-    margin-bottom:40px;
-  }
-  section h2{
-    font-size:1.5rem;
-    border-bottom:2px solid var(--accent);
-    padding-bottom:8px;
-    margin-bottom:16px;
-  }
-  section h3{
-    font-size:1.15rem;
-    margin-bottom:8px;
-    margin-top:22px;
-  }
-
-  ul.clean{
-    padding-left:20px;
-    margin:0 0 12px 0;
-  }
-  ul.clean li{
-    margin-bottom:6px;
-  }
-  ul.two-col{
-    columns:2;
-    column-gap:32px;
-  }
-  @media (max-width:600px){
-    ul.two-col{columns:1;}
-  }
+  p{margin:0 0 14px 0;}
+  ul{margin:0 0 16px 0; padding-left:22px;}
+  li{margin-bottom:6px;}
 
   .callout{
-    background:#fdf6ea;
-    border-left:4px solid var(--accent);
-    padding:14px 18px;
-    margin:16px 0;
-    font-size:0.98rem;
+    background:var(--paper-dark);
+    border-left:4px solid var(--accent-dark);
+    padding:16px 20px;
+    border-radius:4px;
+    margin-bottom:18px;
   }
-
-  table.deal-terms{
-    width:100%;
-    border-collapse:collapse;
-    background:#fffaf1;
-    border:1px solid var(--line);
-  }
-  table.deal-terms td{
-    padding:10px 16px;
-    border-bottom:1px solid var(--line);
-    font-size:0.97rem;
-    vertical-align:top;
-  }
-  table.deal-terms td:first-child{
-    font-weight:600;
+  .callout .big{
+    font-family:'Playfair Display',serif;
+    font-size:1.6rem;
     color:var(--accent-dark);
-    width:40%;
-  }
-  table.deal-terms tr:last-child td{
-    border-bottom:none;
+    font-weight:700;
   }
 
   .comp-grid{
@@ -204,301 +173,317 @@
     flex-wrap:wrap;
   }
   .comp-card{
-    flex:1;
-    min-width:220px;
-    background:#fffaf1;
+    flex:1 1 260px;
+    background:var(--cream);
     border:1px solid var(--line);
-    border-radius:6px;
-    padding:18px;
+    border-radius:8px;
+    padding:18px 20px;
   }
-  .comp-card .amount{
-    font-family:'Playfair Display',serif;
-    font-size:1.6rem;
+  .comp-card h4{
+    font-size:1.05rem;
+    margin-bottom:8px;
+  }
+  .comp-card .amt{
+    font-size:1.5rem;
+    font-weight:800;
     color:var(--accent-dark);
+    font-family:'Playfair Display',serif;
   }
 
-  .disclosure{
-    font-size:0.92rem;
-    color:#4b4235;
-    background:#f0e9db;
+  table.terms{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--cream);
     border:1px solid var(--line);
-    border-radius:6px;
-    padding:16px 18px;
+    border-radius:8px;
+    overflow:hidden;
   }
+  table.terms tr{border-bottom:1px solid var(--line);}
+  table.terms tr:last-child{border-bottom:none;}
+  table.terms td{
+    padding:12px 18px;
+    font-size:.95rem;
+    vertical-align:top;
+  }
+  table.terms td.k{
+    width:42%;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    font-size:.78rem;
+    font-weight:600;
+  }
+
+  .snapshot-list{
+    columns:2;
+    column-gap:34px;
+  }
+  .snapshot-list li{break-inside:avoid;}
 
   .cta-band{
     background:var(--accent-dark);
-    color:#f6f1e9;
-    padding:44px 0;
-    margin-top:60px;
-    margin-bottom:0;
-    text-align:center;
+    color:var(--cream);
+    padding-top:44px;
+    padding-bottom:44px;
+    border-bottom:none;
   }
   .cta-band h2{
-    color:#f6f1e9;
-    border:none;
-    font-size:1.8rem;
+    color:var(--cream);
+    font-size:1.9rem;
     margin-bottom:14px;
   }
   .cta-band p{
-    font-size:1rem;
-    margin-bottom:22px;
-    color:#e7ddc9;
+    color:#e9dfd0;
+    max-width:640px;
   }
   .cta-contacts{
+    margin-top:20px;
     display:flex;
-    justify-content:center;
-    gap:24px;
+    gap:28px;
     flex-wrap:wrap;
   }
   .cta-contacts a{
-    color:#f6f1e9;
-    background:var(--accent);
-    padding:12px 22px;
-    border-radius:5px;
-    text-decoration:none;
+    color:var(--cream);
+    font-size:1.15rem;
     font-weight:600;
-    font-size:1rem;
+    text-decoration:none;
+    border-bottom:2px solid #c9a876;
+    padding-bottom:3px;
   }
 
   footer.legal{
-    background:#efe7d6;
-    padding:28px 0 40px 0;
+    padding-top:26px;
+    padding-bottom:40px;
+    font-size:.8rem;
+    color:var(--ink-soft);
+    background:var(--paper);
   }
-  footer.legal p{
-    font-size:0.82rem;
-    color:#5c5343;
-    margin:0 0 10px 0;
-  }
+  footer.legal p{margin-bottom:10px;}
 </style>
 </head>
-<body>
+<body><div style="max-width:640px;margin:0 auto 20px;padding:20px 24px;text-align:center;font-family:Arial,sans-serif;border-bottom:1px solid #ddd;"><p style="color:#444;margin-bottom:16px;">Addresses are shared with wholesalers who already have an interested buyer for this deal, or with direct buyers reviewing this listing. Log in or create a free account to request it.</p><a href="https://sendmybuyer.com/?requestAddress=5ab7021a-e9b7-4375-b86f-d91f444c2e80&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F5ab7021a-e9b7-4375-b86f-d91f444c2e80.html" style="display:inline-block;padding:12px 28px;background:#1a73e8;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;">Request the Address</a><p style="margin-top:16px;"><a href="https://sendmybuyer.com" style="color:#1a73e8;">Log in</a> &nbsp;&middot;&nbsp; <a href="https://sendmybuyer.com" style="color:#1a73e8;">Browse all deals</a></p><p style="color:#888;font-size:0.9em;margin-top:20px;">Interested in this deal? This listing isn't searchable once you leave — <strong>save or bookmark this page's link</strong> before heading to the home page, so you can find your way back to it.</p></div>
 
-<div class="topbar">
+<header class="top">
   <div class="wrap">
-    <span>Wholesale Assignment Opportunity</span>
-    <span>Brunswick County, North Carolina</span>
-  </div>
-</div>
-
-<header class="hero">
-  <div class="wrap">
-    <span class="deal-code">Deal Code: NC - 3 (Land)</span>
-    <h1 class="headline">Brunswick Plantation — 0.30± Acre Golf Community Homesite</h1>
-    <div class="location-line">Calabash, Brunswick County, North Carolina</div>
-    <div class="address-note">Address available upon request — contact us for the full parcel address.</div>
+    <div class="eyebrow">Deal Code: NC - 3 (Land) · Wholesale Assignment of Contract</div>
+    <h1 class="title">Brunswick Plantation Golf Community Homesite<br>0.30± Acre Vacant Residential Lot</h1>
+    <div class="loc-line">Calabash, Brunswick County, North Carolina · Brunswick Plantation Community</div>
+    <div class="addr-note">Address available upon request — contact us for the full property address.</div>
 
     <div class="price-block">
-      <div>
-        <span class="price-label">Asking Price</span>
-        <span class="price">$42,500</span>
+      <div class="price-main">
+        <div class="label">Asking Price</div>
+        <div class="amount">$42,500</div>
       </div>
-      <div class="price-sub">As-Is Value (est.): $40,000<br>Cash or hard money only &middot; Assignment of contract</div>
+      <div class="price-sub">
+        <div><span class="k">As-Is Value</span>$40,000</div>
+        <div><span class="k">Lot Size</span>0.30± Acres</div>
+        <div><span class="k">Property Type</span>Vacant Residential Land</div>
+        <div><span class="k">Terms</span>Cash or Hard Money Only</div>
+      </div>
     </div>
   </div>
 </header>
 
-<div class="wrap gallery-section">
-  <h2 style="border:none;padding:0;margin-bottom:12px;">Property Photos</h2>
-  <div class="gallery">
-    <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/1.jpg" alt="Brunswick Plantation homesite photo 1">
-    <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/2.jpg" alt="Brunswick Plantation homesite photo 2">
-    <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/3.jpg" alt="Brunswick Plantation homesite photo 3">
-    <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/4.jpg" alt="Brunswick Plantation homesite photo 4">
-    <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/5.jpg" alt="Brunswick Plantation homesite photo 5">
-    <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/6.jpg" alt="Brunswick Plantation homesite photo 6">
-    <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/7.jpg" alt="Brunswick Plantation homesite photo 7">
-    <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/8.jpg" alt="Brunswick Plantation homesite photo 8">
-    <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/9.jpg" alt="Brunswick Plantation homesite photo 9">
-    <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/10.jpg" alt="Brunswick Plantation homesite photo 10">
-    <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/11.jpg" alt="Brunswick Plantation homesite photo 11">
-    <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/12.jpg" alt="Brunswick Plantation homesite photo 12">
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Photos</h2>
+    <div class="gallery-scroll">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/1.jpg" alt="Brunswick Plantation homesite photo 1">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/2.jpg" alt="Brunswick Plantation homesite photo 2">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/3.jpg" alt="Brunswick Plantation homesite photo 3">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/4.jpg" alt="Brunswick Plantation homesite photo 4">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/5.jpg" alt="Brunswick Plantation homesite photo 5">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/6.jpg" alt="Brunswick Plantation homesite photo 6">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/7.jpg" alt="Brunswick Plantation homesite photo 7">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/8.jpg" alt="Brunswick Plantation homesite photo 8">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/9.jpg" alt="Brunswick Plantation homesite photo 9">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/10.jpg" alt="Brunswick Plantation homesite photo 10">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/11.jpg" alt="Brunswick Plantation homesite photo 11">
+      <img src="/deals/5ab7021a-e9b7-4375-b86f-d91f444c2e80/photos/12.jpg" alt="Brunswick Plantation homesite photo 12">
+    </div>
   </div>
-</div>
+</section>
 
-<div class="wrap">
-
-  <section>
-    <h2>Overview</h2>
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Here Is What We Have</h2>
     <p>This is an approximately 0.30-acre residential homesite located inside Brunswick Plantation, an established golf community in Brunswick County, North Carolina.</p>
-    <p>The primary diligence item on this parcel is a reported <strong>AE Floodway designation</strong>. That designation should be fully evaluated by any prospective buyer before construction assumptions are made.</p>
-    <p>The reason this property is still worth evaluating is the immediate market evidence: a floodway-designated lot across the fairway reportedly sold for approximately <strong>$40,000</strong>, placing this subject's asking price of <strong>$42,500</strong> very close to a reported comparable sale involving another floodway lot within the same community.</p>
+    <p>The primary diligence item is the parcel's reported <strong>AE Floodway Designation</strong>. That designation should be fully evaluated by any prospective buyer before construction assumptions are made.</p>
+    <p>The reason this property is still worth evaluating is the immediate market evidence: a floodway-designated lot across the fairway reportedly sold for approximately $40,000. The subject is being offered at $42,500 — which places the asking price very close to a reported comparable sale involving another floodway lot within the same community.</p>
     <p>Additionally, certain builders have continued purchasing lots within Brunswick Plantation despite flood-related designations, demonstrating that these properties are not automatically unusable. However, every parcel requires individual engineering, elevation, floodway, and building-envelope review.</p>
-  </section>
 
-  <section>
-    <h2>The Numbers</h2>
-    <ul class="clean two-col">
-      <li><strong>Asking Price:</strong> $42,500</li>
-      <li><strong>Lot Size:</strong> 0.30± acres</li>
-      <li><strong>County:</strong> Brunswick County</li>
-      <li><strong>Community:</strong> Brunswick Plantation</li>
-      <li><strong>Property Type:</strong> Vacant residential land</li>
-      <li><strong>Reported Flood Designation:</strong> AE Floodway</li>
-      <li><strong>Reported Comparable Floodway Sale:</strong> Approximately $40,000</li>
-      <li><strong>Financing:</strong> Cash or hard money only</li>
-      <li><strong>Transaction Type:</strong> Assignment of contract</li>
-    </ul>
-  </section>
-
-  <section>
-    <h2>Property Snapshot</h2>
-    <ul class="clean two-col">
-      <li>0.30± acre residential homesite</li>
-      <li>Located in Brunswick Plantation</li>
-      <li>Established golf community</li>
+    <h2 class="section-title" style="margin-top:30px;">Property Snapshot</h2>
+    <ul class="snapshot-list">
+      <li>0.30± Acre Residential Homesite</li>
+      <li>Brunswick Plantation</li>
+      <li>Established Golf Community</li>
       <li>Brunswick County, North Carolina</li>
-      <li>Reported AE floodway designation</li>
-      <li>Comparable floodway lot across the fairway reportedly sold around $40,000</li>
-      <li>Builders continue to acquire select lots within the community</li>
-      <li>Subject asking $42,500</li>
-      <li>Buyer responsible for full flood / engineering / buildability review</li>
-      <li>Property sold as-is</li>
+      <li>Reported AE Floodway Designation</li>
+      <li>Comparable Floodway Lot Across the Fairway Reportedly Sold Around $40,000</li>
+      <li>Builders Continue to Acquire Select Lots Within the Community</li>
+      <li>Subject Asking $42,500</li>
+      <li>Buyer Responsible for Full Flood / Engineering / Buildability Review</li>
+      <li>Property Sold As-Is</li>
     </ul>
-  </section>
+  </div>
+</section>
 
-  <section>
-    <h2>Why This Lot Makes Sense</h2>
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Why This Lot Makes Sense</h2>
     <p>The underwriting here should be based on actual floodway-lot activity rather than comparing the subject to fully unconstrained lots. A nearby lot across the fairway with a similar floodway consideration reportedly sold for approximately $40,000, against a subject asking price of $42,500 — creating a clear market reference point for a buyer's initial underwriting.</p>
     <p>The property also benefits from being located inside an established residential golf community where builders and homeowners continue to evaluate and acquire land.</p>
-    <div class="callout">The opportunity is not that the floodway designation should be ignored. The opportunity is that the market has demonstrated that certain floodway-designated lots within Brunswick Plantation can still attract buyers when pricing, engineering, and site conditions make sense.</div>
-  </section>
+    <p>The opportunity is not that the floodway designation should be ignored. The opportunity is that the market has demonstrated that certain floodway-designated lots within Brunswick Plantation can still attract buyers when pricing, engineering, and site conditions make sense.</p>
 
-  <section>
-    <h2>Comparable Support</h2>
+    <h2 class="section-title" style="margin-top:30px;">Comparable Support</h2>
     <div class="comp-grid">
       <div class="comp-card">
-        <h3 style="margin-top:0;">Reported Floodway Lot — Across Fairway</h3>
-        <p>Similar community setting</p>
-        <p>Reported sale price:</p>
-        <div class="amount">$40,000</div>
+        <h4>Reported Floodway Lot Across Fairway</h4>
+        <p>Similar community setting.</p>
+        <div class="amt">$40,000</div>
+        <p style="font-size:.85rem;color:var(--ink-soft);margin-top:6px;">Reported sale price</p>
       </div>
       <div class="comp-card">
-        <h3 style="margin-top:0;">Subject Property</h3>
-        <p>0.30± acres</p>
-        <p>Asking price:</p>
-        <div class="amount">$42,500</div>
+        <h4>Subject Property</h4>
+        <p>0.30± Acres</p>
+        <div class="amt">$42,500</div>
+        <p style="font-size:.85rem;color:var(--ink-soft);margin-top:6px;">Asking price</p>
       </div>
     </div>
-    <p style="margin-top:14px;font-size:0.92rem;color:#4b4235;">This comparable should be independently verified by buyer before being relied upon for underwriting.</p>
-  </section>
+    <p style="margin-top:14px;font-size:.9rem;color:var(--ink-soft);">The comparable should be independently verified by the buyer before being relied upon for underwriting.</p>
+  </div>
+</section>
 
-  <section>
-    <h2>Floodway Diligence</h2>
-    <p>The subject is reported to have an <strong>AE Floodway designation</strong>. This is the most important diligence item. Buyer must independently determine:</p>
-    <ul class="clean two-col">
-      <li>Exact FEMA designation</li>
-      <li>Floodway boundary</li>
-      <li>Base flood elevation</li>
-      <li>Required finished-floor elevation</li>
-      <li>Lowest-floor requirements</li>
-      <li>Foundation requirements</li>
-      <li>Flood-resistant construction standards</li>
-      <li>Whether fill is permitted</li>
-      <li>No-rise certification requirements</li>
-      <li>Engineering requirements</li>
-      <li>Building envelope</li>
-      <li>Driveway / access elevations</li>
-      <li>Potential CAMA requirements, if applicable</li>
-      <li>Flood insurance requirements</li>
-      <li>County building requirements</li>
-      <li>Any additional state or federal restrictions</li>
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Floodway Diligence</h2>
+    <div class="callout">
+      <div class="big">AE Floodway Designation</div>
+      <p style="margin-top:8px;margin-bottom:0;">This is the most important diligence item for this property.</p>
+    </div>
+    <p>Buyer must independently determine:</p>
+    <ul>
+      <li>Exact FEMA Designation</li>
+      <li>Floodway Boundary</li>
+      <li>Base Flood Elevation</li>
+      <li>Required Finished-Floor Elevation</li>
+      <li>Lowest-Floor Requirements</li>
+      <li>Foundation Requirements</li>
+      <li>Flood-Resistant Construction Standards</li>
+      <li>Whether Fill Is Permitted</li>
+      <li>No-Rise Certification Requirements</li>
+      <li>Engineering Requirements</li>
+      <li>Building Envelope</li>
+      <li>Driveway / Access Elevations</li>
+      <li>Potential CAMA Requirements, If Applicable</li>
+      <li>Flood Insurance Requirements</li>
+      <li>County Building Requirements</li>
+      <li>Any Additional State or Federal Restrictions</li>
     </ul>
-    <p style="font-size:0.92rem;color:#4b4235;">No representation is made that a conventional slab-on-grade home can be constructed on the property.</p>
-  </section>
+    <p>No representation is made that a conventional slab-on-grade home can be constructed on the property.</p>
+  </div>
+</section>
 
-  <section>
-    <h2>Builder Play</h2>
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Builder Play</h2>
     <p>For a builder experienced with coastal Brunswick County or elevated-home construction, this lot deserves individual underwriting. The play is straightforward:</p>
-    <ul class="clean">
-      <li>Acquire at $42,500.</li>
-      <li>Complete floodway, survey, elevation, engineering, utility, and building-envelope diligence.</li>
-      <li>Determine the appropriate foundation and finished-floor elevation.</li>
-      <li>Advance the property toward a permitted residential build if feasible.</li>
+    <ul>
+      <li>Acquire at $42,500</li>
+      <li>Complete floodway, survey, elevation, engineering, utility, and building-envelope diligence</li>
+      <li>Determine the appropriate foundation and finished-floor elevation</li>
+      <li>Advance the property toward a permitted residential build if feasible</li>
     </ul>
     <p>A builder experienced with flood-designated parcels may be able to evaluate this opportunity more efficiently than a buyer unfamiliar with coastal construction.</p>
 
-    <h3>Custom Home Play</h3>
+    <h2 class="section-title" style="margin-top:30px;">Custom Home Play</h2>
     <p>A future homeowner interested in Brunswick Plantation can evaluate the property for a custom residence designed specifically around the site's elevation and flood requirements. The community setting may support an elevated or engineered residential product, subject to architectural and governmental approval.</p>
-  </section>
+  </div>
+</section>
 
-  <section>
-    <h2>Community Context</h2>
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Community Context</h2>
     <p>Brunswick Plantation offers an established residential setting with golf-course development and existing homes throughout the community. Buyer should independently verify:</p>
-    <ul class="clean two-col">
-      <li>HOA / POA fees</li>
-      <li>Architectural guidelines</li>
-      <li>Minimum home size</li>
-      <li>Approved builders</li>
-      <li>Construction standards</li>
-      <li>Golf-course setbacks</li>
-      <li>Rental restrictions</li>
-      <li>Road maintenance</li>
-      <li>Community assessments</li>
-      <li>Any additional restrictions</li>
+    <ul>
+      <li>HOA / POA Fees</li>
+      <li>Architectural Guidelines</li>
+      <li>Minimum Home Size</li>
+      <li>Approved Builders</li>
+      <li>Construction Standards</li>
+      <li>Golf-Course Setbacks</li>
+      <li>Rental Restrictions</li>
+      <li>Road Maintenance</li>
+      <li>Community Assessments</li>
+      <li>Any Additional Restrictions</li>
     </ul>
-  </section>
 
-  <section>
-    <h2>Utilities</h2>
+    <h2 class="section-title" style="margin-top:30px;">Utilities</h2>
     <p>Buyer must independently determine the exact utility setup for the parcel, including:</p>
-    <ul class="clean two-col">
+    <ul>
       <li>Water</li>
       <li>Sewer</li>
       <li>Electricity</li>
-      <li>Tap status</li>
-      <li>Meter status</li>
-      <li>Utility fees</li>
-      <li>Impact fees</li>
-      <li>Connection costs</li>
-      <li>Capacity and service availability</li>
+      <li>Tap Status</li>
+      <li>Meter Status</li>
+      <li>Utility Fees</li>
+      <li>Impact Fees</li>
+      <li>Connection Costs</li>
+      <li>Capacity and Service Availability</li>
     </ul>
-    <p style="font-size:0.92rem;color:#4b4235;">No representation is made that all utility connections are currently installed or paid.</p>
-  </section>
-
-  <section>
-    <h2>Buyer Due Diligence Notice</h2>
-    <div class="disclosure">
-      Buyer must independently verify zoning, survey boundaries, exact acreage, flood zone, floodway limits, base flood elevation, no-rise requirements, engineering, fill limitations, building envelope, setbacks, foundation requirements, HOA restrictions, utilities, water, sewer, electric service, drainage, soils, wetlands, CAMA requirements if applicable, title, deed restrictions, development costs, and all Brunswick County development requirements prior to closing.
-    </div>
-  </section>
-
-  <section>
-    <h2>Deal Terms</h2>
-    <table class="deal-terms">
-      <tr><td>Purchase Price</td><td>$42,500</td></tr>
-      <tr><td>Lot Size</td><td>0.30± acre residential homesite</td></tr>
-      <tr><td>Financing</td><td>Cash or hard money only</td></tr>
-      <tr><td>Transaction Type</td><td>Assignment of contract</td></tr>
-      <tr><td>Closing Costs</td><td>Buyer pays closing costs</td></tr>
-      <tr><td>Condition</td><td>Property sold as-is</td></tr>
-      <tr><td>Proof of Funds</td><td>Required</td></tr>
-      <tr><td>Terms</td><td>First come, first served — no auction, no highest and best</td></tr>
-    </table>
-    <p style="margin-top:16px;">This is a wholesale assignment. JNA Dynamic Holdings LLC holds equitable interest in the subject transaction pursuant to an executed purchase contract with the seller. The end buyer will receive an assignment of contract. JNA Dynamic Holdings LLC does not represent the seller and is not acting as a real estate broker.</p>
-    <p style="font-size:0.92rem;color:#4b4235;">All flood, engineering, elevation, utility, zoning, buildability, HOA, and development information must be independently verified by buyer prior to closing.</p>
-  </section>
-
-</div>
-
-<div class="cta-band">
-  <div class="wrap">
-    <h2>0.30 Acres. Brunswick Plantation. Reported AE Floodway.</h2>
-    <p>Floodway lot across the fairway reportedly sold around $40,000. Subject offered at $42,500. First come, first served — cash or hard money only.</p>
-    <div class="cta-contacts">
-      <a href="tel:5206336437">Call 520-633-6437</a>
-      <a href="mailto:montanoemmanuel@gmail.com">Email montanoemmanuel@gmail.com</a>
-    </div>
+    <p>No representation is made that all utility connections are currently installed or paid.</p>
   </div>
-</div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Buyer Due Diligence Notice</h2>
+    <p>Buyer must independently verify zoning, survey boundaries, exact acreage, flood zone, floodway limits, base flood elevation, no-rise requirements, engineering, fill limitations, building envelope, setbacks, foundation requirements, HOA restrictions, utilities, water, sewer, electric service, drainage, soils, wetlands, CAMA requirements if applicable, title, deed restrictions, development costs, and all Brunswick County development requirements prior to closing.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Deal Terms</h2>
+    <table class="terms">
+      <tr><td class="k">Purchase Price</td><td>$42,500</td></tr>
+      <tr><td class="k">Lot Size</td><td>0.30± Acre Residential Homesite</td></tr>
+      <tr><td class="k">County</td><td>Brunswick County, North Carolina</td></tr>
+      <tr><td class="k">Community</td><td>Brunswick Plantation</td></tr>
+      <tr><td class="k">Property Type</td><td>Vacant Residential Land</td></tr>
+      <tr><td class="k">Reported Flood Designation</td><td>AE Floodway</td></tr>
+      <tr><td class="k">Reported Comparable Floodway Sale</td><td>Approximately $40,000</td></tr>
+      <tr><td class="k">Financing</td><td>Cash or Hard Money Only</td></tr>
+      <tr><td class="k">Deal Structure</td><td>Assignment of Contract</td></tr>
+      <tr><td class="k">Closing Costs</td><td>Buyer Pays Closing Costs</td></tr>
+      <tr><td class="k">Condition</td><td>Property Sold As-Is</td></tr>
+      <tr><td class="k">Requirement</td><td>Proof of Funds Required</td></tr>
+      <tr><td class="k">Process</td><td>First Come, First Served — No Auction, No Highest and Best</td></tr>
+    </table>
+    <p style="margin-top:16px;">This is a wholesale assignment. JNA Dynamic Holdings LLC holds equitable interest in the subject transaction pursuant to an executed purchase contract and memorandum with the seller. The end buyer will receive an assignment of contract. JNA Dynamic Holdings LLC does not represent the seller and is not acting as a real estate broker.</p>
+    <p>All flood, engineering, elevation, utility, zoning, buildability, HOA, and development information must be independently verified by the buyer prior to closing.</p>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="wrap">
+    <h2>0.30 Acres. Brunswick Plantation. AE Floodway Reported.</h2>
+    <p>A floodway lot across the fairway reportedly sold around $40,000. The subject is offered at $42,500. Cash or hard money only, assignment of contract, first come first served — contact us today to receive the full address and remaining diligence details.</p>
+    <div class="cta-contacts">
+      <a href="tel:5206336437">520-633-6437</a>
+      <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
+    </div>
+    <p style="margin-top:18px;font-weight:600;color:var(--cream);">JNA Dynamic Holdings LLC</p>
+  </div>
+</section>
 
 <footer class="legal">
   <div class="wrap">
-    <p><strong>JNA Dynamic Holdings LLC</strong></p>
-    <p>This is an assignment of contract. A legally binding purchase contract and memorandum have been executed with the seller, giving JNA Dynamic Holdings LLC contractual and equitable rights in the transaction. JNA Dynamic Holdings LLC does not represent the seller and is not acting as a real estate broker. Do not contact the owner/seller without explicit written consent. Any attempt to circumvent JNA Dynamic Holdings LLC or renegotiate directly with the seller may result in enforcement of contractual and legal rights.</p>
-    <p>All figures, acreage, flood designations, comparable sale information, and other details on this page have not been independently verified by JNA Dynamic Holdings LLC and should be confirmed by buyer prior to closing.</p>
+    <p><strong>Disclaimer:</strong> This is an assignment of contract. A legally binding purchase contract and memorandum have been executed with the seller, giving JNA Dynamic Holdings LLC contractual and equitable rights in the transaction. JNA Dynamic Holdings LLC does not represent the seller and is not acting as a real estate broker. Do not contact the owner/seller without our explicit written consent. Any attempt to circumvent JNA Dynamic Holdings LLC or renegotiate directly with the seller may result in enforcement of our contractual and legal rights.</p>
+    <p>All figures, acreage, flood designations, and comparable sale information referenced on this page have not been independently verified by JNA Dynamic Holdings LLC and should be independently confirmed by any prospective buyer prior to closing.</p>
   </div>
 </footer>
 
-<div style="max-width:640px;margin:40px auto;padding:28px 24px;text-align:center;font-family:Arial,sans-serif;border-top:1px solid #ddd;"><p style="color:#444;margin-bottom:16px;">Addresses are shared with wholesalers who already have an interested buyer for this deal, or with direct buyers reviewing this listing. Log in or create a free account to request it.</p><a href="https://sendmybuyer.com/?requestAddress=5ab7021a-e9b7-4375-b86f-d91f444c2e80" style="display:inline-block;padding:12px 28px;background:#1a73e8;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;">Request the Address</a><p style="margin-top:16px;"><a href="https://sendmybuyer.com" style="color:#1a73e8;">Log in</a> &nbsp;&middot;&nbsp; <a href="https://sendmybuyer.com" style="color:#1a73e8;">Browse all deals</a></p><p style="color:#888;font-size:0.9em;margin-top:20px;">Interested in this deal? This listing isn't searchable once you leave — <strong>save or bookmark this page's link</strong> before heading to the home page, so you can find your way back to it.</p></div></body>
+</body>
 </html>
