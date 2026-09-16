@@ -3,151 +3,196 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>0.21± Acre Residential Infill Lot — Ocala, FL 34475 | JNA Dynamic Holdings LLC</title>
+<title>Ocala, FL 34475 — 0.21± Acre Residential Infill Lot | JNA Dynamic Holdings LLC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#f6f1e8;
+    --paper:#f7f2ea;
     --ink:#2b2620;
-    --ink-soft:#5c554a;
-    --line:#d9cfbd;
-    --accent:#8a5a34;
+    --ink-soft:#5c5348;
+    --line:#ddd3c2;
+    --accent:#8a6b3f;
+    --accent-deep:#5f4a2c;
     --card:#fffdf9;
   }
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
   body{
+    margin:0;
     background:var(--paper);
     color:var(--ink);
-    font-family:'Source Sans 3', sans-serif;
+    font-family:'Inter',sans-serif;
     font-size:16px;
-    line-height:1.55;
+    line-height:1.6;
   }
   h1,h2,h3{
-    font-family:'Cormorant Garamond', serif;
-    font-weight:600;
+    font-family:'Fraunces',serif;
     color:var(--ink);
-    letter-spacing:0.01em;
+    font-weight:600;
+    letter-spacing:0.2px;
   }
   .wrap{
     max-width:920px;
     margin:0 auto;
-    padding:0 28px;
+    padding:0 24px;
   }
-
-  header.top{
+  a{color:var(--accent-deep);}
+  .topbar{
+    background:var(--ink);
+    color:#f2ece0;
+    padding-top:10px;
+    padding-bottom:10px;
+    font-size:13px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+  }
+  .topbar .wrap{
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  header.hero{
+    padding-top:48px;
+    padding-bottom:32px;
     border-bottom:1px solid var(--line);
-    padding-top:36px;
-    padding-bottom:28px;
   }
   .eyebrow{
     text-transform:uppercase;
-    letter-spacing:0.16em;
-    font-size:12px;
-    color:var(--accent);
+    letter-spacing:0.14em;
+    font-size:13px;
+    color:var(--accent-deep);
     font-weight:600;
+    margin-bottom:14px;
+  }
+  h1.title{
+    font-size:2.4rem;
     margin:0 0 10px 0;
+    line-height:1.15;
   }
-  h1.headline{
-    font-size:42px;
-    margin:0 0 12px 0;
-    line-height:1.1;
-  }
-  .loc-line{
-    font-size:18px;
+  .location-line{
+    font-size:1.1rem;
     color:var(--ink-soft);
-    margin:0 0 6px 0;
+    margin-bottom:6px;
   }
-  .addr-note{
-    font-size:14.5px;
-    color:var(--ink-soft);
-    font-style:italic;
-    margin:6px 0 0 0;
-  }
-
-  .price-block{
-    display:flex;
-    flex-wrap:wrap;
-    align-items:baseline;
-    gap:18px;
-    margin-top:22px;
-  }
-  .price-tag{
-    font-family:'Cormorant Garamond', serif;
-    font-size:52px;
-    font-weight:700;
-    color:var(--ink);
-  }
-  .price-sub{
+  .address-note{
+    display:inline-block;
+    margin-top:10px;
+    padding:10px 16px;
+    background:#efe6d4;
+    border:1px solid var(--line);
+    border-radius:6px;
     font-size:14px;
     color:var(--ink-soft);
+  }
+  .price-block{
+    margin-top:28px;
+    display:flex;
+    align-items:baseline;
+    gap:18px;
+    flex-wrap:wrap;
+  }
+  .price-block .price{
+    font-family:'Fraunces',serif;
+    font-size:3rem;
+    font-weight:700;
+    color:var(--accent-deep);
+  }
+  .price-block .price-label{
     text-transform:uppercase;
-    letter-spacing:0.08em;
+    letter-spacing:0.1em;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .tag-row{
+    margin-top:18px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .tag{
+    background:var(--card);
+    border:1px solid var(--line);
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:12.5px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
   }
 
-  section{
-    margin-top:44px;
-    margin-bottom:44px;
+  .gallery-section{
+    margin-top:40px;
+    margin-bottom:40px;
   }
-  section h2{
-    font-size:28px;
-    margin:0 0 18px 0;
-    padding-bottom:10px;
-    border-bottom:1px solid var(--line);
-  }
-  section h3{
-    font-size:20px;
-    margin:22px 0 10px 0;
-  }
-  p{margin:0 0 12px 0;}
-
-  /* gallery */
-  .gallery-wrap{
-    margin-top:24px;
+  .gallery-section h2{
+    font-size:1.3rem;
+    margin-bottom:14px;
   }
   .gallery{
     display:flex;
     gap:14px;
     overflow-x:auto;
-    padding-bottom:12px;
+    padding-bottom:10px;
     scroll-snap-type:x mandatory;
   }
   .gallery img{
-    height:230px;
+    height:260px;
     width:auto;
-    flex:0 0 auto;
-    border-radius:4px;
+    max-width:none;
+    border-radius:8px;
     object-fit:cover;
     scroll-snap-align:start;
     border:1px solid var(--line);
+    background:#eee;
   }
   .more-photos{
     display:inline-block;
-    margin-top:10px;
+    margin-top:12px;
     font-size:14px;
-    color:var(--accent);
-    text-decoration:underline;
+    font-weight:600;
   }
 
-  ul.clean{
+  section.block{
+    margin-top:44px;
+    margin-bottom:44px;
+  }
+  section.block h2{
+    font-size:1.5rem;
+    margin:0 0 16px 0;
+    border-bottom:2px solid var(--accent);
+    display:inline-block;
+    padding-bottom:6px;
+  }
+  section.block h3{
+    font-size:1.1rem;
+    margin:22px 0 10px 0;
+    color:var(--accent-deep);
+  }
+  p{
+    color:var(--ink);
+    margin:0 0 14px 0;
+  }
+  ul{
     margin:0 0 14px 0;
     padding-left:22px;
   }
-  ul.clean li{
+  ul li{
     margin-bottom:6px;
   }
 
   .snapshot-grid{
     display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:10px 24px;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:12px;
   }
   .snapshot-grid div{
-    padding:10px 0;
-    border-bottom:1px dotted var(--line);
-    font-size:15px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:14px 16px;
+    font-size:14.5px;
   }
 
   table.terms{
@@ -155,6 +200,8 @@
     border-collapse:collapse;
     background:var(--card);
     border:1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden;
   }
   table.terms tr{
     border-bottom:1px solid var(--line);
@@ -169,131 +216,156 @@
   }
   table.terms td.label{
     width:38%;
-    color:var(--ink-soft);
     font-weight:600;
-  }
-
-  .card-box{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:6px;
-    padding:20px 24px;
-  }
-
-  .disclosure{
-    font-size:14px;
     color:var(--ink-soft);
-    background:var(--card);
+    text-transform:uppercase;
+    font-size:12.5px;
+    letter-spacing:0.05em;
+  }
+
+  .comp-list{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  .comp-list span{
+    background:#efe6d4;
     border:1px solid var(--line);
+    padding:6px 12px;
     border-radius:6px;
-    padding:18px 22px;
+    font-size:14px;
+  }
+
+  .disclosure-box{
+    background:#efe6d4;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:18px 20px;
+    font-size:14.5px;
+    color:var(--ink-soft);
   }
 
   .cta-band{
     background:var(--ink);
-    color:var(--paper);
-    margin-top:56px;
-    margin-bottom:0;
-    padding:44px 0 50px 0;
+    color:#f4efe4;
+    padding-top:48px;
+    padding-bottom:48px;
+    margin-top:60px;
   }
   .cta-band h2{
-    color:var(--paper);
-    border-bottom:1px solid #55503f;
-    font-size:30px;
+    color:#f4efe4;
+    border-bottom:2px solid var(--accent);
+    display:inline-block;
+    padding-bottom:6px;
+    font-size:1.6rem;
   }
   .cta-band p{
-    color:#e4dccb;
+    color:#d9d1c2;
+    max-width:640px;
   }
   .cta-contacts{
-    margin-top:18px;
+    margin-top:20px;
     display:flex;
-    flex-wrap:wrap;
     gap:26px;
+    flex-wrap:wrap;
+    font-size:1.05rem;
   }
   .cta-contacts a{
-    color:#f6f1e8;
-    font-size:19px;
+    color:#f4efe4;
     font-weight:600;
     text-decoration:none;
-    border-bottom:2px solid var(--accent);
+    border-bottom:1px solid var(--accent);
     padding-bottom:2px;
   }
   footer.foot{
-    text-align:center;
-    font-size:12.5px;
-    color:#8b8272;
-    padding:22px 0 34px 0;
+    padding-top:24px;
+    padding-bottom:40px;
   }
-
-  @media (max-width:600px){
-    h1.headline{font-size:32px;}
-    .price-tag{font-size:40px;}
-    .snapshot-grid{grid-template-columns:1fr;}
+  footer.foot p{
+    font-size:12.5px;
+    color:var(--ink-soft);
   }
 </style>
 </head>
-<body>
+<body><div style="max-width:640px;margin:0 auto 20px;padding:20px 24px;text-align:center;font-family:Arial,sans-serif;border-bottom:1px solid #ddd;"><p style="color:#444;margin-bottom:16px;">Addresses are shared with wholesalers who already have an interested buyer for this deal, or with direct buyers reviewing this listing. Log in or create a free account to request it.</p><a href="https://sendmybuyer.com/?requestAddress=9618a1f9-c638-4194-9b3e-bb6550e8df18&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F9618a1f9-c638-4194-9b3e-bb6550e8df18.html" style="display:inline-block;padding:12px 28px;background:#1a73e8;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;">Request the Address</a><p style="margin-top:16px;"><a href="https://sendmybuyer.com" style="color:#1a73e8;">Log in</a> &nbsp;&middot;&nbsp; <a href="https://sendmybuyer.com" style="color:#1a73e8;">Browse all deals</a></p><p style="color:#888;font-size:0.9em;margin-top:20px;">Interested in this deal? This listing isn't searchable once you leave — <strong>save or bookmark this page's link</strong> before heading to the home page, so you can find your way back to it.</p></div>
 
-<header class="top">
+<div class="topbar">
   <div class="wrap">
-    <p class="eyebrow">Deal Fl-1 &middot; Wholesale Assignment &middot; Land</p>
-    <h1 class="headline">0.21± Acre Residential Infill Lot</h1>
-    <p class="loc-line">Ocala, FL 34475 &middot; Marion County</p>
-    <p class="addr-note">Address available upon request — the exact parcel location and legal description will be provided to interested buyers upon contact.</p>
+    <span>JNA Dynamic Holdings LLC</span>
+    <span>Deal Code: FL-1</span>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Wholesale Land Assignment</div>
+    <h1 class="title">0.21± Acre Residential Infill Lot</h1>
+    <div class="location-line">Ocala, FL 34475 &nbsp;·&nbsp; Marion County</div>
+    <div class="address-note">Address available upon request — contact us for the exact parcel location.</div>
+
     <div class="price-block">
-      <div class="price-tag">$15,500</div>
-      <div class="price-sub">Asking Price &middot; Cash or Hard Money &middot; Assignment of Contract</div>
+      <div>
+        <div class="price-label">Asking Price</div>
+        <div class="price">$15,500</div>
+      </div>
+    </div>
+
+    <div class="tag-row">
+      <span class="tag">Vacant Land</span>
+      <span class="tag">0.21± Acres</span>
+      <span class="tag">≈9,148 SF</span>
+      <span class="tag">Cash or Hard Money</span>
+      <span class="tag">Assignment of Contract</span>
     </div>
   </div>
 </header>
 
 <div class="wrap">
 
-  <section class="gallery-wrap">
+  <div class="gallery-section">
     <h2>Photos</h2>
     <div class="gallery">
-      <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/1.jpg" alt="Vacant residential lot in Ocala, FL 34475 - photo 1">
-      <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/2.jpg" alt="Vacant residential lot in Ocala, FL 34475 - photo 2">
-      <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/3.jpg" alt="Vacant residential lot in Ocala, FL 34475 - photo 3">
-      <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/4.jpg" alt="Vacant residential lot in Ocala, FL 34475 - photo 4">
-      <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/5.jpg" alt="Vacant residential lot in Ocala, FL 34475 - photo 5">
-      <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/6.jpg" alt="Vacant residential lot in Ocala, FL 34475 - photo 6">
-      <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/7.jpg" alt="Vacant residential lot in Ocala, FL 34475 - photo 7">
-      <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/8.jpg" alt="Vacant residential lot in Ocala, FL 34475 - photo 8">
-      <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/9.jpg" alt="Vacant residential lot in Ocala, FL 34475 - photo 9">
+      <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/1.jpg" alt="Vacant residential lot in Ocala FL 34475, photo 1">
+      <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/2.jpg" alt="Vacant residential lot in Ocala FL 34475, photo 2">
+      <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/3.jpg" alt="Vacant residential lot in Ocala FL 34475, photo 3">
+      <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/4.jpg" alt="Vacant residential lot in Ocala FL 34475, photo 4">
+      <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/5.jpg" alt="Vacant residential lot in Ocala FL 34475, photo 5">
+      <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/6.jpg" alt="Vacant residential lot in Ocala FL 34475, photo 6">
+      <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/7.jpg" alt="Vacant residential lot in Ocala FL 34475, photo 7">
+      <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/8.jpg" alt="Vacant residential lot in Ocala FL 34475, photo 8">
+      <img src="/deals/9618a1f9-c638-4194-9b3e-bb6550e8df18/photos/9.jpg" alt="Vacant residential lot in Ocala FL 34475, photo 9">
     </div>
-  </section>
+  </div>
 
-  <section>
+  <section class="block">
     <h2>Here Is What We Have</h2>
     <p>This is an approximately 0.21-acre / 9,148-square-foot vacant residential lot in Ocala, Florida 34475. The property is positioned as a straightforward small-lot residential infill opportunity for a builder, land investor, owner-builder, or future homeowner.</p>
     <p>The immediate 34475 land market contains multiple similarly sized vacant residential lots currently being marketed in the high teens and low $20Ks. The subject is being offered at $15,500. The pricing is intentionally positioned near the lower end of comparable current asking inventory while leaving a buyer room to complete zoning, utility, access, and buildability diligence.</p>
   </section>
 
-  <section>
+  <section class="block">
     <h2>Property Snapshot</h2>
-    <div class="card-box">
-      <div class="snapshot-grid">
-        <div>0.21± Acres</div>
-        <div>Approximately 9,148 SF</div>
-        <div>Ocala, FL 34475</div>
-        <div>Marion County</div>
-        <div>Small residential infill lot</div>
-        <div>Established local land market</div>
-        <div>Current area lot inventory in high teens / low $20Ks</div>
-        <div>Low entry price point</div>
-      </div>
-      <p style="margin-top:14px;">Buyer is responsible for completing full due diligence prior to closing.</p>
+    <div class="snapshot-grid">
+      <div>0.21± Acres</div>
+      <div>Approximately 9,148 SF</div>
+      <div>Ocala, FL 34475</div>
+      <div>Marion County</div>
+      <div>Small Residential Infill Lot</div>
+      <div>Established Land Market</div>
+      <div>Current Area Lot Inventory in High Teens / Low $20Ks</div>
+      <div>Low Entry Price</div>
+      <div>Buyer Responsible for Full Due Diligence</div>
     </div>
   </section>
 
-  <section>
+  <section class="block">
     <h2>The Numbers</h2>
     <table class="terms">
       <tr><td class="label">Asking Price</td><td>$15,500</td></tr>
-      <tr><td class="label">Lot Size</td><td>0.21± acres</td></tr>
+      <tr><td class="label">Lot Size</td><td>0.21± Acres</td></tr>
       <tr><td class="label">Land Area</td><td>Approximately 9,148 SF</td></tr>
-      <tr><td class="label">Property Type</td><td>Vacant land</td></tr>
+      <tr><td class="label">Property Type</td><td>Vacant Land</td></tr>
       <tr><td class="label">Market</td><td>Ocala, FL 34475</td></tr>
       <tr><td class="label">County</td><td>Marion County</td></tr>
       <tr><td class="label">Zoning</td><td>Buyer to verify</td></tr>
@@ -306,29 +378,29 @@
       <tr><td class="label">Flood Zone</td><td>Buyer to verify</td></tr>
       <tr><td class="label">Wetlands</td><td>Buyer to verify</td></tr>
       <tr><td class="label">Financing</td><td>Cash or hard money</td></tr>
-      <tr><td class="label">Transaction Type</td><td>Assignment of contract</td></tr>
+      <tr><td class="label">Structure</td><td>Assignment of contract</td></tr>
     </table>
   </section>
 
-  <section>
+  <section class="block">
     <h2>Why This Lot Makes Sense</h2>
     <p>The opportunity here is straightforward. This is an inexpensive residential land play in a market where similarly sized vacant lots are actively being marketed around the high teens to low $20Ks.</p>
     <p>Current 34475 asking inventory for approximately 8,700 to 10,000-square-foot lots includes properties around:</p>
-    <ul class="clean">
-      <li>$18,500</li>
-      <li>$19,000</li>
-      <li>$20,000+</li>
-    </ul>
+    <div class="comp-list">
+      <span>$18,500</span>
+      <span>$19,000</span>
+      <span>$20,000+</span>
+    </div>
     <p>Larger lots around approximately 0.25 to 0.30 acres are also being marketed around $19,000 to $23,000+.</p>
     <p>The subject is being offered at $15,500 — directly inside the current local asking range without relying on aggressive $25K+ retail assumptions.</p>
     <p>The investment thesis is not based on automated valuations. It is based on a simple low-cost land position in an active Ocala residential lot market.</p>
   </section>
 
-  <section>
+  <section class="block">
     <h2>Local Land Market Context</h2>
     <p>Current small-lot inventory in 34475 generally supports asking prices in the high teens and low $20Ks depending on exact location, utilities, zoning, access, flood conditions, and buildability. There are also lower-priced lots in the market, so buyers should not assume every 0.20-acre parcel automatically supports $20K+.</p>
     <p>The strongest value case will depend on confirming:</p>
-    <ul class="clean">
+    <ul>
       <li>Residential zoning</li>
       <li>Standard single-family home eligibility</li>
       <li>Lot width</li>
@@ -343,10 +415,10 @@
     <p>Once those items are confirmed cleanly, the property becomes significantly easier for a builder or retail land buyer to underwrite.</p>
   </section>
 
-  <section>
+  <section class="block">
     <h2>Zoning / Use Diligence</h2>
     <p>The exact zoning and permitted residential use should be independently confirmed with Marion County or the applicable local jurisdiction. Buyer should verify:</p>
-    <ul class="clean">
+    <ul>
       <li>Current zoning</li>
       <li>Single-family home eligibility</li>
       <li>Minimum lot size</li>
@@ -363,10 +435,10 @@
     <p>No specific residential development entitlement is being guaranteed.</p>
   </section>
 
-  <section>
+  <section class="block">
     <h2>Utility Diligence</h2>
     <p>Do not assume that water, sewer, or utility taps are already installed. Buyer should independently verify:</p>
-    <ul class="clean">
+    <ul>
       <li>Water provider</li>
       <li>Water main location</li>
       <li>Water tap availability</li>
@@ -382,10 +454,10 @@
     <p>Nearby infrastructure does not guarantee a specific connection to the subject parcel.</p>
   </section>
 
-  <section>
+  <section class="block">
     <h2>Buildability Diligence</h2>
     <p>Because this is approximately 9,148 square feet, the buyer should verify that the parcel can accommodate the intended residence after all required setbacks and site constraints are applied. Buyer should confirm:</p>
-    <ul class="clean">
+    <ul>
       <li>Building envelope</li>
       <li>Lot width</li>
       <li>Road frontage</li>
@@ -403,15 +475,28 @@
     <p>A smaller lot can work extremely well for infill construction, but only if the usable building envelope supports the buyer's intended plan.</p>
   </section>
 
-  <section>
-    <h2>How Different Buyers Might Use This</h2>
-    <h3>Builder Play</h3>
-    <p>Acquire a low-cost residential lot and complete zoning, utility, survey, and building-envelope diligence. The ideal builder is someone who already understands small-lot infill in the Ocala market and can quickly determine what can be built, utility connection cost, site prep cost, permitting cost, and finished home value. At $15,500, the property provides a relatively low land basis compared with the total cost of a finished residential build.</p>
-    <h3>Owner-Builder Play</h3>
+  <section class="block">
+    <h2>Builder Play</h2>
+    <p>Acquire a low-cost residential lot and complete zoning, utility, survey, and building-envelope diligence. The ideal builder is someone who already understands small-lot infill in the Ocala market and can quickly determine:</p>
+    <ul>
+      <li>What can be built</li>
+      <li>Utility connection cost</li>
+      <li>Site prep cost</li>
+      <li>Permitting cost</li>
+      <li>Finished home value</li>
+    </ul>
+    <p>At $15,500, the property provides a relatively low land basis compared with the total cost of a finished residential build.</p>
+  </section>
+
+  <section class="block">
+    <h2>Owner-Builder Play</h2>
     <p>A future homeowner or owner-builder may use the property as an opportunity to secure an inexpensive residential homesite in Ocala. The buyer should first confirm all zoning, utility, setback, and construction requirements before selecting a home plan.</p>
-    <h3>Land Investor Play</h3>
+  </section>
+
+  <section class="block">
+    <h2>Land Investor Play</h2>
     <p>A land investor could strengthen the property by obtaining:</p>
-    <ul class="clean">
+    <ul>
       <li>Current survey</li>
       <li>Zoning confirmation</li>
       <li>Building-envelope analysis</li>
@@ -424,41 +509,42 @@
     <p>Completing these items could make the property significantly easier to remarket to a builder or retail end user.</p>
   </section>
 
-  <section>
+  <section class="block">
     <h2>Location Advantage</h2>
-    <ul class="clean">
-      <li>Ocala, FL</li>
-      <li>Marion County</li>
-      <li>ZIP code 34475</li>
-      <li>Central Florida</li>
-      <li>Established residential land market</li>
-      <li>Small-lot infill opportunity</li>
-      <li>Low entry price</li>
-    </ul>
-    <p>The key investment thesis is simple: 0.21 acres + 9,148 SF + Ocala 34475 + active small-lot market, with area asking inventory referenced up to approximately $19,900.</p>
+    <div class="snapshot-grid">
+      <div>Ocala, FL</div>
+      <div>Marion County</div>
+      <div>ZIP Code 34475</div>
+      <div>Central Florida</div>
+      <div>Established Residential Land Market</div>
+      <div>Small-Lot Infill Opportunity</div>
+      <div>Low Entry Price</div>
+    </div>
+    <p style="margin-top:18px;">The key investment thesis is simple: 0.21 acres + 9,148 SF + Ocala 34475 + active small-lot market + $19,900 ask.</p>
   </section>
 
-  <section>
+  <section class="block">
     <h2>Buyer Due Diligence Notice</h2>
-    <div class="disclosure">
+    <div class="disclosure-box">
       <p>Buyer must independently verify exact zoning, permitted use, survey boundaries, acreage, lot dimensions, minimum lot width, setbacks, buildable envelope, road frontage, legal access, water availability, sewer availability, septic requirements, electric service, utility connection costs, flood-zone designation, wetlands, drainage, soils, easements, title conditions, liens, code issues, permitting requirements, and all development costs prior to closing.</p>
       <p>Buyer should also independently confirm that the parcel has not been combined, altered, or legally affected by adjoining parcels or prior plat changes.</p>
-      <p>No representation is made that public water, public sewer, septic approval, utility taps, meters, or development permits are currently installed or approved. Figures presented on this page have not been independently verified by JNA Dynamic Holdings LLC.</p>
+      <p style="margin-bottom:0;">No representation is made that public water, public sewer, septic approval, utility taps, meters, or development permits are currently installed or approved.</p>
     </div>
   </section>
 
-  <section>
+  <section class="block">
     <h2>Deal Terms</h2>
     <table class="terms">
       <tr><td class="label">Purchase Price</td><td>$15,500</td></tr>
-      <tr><td class="label">Funding</td><td>Cash or hard money</td></tr>
+      <tr><td class="label">Financing</td><td>Cash or hard money</td></tr>
       <tr><td class="label">Transaction Structure</td><td>Assignment of contract</td></tr>
       <tr><td class="label">Closing Costs</td><td>Buyer pays closing costs</td></tr>
       <tr><td class="label">Condition</td><td>Property sold as-is</td></tr>
-      <tr><td class="label">Purchase Requirement</td><td>Proof of funds required</td></tr>
-      <tr><td class="label">Terms</td><td>First come, first served — no auction, no highest and best</td></tr>
+      <tr><td class="label">Proof of Funds</td><td>Required</td></tr>
+      <tr><td class="label">Process</td><td>First come, first served — no auction, no highest and best</td></tr>
     </table>
-    <p style="margin-top:16px;">This is a wholesale assignment. JNA Dynamic Holdings LLC holds equitable interest in the subject transaction under contract with the underlying property owner. The end buyer will receive an assignment of contract, not a direct transfer from the seller. All zoning, utility, access, flood, wetlands, title, buildability, and development information must be independently verified by buyer prior to closing.</p>
+    <p style="margin-top:18px;">This is a wholesale assignment. JNA Dynamic Holdings LLC holds equitable interest in the subject transaction under contract with the underlying property owner. The end buyer will receive an assignment of contract, not a direct deed from JNA Dynamic Holdings LLC.</p>
+    <p>All zoning, utility, access, flood, wetlands, title, buildability, and development information must be independently verified by buyer prior to closing. Figures presented on this page have not been independently verified by JNA Dynamic Holdings LLC.</p>
   </section>
 
 </div>
@@ -466,7 +552,7 @@
 <div class="cta-band">
   <div class="wrap">
     <h2>Interested in This Lot?</h2>
-    <p>0.21± acres. Approximately 9,148 SF. Ocala 34475. Small residential infill lot. Current area asking inventory generally in the high teens / low $20Ks. Subject offered at $15,500. First come, first served — contact us today to receive the exact parcel location and full due diligence package.</p>
+    <p>0.21± acres. Approximately 9,148 SF. Ocala 34475. Small residential infill lot. Current area asking inventory generally in the high teens / low $20Ks. Subject offered at $15,500. Contact us for the full address and to move forward on a first-come, first-served basis.</p>
     <div class="cta-contacts">
       <a href="tel:520-633-6437">520-633-6437</a>
       <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
@@ -476,9 +562,9 @@
 
 <footer class="foot">
   <div class="wrap">
-    <p>JNA Dynamic Holdings LLC &middot; Deal Fl-1 &middot; Ocala, FL &middot; Marion County</p>
+    <p>JNA Dynamic Holdings LLC | This offering is an assignment of contract. JNA Dynamic Holdings LLC holds equitable interest via contract with the underlying property owner and is not the recorded titleholder. Address available upon request. All figures are believed accurate but have not been independently verified by JNA Dynamic Holdings LLC; buyer is responsible for full independent due diligence prior to closing.</p>
   </div>
 </footer>
 
-<div style="max-width:640px;margin:40px auto;padding:28px 24px;text-align:center;font-family:Arial,sans-serif;border-top:1px solid #ddd;"><p style="color:#444;margin-bottom:16px;">Addresses are shared with wholesalers who already have an interested buyer for this deal, or with direct buyers reviewing this listing. Log in or create a free account to request it.</p><a href="https://sendmybuyer.com/?requestAddress=9618a1f9-c638-4194-9b3e-bb6550e8df18" style="display:inline-block;padding:12px 28px;background:#1a73e8;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;">Request the Address</a><p style="margin-top:16px;"><a href="https://sendmybuyer.com" style="color:#1a73e8;">Log in</a> &nbsp;&middot;&nbsp; <a href="https://sendmybuyer.com" style="color:#1a73e8;">Browse all deals</a></p><p style="color:#888;font-size:0.9em;margin-top:20px;">Interested in this deal? This listing isn't searchable once you leave — <strong>save or bookmark this page's link</strong> before heading to the home page, so you can find your way back to it.</p></div></body>
+</body>
 </html>
