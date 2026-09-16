@@ -680,14 +680,20 @@ document.getElementById("signup-btn").addEventListener("click", async function (
 });
 
 // Deep link from a public deal page's "Request the Address" button
-// (?requestAddress=<dealId>) -- already-logged-in returning visitors (a
-// persisted localStorage session) get the request fired immediately on
-// load; everyone else sees a banner and it fires right after they log in
-// or sign up (see the call above and the one in doLogin). Clears the query
-// param either way so a page refresh doesn't re-fire it.
+// (?requestAddress=<dealId>&returnTo=<dealPageUrl>) -- already-logged-in
+// returning visitors (a persisted localStorage session) get the request
+// fired immediately on load; everyone else sees a banner and it fires
+// right after they log in or sign up (see the call above and the one in
+// doLogin). Once it fires, sends them right back to the listing they came
+// from (returnTo) rather than leaving them sitting on this app -- Log In /
+// Browse All Deals on that same page deliberately don't carry a returnTo,
+// since picking either of those means leaving the listing on purpose.
+// Clears the query params either way so a page refresh doesn't re-fire it.
 async function maybeFireAddressRequestFromUrl() {
-  const dealId = new URLSearchParams(window.location.search).get("requestAddress");
+  const params = new URLSearchParams(window.location.search);
+  const dealId = params.get("requestAddress");
   if (!dealId) return;
+  const returnTo = params.get("returnTo");
   const session = getSession();
   if (!session) {
     document.getElementById("address-request-banner").hidden = false;
@@ -696,7 +702,8 @@ async function maybeFireAddressRequestFromUrl() {
   window.history.replaceState(null, "", window.location.pathname);
   const res = await api("publicRequestAddressAccess", { dealId: dealId });
   if (!res.ok) { showToast(res.error || "Could not send the address request.", true); return; }
-  showToast(res.autoGranted ? "Address granted — check the deal in your Deals tab." : "Request sent — admin will grant the address shortly.");
+  showToast(res.autoGranted ? "Address granted — taking you back to the listing…" : "Request sent — admin will grant the address shortly. Taking you back to the listing…");
+  if (returnTo) setTimeout(function () { window.location.href = returnTo; }, 1200);
 }
 
 showView(getSession());

@@ -2034,8 +2034,13 @@ function generateDealPageHtml(deal, sourceListingText, photoPaths, morePhotosLin
 }
 
 function requestAddressButtonHtml(dealId) {
-  const requestUrl = 'https://sendmybuyer.com/?requestAddress=' + encodeURIComponent(dealId);
   const homeUrl = 'https://sendmybuyer.com';
+  // returnTo brings the visitor back to THIS listing once the request
+  // fires (see maybeFireAddressRequestFromUrl) -- Log In / Browse All
+  // Deals below deliberately don't carry it, since choosing either of
+  // those is choosing to leave this listing on purpose.
+  const pageUrl = homeUrl + '/deals/' + encodeURIComponent(dealId) + '.html';
+  const requestUrl = homeUrl + '/?requestAddress=' + encodeURIComponent(dealId) + '&returnTo=' + encodeURIComponent(pageUrl);
   return '<div style="max-width:640px;margin:0 auto 20px;padding:20px 24px;text-align:center;' +
     'font-family:Arial,sans-serif;border-bottom:1px solid #ddd;">' +
     '<p style="color:#444;margin-bottom:16px;">Addresses are shared with wholesalers who already have ' +
