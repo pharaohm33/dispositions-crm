@@ -2690,6 +2690,49 @@ function adminGetAddressGrants(body) {
 // still a deliberate, separate admin action via
 // adminGrantAddressAccess, this only asks for it. Never includes the
 // Address itself -- this rep doesn't have it yet, that's the whole point.
+// A person can exist on the BuyerLeads calling list (brought in by a rep,
+// or admin's own import) AND separately self-register a real Buyer
+// account with the same contact info later. When that overlap exists,
+// admin wants to know -- who originally brought this person in, and who
+// last actually talked to them -- so a relationship/credit history isn't
+// lost just because they showed up again through a different door.
+// Matches by email OR phone (digits only, so formatting differences don't
+// matter); returns null when there's no overlap to report.
+function findMatchingBuyerLeadContext(session) {
+  const rep = findRepByUsername(session.u);
+  const email = String((rep && rep['Email']) || session.u || '').trim().toLowerCase();
+  const phone = String((rep && rep['Phone']) || '').replace(/\D/g, '');
+  if (!email && !phone) return null;
+
+  const lead = sheetToObjects(getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS)).find(function (l) {
+    const leadEmail = String(l['Email'] || '').trim().toLowerCase();
+    const leadPhone = String(l['Phone'] || '').replace(/\D/g, '');
+    return (email && leadEmail === email) || (phone && leadPhone && leadPhone === phone);
+  });
+  if (!lead) return null;
+
+  const contacts = sheetToObjects(getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS))
+    .filter(function (c) { return c['BuyerLeadID'] === lead['BuyerLeadID']; })
+    .sort(function (a, b) { return new Date(b['ContactedAt']) - new Date(a['ContactedAt']); });
+  const lastContact = contacts[0];
+
+  return {
+    uploadedBy: lead['UploadedBy'] || '(admin / shared pool, not a specific rep)',
+    lastContactedBy: lastContact ? lastContact['Username'] : null,
+    lastContactedAt: lastContact ? lastContact['ContactedAt'] : null
+  };
+}
+
+function buyerLeadContextEmailBlock(session) {
+  const ctx = findMatchingBuyerLeadContext(session);
+  if (!ctx) return '';
+  return '\n\nThis email/phone also matches an existing entry on the Buyer Leads calling list -- ' +
+    'originally brought in by ' + ctx.uploadedBy + ', ' +
+    (ctx.lastContactedBy
+      ? 'last contacted by ' + ctx.lastContactedBy + (ctx.lastContactedAt ? ' on ' + new Date(ctx.lastContactedAt).toLocaleString() : '')
+      : 'never yet contacted') + '.';
+}
+
 function requestAddressAccess(body, session) {
   if (!body.dealId) return { ok: false, error: 'Missing dealId.' };
   if (!canAccessDeal(session, body.dealId)) return { ok: false, error: 'You do not have access to this deal.' };
@@ -2697,13 +2740,30 @@ function requestAddressAccess(body, session) {
   const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === body.dealId; });
   if (!deal) return { ok: false, error: 'Deal not found.' };
 
-  // "all_on_request" mode -- skip the manual-approval step entirely and
-  // grant this rep the address the instant they ask, instead of just
-  // emailing admin and waiting. Still recorded as a normal AddressGrants
-  // row, so it shows up (and can be revoked) in Address Access exactly
-  // like any manual grant would.
-  if (adminGetAutoDiscloseAddressSettings({}).mode === 'all_on_request') {
+  // A registered Buyer account (the actual end buyer, not a wholesaler/
+  // rep) gets the address instantly, always -- separate from and in
+  // addition to the site-wide "all_on_request" setting below, which
+  // covers everyone else. Admin still gets notified either way, with
+  // whatever Buyer Leads history overlaps this person (see
+  // buyerLeadContextEmailBlock) -- auto-granting doesn't mean admin
+  // doesn't get told it happened.
+  const rep = findRepByUsername(session.u);
+  const isRegisteredBuyer = rep && rep['PersonType'] === 'Buyer';
+  const autoGrant = isRegisteredBuyer || adminGetAutoDiscloseAddressSettings({}).mode === 'all_on_request';
+
+  if (autoGrant) {
     adminGrantAddressAccess({ dealId: body.dealId, username: session.u });
+    const supportEmail = getSupportEmail();
+    if (supportEmail) {
+      MailApp.sendEmail({
+        to: supportEmail,
+        subject: 'SendMyBuyer — address auto-granted for ' + (deal['DealCode'] || deal['DealID']),
+        body: (session.n || session.u) + (isRegisteredBuyer ? ' (a registered Buyer account)' : '') +
+          ' was just auto-granted the full address for ' + (deal['DealCode'] || deal['DealID']) +
+          ' (' + [deal['City'], deal['State']].filter(Boolean).join(', ') + ').' +
+          buyerLeadContextEmailBlock(session)
+      });
+    }
     return { ok: true, autoGranted: true };
   }
 
@@ -2716,7 +2776,8 @@ function requestAddressAccess(body, session) {
     body: (session.n || session.u) + ' is requesting the full address for ' + (deal['DealCode'] || deal['DealID']) +
       ' (' + [deal['City'], deal['State']].filter(Boolean).join(', ') + ').\n\n' +
       (body.note ? 'Note from rep: ' + body.note + '\n\n' : '') +
-      'Grant or deny from that deal\'s Address Access section in the admin panel.'
+      'Grant or deny from that deal\'s Address Access section in the admin panel.' +
+      buyerLeadContextEmailBlock(session)
   });
   return { ok: true };
 }
@@ -2734,8 +2795,27 @@ function publicRequestAddressAccess(body, session) {
   const deal = sheetToObjects(getSheet(DEALS_SHEET, DEAL_COLUMNS)).find(function (d) { return d['DealID'] === body.dealId; });
   if (!deal) return { ok: false, error: 'Deal not found.' };
 
-  if (adminGetAutoDiscloseAddressSettings({}).mode === 'all_on_request') {
+  // Same registered-Buyer auto-grant as requestAddressAccess above -- see
+  // its comment. A wholesaler/realtor/other account requesting from a
+  // public page still only auto-grants if the site-wide "all_on_request"
+  // setting is on.
+  const rep = findRepByUsername(session.u);
+  const isRegisteredBuyer = rep && rep['PersonType'] === 'Buyer';
+  const autoGrant = isRegisteredBuyer || adminGetAutoDiscloseAddressSettings({}).mode === 'all_on_request';
+
+  if (autoGrant) {
     adminGrantAddressAccess({ dealId: body.dealId, username: session.u });
+    const supportEmail = getSupportEmail();
+    if (supportEmail) {
+      MailApp.sendEmail({
+        to: supportEmail,
+        subject: 'SendMyBuyer -- address auto-granted from the public deal page (' + (deal['DealCode'] || deal['DealID']) + ')',
+        body: (session.n || session.u) + (isRegisteredBuyer ? ' (a registered Buyer account)' : '') +
+          ' was just auto-granted the full address for ' + (deal['DealCode'] || deal['DealID']) +
+          ' (' + [deal['City'], deal['State']].filter(Boolean).join(', ') + ') after logging in from the public deal page.' +
+          buyerLeadContextEmailBlock(session)
+      });
+    }
     return { ok: true, autoGranted: true };
   }
 
@@ -2746,7 +2826,8 @@ function publicRequestAddressAccess(body, session) {
     subject: 'SendMyBuyer -- address requested from the public deal page (' + (deal['DealCode'] || deal['DealID']) + ')',
     body: (session.n || session.u) + ' (' + session.u + ') just logged in from the public deal page and is requesting the full address for ' +
       (deal['DealCode'] || deal['DealID']) + ' (' + [deal['City'], deal['State']].filter(Boolean).join(', ') + ').\n\n' +
-      'They may not have standing access to this specific deal yet -- grant or deny from that deal\'s Address Access section, assigning them to it first if appropriate.'
+      'They may not have standing access to this specific deal yet -- grant or deny from that deal\'s Address Access section, assigning them to it first if appropriate.' +
+      buyerLeadContextEmailBlock(session)
   });
   return { ok: true };
 }
