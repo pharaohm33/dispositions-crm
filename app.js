@@ -321,6 +321,10 @@ function buildBuyerShareText(deal, shortenDescription) {
   if (deal.AsIsValue) lines.push("As-Is Equity: " + formatAsIsEquity(deal.AsIsEquity).replace(/&mdash;/g, "—"));
   if (deal.FinancingType) lines.push("Financing Type: " + deal.FinancingType);
   if (deal.Description) lines.push(shortenDescription ? truncateText(deal.Description, 220) : deal.Description);
+  // Reads live off the deal record every time this is copied -- never
+  // baked into the stored Description text itself, so it's always
+  // current with no regeneration step needed if the page URL ever changes.
+  if (deal.PublicPageUrl) lines.push("Full listing: " + deal.PublicPageUrl);
   if (deal.GeneralDriveLink) lines.push("Deal Link with pictures: " + deal.GeneralDriveLink);
   return lines.join("\n");
 }
@@ -973,7 +977,8 @@ function dealCardHtml(d) {
       d.Price ? "Asking Price: " + esc(formatAdminMoney(d.Price)) : "",
       d.ARV ? "ARV: " + esc(formatAdminMoney(d.ARV)) : "",
       d.RehabEstimate ? "Rehab: " + esc(formatAdminMoney(d.RehabEstimate)) : "",
-      d.AsIsValue ? "As-Is Value: " + esc(formatAdminMoney(d.AsIsValue)) : ""
+      d.AsIsValue ? "As-Is Value: " + esc(formatAdminMoney(d.AsIsValue)) : "",
+      d.FinancingType ? "Financing: " + esc(d.FinancingType) : ""
     ].filter(Boolean).join(" &middot; ");
     const dealTypeTags = dealTypeTagsHtml(d.DealTypes);
     return '<div class="deal-card" data-deal-id="' + esc(d.DealID) + '">' +
@@ -2526,7 +2531,16 @@ function renderAdminDeals() {
         (matchingBuyers.length > 0 ? ' <span class="status-pill status-active-match" title="' + esc(matchingBuyers.map(function (r) { return r.name; }).join(", ")) + '">' + matchingBuyers.length + ' buyer' + (matchingBuyers.length === 1 ? "" : "s") + ' match</span>' : "") + '</td>' +
       '<td>' + esc(d.Address) + (d.City ? ", " + esc(d.City) : "") + (dealTypeTagsHtml(d.DealTypes) ? '<div style="margin-top:4px;">' + dealTypeTagsHtml(d.DealTypes) + '</div>' : "") + '</td>' +
       '<td>' + esc(d.AssetType || "") + '</td>' +
-      '<td>' + esc(d.Price ? formatAdminMoney(d.Price) : "") + '</td>' +
+      '<td>' + esc(d.Price ? formatAdminMoney(d.Price) : "") +
+        (function () {
+          const extra = [
+            d.ARV ? "ARV: " + esc(formatAdminMoney(d.ARV)) : "",
+            d.RehabEstimate ? "Rehab: " + esc(formatAdminMoney(d.RehabEstimate)) : "",
+            d.AsIsValue ? "As-Is: " + esc(formatAdminMoney(d.AsIsValue)) : "",
+            d.FinancingType ? esc(d.FinancingType) : ""
+          ].filter(Boolean);
+          return extra.length > 0 ? '<div class="small-muted" style="margin-top:4px;">' + extra.join("<br>") + '</div>' : "";
+        })() + '</td>' +
       '<td><span class="status-pill ' + statusClass(d.Status) + '">' + esc(d.Status || "") + '</span></td>' +
       '<td>' + (d.repsWithAccessCount === undefined ? "&mdash;" :
         d.currentAdminHasAccess ? "Admin" + (d.repsWithAccessCount > 0 ? " + " + d.repsWithAccessCount : "") :
