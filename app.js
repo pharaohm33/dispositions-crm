@@ -1055,6 +1055,15 @@ async function openRepDealDetail(dealId) {
       '</div>' +
     '</div>' +
 
+    '<div class="section-title">Already Talked To A Buyer About This Deal?</div>' +
+    '<p class="small-muted">If you sent someone this deal directly (e.g. the public listing link) and they\'re already on the calling list or just registered, enter what you have below to match yourself to them — no need to wait for auto-matching.</p>' +
+    '<div class="row2">' +
+      '<div><label class="field-label">Phone</label><input type="text" id="selfmatch-phone-input"></div>' +
+      '<div><label class="field-label">Email</label><input type="text" id="selfmatch-email-input"></div>' +
+    '</div>' +
+    '<div class="nav-row" style="justify-content:flex-end;"><button class="btn secondary small" id="selfmatch-btn">Find &amp; Match Myself</button></div>' +
+    '<div id="selfmatch-result" class="small-muted"></div>' +
+
     '<div class="section-title">Match My Buyer Leads To This Deal</div>' +
     '<p class="small-muted">Auto-matches buyer leads you can see (your own uploads, plus anything shared by the team) to this deal by state/city/asset category — same matching admin uses — and gives them to yourself, so they show up on your Buyer Leads tab to start calling.</p>' +
     (visibleCities.length > 0
@@ -1110,6 +1119,23 @@ async function openRepDealDetail(dealId) {
     } catch (err) {
       showToast("Could not copy — try selecting the text manually.", true);
     }
+  });
+
+  document.getElementById("selfmatch-btn").addEventListener("click", async function () {
+    const btn = this;
+    const resultEl = document.getElementById("selfmatch-result");
+    const phone = document.getElementById("selfmatch-phone-input").value.trim();
+    const email = document.getElementById("selfmatch-email-input").value.trim();
+    if (!phone && !email) { resultEl.textContent = "Enter at least a phone number or email."; return; }
+    if (btn.disabled) return;
+    btn.disabled = true;
+    resultEl.textContent = "Searching…";
+    const res = await api("repMatchSelfToBuyer", { dealId: deal.DealID, phone: phone, email: email });
+    btn.disabled = false;
+    if (!res.ok) { resultEl.textContent = res.error || "Could not match."; showToast(res.error || "Could not match.", true); return; }
+    resultEl.textContent = "Matched to " + res.buyerName + " — check your Buyer Leads tab." +
+      (res.hadOtherHistory ? " (Admin's been notified — this buyer has other history too.)" : "");
+    showToast("Matched to " + res.buyerName + ".");
   });
 
   document.getElementById("give-myself-btn").addEventListener("click", async function () {
@@ -5229,6 +5255,25 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
       '<button class="link-btn" id="close-detail-btn">Close</button>' +
     '</div>' +
     '<div style="margin-bottom:8px;">' + buyerStatusTagsHtml(lead, false) + (lead.UploadedBy ? ' ' + uploaderTagHtml(lead.UploadedBy) : "") + (lead.FirstResponsiveBy ? ' ' + firstResponsiveTagHtml(lead.FirstResponsiveBy) : "") + (assignedRepsTagHtml(lead.AssignedReps) ? ' ' + assignedRepsTagHtml(lead.AssignedReps) : "") + '</div>' +
+
+    (function () {
+      // Who currently has an open pitch on this buyer (out of the reps),
+      // deduped, each with when they were given it -- so opening a buyer
+      // profile tells you at a glance who else besides you already knows
+      // about them, not just the uploader/first-responder tags above.
+      const seen = {};
+      const repsWithAccess = [];
+      pitches.forEach(function (p) {
+        const u = String(p.Username || "").toLowerCase();
+        if (!u || seen[u]) return;
+        seen[u] = true;
+        repsWithAccess.push({ username: p.Username, givenAt: p.GivenAt });
+      });
+      if (repsWithAccess.length === 0) return "";
+      return '<p class="small-muted"><strong>Reps with access to this buyer:</strong> ' +
+        repsWithAccess.map(function (r) { return esc(r.username) + (r.givenAt ? ' (since ' + esc(formatDate(r.givenAt)) + ')' : ""); }).join(", ") +
+        '</p>';
+    })() +
 
     (isDnc ? '<div class="banner danger"><strong>Do Not Contact.</strong> No rep can log a new call/text for this buyer, and they can\'t be given a new pitch.</div>' : "") +
 

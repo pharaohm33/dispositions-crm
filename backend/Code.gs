@@ -288,6 +288,8 @@ function doPost(e) {
         return jsonOut(withSession(body, addPitchContact));
       case 'requestAddressAccess':
         return jsonOut(withSession(body, requestAddressAccess));
+      case 'repMatchSelfToBuyer':
+        return jsonOut(withSession(body, repMatchSelfToBuyer));
       case 'publicRequestAddressAccess':
         return jsonOut(withSession(body, publicRequestAddressAccess));
       case 'importBuyerLeads':
@@ -4099,6 +4101,65 @@ function buyerOwnershipWarningInfo(lead, targetUsername) {
     details: details,
     recommendation: 'Recommended: contact the rep(s) above and give them 3 days to respond before reassigning. If there\'s no response, you can contact the buyer yourself or give this buyer to someone else at your discretion.'
   };
+}
+
+// Rep self-service: "I already sent/talked to this buyer about this deal,
+// let me match myself to them" -- for when a buyer the rep reached OUTSIDE
+// the normal auto-feed/matching flow (e.g. sent them the public deal link
+// directly, they later registered or got added to the calling list) needs
+// to actually show up as this rep's pitch. Searches by phone OR email
+// (name alone is too fuzzy to match on). Deliberately does NOT block on
+// someone else already having a claim on this buyer -- multiple reps CAN
+// share a buyer -- but does tell admin about it when it happens, with the
+// same who/when detail as the admin-side ownership warning, so admin has
+// visibility even though nothing here required their approval.
+function repMatchSelfToBuyer(body, session) {
+  if (!body.dealId) return { ok: false, error: 'Missing dealId.' };
+  if (!canAccessDeal(session, body.dealId)) return { ok: false, error: 'You do not have access to this deal.' };
+  const phone = normalizePhoneForDedup(body.phone);
+  const email = normalizeText(body.email);
+  if (!phone && !email) return { ok: false, error: 'Enter at least a phone number or email to search by.' };
+
+  const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const lead = sheetToObjects(leadsSheet).find(function (l) {
+    return (phone && normalizePhoneForDedup(l['Phone']) === phone) || (email && normalizeText(l['Email']) === email);
+  });
+  if (!lead) {
+    return { ok: false, error: 'No matching buyer found on the calling list yet -- they may not have been added.', notFound: true };
+  }
+  if (lead['DoNotContact'] === true || lead['DoNotContact'] === 'TRUE') {
+    return { ok: false, error: 'This buyer is marked Do Not Contact and cannot be matched to a new pitch.' };
+  }
+
+  const username = session.u;
+  const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+  const existingPitches = sheetToObjects(pitchesSheet);
+  const clash = existingPitches.some(function (p) { return p['BuyerLeadID'] === lead['BuyerLeadID'] && p['DealID'] === body.dealId && String(p['Username'] || '').toLowerCase() === username; });
+  if (clash) return { ok: false, error: 'You already have this buyer matched to this deal.' };
+
+  appendRowByHeaders(pitchesSheet, {
+    'PitchID': Utilities.getUuid(), 'BuyerLeadID': lead['BuyerLeadID'], 'DealID': body.dealId,
+    'Username': username, 'GivenAt': new Date().toISOString(), 'Source': 'self-match'
+  });
+
+  const warning = buyerOwnershipWarningInfo(lead, username);
+  if (warning) {
+    const supportEmail = getSupportEmail();
+    if (supportEmail) {
+      MailApp.sendEmail({
+        to: supportEmail,
+        subject: 'SendMyBuyer -- ' + (session.n || username) + ' self-matched to a buyer with existing history',
+        body: (session.n || username) + ' just matched themselves to buyer "' + lead['BuyerName'] + '" for a deal, but this buyer already has other history:\n\n' +
+          warning.details.map(function (d) {
+            return '- ' + d.name + (d.isUploader ? ' (uploaded this buyer)' : ' (has an open pitch)') + ': ' +
+              (d.daysSinceActivity === null ? 'no logged contact yet' : d.daysSinceActivity + ' day(s) since last contact');
+          }).join('\n') +
+          '\n\nSee this buyer\'s Full Contact Log and Pitches tab for full detail.'
+      });
+    }
+  }
+
+  return { ok: true, buyerName: lead['BuyerName'], buyerLeadId: lead['BuyerLeadID'], hadOtherHistory: !!warning };
 }
 
 function adminGiveBuyerLeadToRep(body) {
