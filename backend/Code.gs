@@ -2016,24 +2016,28 @@ function generateDealPageHtml(deal, sourceListingText, photoPaths, morePhotosLin
   if (html.toLowerCase().indexOf('<!doctype') === -1 && html.toLowerCase().indexOf('<html') === -1) {
     throw new Error('Claude did not return an HTML document.');
   }
-  // The real "Request the Address" mechanism is appended here in fixed
+  // The real "Request the Address" mechanism is inserted here in fixed
   // code, not left to the prompt above -- Claude's copy already says an
   // address is available on request (see the address-redaction rule
   // above), but that's just text; this is the actual working button,
   // deep-linking into the app's login/signup + the address-grant system
   // (see publicRequestAddressAccess), so it behaves identically on every
-  // generated page regardless of whatever layout Claude produced.
-  const withAddressRequest = /<\/body>/i.test(html)
-    ? html.replace(/<\/body>/i, requestAddressButtonHtml(deal['DealID']) + '</body>')
-    : html + requestAddressButtonHtml(deal['DealID']);
+  // generated page regardless of whatever layout Claude produced. Placed
+  // right after <body> (top of the page) rather than at the end -- a
+  // visitor deciding whether to bother logging in should see this before
+  // scrolling through the whole listing, not after.
+  const buttonHtml = requestAddressButtonHtml(deal['DealID']);
+  const withAddressRequest = /<body[^>]*>/i.test(html)
+    ? html.replace(/(<body[^>]*>)/i, '$1' + buttonHtml)
+    : buttonHtml + html;
   return withAddressRequest;
 }
 
 function requestAddressButtonHtml(dealId) {
   const requestUrl = 'https://sendmybuyer.com/?requestAddress=' + encodeURIComponent(dealId);
   const homeUrl = 'https://sendmybuyer.com';
-  return '<div style="max-width:640px;margin:40px auto;padding:28px 24px;text-align:center;' +
-    'font-family:Arial,sans-serif;border-top:1px solid #ddd;">' +
+  return '<div style="max-width:640px;margin:0 auto 20px;padding:20px 24px;text-align:center;' +
+    'font-family:Arial,sans-serif;border-bottom:1px solid #ddd;">' +
     '<p style="color:#444;margin-bottom:16px;">Addresses are shared with wholesalers who already have ' +
     'an interested buyer for this deal, or with direct buyers reviewing this listing. Log in or create ' +
     'a free account to request it.</p>' +
