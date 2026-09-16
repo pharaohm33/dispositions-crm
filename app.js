@@ -1017,7 +1017,7 @@ async function openRepDealDetail(dealId) {
   const codeTag = deal.DealCode ? '<span class="status-pill status-default" style="margin-right:6px;">' + esc(deal.DealCode) + '</span>' : "";
   panel.innerHTML =
     '<div style="display:flex; justify-content:space-between; align-items:flex-start;">' +
-      '<div><h2 class="step-title">' + (deal.Address ? esc(deal.Address) : (deal.City ? esc(deal.City) : "Deal")) + '</h2>' +
+      '<div><h2 class="step-title">' + (deal.City ? esc(deal.City) : "Deal") + '</h2>' +
       '<p class="step-sub">' + codeTag + [deal.City, deal.State].filter(Boolean).join(", ") + (deal.Zip ? " " + esc(deal.Zip) : "") +
       (deal.County ? " &middot; " + esc(deal.County) + " County" : "") + '</p></div>' +
       '<button class="link-btn" id="close-detail-btn">Close</button>' +
@@ -1037,6 +1037,7 @@ async function openRepDealDetail(dealId) {
       (deal.Description ? '<div style="margin-top:8px;">' + esc(deal.Description) + '</div>' : "") +
       (deal.GeneralDriveLink ? '<div style="margin-top:8px;"><a href="' + esc(deal.GeneralDriveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
       (deal.PublicPageUrl ? '<div style="margin-top:8px;"><strong>Deal Page:</strong> <a href="' + esc(deal.PublicPageUrl) + '" target="_blank" rel="noopener">' + esc(deal.PublicPageUrl) + '</a> <span class="small-muted">(share this with buyers)</span></div>' : "") +
+      addressRevealHtml(deal) +
       (!deal.Address ? '<div style="margin-top:10px;"><button class="btn secondary small" id="request-address-btn" data-deal-id="' + esc(deal.DealID) + '">Request Address Access</button>' +
         '<div class="small-muted" style="margin-top:6px;">Pitch off the general deal info first — only use this once a buyer has responded, is genuinely interested, and specifically asks you for the address. This just emails admin to ask; it does not grant it.</div></div>' : "") +
       '<div style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.08);">' +
@@ -1497,6 +1498,46 @@ function wireRequestAddressButton() {
 // addressGranted is never set -- the grant-specific warning banner is
 // skipped in that case since admin always has full access, not a
 // specifically-granted one.
+// Address is never printed directly into the page -- it's stashed in a
+// data attribute and only ever written into the DOM once the visitor has
+// checked the agreement AND clicked through, both required. Company name
+// resolves per-deal (see resolveDealContactInfo/ResolvedCompanyName) so a
+// deal running under a different entity shows the right name here too.
+// Wired once, globally, via the delegated listeners below -- every call
+// site gets working checkbox/button behavior for free, no per-render wiring.
+function addressRevealHtml(deal) {
+  if (!deal.Address) return "";
+  const company = esc(deal.ResolvedCompanyName || "the Disposition Manager");
+  return '<div class="address-reveal" data-address="' + esc(deal.Address) + '" style="margin-top:8px;">' +
+    '<label class="checkbox-row" style="align-items:flex-start;">' +
+    '<input type="checkbox" class="address-reveal-agree">' +
+    '<span class="small-muted">I agree to conduct all inquiries into and discussions about this property solely through ' +
+    company + ' and will not directly contact the seller. Any unauthorized contact with the seller will be considered ' +
+    'intentional interference with a contract, and I agree to pay damages of $100,000 to ' + company + ' if I attempt to ' +
+    'circumvent or interfere with it.</span>' +
+    '</label>' +
+    '<button class="btn secondary small address-reveal-btn" disabled>View Full Address</button>' +
+    '<div class="address-reveal-value" hidden style="margin-top:6px;"><strong>Address:</strong> <span></span></div>' +
+    '</div>';
+}
+
+document.addEventListener("change", function (e) {
+  if (!e.target.classList || !e.target.classList.contains("address-reveal-agree")) return;
+  const wrap = e.target.closest(".address-reveal");
+  wrap.querySelector(".address-reveal-btn").disabled = !e.target.checked;
+});
+
+document.addEventListener("click", function (e) {
+  const btn = e.target.closest(".address-reveal-btn");
+  if (!btn || btn.disabled) return;
+  const wrap = btn.closest(".address-reveal");
+  const valueEl = wrap.querySelector(".address-reveal-value");
+  valueEl.querySelector("span").textContent = wrap.getAttribute("data-address");
+  valueEl.hidden = false;
+  btn.hidden = true;
+  wrap.querySelector("label").hidden = true;
+});
+
 function renderPitchDealInfo(deal) {
   if (!deal) return "";
   const addressBanner = deal.addressGranted && deal.Address
@@ -1508,7 +1549,7 @@ function renderPitchDealInfo(deal) {
     '<div class="section-title">Deal Info</div>' +
     addressBanner +
     '<div class="banner info">' +
-      (deal.Address ? '<div><strong>Address:</strong> ' + esc(deal.Address) + '</div>' : "") +
+      addressRevealHtml(deal) +
       (deal.AssetType ? '<div style="margin-top:8px;"><strong>Asset Type:</strong> ' + esc(deal.AssetType) + '</div>' : "") +
       (deal.Price ? '<div><strong>Asking Price:</strong> ' + esc(formatAdminMoney(deal.Price)) + '</div>' : "") +
       (deal.ARV ? '<div><strong>ARV:</strong> ' + esc(formatAdminMoney(deal.ARV)) + '</div>' : "") +
@@ -2639,6 +2680,9 @@ function openDealModal() {
   document.getElementById("deal-admin-notes-input").value = "";
   document.getElementById("deal-source-link-input").value = "";
   document.getElementById("deal-pictureslink-input").value = "";
+  document.getElementById("deal-companyname-input").value = "";
+  document.getElementById("deal-contactphone-input").value = "";
+  document.getElementById("deal-contactemail-input").value = "";
   document.getElementById("deal-assignmode-input").value = "";
   const statusSelect = document.getElementById("deal-status-input");
   statusSelect.innerHTML = statusOptionsCache.map(function (s) { return '<option value="' + esc(s) + '">' + esc(s) + '</option>'; }).join("");
@@ -2696,7 +2740,10 @@ document.getElementById("deal-modal-save").addEventListener("click", async funct
     sensitiveDriveLink: document.getElementById("deal-sensitive-drive-input").value.trim(),
     adminPrivateNotes: document.getElementById("deal-admin-notes-input").value.trim(),
     sourceLink: document.getElementById("deal-source-link-input").value.trim(),
-    picturesLink: document.getElementById("deal-pictureslink-input").value.trim()
+    picturesLink: document.getElementById("deal-pictureslink-input").value.trim(),
+    companyName: document.getElementById("deal-companyname-input").value.trim(),
+    contactPhone: document.getElementById("deal-contactphone-input").value.trim(),
+    contactEmail: document.getElementById("deal-contactemail-input").value.trim()
   };
   const assignMode = document.getElementById("deal-assignmode-input").value;
   const res = await api("adminAddDeal", { data: data, assignMode: assignMode });
@@ -2991,6 +3038,13 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     '<div class="banner danger">Only you (admin) can see anything in this section &mdash; no rep ever receives it, in the UI or the API.</div>' +
     '<label class="field-label">Source Link <span class="small-muted">(where you found this deal online)</span></label>' +
     '<input type="text" id="deal-source-link-edit" value="' + esc(deal.SourceLink || "") + '" placeholder="https://...">' +
+    '<div class="section-title" style="margin-top:16px;">Contact / Company Override <span class="small-muted">(optional — blank uses the site default)</span></div>' +
+    '<label class="field-label">Company Name</label>' +
+    '<input type="text" id="deal-companyname-edit" value="' + esc(deal.CompanyName || "") + '" placeholder="Uses site default">' +
+    '<div class="row2">' +
+      '<div><label class="field-label">Contact Phone</label><input type="text" id="deal-contactphone-edit" value="' + esc(deal.ContactPhone || "") + '" placeholder="Uses site default"></div>' +
+      '<div><label class="field-label">Contact Email</label><input type="text" id="deal-contactemail-edit" value="' + esc(deal.ContactEmail || "") + '" placeholder="Uses site default"></div>' +
+    '</div>' +
     (deal.SourceLink
       ? '<div class="nav-row" style="justify-content:flex-start; margin-top:6px;"><button class="btn secondary small" id="check-deal-live-btn">Check If Still Live</button><span class="small-muted" id="check-deal-live-result"></span></div>' +
         '<p class="small-muted">Fetches the Source Link and looks for the specific "property not found" marker InvestorLift shows on a pulled listing — if it\'s there, this deal\'s Status is set to Dead automatically. Only works for InvestorLift links today, and will need updating if InvestorLift changes that page.</p>' +
@@ -3096,7 +3150,10 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
       dealId: deal.DealID,
       data: {
         SourceLink: document.getElementById("deal-source-link-edit").value.trim(),
-        AdminPrivateNotes: document.getElementById("deal-admin-notes-edit").value.trim()
+        AdminPrivateNotes: document.getElementById("deal-admin-notes-edit").value.trim(),
+        CompanyName: document.getElementById("deal-companyname-edit").value.trim(),
+        ContactPhone: document.getElementById("deal-contactphone-edit").value.trim(),
+        ContactEmail: document.getElementById("deal-contactemail-edit").value.trim()
       }
     });
     btn.disabled = false;
@@ -3451,8 +3508,8 @@ function renderAdminFbList(requests) {
 /* ---------- Team tab ---------- */
 
 async function loadReps() {
-  const [repsRes, joinRes, autoApproveRes, autoDiscloseRes] = await Promise.all([
-    api("adminGetReps", {}), api("getJoinContact", {}), api("adminGetAutoApproveSettings", {}), api("adminGetAutoDiscloseAddressSettings", {})
+  const [repsRes, joinRes, autoApproveRes, autoDiscloseRes, contactDefaultsRes] = await Promise.all([
+    api("adminGetReps", {}), api("getJoinContact", {}), api("adminGetAutoApproveSettings", {}), api("adminGetAutoDiscloseAddressSettings", {}), api("adminGetContactDefaults", {})
   ]);
   if (repsRes.ok) { adminReps = repsRes.reps; renderReps(); }
   if (joinRes.ok) {
@@ -3466,7 +3523,27 @@ async function loadReps() {
   if (autoDiscloseRes.ok) {
     document.getElementById("autodisclose-mode-input").value = autoDiscloseRes.mode;
   }
+  if (contactDefaultsRes.ok) {
+    document.getElementById("contactdefaults-company-input").value = contactDefaultsRes.company || "";
+    document.getElementById("contactdefaults-phone-input").value = contactDefaultsRes.phone || "";
+    document.getElementById("contactdefaults-email-input").value = contactDefaultsRes.email || "";
+  }
 }
+
+document.getElementById("contactdefaults-save-btn").addEventListener("click", async function () {
+  const btn = this;
+  const resultEl = document.getElementById("contactdefaults-result");
+  btn.disabled = true;
+  const res = await api("adminSetContactDefaults", {
+    company: document.getElementById("contactdefaults-company-input").value.trim(),
+    phone: document.getElementById("contactdefaults-phone-input").value.trim(),
+    email: document.getElementById("contactdefaults-email-input").value.trim()
+  });
+  btn.disabled = false;
+  if (!res.ok) { resultEl.textContent = res.error || "Could not save."; showToast(res.error || "Could not save.", true); return; }
+  resultEl.textContent = "Saved — regenerate a deal's page (or Regenerate All) for this to show up on it.";
+  showToast("Contact template saved.");
+});
 
 document.getElementById("autoapprove-save-btn").addEventListener("click", async function () {
   const btn = this;

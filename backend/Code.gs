@@ -127,7 +127,12 @@ const PERSON_TYPES = ['Buyer', 'Wholesaler', 'Realtor', 'Other'];
 // buyer<->deal auto-matching -- see buyerMatchesDeal. AssetType stays a
 // free-text description field ("SFR - 3bd/2ba") separate from the
 // structured AssetCategory used for matching.
-const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt', 'Locked', 'DealTypes', 'FinancingType', 'PublicPageUrl', 'LastPriceSyncAt', 'ArtifactPicturesLink', 'ArtifactPhotoPaths', 'LastAutoPriceSyncAt', 'ArtifactPhotoTotalFound'];
+const DEAL_COLUMNS = ['DealID', 'DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'Status', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CreatedAt', 'UpdatedAt', 'Locked', 'DealTypes', 'FinancingType', 'PublicPageUrl', 'LastPriceSyncAt', 'ArtifactPicturesLink', 'ArtifactPhotoPaths', 'LastAutoPriceSyncAt', 'ArtifactPhotoTotalFound',
+  // Per-deal override of the site-wide contact/company template (see
+  // resolveDealContactInfo) -- blank on any of these three falls back to
+  // the DEFAULT_CONTACT_PHONE/DEFAULT_CONTACT_EMAIL/DEFAULT_COMPANY_NAME
+  // Script Properties, for a deal running under a different entity/number.
+  'ContactPhone', 'ContactEmail', 'CompanyName'];
 // Source distinguishes a deliberate, one-deal-at-a-time grant ('manual' --
 // the Access section's "Add Access" dropdown, or "Assign Myself") from one
 // written by the bulk-assign mechanism ('bulk' -- see applyDealAssignMode).
@@ -427,6 +432,10 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminGetAutoDiscloseAddressSettings));
       case 'adminSetAutoDiscloseAddress':
         return jsonOut(withAdminSession(body, adminSetAutoDiscloseAddress));
+      case 'adminGetContactDefaults':
+        return jsonOut(withAdminSession(body, adminGetContactDefaults));
+      case 'adminSetContactDefaults':
+        return jsonOut(withAdminSession(body, adminSetContactDefaults));
       case 'adminRunAutoFeedNow':
         return jsonOut(withAdminSession(body, adminRunAutoFeedNow));
       case 'adminAddStatusOption':
@@ -1062,7 +1071,46 @@ function withComputedFields(deal) {
   const copy = Object.assign({}, deal);
   copy.GrossMargin = computeGrossMargin(deal);
   copy.AsIsEquity = computeAsIsEquity(deal);
+  // Resolved (not raw ContactPhone/ContactEmail/CompanyName) so the
+  // frontend never has to duplicate the "blank falls back to the site
+  // default" logic itself -- used for the in-app address-disclosure
+  // disclaimer (see addressRevealHtml).
+  const resolved = resolveDealContactInfo(deal);
+  copy.ResolvedCompanyName = resolved.company;
   return copy;
+}
+
+// Falls back to the DEFAULT_CONTACT_PHONE/DEFAULT_CONTACT_EMAIL/
+// DEFAULT_COMPANY_NAME Script Properties (set via adminSetContactDefaults)
+// for any field a deal doesn't specifically override, and further falls
+// back to the original hardcoded values if even the defaults were never
+// set (so an existing site upgrading to this doesn't lose its contact info
+// on first deploy).
+function resolveDealContactInfo(deal) {
+  const props = PropertiesService.getScriptProperties();
+  return {
+    phone: (deal && deal['ContactPhone']) || props.getProperty('DEFAULT_CONTACT_PHONE') || '520-633-6437',
+    email: (deal && deal['ContactEmail']) || props.getProperty('DEFAULT_CONTACT_EMAIL') || 'montanoemmanuel@gmail.com',
+    company: (deal && deal['CompanyName']) || props.getProperty('DEFAULT_COMPANY_NAME') || 'JNA Dynamic Holdings LLC'
+  };
+}
+
+function adminGetContactDefaults(body) {
+  const props = PropertiesService.getScriptProperties();
+  return {
+    ok: true,
+    phone: props.getProperty('DEFAULT_CONTACT_PHONE') || '520-633-6437',
+    email: props.getProperty('DEFAULT_CONTACT_EMAIL') || 'montanoemmanuel@gmail.com',
+    company: props.getProperty('DEFAULT_COMPANY_NAME') || 'JNA Dynamic Holdings LLC'
+  };
+}
+
+function adminSetContactDefaults(body) {
+  const props = PropertiesService.getScriptProperties();
+  if (body.phone !== undefined) props.setProperty('DEFAULT_CONTACT_PHONE', body.phone || '');
+  if (body.email !== undefined) props.setProperty('DEFAULT_CONTACT_EMAIL', body.email || '');
+  if (body.company !== undefined) props.setProperty('DEFAULT_COMPANY_NAME', body.company || '');
+  return { ok: true };
 }
 
 function computeGrossMargin(deal) {
@@ -1152,7 +1200,8 @@ function adminAddDeal(body) {
     'Status': d.status || DEFAULT_STATUSES[0],
     'Description': d.description || '', 'GeneralDriveLink': d.generalDriveLink || '', 'SensitiveDriveLink': d.sensitiveDriveLink || '',
     'AdminPrivateNotes': d.adminPrivateNotes || '', 'SourceLink': d.sourceLink || '',
-    'CreatedAt': now, 'UpdatedAt': now, 'DealTypes': dealTypes.join(', '), 'FinancingType': financingType
+    'CreatedAt': now, 'UpdatedAt': now, 'DealTypes': dealTypes.join(', '), 'FinancingType': financingType,
+    'ContactPhone': d.contactPhone || '', 'ContactEmail': d.contactEmail || '', 'CompanyName': d.companyName || ''
   });
 
   const assignedCount = applyDealAssignMode(dealId, d.assetCategory, body.assignMode, now);
@@ -1425,7 +1474,7 @@ function adminUpdateDeal(body) {
   // of other fields that don't touch Price at all.
   if (d.Price !== undefined && !d.Price) return { ok: false, error: 'Asking Price is required.' };
   if (d.FinancingType !== undefined && d.FinancingType && FINANCING_TYPES.indexOf(d.FinancingType) === -1) d.FinancingType = '';
-  const editable = ['DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'FinancingType', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink'];
+  const editable = ['DealCode', 'Address', 'City', 'State', 'Zip', 'County', 'MatchCities', 'AssetType', 'AssetCategory', 'Price', 'ARV', 'RehabEstimate', 'AsIsValue', 'FinancingType', 'Description', 'GeneralDriveLink', 'SensitiveDriveLink', 'AdminPrivateNotes', 'SourceLink', 'CompanyName', 'ContactPhone', 'ContactEmail'];
   editable.forEach(function (field) {
     if (d[field] === undefined) return;
     const col = getColumnIndex(sheet, field);
@@ -1885,11 +1934,12 @@ function generateDealPageHtml(deal, sourceListingText, photoPaths, morePhotosLin
     rehabEstimate: deal['RehabEstimate'] || '',
     asIsValue: deal['AsIsValue'] || '',
     financingType: deal['FinancingType'] || '',
-    description: deal['Description'] || '',
-    contactPhone: '520-633-6437',
-    contactEmail: 'montanoemmanuel@gmail.com',
-    company: 'JNA Dynamic Holdings LLC'
+    description: deal['Description'] || ''
   };
+  const contactInfo = resolveDealContactInfo(deal);
+  facts.contactPhone = contactInfo.phone;
+  facts.contactEmail = contactInfo.email;
+  facts.company = contactInfo.company;
 
   const prompt = 'Generate ONE self-contained HTML document (no markdown fences, no commentary, ' +
     'just the raw HTML starting with <!doctype html>) for a real-estate wholesale-assignment ' +

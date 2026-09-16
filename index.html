@@ -682,13 +682,28 @@
     </div>
 
     <div class="card">
+      <div class="section-title" style="margin-top:0;">Contact &amp; Company Template</div>
+      <p class="small-muted">Used on every generated public deal page (and the address-disclosure disclaimer inside the app) unless a specific deal overrides one of these on its own Edit Deal screen — handy if you ever run a deal under a different phone number or entity.</p>
+      <label class="field-label">Company Name</label>
+      <input type="text" id="contactdefaults-company-input" placeholder="JNA Dynamic Holdings LLC">
+      <label class="field-label">Contact Phone</label>
+      <input type="text" id="contactdefaults-phone-input" placeholder="520-633-6437">
+      <label class="field-label">Contact Email</label>
+      <input type="text" id="contactdefaults-email-input" placeholder="montanoemmanuel@gmail.com">
+      <div class="nav-row" style="justify-content:flex-end; margin-top:10px;">
+        <button class="btn secondary small" id="contactdefaults-save-btn">Save</button>
+      </div>
+      <div id="contactdefaults-result" class="small-muted"></div>
+    </div>
+
+    <div class="card">
       <div class="section-title" style="margin-top:0;">Auto-Disclose Address</div>
       <p class="small-muted">Normally a deal's exact address is only shared with a rep once you manually grant it (Address Access, on the deal's own page). Turn this on to skip that manual step in specific situations — grants still show up as normal in Address Access afterward, and can be revoked there like any other grant.</p>
       <select id="autodisclose-mode-input">
         <option value="off">Off — always grant manually (default)</option>
         <option value="all_on_interest">Auto-grant to every rep with access to the deal, the moment any buyer is marked interested on it</option>
         <option value="trusted_on_interest">Auto-grant only to "trusted" reps (already granted an address on at least one other deal), the moment any buyer is marked interested</option>
-        <option value="all_on_request">Auto-grant instantly to any rep who clicks "Request Address Access" — no admin approval step</option>
+        <option value="all_on_request">Auto-grant instantly to anyone who requests it — no admin approval step (covers a rep clicking "Request Address Access" here AND anyone clicking "Request the Address" on a public deal page)</option>
       </select>
       <div class="nav-row" style="justify-content:flex-end; margin-top:10px;">
         <button class="btn secondary small" id="autodisclose-save-btn">Save</button>
@@ -1149,6 +1164,15 @@
     <input type="text" id="deal-pictureslink-input" placeholder="https://drive.google.com/...">
     <label class="field-label">Private Admin Notes</label>
     <textarea id="deal-admin-notes-input"></textarea>
+
+    <div class="section-title">Contact / Company Override <span class="small-muted">(optional)</span></div>
+    <p class="small-muted">Leave any of these blank to use the site-wide default (Deals tab → Contact &amp; Company Template).</p>
+    <label class="field-label">Company Name</label>
+    <input type="text" id="deal-companyname-input" placeholder="Uses site default">
+    <div class="row2">
+      <div><label class="field-label">Contact Phone</label><input type="text" id="deal-contactphone-input" placeholder="Uses site default"></div>
+      <div><label class="field-label">Contact Email</label><input type="text" id="deal-contactemail-input" placeholder="Uses site default"></div>
+    </div>
 
     <div class="section-title">Tell These Reps To Work This Deal</div>
     <select id="deal-assignmode-input">
