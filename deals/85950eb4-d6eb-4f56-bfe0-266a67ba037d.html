@@ -3,491 +3,434 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>St. Louis, MO — Brick Bungalow Assignment Opportunity | JNA Dynamic Holdings LLC</title>
+<title>St. Louis, MO 63147 — Brick Bungalow Wholesale Assignment | JNA Dynamic Holdings LLC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: #f6f1e9;
-    color: #2b2620;
-    font-family: 'Inter', sans-serif;
-    line-height: 1.55;
+  :root{
+    --paper:#f6f1e9;
+    --paper-dark:#eee6d8;
+    --ink:#25201a;
+    --ink-soft:#5a5148;
+    --line:#d9cdb9;
+    --accent:#8a5a34;
+    --accent-dark:#5f3c22;
   }
-  h1, h2, h3 {
-    font-family: 'Source Serif 4', serif;
-    font-weight: 600;
-    color: #1f1b15;
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    line-height:1.55;
   }
-  .wrap {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 0 24px;
+  h1,h2,h3{
+    font-family:'Playfair Display',serif;
+    font-weight:600;
+    color:var(--ink);
+    margin:0;
   }
-  a { color: #7a3f1d; }
+  .wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding-left:24px;
+    padding-right:24px;
+  }
+  a{color:var(--accent-dark);}
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:.72rem;
+    font-weight:600;
+    color:var(--ink-soft);
+  }
+  header.top{
+    background:var(--paper-dark);
+    border-bottom:1px solid var(--line);
+    padding-top:34px;
+    padding-bottom:30px;
+  }
+  header.top h1{
+    font-size:2.4rem;
+    margin-top:10px;
+    margin-bottom:8px;
+  }
+  .loc-line{
+    font-size:1.05rem;
+    color:var(--ink-soft);
+    margin-top:0;
+    margin-bottom:14px;
+  }
+  .addr-note{
+    display:inline-block;
+    background:#fff8ec;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:8px 14px;
+    font-size:.92rem;
+    font-weight:600;
+    color:var(--accent-dark);
+    margin-top:4px;
+    margin-bottom:4px;
+  }
+  section{
+    padding-top:36px;
+    padding-bottom:36px;
+    border-bottom:1px solid var(--line);
+  }
+  section:last-of-type{border-bottom:none;}
+  section h2{
+    font-size:1.5rem;
+    margin-bottom:18px;
+  }
+  .price-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+    gap:18px;
+  }
+  .price-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:18px 20px;
+  }
+  .price-card .label{
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .price-card .value{
+    font-family:'Playfair Display',serif;
+    font-size:1.6rem;
+    color:var(--accent-dark);
+  }
+  .price-card.hero{
+    background:var(--accent-dark);
+    border-color:var(--accent-dark);
+  }
+  .price-card.hero .label{color:#e9d9c4;}
+  .price-card.hero .value{color:#fff;font-size:2rem;}
 
-  header.hero {
-    background: #1f1b15;
-    color: #f6f1e9;
-    padding-top: 40px;
-    padding-bottom: 34px;
+  .gallery-scroll{
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    padding-bottom:10px;
+    -webkit-overflow-scrolling:touch;
   }
-  .eyebrow {
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-size: 12px;
-    color: #cbb896;
-    margin-bottom: 10px;
+  .gallery-scroll img{
+    height:230px;
+    width:auto;
+    flex:0 0 auto;
+    border-radius:6px;
+    border:1px solid var(--line);
+    object-fit:cover;
   }
-  header.hero h1 {
-    color: #f6f1e9;
-    font-size: 40px;
-    margin: 0 0 8px 0;
-  }
-  .location-line {
-    font-size: 18px;
-    color: #e7dfd0;
-    margin-bottom: 6px;
-  }
-  .addr-note {
-    display: inline-block;
-    background: #3a3226;
-    color: #f2e6c9;
-    border: 1px solid #7a3f1d;
-    border-radius: 4px;
-    padding: 8px 14px;
-    font-size: 14px;
-    margin-top: 6px;
-  }
-
-  .price-band {
-    background: #fffaf0;
-    border-top: 1px solid #e4d9c3;
-    border-bottom: 1px solid #e4d9c3;
-    padding-top: 24px;
-    padding-bottom: 24px;
-  }
-  .price-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 28px;
-  }
-  .price-item {
-    min-width: 170px;
-  }
-  .price-item .label {
-    text-transform: uppercase;
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    color: #7a6e5a;
-    margin-bottom: 4px;
-  }
-  .price-item .value {
-    font-family: 'Source Serif 4', serif;
-    font-size: 26px;
-    color: #1f1b15;
-  }
-  .price-item .value.big {
-    font-size: 34px;
-    color: #7a3f1d;
-  }
-
-  .gallery-section {
-    padding-top: 30px;
-    padding-bottom: 10px;
-  }
-  .gallery-section h2 {
-    font-size: 22px;
-    margin-bottom: 12px;
-  }
-  .gallery-scroll {
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    padding-bottom: 12px;
-  }
-  .gallery-scroll img {
-    height: 230px;
-    width: auto;
-    border-radius: 6px;
-    border: 1px solid #e4d9c3;
-    flex-shrink: 0;
-  }
-  .more-photos {
-    font-size: 14px;
-    margin-top: 4px;
-    display: inline-block;
-  }
-
-  section.block {
-    padding-top: 34px;
-    padding-bottom: 10px;
-  }
-  section.block h2 {
-    font-size: 24px;
-    border-bottom: 2px solid #d9c9a3;
-    padding-bottom: 8px;
-    margin-bottom: 16px;
-  }
-  section.block p {
-    font-size: 15.5px;
-    color: #3a3226;
-  }
-
-  table.deal-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 15px;
-    margin-bottom: 8px;
-  }
-  table.deal-table td, table.deal-table th {
-    text-align: left;
-    padding: 10px 12px;
-    border-bottom: 1px solid #e4d9c3;
-  }
-  table.deal-table th {
-    width: 42%;
-    color: #7a6e5a;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 12px;
-    letter-spacing: 0.05em;
+  .more-photos{
+    display:inline-block;
+    margin-top:12px;
+    font-size:.9rem;
+    font-weight:600;
   }
 
-  ul.plain {
-    padding-left: 20px;
-    font-size: 15.5px;
-    color: #3a3226;
+  table.terms{
+    width:100%;
+    border-collapse:collapse;
   }
-  ul.plain li { margin-bottom: 6px; }
-
-  .exit-cards {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
+  table.terms td{
+    padding:10px 6px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
   }
-  .exit-card {
-    background: #fffaf0;
-    border: 1px solid #e4d9c3;
-    border-radius: 6px;
-    padding: 16px 18px;
-    flex: 1 1 260px;
-  }
-  .exit-card h3 {
-    font-size: 16px;
-    margin: 0 0 8px 0;
-    color: #7a3f1d;
-  }
-  .exit-card p {
-    font-size: 14.5px;
-    margin: 0;
+  table.terms td.k{
+    width:38%;
+    font-weight:600;
+    color:var(--ink-soft);
   }
 
-  .callout {
-    background: #f2e6c9;
-    border-left: 4px solid #7a3f1d;
-    padding: 14px 18px;
-    font-size: 14.5px;
-    margin-top: 6px;
-    margin-bottom: 6px;
+  .snapshot-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:0 32px;
+  }
+  .snapshot-grid dl{margin:0;}
+  .snapshot-grid dt{
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--ink-soft);
+    margin-top:12px;
+  }
+  .snapshot-grid dd{
+    margin:2px 0 0 0;
+    font-size:1rem;
+    font-weight:500;
   }
 
-  .disclaimer-section {
-    padding-top: 26px;
-    padding-bottom: 26px;
+  .callout{
+    background:#fbeee0;
+    border:1px solid #e0c39c;
+    border-radius:8px;
+    padding:18px 20px;
+    font-size:.95rem;
   }
-  .disclaimer-section p {
-    font-size: 13px;
-    color: #6b5f4d;
+  .callout strong{color:var(--accent-dark);}
+
+  ul.exit-list{
+    padding-left:20px;
+    margin:0;
+  }
+  ul.exit-list li{
+    margin-bottom:14px;
   }
 
-  .cta-band {
-    background: #1f1b15;
-    color: #f6f1e9;
-    padding-top: 40px;
-    padding-bottom: 40px;
-    margin-top: 20px;
+  .disclaimer{
+    font-size:.85rem;
+    color:var(--ink-soft);
+    line-height:1.6;
   }
-  .cta-band h2 {
-    color: #f6f1e9;
-    font-size: 28px;
-    margin: 0 0 10px 0;
+
+  .cta-band{
+    background:var(--accent-dark);
+    color:#fdf6ea;
+    padding-top:44px;
+    padding-bottom:44px;
+    text-align:center;
   }
-  .cta-band p {
-    color: #d8cdb6;
-    font-size: 15.5px;
-    margin: 0 0 18px 0;
+  .cta-band h2{
+    color:#fff;
+    font-size:1.9rem;
+    margin-bottom:10px;
   }
-  .cta-contacts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 22px;
+  .cta-band p{
+    color:#e9d9c4;
+    margin-top:0;
+    margin-bottom:22px;
   }
-  .cta-contacts a {
-    color: #f2e6c9;
-    font-family: 'Source Serif 4', serif;
-    font-size: 20px;
-    text-decoration: none;
-    border-bottom: 1px solid #7a3f1d;
-    padding-bottom: 2px;
+  .cta-contacts{
+    display:flex;
+    justify-content:center;
+    gap:26px;
+    flex-wrap:wrap;
   }
-  footer.foot {
-    background: #171410;
-    color: #8c8069;
-    padding-top: 18px;
-    padding-bottom: 18px;
+  .cta-contacts a{
+    color:#fff;
+    font-weight:700;
+    font-size:1.15rem;
+    text-decoration:none;
+    border-bottom:2px solid #e0c39c;
+    padding-bottom:2px;
   }
-  footer.foot p {
-    font-size: 12px;
-    margin: 0;
+  .cta-company{
+    margin-top:20px;
+    font-size:.85rem;
+    color:#c9b393;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+  }
+
+  footer.legal{
+    padding-top:26px;
+    padding-bottom:40px;
   }
 </style>
 </head>
-<body>
+<body><div style="max-width:640px;margin:0 auto 20px;padding:20px 24px;text-align:center;font-family:Arial,sans-serif;border-bottom:1px solid #ddd;"><p style="color:#444;margin-bottom:16px;">Addresses are shared with wholesalers who already have an interested buyer for this deal, or with direct buyers reviewing this listing. Log in or create a free account to request it.</p><a href="https://sendmybuyer.com/?requestAddress=85950eb4-d6eb-4f56-bfe0-266a67ba037d&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F85950eb4-d6eb-4f56-bfe0-266a67ba037d.html" style="display:inline-block;padding:12px 28px;background:#1a73e8;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;">Request the Address</a><p style="margin-top:16px;"><a href="https://sendmybuyer.com" style="color:#1a73e8;">Log in</a> &nbsp;&middot;&nbsp; <a href="https://sendmybuyer.com" style="color:#1a73e8;">Browse all deals</a></p><p style="color:#888;font-size:0.9em;margin-top:20px;">Interested in this deal? This listing isn't searchable once you leave — <strong>save or bookmark this page's link</strong> before heading to the home page, so you can find your way back to it.</p></div>
 
-<header class="hero">
+<header class="top">
   <div class="wrap">
-    <div class="eyebrow">Deal Code: MO-1 (SFH) &nbsp;|&nbsp; Wholesale Assignment</div>
-    <h1>Brick Bungalow — North Pointe Submarket</h1>
-    <div class="location-line">St. Louis, MO &nbsp;·&nbsp; St. Louis City &nbsp;·&nbsp; Pointe Add Subdivision &nbsp;·&nbsp; 63147</div>
-    <div class="addr-note">Address available upon request — contact us for the full property address.</div>
+    <div class="eyebrow">Wholesale Assignment Opportunity &middot; Deal MO-1</div>
+    <h1>Brick Bungalow — Fixer with Comp-Supported Upside</h1>
+    <p class="loc-line">St. Louis, MO 63147 &middot; St. Louis City &middot; Pointe Add Subdivision &middot; North Pointe Submarket</p>
+    <div class="addr-note">Address available upon request — contact us for the full street address.</div>
   </div>
 </header>
 
-<section class="price-band">
+<section id="price">
   <div class="wrap">
+    <h2>The Numbers</h2>
     <div class="price-grid">
-      <div class="price-item">
+      <div class="price-card hero">
         <div class="label">Asking Price</div>
-        <div class="value big">$65,000</div>
+        <div class="value">$65,000</div>
       </div>
-      <div class="price-item">
+      <div class="price-card">
         <div class="label">ARV</div>
         <div class="value">$142,603</div>
       </div>
-      <div class="price-item">
+      <div class="price-card">
         <div class="label">Gross Spread Below ARV</div>
         <div class="value">$77,603</div>
       </div>
-      <div class="price-item">
-        <div class="label">Comp-Report ARV Range</div>
+      <div class="price-card">
+        <div class="label">ARV Range (Comp Report)</div>
         <div class="value">$135,473 – $149,733</div>
       </div>
-      <div class="price-item">
-        <div class="label">Estimated Rehab</div>
+      <div class="price-card">
+        <div class="label">Avg. Comp Price / Sq Ft</div>
+        <div class="value">$112</div>
+      </div>
+      <div class="price-card">
+        <div class="label">Last Sale Price</div>
+        <div class="value">$126,500</div>
+      </div>
+      <div class="price-card">
+        <div class="label">Last Sale Date</div>
+        <div class="value" style="font-size:1.2rem;">11/08/2023</div>
+      </div>
+      <div class="price-card">
+        <div class="label">Estimated Rehab (JNA estimate)</div>
         <div class="value">$15,000</div>
       </div>
     </div>
   </div>
 </section>
 
-<div class="gallery-section wrap">
-  <h2>Photos</h2>
-  <div class="gallery-scroll">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/1.jpg" alt="St. Louis brick bungalow photo 1">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/2.jpg" alt="St. Louis brick bungalow photo 2">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/3.jpg" alt="St. Louis brick bungalow photo 3">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/4.jpg" alt="St. Louis brick bungalow photo 4">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/5.jpg" alt="St. Louis brick bungalow photo 5">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/6.jpg" alt="St. Louis brick bungalow photo 6">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/7.jpg" alt="St. Louis brick bungalow photo 7">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/8.jpg" alt="St. Louis brick bungalow photo 8">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/9.jpg" alt="St. Louis brick bungalow photo 9">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/10.jpg" alt="St. Louis brick bungalow photo 10">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/11.jpg" alt="St. Louis brick bungalow photo 11">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/12.jpg" alt="St. Louis brick bungalow photo 12">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/13.jpg" alt="St. Louis brick bungalow photo 13">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/14.jpg" alt="St. Louis brick bungalow photo 14">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/15.jpg" alt="St. Louis brick bungalow photo 15">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/16.jpg" alt="St. Louis brick bungalow photo 16">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/17.jpg" alt="St. Louis brick bungalow photo 17">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/18.jpg" alt="St. Louis brick bungalow photo 18">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/19.jpg" alt="St. Louis brick bungalow photo 19">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/20.jpg" alt="St. Louis brick bungalow photo 20">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/21.jpg" alt="St. Louis brick bungalow photo 21">
-    <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/22.jpg" alt="St. Louis brick bungalow photo 22">
-  </div>
-</div>
-
-<section class="block">
+<section id="gallery">
   <div class="wrap">
-    <h2>Here Is What We Have</h2>
-    <p>
-      Saint Louis, Missouri. St. Louis City. Pointe Add subdivision. We are moving a 3 bedroom, 2 bathroom
-      brick bungalow at $65,000 with an ARV of $142,603 — a gross spread of $77,603 below ARV at asking price
-      on a fixer with original hardwood floors, a woodburning fireplace, and a full basement, sitting in a
-      North Pointe submarket that is actively trading and reselling in this exact price band. This home last
-      traded at $126,500 on 11/08/2023 and is now vacant and ready for a fast close. Three closed comps within
-      0.2 to 0.3 miles support the ARV with an average price per square foot of $112 across the immediate
-      block. Cosmetic and mechanical rehab throughout gives an investor full control of the scope and the
-      margin. Access confirmation is pending — contact us to get on the list. First buyer locks it.
-    </p>
-  </div>
-</section>
-
-<section class="block">
-  <div class="wrap">
-    <h2>The Numbers</h2>
-    <table class="deal-table">
-      <tr><th>Asking Price</th><td>$65,000</td></tr>
-      <tr><th>ARV</th><td>$142,603</td></tr>
-      <tr><th>Gross Spread Below ARV</th><td>$77,603</td></tr>
-      <tr><th>ARV Range (Comp Report)</th><td>$135,473 – $149,733</td></tr>
-      <tr><th>Avg. Comp Price / Sq Ft</th><td>$112</td></tr>
-      <tr><th>Last Sale Price</th><td>$126,500 (11/08/2023)</td></tr>
-      <tr><th>Estimated Rehab</th><td>$15,000</td></tr>
-      <tr><th>EMD</th><td>$5,000 — non-refundable</td></tr>
-      <tr><th>Close of Escrow</th><td>September 11, 2026</td></tr>
-      <tr><th>Title Company</th><td>Investor Title Company</td></tr>
-      <tr><th>HOA</th><td>None</td></tr>
-    </table>
-    <div class="callout">
-      <strong>Short Sale Note:</strong> This is a short sale. The underlying contract is subject to the seller's
-      lienholder approving the payoff amount. If the lienholder does not approve on or before the scheduled
-      closing, the contract — and this sale — will terminate, and the buyer's earnest money will be returned.
-      The closing date is anticipated, not guaranteed.
+    <h2>Photos</h2>
+    <div class="gallery-scroll">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/1.jpg" alt="Brick bungalow exterior, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/2.jpg" alt="Brick bungalow exterior view, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/3.jpg" alt="Interior living room, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/4.jpg" alt="Interior room, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/5.jpg" alt="Interior hardwood floors, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/6.jpg" alt="Interior fireplace, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/7.jpg" alt="Kitchen, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/8.jpg" alt="Kitchen view, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/9.jpg" alt="Bathroom, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/10.jpg" alt="Bedroom, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/11.jpg" alt="Bedroom view, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/12.jpg" alt="Hallway, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/13.jpg" alt="Basement, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/14.jpg" alt="Basement walk-out access, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/15.jpg" alt="Exterior side view, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/16.jpg" alt="Exterior rear view, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/17.jpg" alt="Backyard, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/18.jpg" alt="Front porch, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/19.jpg" alt="Roofline, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/20.jpg" alt="Street view, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/21.jpg" alt="Interior detail, St. Louis, MO 63147">
+      <img src="/deals/85950eb4-d6eb-4f56-bfe0-266a67ba037d/photos/22.jpg" alt="Property detail, St. Louis, MO 63147">
     </div>
   </div>
 </section>
 
-<section class="block">
+<section id="snapshot">
   <div class="wrap">
     <h2>Property Snapshot</h2>
-    <table class="deal-table">
-      <tr><th>Bedrooms</th><td>3</td></tr>
-      <tr><th>Bathrooms</th><td>2</td></tr>
-      <tr><th>Living Area</th><td>1,184 Sq Ft</td></tr>
-      <tr><th>Year Built</th><td>1939</td></tr>
-      <tr><th>Stories</th><td>Two and One Half Stories</td></tr>
-      <tr><th>Style</th><td>Bungalow</td></tr>
-      <tr><th>Construction</th><td>Brick</td></tr>
-      <tr><th>Lot Size</th><td>3,045 Sq Ft</td></tr>
-      <tr><th>Subdivision</th><td>Pointe Add</td></tr>
-      <tr><th>City / ZIP</th><td>St. Louis City, 63147</td></tr>
-      <tr><th>Fireplace</th><td>Yes — Living Room</td></tr>
-      <tr><th>Roof</th><td>Shingle</td></tr>
-      <tr><th>Basement</th><td>Full, Unfinished, Interior Entry, Walk-Out Access</td></tr>
-      <tr><th>Heating</th><td>Forced Air, Gas</td></tr>
-      <tr><th>Cooling</th><td>Central Air, Ceiling Fans</td></tr>
-      <tr><th>HOA</th><td>None</td></tr>
-      <tr><th>Occupancy</th><td>Vacant — immediate access available upon confirmation</td></tr>
-      <tr><th>Sale Condition</th><td>Sold As-Is — buyer responsible for full due diligence</td></tr>
-    </table>
-  </div>
-</section>
-
-<section class="block">
-  <div class="wrap">
-    <h2>Condition Notes</h2>
-    <ul class="plain">
-      <li><strong>Rehab Scope:</strong> Fixer — full cosmetic and mechanical update throughout</li>
-      <li><strong>Interior:</strong> Original hardwood floors, natural woodwork, eat-in kitchen</li>
-      <li><strong>Kitchen:</strong> Dated, needs full update</li>
-      <li><strong>Bathrooms:</strong> Dated, needs full update</li>
-      <li><strong>Basement:</strong> Full, unfinished, walk-out access</li>
-      <li><strong>Construction:</strong> Brick, per records</li>
-    </ul>
-    <p style="font-size:13px;color:#6b5f4d;">
-      All condition information is provided from records and photos. Buyers are strongly advised to conduct
-      independent inspections of all systems prior to closing. JNA Dynamic Holdings LLC makes no representations
-      regarding property condition.
-    </p>
-  </div>
-</section>
-
-<section class="block">
-  <div class="wrap">
-    <h2>Why This Deal Makes Sense</h2>
-    <p>
-      North Pointe sits in St. Louis City in a corridor that continues to see steady comp activity in the
-      sub-$150,000 retail range. Three comparable sales within 0.2 to 0.3 miles — 5919 Era Ave, 5949 Era Ave,
-      and 8528 Riverview Blvd — all closed within the last six months and support an adjusted ARV of $142,603,
-      with individual adjusted values ranging from $126,428 to $156,957. At a $65,000 entry, you are buying more
-      than $77,000 below that ARV on a property with original hardwood floors, a fireplace, and a full walk-out
-      basement that adds real value-add upside once modernized. This is a full rehab opportunity in a market
-      with proven comp support and a fast, firm closing date.
-    </p>
-  </div>
-</section>
-
-<section class="block">
-  <div class="wrap">
-    <h2>Exit Strategies</h2>
-    <div class="exit-cards">
-      <div class="exit-card">
-        <h3>Fix & Flip</h3>
-        <p>Full cosmetic and mechanical rehab on a 3 bedroom, 2 bathroom brick bungalow with original hardwood
-        floors and a fireplace — list into a $142,603 ARV with $77,603 of gross spread before renovation costs.
-        Comp-supported exit with three closed sales within 0.3 miles.</p>
-      </div>
-      <div class="exit-card">
-        <h3>Buy & Hold Rental</h3>
-        <p>North Pointe rental demand supports steady occupancy for renovated 3-bedroom product — a full rehab
-        at this acquisition cost pencils hard for a long-term hold strategy.</p>
-      </div>
-      <div class="exit-card">
-        <h3>BRRRR</h3>
-        <p>Acquire at $65,000, complete a full rehab, stabilize with a tenant, and refinance against a $142,603
-        ARV — the equity gap creates a strong cash-out refinance position.</p>
-      </div>
+    <div class="snapshot-grid">
+      <dl>
+        <dt>Bedrooms</dt><dd>3</dd>
+        <dt>Bathrooms</dt><dd>2</dd>
+        <dt>Living Area</dt><dd>1,184 sq ft</dd>
+        <dt>Year Built</dt><dd>1939</dd>
+        <dt>Stories</dt><dd>Two and one half</dd>
+        <dt>Style</dt><dd>Bungalow</dd>
+      </dl>
+      <dl>
+        <dt>Lot Size</dt><dd>3,045 sq ft</dd>
+        <dt>Subdivision</dt><dd>Pointe Add</dd>
+        <dt>Location</dt><dd>St. Louis City, 63147</dd>
+        <dt>Fireplace</dt><dd>Yes — living room</dd>
+        <dt>Roof</dt><dd>Shingle</dd>
+        <dt>Construction</dt><dd>Brick</dd>
+      </dl>
+      <dl>
+        <dt>Basement</dt><dd>Full, unfinished, interior entry, walk-out access</dd>
+        <dt>Heating</dt><dd>Forced air, gas</dd>
+        <dt>Cooling</dt><dd>Central air, ceiling fans</dd>
+        <dt>HOA</dt><dd>None</dd>
+        <dt>Condition</dt><dd>Sold as-is — buyer responsible for full due diligence</dd>
+        <dt>Occupancy</dt><dd>Vacant — immediate access available upon confirmation</dd>
+      </dl>
     </div>
   </div>
 </section>
 
-<section class="block">
+<section id="condition">
   <div class="wrap">
-    <h2>Deal Terms</h2>
-    <table class="deal-table">
-      <tr><th>Purchase Price</th><td>$65,000</td></tr>
-      <tr><th>EMD</th><td>$5,000 — non-refundable</td></tr>
-      <tr><th>Close of Escrow</th><td>September 11, 2026 — no extensions</td></tr>
-      <tr><th>Title Company</th><td>Investor Title Company</td></tr>
-      <tr><th>Access</th><td>Pending confirmation — contact us to get on the access list</td></tr>
-      <tr><th>Funding</th><td>Cash or hard money only</td></tr>
-      <tr><th>Condition</th><td>Property sold as-is</td></tr>
-      <tr><th>Transaction Coordination Fee</th><td>$425, paid by buyer</td></tr>
-      <tr><th>Terms</th><td>First come, first served</td></tr>
+    <h2>Condition Notes</h2>
+    <table class="terms">
+      <tr><td class="k">Rehab Scope</td><td>Fixer — full cosmetic and mechanical update throughout</td></tr>
+      <tr><td class="k">Interior</td><td>Original hardwood floors, natural woodwork, eat-in kitchen</td></tr>
+      <tr><td class="k">Kitchen</td><td>Dated, needs full update</td></tr>
+      <tr><td class="k">Bathrooms</td><td>Dated, needs full update</td></tr>
+      <tr><td class="k">Basement</td><td>Full, unfinished, walk-out access</td></tr>
+      <tr><td class="k">Construction</td><td>Brick, per records</td></tr>
     </table>
+    <p class="disclaimer" style="margin-top:18px;">All condition information is provided from records and photos. Buyers are strongly advised to conduct independent inspections of all systems prior to closing. JNA Dynamic Holdings LLC makes no representations regarding property condition.</p>
   </div>
 </section>
 
-<section class="disclaimer-section">
+<section id="why">
   <div class="wrap">
-    <p>
-      This is a wholesale assignment of contract. JNA Dynamic Holdings LLC holds equitable interest in this
-      property under contract with the underlying property owner; the end buyer will receive an assignment of
-      that contract, not a direct purchase from the property owner. All figures — including ARV, comp values,
-      and condition notes — are believed to be reliable but have not been independently verified by JNA Dynamic
-      Holdings LLC and are not guaranteed. Buyers are advised to conduct independent due diligence, including
-      independent inspection and ARV verification, prior to executing any purchase agreement. This is not an
-      offer to sell real property. JNA Dynamic Holdings LLC operates in compliance with Missouri wholesale
-      disclosure requirements.
-    </p>
+    <h2>Why This Deal Makes Sense</h2>
+    <p>North Pointe sits in St. Louis City in a corridor that continues to see steady comp activity in the sub-$150,000 retail range. Three comparable sales within 0.2 to 0.3 miles closed within the last six months and support an adjusted ARV of $142,603, with individual adjusted values ranging from $126,428 to $156,957. At a $65,000 entry, this is more than $77,000 below that ARV on a property with original hardwood floors, a fireplace, and a full walk-out basement that adds real value-add upside once modernized. This is a full rehab opportunity in a market with proven comp support and a fast, firm closing date.</p>
+  </div>
+</section>
+
+<section id="exit">
+  <div class="wrap">
+    <h2>Exit Strategies</h2>
+    <ul class="exit-list">
+      <li><strong>Fix and Flip:</strong> Full cosmetic and mechanical rehab on a 3 bedroom, 2 bathroom brick bungalow with original hardwood floors and a fireplace — list into a $142,603 ARV with $77,603 of gross spread before renovation costs. Comp-supported exit with three closed sales within 0.3 miles.</li>
+      <li><strong>Buy and Hold Rental:</strong> North Pointe rental demand supports steady occupancy for renovated 3-bedroom product — a full rehab at this acquisition cost pencils hard for a long-term hold strategy.</li>
+      <li><strong>BRRRR:</strong> Acquire at $65,000, complete a full rehab, stabilize with a tenant, and refinance against a $142,603 ARV — the equity gap creates a strong cash-out refinance position.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="terms">
+  <div class="wrap">
+    <h2>Deal Terms</h2>
+    <table class="terms">
+      <tr><td class="k">Purchase Price</td><td>$65,000</td></tr>
+      <tr><td class="k">Earnest Money Deposit</td><td>$5,000 — non-refundable</td></tr>
+      <tr><td class="k">Close of Escrow</td><td>September 11, 2026 — no extensions (anticipated, not guaranteed)</td></tr>
+      <tr><td class="k">Title Company</td><td>Investor Title Company</td></tr>
+      <tr><td class="k">Access</td><td>Pending confirmation — contact us to get on the access list</td></tr>
+      <tr><td class="k">Financing</td><td>Cash or hard money only</td></tr>
+      <tr><td class="k">Property Condition</td><td>Sold as-is</td></tr>
+      <tr><td class="k">Transaction Coordination Fee</td><td>Buyer to pay $425 TC fee</td></tr>
+      <tr><td class="k">HOA</td><td>None</td></tr>
+      <tr><td class="k">Priority</td><td>First come, first served</td></tr>
+    </table>
+
+    <div class="callout" style="margin-top:22px;">
+      <strong>Short Sale Notice:</strong> This is a short sale. The underlying contract is subject to the seller's lienholder approving the payoff amount. If the lienholder does not approve on or before the scheduled closing, the contract — and this sale — will terminate, and the buyer's earnest money will be returned. The closing date is anticipated, not guaranteed.
+    </div>
+  </div>
+</section>
+
+<section id="legal">
+  <div class="wrap">
+    <h2>Assignment &amp; Disclosures</h2>
+    <p class="disclaimer">This is a wholesale assignment of contract, not a direct sale of real property. JNA Dynamic Holdings LLC holds equitable interest in this property under contract with the property owner. The end buyer will receive an assignment of contract, not a deed directly from JNA Dynamic Holdings LLC. All figures on this page — including price, ARV, comp values, square footage, and condition notes — are provided from third-party sources and have not been independently verified by JNA Dynamic Holdings LLC. Buyers are advised to conduct independent due diligence, including independent inspection and ARV verification, prior to executing any purchase agreement. This is not an offer to sell real property. JNA Dynamic Holdings LLC operates in compliance with Missouri wholesale disclosure requirements.</p>
   </div>
 </section>
 
 <div class="cta-band">
   <div class="wrap">
-    <h2>Serious Buyers Only — First In Wins</h2>
-    <p>
-      Saint Louis, MO. St. Louis City. 3BD/2BA brick bungalow. Full basement. Fireplace. No HOA. $65,000 entry.
-      ARV $142,603. Comp-supported, $77,603 below ARV. Fixer scope. Send proof of funds now to lock this deal
-      with JNA Dynamic Holdings LLC.
-    </p>
+    <h2>Send Proof of Funds — First In Wins</h2>
+    <p>Saint Louis, MO &middot; St. Louis City &middot; 3BD/2BA brick bungalow &middot; full basement &middot; fireplace &middot; no HOA &middot; $65,000 entry &middot; $142,603 ARV &middot; comp-supported &middot; $77,603 below ARV &middot; fixer scope.</p>
     <div class="cta-contacts">
-      <a href="tel:520-633-6437">520-633-6437</a>
+      <a href="tel:5206336437">520-633-6437</a>
       <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
     </div>
+    <div class="cta-company">JNA Dynamic Holdings LLC</div>
   </div>
 </div>
 
-<footer class="foot">
+<footer class="legal">
   <div class="wrap">
-    <p>JNA Dynamic Holdings LLC — This is a marketing communication for an assignment of contract, not an offer to sell real property.</p>
+    <p class="disclaimer">Address available upon request — contact us for the full street address. Photos and details reflect the property's current as-is condition. Cash or hard money buyers only. Sold as-is.</p>
   </div>
 </footer>
 
-<div style="max-width:640px;margin:40px auto;padding:28px 24px;text-align:center;font-family:Arial,sans-serif;border-top:1px solid #ddd;"><p style="color:#444;margin-bottom:16px;">Addresses are shared with wholesalers who already have an interested buyer for this deal, or with direct buyers reviewing this listing. Log in or create a free account to request it.</p><a href="https://sendmybuyer.com/?requestAddress=85950eb4-d6eb-4f56-bfe0-266a67ba037d" style="display:inline-block;padding:12px 28px;background:#1a73e8;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;">Request the Address</a><p style="margin-top:16px;"><a href="https://sendmybuyer.com" style="color:#1a73e8;">Log in</a> &nbsp;&middot;&nbsp; <a href="https://sendmybuyer.com" style="color:#1a73e8;">Browse all deals</a></p><p style="color:#888;font-size:0.9em;margin-top:20px;">Interested in this deal? This listing isn't searchable once you leave — <strong>save or bookmark this page's link</strong> before heading to the home page, so you can find your way back to it.</p></div></body>
+</body>
 </html>
