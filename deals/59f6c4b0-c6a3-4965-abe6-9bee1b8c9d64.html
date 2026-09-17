@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NC-5 (Land) &mdash; Southport / Boiling Spring Lakes Area, Brunswick County, NC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: #f6f1e9;
+    color: #2b261f;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  h1, h2, h3, .display {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    color: #201b14;
+    letter-spacing: 0.2px;
+  }
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  header.top {
+    background: #201b14;
+    color: #f6f1e9;
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+  header.top .brand {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  header.top .tagline {
+    font-size: 13px;
+    color: #c9bfa8;
+    margin-top: 4px;
+  }
+  section.hero {
+    margin-top: 44px;
+    margin-bottom: 30px;
+  }
+  .kicker {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 12px;
+    color: #8a6f45;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  h1.title {
+    font-size: 40px;
+    line-height: 1.15;
+    margin: 0 0 10px 0;
+  }
+  .location-line {
+    font-size: 17px;
+    color: #4a4436;
+    margin-bottom: 6px;
+  }
+  .address-note {
+    display: inline-block;
+    background: #ece2cd;
+    border: 1px solid #d8c9a3;
+    color: #5c4a24;
+    font-size: 13.5px;
+    padding: 7px 14px;
+    border-radius: 4px;
+    margin-top: 10px;
+  }
+  .price-block {
+    margin-top: 26px;
+    margin-bottom: 6px;
+    background: #fffdf9;
+    border: 1px solid #e3d8c1;
+    border-radius: 8px;
+    padding: 26px 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    align-items: baseline;
+  }
+  .price-block .main-price {
+    font-family: 'Fraunces', serif;
+    font-size: 44px;
+    font-weight: 700;
+    color: #7a3b1a;
+  }
+  .price-block .sub {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #8a7f66;
+    display: block;
+    margin-bottom: 2px;
+  }
+  .price-secondary {
+    font-size: 22px;
+    font-weight: 600;
+    color: #3a3427;
+  }
+  section.gallery {
+    margin-top: 10px;
+    margin-bottom: 40px;
+  }
+  .gallery-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+  .gallery-scroll img {
+    height: 260px;
+    width: auto;
+    border-radius: 6px;
+    border: 1px solid #e3d8c1;
+    flex-shrink: 0;
+  }
+  .more-photos {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 13.5px;
+    color: #7a3b1a;
+    text-decoration: underline;
+  }
+  section.block {
+    margin-top: 38px;
+    margin-bottom: 38px;
+  }
+  h2.section-title {
+    font-size: 26px;
+    margin-bottom: 14px;
+    border-bottom: 2px solid #d8c9a3;
+    padding-bottom: 8px;
+  }
+  ul.tick-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 24px;
+  }
+  ul.tick-list li {
+    font-size: 15px;
+    padding-left: 20px;
+    position: relative;
+  }
+  ul.tick-list li::before {
+    content: "\2022";
+    color: #8a6f45;
+    font-weight: 700;
+    position: absolute;
+    left: 0;
+  }
+  p.body-text {
+    font-size: 15.5px;
+    color: #3a3427;
+    margin-top: 0;
+    margin-bottom: 14px;
+  }
+  .comp-card {
+    background: #fffdf9;
+    border: 1px solid #e3d8c1;
+    border-radius: 8px;
+    padding: 22px 24px;
+  }
+  .comp-card h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 19px;
+  }
+  table.terms {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fffdf9;
+    border: 1px solid #e3d8c1;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  table.terms td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #eee2c9;
+    font-size: 15px;
+  }
+  table.terms tr:last-child td {
+    border-bottom: none;
+  }
+  table.terms td.label {
+    color: #8a7f66;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-size: 12px;
+    width: 42%;
+  }
+  .disclosure-box {
+    background: #f2e9d6;
+    border-left: 4px solid #8a6f45;
+    padding: 16px 20px;
+    font-size: 14px;
+    color: #4a4436;
+    margin-top: 16px;
+  }
+  .assignment-note {
+    font-size: 14px;
+    color: #4a4436;
+    background: #fffdf9;
+    border: 1px dashed #c9b98a;
+    padding: 14px 18px;
+    border-radius: 6px;
+    margin-top: 16px;
+  }
+  section.cta {
+    background: #201b14;
+    color: #f6f1e9;
+    margin-top: 20px;
+    padding-top: 46px;
+    padding-bottom: 46px;
+  }
+  section.cta h2 {
+    color: #f6f1e9;
+    font-size: 30px;
+    margin-bottom: 8px;
+  }
+  section.cta p {
+    color: #d9cfb8;
+    font-size: 15.5px;
+    margin-top: 0;
+    margin-bottom: 22px;
+  }
+  .cta-contacts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+  .cta-contacts a {
+    color: #f6f1e9;
+    background: #7a3b1a;
+    text-decoration: none;
+    padding: 12px 22px;
+    border-radius: 5px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .cta-contacts a.secondary {
+    background: transparent;
+    border: 1px solid #7a6a4a;
+  }
+  footer.disclaimer {
+    padding-top: 24px;
+    padding-bottom: 40px;
+  }
+  footer.disclaimer p {
+    font-size: 12.5px;
+    color: #8a7f66;
+    line-height: 1.7;
+  }
+  @media (max-width: 640px) {
+    ul.tick-list { grid-template-columns: 1fr; }
+    h1.title { font-size: 30px; }
+    .price-block .main-price { font-size: 34px; }
+  }
+</style>
+</head>
+<body><div style="max-width:640px;margin:0 auto 20px;padding:20px 24px;text-align:center;font-family:Arial,sans-serif;border-bottom:1px solid #ddd;"><p style="color:#444;margin-bottom:16px;">Addresses are shared with wholesalers who already have an interested buyer for this deal, or with direct buyers reviewing this listing. Log in or create a free account to request it.</p><a href="https://sendmybuyer.com/?requestAddress=59f6c4b0-c6a3-4965-abe6-9bee1b8c9d64&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F59f6c4b0-c6a3-4965-abe6-9bee1b8c9d64.html" style="display:inline-block;padding:12px 28px;background:#1a73e8;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;">Request the Address</a><p style="margin-top:16px;"><a href="https://sendmybuyer.com" style="color:#1a73e8;">Log in</a> &nbsp;&middot;&nbsp; <a href="https://sendmybuyer.com" style="color:#1a73e8;">Browse all deals</a></p><p style="color:#888;font-size:0.9em;margin-top:20px;">Interested in this deal? This listing isn't searchable once you leave — <strong>save or bookmark this page's link</strong> before heading to the home page, so you can find your way back to it.</p></div>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">JNA DYNAMIC HOLDINGS LLC</div>
+    <div class="tagline">Wholesale Land &amp; Property Assignments</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="hero">
+    <div class="kicker">Deal Code: NC-5 (Land) &nbsp;&middot;&nbsp; Vacant Residential Land</div>
+    <h1 class="title">Level Wooded Corner Lot &mdash; Southport / Boiling Spring Lakes Area</h1>
+    <div class="location-line">Southport / Boiling Spring Lakes Area, Brunswick County, North Carolina</div>
+    <span class="address-note">Address available upon request &mdash; contact us for the full property location.</span>
+  </section>
+
+  <section class="price-block">
+    <div>
+      <span class="sub">Asking Price</span>
+      <span class="main-price">$13,500</span>
+    </div>
+    <div>
+      <span class="sub">Comparable Sold Value (Jan 2026)</span>
+      <span class="price-secondary">$18,000</span>
+    </div>
+  </section>
+
+  <section class="gallery">
+    <div class="gallery-scroll">
+      <img src="/deals/59f6c4b0-c6a3-4965-abe6-9bee1b8c9d64/photos/1.jpg" alt="Vacant land parcel view, Southport / Boiling Spring Lakes area, Brunswick County, NC">
+      <img src="/deals/59f6c4b0-c6a3-4965-abe6-9bee1b8c9d64/photos/2.jpg" alt="Wooded corner lot view, Southport / Boiling Spring Lakes area, Brunswick County, NC">
+      <img src="/deals/59f6c4b0-c6a3-4965-abe6-9bee1b8c9d64/photos/3.jpg" alt="Road frontage view, Southport / Boiling Spring Lakes area, Brunswick County, NC">
+      <img src="/deals/59f6c4b0-c6a3-4965-abe6-9bee1b8c9d64/photos/4.jpg" alt="Lot boundary view, Southport / Boiling Spring Lakes area, Brunswick County, NC">
+      <img src="/deals/59f6c4b0-c6a3-4965-abe6-9bee1b8c9d64/photos/5.jpg" alt="Site condition view, Southport / Boiling Spring Lakes area, Brunswick County, NC">
+    </div>
+  </section>
+
+  <section class="block">
+    <h2 class="section-title">Here Is What We Have</h2>
+    <p class="body-text">Opportunity to acquire approximately 0.74 acres of vacant residential land in the Southport / Boiling Spring Lakes area of Brunswick County, North Carolina. The property is a level, wooded corner parcel with approximately 362 feet of total road frontage and no HOA reported.</p>
+  </section>
+
+  <section class="block">
+    <h2 class="section-title">Property Highlights</h2>
+    <ul class="tick-list">
+      <li>0.74&plusmn; acres</li>
+      <li>Approximately 32,234 SF</li>
+      <li>Level, wooded corner lot</li>
+      <li>Approximately 362' total road frontage</li>
+      <li>BS-R-2 zoning reported</li>
+      <li>No HOA reported</li>
+      <li>Vacant residential land</li>
+      <li>Septic / soil evaluation completed</li>
+      <li>Priced below a highly comparable 2026 septic-unsuitable land sale</li>
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2 class="section-title">Why This Lot Makes Sense</h2>
+    <p class="body-text">The value proposition here is based on acreage, corner positioning, road frontage, and a demonstrated resale market for similarly constrained land.</p>
+    <p class="body-text">At $13,500, the property is priced substantially below a highly comparable 0.75-acre corner lot in the immediate market that sold for $18,000 in January 2026 despite also being marketed as unsuitable for septic.</p>
+    <p class="body-text">This is best suited for land investors, neighboring owners, speculative buyers, or builders/developers experienced with challenging wastewater sites.</p>
+  </section>
+
+  <section class="block">
+    <h2 class="section-title">Septic / Soil Disclosure</h2>
+    <p class="body-text">Brunswick County completed an official soil/site evaluation in January 2026 for a proposed 3-bedroom residence / 360 GPD wastewater system.</p>
+    <div class="disclosure-box">
+      The improvement permit was DENIED and the site was classified UNSUITABLE due to soil wetness. No septic or wastewater system is currently represented as approved. The property is being sold AS-IS, and buyers may independently investigate potential alternative wastewater solutions, additional soil evaluation, engineering, qualifying drainage / site modifications, advanced treatment, or other permitting pathways. All future development potential is subject to professional evaluation and governmental approval.
+    </div>
+    <p class="body-text" style="margin-top:14px;">Full county septic / site-evaluation documentation is available for review.</p>
+  </section>
+
+  <section class="block">
+    <h2 class="section-title">Comparable Sale</h2>
+    <div class="comp-card">
+      <h3>Southport / Boiling Spring Lakes Area, Brunswick County, NC 28461</h3>
+      <ul class="tick-list">
+        <li>0.75 acres</li>
+        <li>Approximately 160' &times; 200'</li>
+        <li>Level corner lot</li>
+        <li>No HOA</li>
+        <li>Marketed as unsuitable for septic</li>
+        <li>Sold January 2026: $18,000</li>
+      </ul>
+      <p class="body-text" style="margin-top:14px;">Subject asking price: $13,500 &mdash; approximately $4,500 below this highly comparable septic-unsuitable land sale.</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2 class="section-title">Investment Highlights</h2>
+    <ul class="tick-list">
+      <li>0.74&plusmn; acres</li>
+      <li>Level corner lot</li>
+      <li>362'&plusmn; total road frontage</li>
+      <li>No HOA reported</li>
+      <li>Low $13,500 entry price</li>
+      <li>Full septic documentation available</li>
+      <li>Land investor / neighboring owner / speculative land play</li>
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2 class="section-title">Utilities / Site Conditions</h2>
+    <p class="body-text">Utility availability and connection requirements must be independently verified by the buyer. The buyer should also independently verify:</p>
+    <ul class="tick-list">
+      <li>Water source</li>
+      <li>Electric availability</li>
+      <li>Legal access</li>
+      <li>Exact lot dimensions</li>
+      <li>Building envelope</li>
+      <li>Setbacks</li>
+      <li>Drainage</li>
+      <li>Flood zone</li>
+      <li>Wetlands</li>
+      <li>Soils</li>
+      <li>Easements</li>
+      <li>Title conditions</li>
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2 class="section-title">Buyer Due Diligence Notice</h2>
+    <p class="body-text">Buyer must independently verify zoning, permitted use, acreage, parcel boundaries, survey, road frontage, legal access, utilities, water source, soils, drainage, flood zone, wetlands, setbacks, easements, wastewater feasibility, permitting requirements, title conditions, and all development costs prior to closing.</p>
+    <div class="disclosure-box">
+      The January 2026 county evaluation denied the proposed 3-bedroom / 360 GPD wastewater system due to soil wetness. No representation is made that any septic, engineered, advanced-treatment, modified-site, or alternative wastewater solution will be approved.
+    </div>
+  </section>
+
+  <section class="block">
+    <h2 class="section-title">Deal Terms</h2>
+    <table class="terms">
+      <tr><td class="label">Purchase Price</td><td>$13,500</td></tr>
+      <tr><td class="label">Payment</td><td>Cash or approved funds</td></tr>
+      <tr><td class="label">Transaction Type</td><td>Assignment of contract</td></tr>
+      <tr><td class="label">Closing Costs</td><td>Buyer pays closing costs</td></tr>
+      <tr><td class="label">Condition</td><td>Property sold as-is</td></tr>
+      <tr><td class="label">Proof of Funds</td><td>Required</td></tr>
+      <tr><td class="label">Due Diligence</td><td>Buyer responsible for all due diligence</td></tr>
+      <tr><td class="label">Documentation</td><td>Septic documentation available immediately</td></tr>
+      <tr><td class="label">Availability</td><td>First come, first served</td></tr>
+    </table>
+    <div class="assignment-note">
+      This is a wholesale assignment. JNA Dynamic Holdings LLC holds equitable interest in the subject transaction under contract with the underlying property owner. The end buyer will receive an assignment of contract, not a direct conveyance from the seller.
+    </div>
+  </section>
+
+</div>
+
+<section class="cta">
+  <div class="wrap">
+    <h2>Ready to Move on This Lot?</h2>
+    <p>0.74&plusmn; acres. Level, wooded corner lot. 362'&plusmn; road frontage. No HOA. Septic / soil evaluation completed. Comparable septic-unsuitable lot sold for $18,000. Subject asking $13,500. Serious buyers: submit offer, EMD amount, and closing timeline.</p>
+    <div class="cta-contacts">
+      <a href="tel:5206336437">Call 520-633-6437</a>
+      <a class="secondary" href="mailto:montanoemmanuel@gmail.com">Email montanoemmanuel@gmail.com</a>
+    </div>
+  </div>
+</section>
+
+<footer class="disclaimer">
+  <div class="wrap">
+    <p>This is a wholesale assignment of contract offered by JNA Dynamic Holdings LLC, which holds an equitable interest in the property under contract with the underlying property owner. JNA Dynamic Holdings LLC is not the titled owner of the property and does not represent the seller in this transaction. All figures, acreage, dimensions, zoning designations, road frontage, soil/septic evaluation results, and comparable sale information contained on this page have not been independently verified by JNA Dynamic Holdings LLC and should be independently confirmed by the buyer prior to closing.</p>
+  </div>
+</footer>
+
+</body>
+</html>
