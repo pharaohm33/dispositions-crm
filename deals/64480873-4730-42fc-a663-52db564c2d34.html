@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NC-6 (SFH) — Statesville, NC | Assignment Opportunity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background-color: #f6f1e9;
+    color: #2b2620;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+  }
+  .wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    color: #1c1812;
+  }
+  header.top {
+    background-color: #efe7d8;
+    border-bottom: 1px solid #ddd2ba;
+    padding-top: 40px;
+    padding-bottom: 32px;
+  }
+  .kicker {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 12px;
+    color: #8a6f3f;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  h1.title {
+    font-size: 40px;
+    margin-top: 0;
+    margin-bottom: 8px;
+  }
+  .location-line {
+    font-size: 18px;
+    color: #4a4234;
+    margin-top: 0;
+    margin-bottom: 14px;
+  }
+  .addr-note {
+    display: inline-block;
+    background-color: #fdf9f0;
+    border: 1px solid #d8c9a3;
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-size: 14.5px;
+    color: #5b4c2c;
+    margin-top: 4px;
+    margin-bottom: 4px;
+  }
+  .price-block {
+    margin-top: 26px;
+    margin-bottom: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+  }
+  .price-item {
+    min-width: 140px;
+  }
+  .price-item .label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8a7a55;
+    margin-bottom: 4px;
+  }
+  .price-item .value {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: #1c1812;
+  }
+  .price-item.primary .value {
+    font-size: 34px;
+    color: #7a3b1e;
+  }
+  .tags {
+    margin-top: 18px;
+    margin-bottom: 4px;
+  }
+  .tag {
+    display: inline-block;
+    background-color: #e7ddc4;
+    color: #4a3d1f;
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 13px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  section {
+    margin-top: 46px;
+    margin-bottom: 46px;
+  }
+
+  h2.section-title {
+    font-size: 26px;
+    margin-top: 0;
+    margin-bottom: 18px;
+    border-bottom: 2px solid #d8c9a3;
+    padding-bottom: 10px;
+  }
+
+  .gallery-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding-bottom: 12px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .gallery-scroll img {
+    height: 260px;
+    width: auto;
+    flex-shrink: 0;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid #ddd2ba;
+  }
+  .more-photos {
+    margin-top: 12px;
+    font-size: 14px;
+  }
+  .more-photos a {
+    color: #7a3b1e;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid #7a3b1e;
+  }
+
+  table.terms {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fdf9f0;
+    border: 1px solid #ddd2ba;
+  }
+  table.terms tr {
+    border-bottom: 1px solid #e5dabf;
+  }
+  table.terms tr:last-child {
+    border-bottom: none;
+  }
+  table.terms td {
+    padding: 13px 18px;
+    font-size: 15px;
+  }
+  table.terms td.k {
+    color: #6b5d3f;
+    font-weight: 500;
+    width: 46%;
+  }
+  table.terms td.v {
+    color: #1c1812;
+    font-weight: 600;
+  }
+
+  .notes {
+    font-size: 15px;
+    color: #4a4234;
+  }
+  .notes p {
+    margin-top: 0;
+    margin-bottom: 14px;
+  }
+
+  .disclaimer-box {
+    background-color: #efe7d8;
+    border-left: 4px solid #b79b5b;
+    padding: 16px 20px;
+    font-size: 13.5px;
+    color: #5c5138;
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+
+  .cta-band {
+    background-color: #2b2620;
+    color: #f6f1e9;
+    padding-top: 44px;
+    padding-bottom: 44px;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  .cta-band h2 {
+    color: #f6f1e9;
+    font-size: 30px;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  .cta-band p {
+    color: #d8cfbc;
+    margin-top: 0;
+    margin-bottom: 22px;
+    font-size: 16px;
+  }
+  .cta-contacts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+  .cta-contacts a {
+    display: inline-block;
+    background-color: #cfa25a;
+    color: #2b2620;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 13px 24px;
+    border-radius: 4px;
+    font-size: 15px;
+  }
+  .cta-company {
+    margin-top: 24px;
+    font-size: 13.5px;
+    color: #a99d81;
+  }
+
+  footer.legal {
+    padding-top: 26px;
+    padding-bottom: 40px;
+    font-size: 12.5px;
+    color: #8a7f66;
+  }
+</style>
+</head>
+<body><div style="max-width:640px;margin:0 auto 20px;padding:20px 24px;text-align:center;font-family:Arial,sans-serif;border-bottom:1px solid #ddd;"><p style="color:#444;margin-bottom:16px;">Addresses are shared with wholesalers who already have an interested buyer for this deal, or with direct buyers reviewing this listing. Log in or create a free account to request it.</p><a href="https://sendmybuyer.com/?requestAddress=64480873-4730-42fc-a663-52db564c2d34&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F64480873-4730-42fc-a663-52db564c2d34.html" style="display:inline-block;padding:12px 28px;background:#1a73e8;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;">Request the Address</a><p style="margin-top:16px;"><a href="https://sendmybuyer.com" style="color:#1a73e8;">Log in</a> &nbsp;&middot;&nbsp; <a href="https://sendmybuyer.com" style="color:#1a73e8;">Browse all deals</a></p><p style="color:#888;font-size:0.9em;margin-top:20px;">Interested in this deal? This listing isn't searchable once you leave — <strong>save or bookmark this page's link</strong> before heading to the home page, so you can find your way back to it.</p></div>
+
+<header class="top">
+  <div class="wrap">
+    <div class="kicker">Assignment of Contract Opportunity</div>
+    <h1 class="title">NC-6 (SFH)</h1>
+    <p class="location-line">Statesville, Iredell County, North Carolina</p>
+    <div class="addr-note">Address available upon request — reach out and we'll send the full property address.</div>
+
+    <div class="tags">
+      <span class="tag">Fix and Flip</span>
+      <span class="tag">Buy and Hold</span>
+      <span class="tag">Single Family Home</span>
+    </div>
+
+    <div class="price-block">
+      <div class="price-item primary">
+        <div class="label">Assignment Price</div>
+        <div class="value">$110,000</div>
+      </div>
+      <div class="price-item">
+        <div class="label">After Repair Value</div>
+        <div class="value">$210,000</div>
+      </div>
+      <div class="price-item">
+        <div class="label">Estimated Rehab</div>
+        <div class="value">$35,000</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section id="gallery">
+    <h2 class="section-title">Property Photos</h2>
+    <div class="gallery-scroll">
+      <img src="/deals/64480873-4730-42fc-a663-52db564c2d34/photos/1.jpg" alt="NC-6 SFH photo 1">
+      <img src="/deals/64480873-4730-42fc-a663-52db564c2d34/photos/2.jpg" alt="NC-6 SFH photo 2">
+      <img src="/deals/64480873-4730-42fc-a663-52db564c2d34/photos/3.jpg" alt="NC-6 SFH photo 3">
+      <img src="/deals/64480873-4730-42fc-a663-52db564c2d34/photos/4.jpg" alt="NC-6 SFH photo 4">
+      <img src="/deals/64480873-4730-42fc-a663-52db564c2d34/photos/5.jpg" alt="NC-6 SFH photo 5">
+      <img src="/deals/64480873-4730-42fc-a663-52db564c2d34/photos/6.jpg" alt="NC-6 SFH photo 6">
+      <img src="/deals/64480873-4730-42fc-a663-52db564c2d34/photos/7.jpg" alt="NC-6 SFH photo 7">
+      <img src="/deals/64480873-4730-42fc-a663-52db564c2d34/photos/8.jpg" alt="NC-6 SFH photo 8">
+      <img src="/deals/64480873-4730-42fc-a663-52db564c2d34/photos/9.jpg" alt="NC-6 SFH photo 9">
+      <img src="/deals/64480873-4730-42fc-a663-52db564c2d34/photos/10.jpg" alt="NC-6 SFH photo 10">
+      <img src="/deals/64480873-4730-42fc-a663-52db564c2d34/photos/11.jpg" alt="NC-6 SFH photo 11">
+      <img src="/deals/64480873-4730-42fc-a663-52db564c2d34/photos/12.jpg" alt="NC-6 SFH photo 12">
+      <img src="/deals/64480873-4730-42fc-a663-52db564c2d34/photos/13.jpg" alt="NC-6 SFH photo 13">
+      <img src="/deals/64480873-4730-42fc-a663-52db564c2d34/photos/14.jpg" alt="NC-6 SFH photo 14">
+      <img src="/deals/64480873-4730-42fc-a663-52db564c2d34/photos/15.jpg" alt="NC-6 SFH photo 15">
+      <img src="/deals/64480873-4730-42fc-a663-52db564c2d34/photos/16.jpg" alt="NC-6 SFH photo 16">
+      <img src="/deals/64480873-4730-42fc-a663-52db564c2d34/photos/17.jpg" alt="NC-6 SFH photo 17">
+    </div>
+  </section>
+
+  <section id="overview">
+    <h2 class="section-title">Deal Overview</h2>
+    <div class="notes">
+      <p>This is a single-family fix-and-flip / buy-and-hold opportunity located in Statesville, Iredell County, North Carolina, offered under deal code NC-6 (SFH). The property presents a wide spread between the assignment price and projected after-repair value, with a modest estimated rehab budget, making it suitable for either a value-add resale strategy or a long-term rental hold.</p>
+      <p>This offering is an assignment of contract. JNA Dynamic Holdings LLC holds an equitable interest in the underlying purchase contract with the property owner and is marketing that contract position — this is not a direct sale by the underlying seller, and buyers will be transacting an assignment, not a direct purchase from the owner.</p>
+    </div>
+  </section>
+
+  <section id="terms">
+    <h2 class="section-title">Deal Terms</h2>
+    <table class="terms">
+      <tr><td class="k">Deal Code</td><td class="v">NC-6 (SFH)</td></tr>
+      <tr><td class="k">City / State</td><td class="v">Statesville, NC</td></tr>
+      <tr><td class="k">County</td><td class="v">Iredell County</td></tr>
+      <tr><td class="k">Deal Type</td><td class="v">Fix and Flip, Buy and Hold</td></tr>
+      <tr><td class="k">Assignment Price</td><td class="v">$110,000</td></tr>
+      <tr><td class="k">After Repair Value (ARV)</td><td class="v">$210,000</td></tr>
+      <tr><td class="k">Estimated Rehab Cost</td><td class="v">$35,000</td></tr>
+      <tr><td class="k">Estimated Spread (ARV less Price and Rehab)</td><td class="v">$65,000</td></tr>
+    </table>
+  </section>
+
+  <section id="disclosures">
+    <h2 class="section-title">Disclosures</h2>
+    <div class="disclaimer-box">
+      This is an assignment of contract. JNA Dynamic Holdings LLC is assigning its equitable interest in the purchase contract for this property and is not the titled owner. All figures presented above — including price, ARV, and rehab estimate — have not been independently verified by JNA Dynamic Holdings LLC and should be confirmed through buyer's own due diligence prior to entering any agreement.
+    </div>
+  </section>
+
+</div>
+
+<div class="cta-band">
+  <div class="wrap">
+    <h2>Interested in NC-6 (SFH)?</h2>
+    <p>Contact us today for the full property address, additional documentation, and to discuss next steps on this assignment opportunity.</p>
+    <div class="cta-contacts">
+      <a href="tel:520-633-6437">Call / Text: 520-633-6437</a>
+      <a href="mailto:montanoemmanuel@gmail.com">Email: montanoemmanuel@gmail.com</a>
+    </div>
+    <div class="cta-company">JNA Dynamic Holdings LLC</div>
+  </div>
+</div>
+
+<footer class="legal">
+  <div class="wrap">
+    <p>Information provided is believed to be accurate but has not been independently verified by JNA Dynamic Holdings LLC. Buyers are advised to perform their own due diligence, including independent inspection and valuation, prior to entering any agreement. This offering is an assignment of contract and is subject to the underlying property owner's contract terms.</p>
+  </div>
+</footer>
+
+</body>
+</html>
