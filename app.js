@@ -797,14 +797,21 @@ async function initRepView() {
     renderMyBuyerListDealSelect();
 
     const session = getEffectiveSession() || {};
-    // A Buyer signup isn't out hunting for buyers themselves -- skip the
-    // whole "build your own list" card and guide for them. Everyone else
-    // (blank/Wholesaler/Realtor/Other) gets it.
-    const buildsOwnList = session.personType !== "Buyer";
+    // A Buyer signup isn't out hunting for buyers themselves -- the entire
+    // Buyer Leads tab (how-to-work-a-lead guide, CSV/AI upload, My Buyer
+    // List, My Pitches) is rep tooling for finding buyers to pitch deals
+    // to, not something a buyer browsing deals for themselves needs to see
+    // at all. Hide the tab outright rather than just its contents.
+    const isBuyerSession = session.personType === "Buyer";
+    const buyerLeadsTabBtn = document.querySelector('#rep-view .tab-btn[data-rep-tab="buyerleads"]');
+    if (buyerLeadsTabBtn) buyerLeadsTabBtn.hidden = isBuyerSession;
+    if (isBuyerSession) switchRepTab("deals");
+
+    const buildsOwnList = !isBuyerSession;
     document.getElementById("rep-buyerlist-card").hidden = !buildsOwnList;
     document.getElementById("rep-mybuyerlist-card").hidden = !buildsOwnList;
     if (buildsOwnList) loadMyBuyerLeads();
-    document.getElementById("rep-buybox-edit-row").hidden = session.personType !== "Buyer";
+    document.getElementById("rep-buybox-edit-row").hidden = !isBuyerSession;
     // The text-in SOP is specifically for the three self-identified outside
     // contributor types, not a traditional admin-added rep (blank) or a
     // Buyer -- and only shows once there's an actual phone number to text.
@@ -1090,6 +1097,14 @@ async function openRepDealDetail(dealId) {
   const fbRequests = fbRes.ok ? fbRes.requests : [];
   const visibleCities = citiesRes.ok ? citiesRes.cities : [];
 
+  // A Buyer (real, or admin previewing via Work as Buyer) is browsing
+  // this deal for themselves -- everything below is tooling for finding
+  // OTHER buyers to pitch it to (self-matching yourself to a lead you
+  // called, pulling buyer leads to work, logging an interested buyer you
+  // found, requesting a Facebook post approval). None of that belongs in
+  // front of an actual buyer.
+  const isBuyerView = (getEffectiveSession() || {}).personType === "Buyer";
+
   const addressBanner = deal.addressGranted && deal.Address
     ? '<div class="banner danger"><strong>Confidential &mdash; do not share.</strong> Admin has given you access to this deal\'s exact address. Only share it with a legitimate, matched buyer' +
       ' &mdash; and only with admin approval, once that buyer has expressed real interest and specifically wants to review the full address. Sharing it any earlier, or with anyone else,' +
@@ -1124,18 +1139,22 @@ async function openRepDealDetail(dealId) {
       (deal.GeneralDriveLink ? '<div style="margin-top:8px;"><a href="' + esc(deal.GeneralDriveLink) + '" target="_blank" rel="noopener">Open Drive Folder</a></div>' : "") +
       addressRevealHtml(deal) +
       (!deal.Address ? '<div style="margin-top:10px;"><button class="btn secondary small" id="request-address-btn" data-deal-id="' + esc(deal.DealID) + '">Request Address Access</button>' +
-        '<div class="small-muted" style="margin-top:6px;">Pitch off the general deal info first — only use this once a buyer has responded, is genuinely interested, and specifically asks you for the address. This just emails admin to ask; it does not grant it.</div></div>' : "") +
+        (isBuyerView
+          ? '<div class="small-muted" style="margin-top:6px;">This just emails admin to ask for the exact address — it does not grant it automatically.</div></div>'
+          : '<div class="small-muted" style="margin-top:6px;">Pitch off the general deal info first — only use this once a buyer has responded, is genuinely interested, and specifically asks you for the address. This just emails admin to ask; it does not grant it.</div></div>') : "") +
       '<div style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.08);">' +
         (deal.Description && deal.Description.length > 220
           ? '<label class="checkbox-row" style="margin:0 0 6px;"><input type="checkbox" id="copy-buyer-info-shorten" checked> Shorten the long description (adds "...")</label>'
           : "") +
         '<div class="nav-row" style="justify-content:flex-start;">' +
-          '<button class="btn secondary small" id="copy-buyer-info-btn">Copy Info To Send Buyer</button>' +
+          '<button class="btn secondary small" id="copy-buyer-info-btn">' + (isBuyerView ? "Copy Info" : "Copy Info To Send Buyer") + '</button>' +
         '</div>' +
-        '<p class="small-muted" style="margin-top:6px;"><strong>The moment a buyer you send this to says they\'re interested, contact admin immediately</strong> so we can get them the address — don\'t wait on it, and don\'t send the address yourself.</p>' +
+        (isBuyerView ? "" :
+          '<p class="small-muted" style="margin-top:6px;"><strong>The moment a buyer you send this to says they\'re interested, contact admin immediately</strong> so we can get them the address — don\'t wait on it, and don\'t send the address yourself.</p>') +
       '</div>' +
     '</div>' +
 
+    (isBuyerView ? "" :
     '<div class="section-title">Already Talked To A Buyer About This Deal?</div>' +
     '<p class="small-muted">If you sent someone this deal directly (e.g. the public listing link) and they\'re already on the calling list or just registered, enter what you have below to match yourself to them — no need to wait for auto-matching.</p>' +
     '<div class="row2">' +
@@ -1185,11 +1204,9 @@ async function openRepDealDetail(dealId) {
     '<div class="nav-row" style="justify-content:flex-end;">' +
       '<button class="btn secondary" id="fb-post-submit">Submit for Approval</button>' +
     '</div>' +
-    '<div id="fb-post-list">' + renderFbRequestList(fbRequests, false) + '</div>';
+    '<div id="fb-post-list">' + renderFbRequestList(fbRequests, false) + '</div>');
 
-  wireBuyerMatchListHandlers(document.getElementById("buyer-list"), function () { return refreshBuyerMatchList(dealId, "buyer-list"); });
   wireRequestAddressButton();
-  if (visibleCities.length > 0) renderCityCheckboxList("give-myself-cities", visibleCities);
 
   document.getElementById("copy-buyer-info-btn").addEventListener("click", async function () {
     const shortenCheckbox = document.getElementById("copy-buyer-info-shorten");
@@ -1202,64 +1219,68 @@ async function openRepDealDetail(dealId) {
     }
   });
 
-  document.getElementById("selfmatch-btn").addEventListener("click", async function () {
-    const btn = this;
-    const resultEl = document.getElementById("selfmatch-result");
-    const phone = document.getElementById("selfmatch-phone-input").value.trim();
-    const email = document.getElementById("selfmatch-email-input").value.trim();
-    if (!phone && !email) { resultEl.textContent = "Enter at least a phone number or email."; return; }
-    if (btn.disabled) return;
-    btn.disabled = true;
-    resultEl.textContent = "Searching…";
-    const res = await api("repMatchSelfToBuyer", { dealId: deal.DealID, phone: phone, email: email });
-    btn.disabled = false;
-    if (!res.ok) { resultEl.textContent = res.error || "Could not match."; showToast(res.error || "Could not match.", true); return; }
-    resultEl.textContent = "Matched to " + res.buyerName + " — check your Buyer Leads tab." +
-      (res.hadOtherHistory ? " (Admin's been notified — this buyer has other history too.)" : "");
-    showToast("Matched to " + res.buyerName + ".");
-  });
-
-  document.getElementById("give-myself-btn").addEventListener("click", async function () {
-    const btn = this;
-    const resultEl = document.getElementById("give-myself-result");
-    const count = document.getElementById("give-myself-count").value;
-    if (!count) { resultEl.textContent = "Enter how many to match."; return; }
-    if (btn.disabled) return;
-    btn.disabled = true;
-    const cities = visibleCities.length > 0 ? checkedCityCheckboxValues("give-myself-cities") : [];
-    const res = await api("giveMyBuyerLeads", { dealId: dealId, count: count, cities: cities });
-    btn.disabled = false;
-    if (!res.ok) { resultEl.textContent = res.error || "Could not match leads."; showToast(res.error || "Could not match leads.", true); return; }
-    resultEl.textContent = "Gave yourself " + res.givenCount + " lead(s) for this deal. " + res.remainingInPool + " still unmatched for it.";
-    showToast("Gave yourself " + res.givenCount + " lead(s) — check your Buyer Leads tab.");
-  });
-
   document.getElementById("close-detail-btn").addEventListener("click", function () { overlay.hidden = true; });
 
-  document.getElementById("fb-post-submit").addEventListener("click", async function () {
-    const postText = document.getElementById("fb-post-text").value.trim();
-    const groups = document.getElementById("fb-post-groups").value.trim();
-    const errorEl = document.getElementById("fb-post-error");
-    errorEl.classList.remove("show");
-    if (!postText) {
-      errorEl.textContent = "Enter the post text you'd like approved.";
-      errorEl.classList.add("show");
-      return;
-    }
-    const res = await api("submitFbPostRequest", { dealId: dealId, postText: postText, targetGroups: groups });
-    if (!res.ok) {
-      errorEl.textContent = res.error || "Could not submit.";
-      errorEl.classList.add("show");
-      return;
-    }
-    document.getElementById("fb-post-text").value = "";
-    document.getElementById("fb-post-groups").value = "";
-    const fresh = await api("getMyFbRequests", { dealId: dealId });
-    document.getElementById("fb-post-list").innerHTML = renderFbRequestList(fresh.ok ? fresh.requests : [], false);
-    showToast("Post submitted for approval.");
-  });
+  if (!isBuyerView) {
+    wireBuyerMatchListHandlers(document.getElementById("buyer-list"), function () { return refreshBuyerMatchList(dealId, "buyer-list"); });
+    if (visibleCities.length > 0) renderCityCheckboxList("give-myself-cities", visibleCities);
 
-  document.getElementById("buyer-add-submit").addEventListener("click", async function () {
+    document.getElementById("selfmatch-btn").addEventListener("click", async function () {
+      const btn = this;
+      const resultEl = document.getElementById("selfmatch-result");
+      const phone = document.getElementById("selfmatch-phone-input").value.trim();
+      const email = document.getElementById("selfmatch-email-input").value.trim();
+      if (!phone && !email) { resultEl.textContent = "Enter at least a phone number or email."; return; }
+      if (btn.disabled) return;
+      btn.disabled = true;
+      resultEl.textContent = "Searching…";
+      const res = await api("repMatchSelfToBuyer", { dealId: deal.DealID, phone: phone, email: email });
+      btn.disabled = false;
+      if (!res.ok) { resultEl.textContent = res.error || "Could not match."; showToast(res.error || "Could not match.", true); return; }
+      resultEl.textContent = "Matched to " + res.buyerName + " — check your Buyer Leads tab." +
+        (res.hadOtherHistory ? " (Admin's been notified — this buyer has other history too.)" : "");
+      showToast("Matched to " + res.buyerName + ".");
+    });
+
+    document.getElementById("give-myself-btn").addEventListener("click", async function () {
+      const btn = this;
+      const resultEl = document.getElementById("give-myself-result");
+      const count = document.getElementById("give-myself-count").value;
+      if (!count) { resultEl.textContent = "Enter how many to match."; return; }
+      if (btn.disabled) return;
+      btn.disabled = true;
+      const cities = visibleCities.length > 0 ? checkedCityCheckboxValues("give-myself-cities") : [];
+      const res = await api("giveMyBuyerLeads", { dealId: dealId, count: count, cities: cities });
+      btn.disabled = false;
+      if (!res.ok) { resultEl.textContent = res.error || "Could not match leads."; showToast(res.error || "Could not match leads.", true); return; }
+      resultEl.textContent = "Gave yourself " + res.givenCount + " lead(s) for this deal. " + res.remainingInPool + " still unmatched for it.";
+      showToast("Gave yourself " + res.givenCount + " lead(s) — check your Buyer Leads tab.");
+    });
+
+    document.getElementById("fb-post-submit").addEventListener("click", async function () {
+      const postText = document.getElementById("fb-post-text").value.trim();
+      const groups = document.getElementById("fb-post-groups").value.trim();
+      const errorEl = document.getElementById("fb-post-error");
+      errorEl.classList.remove("show");
+      if (!postText) {
+        errorEl.textContent = "Enter the post text you'd like approved.";
+        errorEl.classList.add("show");
+        return;
+      }
+      const res = await api("submitFbPostRequest", { dealId: dealId, postText: postText, targetGroups: groups });
+      if (!res.ok) {
+        errorEl.textContent = res.error || "Could not submit.";
+        errorEl.classList.add("show");
+        return;
+      }
+      document.getElementById("fb-post-text").value = "";
+      document.getElementById("fb-post-groups").value = "";
+      const fresh = await api("getMyFbRequests", { dealId: dealId });
+      document.getElementById("fb-post-list").innerHTML = renderFbRequestList(fresh.ok ? fresh.requests : [], false);
+      showToast("Post submitted for approval.");
+    });
+
+    document.getElementById("buyer-add-submit").addEventListener("click", async function () {
     const buyerName = document.getElementById("buyer-name-input").value.trim();
     const contact = document.getElementById("buyer-contact-input").value.trim();
     const arvPercent = document.getElementById("buyer-arvpercent-input").value.trim();
@@ -1286,6 +1307,7 @@ async function openRepDealDetail(dealId) {
     await refreshBuyerMatchList(dealId);
     showToast("Buyer added.");
   });
+  }
 }
 
 async function refreshBuyerMatchList(dealId, containerId) {
