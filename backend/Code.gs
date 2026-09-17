@@ -313,6 +313,10 @@ function doPost(e) {
         return jsonOut(withSession(body, repSetBuyerPurchaseCriteria));
       case 'repNotifyBuyerMatchesBulk':
         return jsonOut(withSession(body, repNotifyBuyerMatchesBulk));
+      case 'repBulkAnalyzeBuyerCriteria':
+        return jsonOut(withSession(body, adminBulkAnalyzeBuyerCriteria));
+      case 'repSaveBulkBuyerCriteria':
+        return jsonOut(withSession(body, repSaveBulkBuyerCriteria));
       case 'repFindMyBuyerMatchesForDeal':
         return jsonOut(withSession(body, repFindMyBuyerMatchesForDeal));
       case 'repUpdateMyBuyBox':
@@ -5825,59 +5829,89 @@ function adminBulkAnalyzeBuyerCriteria(body) {
   return { ok: true, buyers: result.buyers };
 }
 
+// Shared by adminSaveBulkBuyerCriteria and repSaveBulkBuyerCriteria --
+// builds one BuyerLeads row + its parsed criteria object from one
+// AI-segmented entry. uploadedBy is '' for admin (shared pool) or a
+// rep's username (private to them, same convention as importBuyerLeads).
+function buildBulkCriteriaRow(e, now, uploadedBy) {
+  const parsed = {
+    nationwide: !!e.nationwide,
+    states: Array.isArray(e.states) ? e.states : splitCommaList(e.states),
+    counties: Array.isArray(e.counties) ? e.counties : splitCommaList(e.counties),
+    radius_notes: e.radius_notes || '',
+    min_acres: e.min_acres === undefined ? null : e.min_acres,
+    max_acres: e.max_acres === undefined ? null : e.max_acres,
+    min_price: e.min_price === undefined ? null : e.min_price,
+    max_price: e.max_price === undefined ? null : e.max_price,
+    asset_types: Array.isArray(e.asset_types) ? e.asset_types : splitCommaList(e.asset_types),
+    deal_types: (Array.isArray(e.deal_types) ? e.deal_types : splitCommaList(e.deal_types))
+      .filter(function (t) { return BUY_BOX_DEAL_TYPES.indexOf(t) !== -1; }),
+    specificity: e.specificity === 'specific' ? 'specific' : 'vague',
+    summary: e.summary || ''
+  };
+  return {
+    row: {
+      'BuyerLeadID': Utilities.getUuid(),
+      'BuyerName': e.name || 'Unknown',
+      'Phone': e.phone || '',
+      'Email': e.email || '',
+      'Website': e.website || '',
+      'State': parsed.states[0] || '',
+      'AssetCategories': parsed.asset_types.join(', '),
+      'DealTypes': parsed.deal_types.join(', '),
+      'GeneralNotes': e.raw_criteria || '',
+      'PurchaseCriteriaRaw': e.raw_criteria || '',
+      'PurchaseCriteriaParsed': JSON.stringify(parsed),
+      'PurchaseCriteriaUpdatedAt': now,
+      'CreatedAt': now,
+      'UploadedBy': uploadedBy
+    },
+    parsed: parsed
+  };
+}
+
 // Step 2 -- admin has reviewed/edited the list from step 1; this creates
 // one new BuyerLeads row per entry. Always creates new rows rather than
 // trying to fuzzy-match existing ones -- the app already has a dedicated
 // "Scan for Duplicates" tool (Buyer Leads tab) for merging afterward, no
-// need for a second, less reliable dedup path here.
+// need for a second, less reliable dedup path here. Saved to the shared
+// pool (UploadedBy blank), same as every other admin-added buyer.
 function adminSaveBulkBuyerCriteria(body) {
   const entries = Array.isArray(body.entries) ? body.entries : [];
   if (!entries.length) return { ok: false, error: 'Nothing to save.' };
 
   const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
   const now = new Date().toISOString();
-  const rows = entries.map(function (e) {
-    const parsed = {
-      nationwide: !!e.nationwide,
-      states: Array.isArray(e.states) ? e.states : splitCommaList(e.states),
-      counties: Array.isArray(e.counties) ? e.counties : splitCommaList(e.counties),
-      radius_notes: e.radius_notes || '',
-      min_acres: e.min_acres === undefined ? null : e.min_acres,
-      max_acres: e.max_acres === undefined ? null : e.max_acres,
-      min_price: e.min_price === undefined ? null : e.min_price,
-      max_price: e.max_price === undefined ? null : e.max_price,
-      asset_types: Array.isArray(e.asset_types) ? e.asset_types : splitCommaList(e.asset_types),
-      deal_types: (Array.isArray(e.deal_types) ? e.deal_types : splitCommaList(e.deal_types))
-        .filter(function (t) { return BUY_BOX_DEAL_TYPES.indexOf(t) !== -1; }),
-      specificity: e.specificity === 'specific' ? 'specific' : 'vague',
-      summary: e.summary || ''
-    };
-    return {
-      row: {
-        'BuyerLeadID': Utilities.getUuid(),
-        'BuyerName': e.name || 'Unknown',
-        'Phone': e.phone || '',
-        'Email': e.email || '',
-        'Website': e.website || '',
-        'State': parsed.states[0] || '',
-        'AssetCategories': parsed.asset_types.join(', '),
-        'DealTypes': parsed.deal_types.join(', '),
-        'GeneralNotes': e.raw_criteria || '',
-        'PurchaseCriteriaRaw': e.raw_criteria || '',
-        'PurchaseCriteriaParsed': JSON.stringify(parsed),
-        'PurchaseCriteriaUpdatedAt': now,
-        'CreatedAt': now,
-        'UploadedBy': ''
-      },
-      parsed: parsed
-    };
-  });
+  const rows = entries.map(function (e) { return buildBulkCriteriaRow(e, now, ''); });
   appendRowsByHeaders(sheet, rows.map(function (r) { return r.row; }));
 
   // Echoes back exactly what got saved for each buyer -- not just a count
   // -- so admin can see straight away, in the UI, that (for example)
   // Morgan Development Co's two-tier acreage/price spec actually landed
   // correctly rather than having to reopen each buyer to check.
+  const saved = rows.map(function (r) {
+    return {
+      name: r.row['BuyerName'], email: r.row['Email'], phone: r.row['Phone'], website: r.row['Website'],
+      parsed: r.parsed
+    };
+  });
+  return { ok: true, count: rows.length, saved: saved };
+}
+
+// Rep-facing version of adminSaveBulkBuyerCriteria -- same AI-segmented
+// review/save flow, but saved private to the rep (UploadedBy = their own
+// username, same convention as their CSV import) instead of the shared
+// pool. Lets a rep log a buyer straight from a call without needing a
+// CSV file at all.
+function repSaveBulkBuyerCriteria(body, session) {
+  const entries = Array.isArray(body.entries) ? body.entries : [];
+  if (!entries.length) return { ok: false, error: 'Nothing to save.' };
+
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const now = new Date().toISOString();
+  const rows = entries.map(function (e) { return buildBulkCriteriaRow(e, now, session.u); });
+  appendRowsByHeaders(sheet, rows.map(function (r) { return r.row; }));
+
   const saved = rows.map(function (r) {
     return {
       name: r.row['BuyerName'], email: r.row['Email'], phone: r.row['Phone'], website: r.row['Website'],

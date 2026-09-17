@@ -237,7 +237,9 @@
     <a href="https://sendmyseller.com" target="_blank" rel="noopener" class="small-muted">Submit Deals</a>
     <span class="who" id="who-label" hidden></span>
     <span class="who small-muted" id="header-support-label" hidden></span>
-    <button id="switch-view-btn" hidden>Work as Rep</button>
+    <button id="switch-view-rep-btn" hidden>Work as Rep</button>
+    <button id="switch-view-buyer-btn" hidden>Work as Buyer</button>
+    <button id="switch-view-back-btn" hidden>Back to Admin</button>
     <button id="logout-btn" hidden>Log Out</button>
   </div>
 </header>
@@ -532,6 +534,16 @@
         </div>
         <div id="rep-csv-import-result" class="small-muted"></div>
       </div>
+
+      <div class="section-title">Or Add a Buyer (AI) <span class="small-muted">— no CSV needed</span></div>
+      <p class="small-muted">Just talked to a buyer? Paste their name, phone/email, and whatever they told you about what they buy, right here — DeepSeek reads it and fills in their Purchase Criteria for you. Review before saving, nothing is added automatically. Private to you, same as your CSV list.</p>
+      <p class="small-muted"><strong>SOP:</strong> use this any time a buyer gives you an active response. Keep their criteria short and plain — one or two sentences. If they have different rules for different asset types (e.g. zoning), write each as its own short sentence instead of combining them — that confuses the AI matching most.</p>
+      <textarea id="rep-bulk-criteria-input" style="min-height:140px;" placeholder="jmiller@tempo-construction.com&#10;Joe Miller&#10;&#10;Land has to be within 1 hour drive of Greensboro NC and 1+ acre."></textarea>
+      <div class="error-text" id="rep-bulk-criteria-error"></div>
+      <div class="nav-row" style="justify-content:flex-end;">
+        <button class="btn primary" id="rep-bulk-criteria-analyze-btn">Analyze With AI</button>
+      </div>
+      <div id="rep-bulk-criteria-review" style="margin-top:12px;"></div>
     </div>
 
     <div class="card" id="rep-mybuyerlist-card" hidden>
@@ -573,6 +585,7 @@
     <div class="card">
       <div style="display:flex; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
         <input type="text" id="mypitches-search" placeholder="Search by buyer name, phone, or city..." style="flex:1; min-width:220px;">
+        <label class="checkbox-row" style="flex:0 0 auto;"><input type="checkbox" id="mypitches-active-only" checked> Active Deals Only</label>
         <select id="mypitches-filter-deal" style="flex:0 0 auto; min-width:170px;"><option value="">All Deals</option></select>
         <select id="mypitches-filter-status" style="flex:0 0 auto; min-width:170px;">
           <option value="">All Statuses</option>
@@ -1411,7 +1424,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=69"></script>
-<script src="app.js?v=69"></script>
+<script src="config.js?v=70"></script>
+<script src="app.js?v=70"></script>
 </body>
 </html>

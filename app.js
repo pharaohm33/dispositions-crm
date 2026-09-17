@@ -46,6 +46,7 @@ async function api(action, payload) {
 // timeout above, and safe to call from anywhere else that needs it.
 function forceLogout(message) {
   adminActingAsRep = false;
+  adminActingAsBuyer = false;
   setSession(null);
   showView(null);
   if (message) {
@@ -358,7 +359,8 @@ function formatDate(iso) {
    ============================================================ */
 
 const els = {};
-["login-view", "rep-view", "admin-view", "who-label", "header-support-label", "logout-btn", "switch-view-btn"].forEach(function (id) {
+["login-view", "rep-view", "admin-view", "who-label", "header-support-label", "logout-btn",
+ "switch-view-rep-btn", "switch-view-buyer-btn", "switch-view-back-btn"].forEach(function (id) {
   els[id] = document.getElementById(id);
 });
 
@@ -379,13 +381,29 @@ function updateHeaderSupportLabel() {
   }
 }
 
-// Lets an admin drop into the same screens a rep uses -- handy while the
-// rep side is still being built out / the team is still small, so admin
-// can work deals themselves without needing a second login. Purely a
-// display toggle: the session and its permissions never change, admin
-// just chooses which UI to look at. Resets to the admin view on logout /
-// next login rather than persisting, so it's always the default.
+// Lets an admin drop into the same screens a rep (or buyer) uses -- handy
+// for previewing what that category of user actually sees, or working
+// deals directly without a second login. Purely a display toggle: the
+// session and its permissions never change, admin just chooses which UI
+// to look at, and getEffectiveSession() below is the only place that
+// pretends personType is "Buyer" for rendering -- the real stored session
+// (and its auth token) is never touched. Resets to the admin view on
+// logout / next login rather than persisting, so it's always the default.
 let adminActingAsRep = false;
+let adminActingAsBuyer = false;
+
+// Every rep-view render that branches on session.personType (build-your-
+// own-list vs. Buy Box UI, etc.) should read through this instead of
+// getSession() directly, so "Work as Buyer" actually changes what admin
+// sees. Anything that isn't UI branching (API calls, the auth token
+// itself) should keep using getSession() as normal.
+function getEffectiveSession() {
+  const session = getSession();
+  if (session && session.isAdmin && adminActingAsBuyer) {
+    return Object.assign({}, session, { personType: "Buyer" });
+  }
+  return session;
+}
 
 function showView(session) {
   els["login-view"].hidden = !!session;
@@ -393,30 +411,47 @@ function showView(session) {
   els["admin-view"].hidden = true;
   els["who-label"].hidden = !session;
   els["logout-btn"].hidden = !session;
-  els["switch-view-btn"].hidden = !session || !session.isAdmin;
+  const showSwitchButtons = !!session && session.isAdmin;
+  const actingAsSomeone = adminActingAsRep || adminActingAsBuyer;
+  els["switch-view-rep-btn"].hidden = !showSwitchButtons || actingAsSomeone;
+  els["switch-view-buyer-btn"].hidden = !showSwitchButtons || actingAsSomeone;
+  els["switch-view-back-btn"].hidden = !showSwitchButtons || !actingAsSomeone;
   updateHeaderSupportLabel();
 
   if (!session) return;
-  els["who-label"].textContent = session.name + (session.isAdmin ? " (Admin)" : "");
+  els["who-label"].textContent = session.name + (session.isAdmin ? " (Admin)" : "") +
+    (adminActingAsBuyer ? " — viewing as Buyer" : adminActingAsRep ? " — viewing as Rep" : "");
 
-  if (session.isAdmin && !adminActingAsRep) {
-    els["switch-view-btn"].textContent = "Work as Rep";
+  if (session.isAdmin && !actingAsSomeone) {
     els["admin-view"].hidden = false;
     initAdminView();
   } else {
-    els["switch-view-btn"].textContent = "Back to Admin";
     els["rep-view"].hidden = false;
     initRepView();
   }
 }
 
-document.getElementById("switch-view-btn").addEventListener("click", function () {
-  adminActingAsRep = !adminActingAsRep;
+document.getElementById("switch-view-rep-btn").addEventListener("click", function () {
+  adminActingAsRep = true;
+  adminActingAsBuyer = false;
+  showView(getSession());
+});
+
+document.getElementById("switch-view-buyer-btn").addEventListener("click", function () {
+  adminActingAsRep = false;
+  adminActingAsBuyer = true;
+  showView(getSession());
+});
+
+document.getElementById("switch-view-back-btn").addEventListener("click", function () {
+  adminActingAsRep = false;
+  adminActingAsBuyer = false;
   showView(getSession());
 });
 
 document.getElementById("logout-btn").addEventListener("click", function () {
   adminActingAsRep = false;
+  adminActingAsBuyer = false;
   setSession(null);
   showView(null);
 });
@@ -761,7 +796,7 @@ async function initRepView() {
     renderRepCsvDealOptions();
     renderMyBuyerListDealSelect();
 
-    const session = getSession() || {};
+    const session = getEffectiveSession() || {};
     // A Buyer signup isn't out hunting for buyers themselves -- skip the
     // whole "build your own list" card and guide for them. Everyone else
     // (blank/Wholesaler/Realtor/Other) gets it.
@@ -896,7 +931,7 @@ function renderRepDeals() {
   // Box only pulls a "Matches Your Buy Box" section to the top (see
   // dealMatchesBuyBox), it never hides anything. Nothing here changes for
   // a rep (non-Buyer) session.
-  const session = getSession() || {};
+  const session = getEffectiveSession() || {};
   const buyBoxBanner = document.getElementById("rep-deals-buybox-banner");
   let buyerMatchIds = null;
   if (session.personType === "Buyer" && session.buyBox) {
@@ -1415,12 +1450,18 @@ function populateMyPitchesDealFilter() {
 
 function getFilteredSortedMyPitches() {
   const q = document.getElementById("mypitches-search").value.trim().toLowerCase();
+  const activeOnly = document.getElementById("mypitches-active-only").checked;
   const dealId = document.getElementById("mypitches-filter-deal").value;
   const status = document.getElementById("mypitches-filter-status").value;
   const sortMode = document.getElementById("mypitches-sort").value;
 
   const filtered = myPitches.filter(function (p) {
     if (q && ![p.buyerName, p.phone, p.city, p.state, p.dealCode].some(function (f) { return String(f || "").toLowerCase().indexOf(q) !== -1; })) return false;
+    // dealStillActive is false once the deal's gone Dead or Sold -- checked
+    // by default so a rep isn't stuck scrolling past buyer leads pitched
+    // for a deal that's already gone nowhere. Uncheck to see everything,
+    // including closed deals, same as before.
+    if (activeOnly && !p.dealStillActive) return false;
     if (dealId && p.DealID !== dealId) return false;
     if (status && p.status !== status) return false;
     return true;
@@ -1493,6 +1534,7 @@ function renderMyPitches() {
 }
 
 document.getElementById("mypitches-search").addEventListener("input", function () { myPitchesCurrentPage = 1; renderMyPitches(); });
+document.getElementById("mypitches-active-only").addEventListener("change", function () { myPitchesCurrentPage = 1; renderMyPitches(); });
 document.getElementById("mypitches-filter-deal").addEventListener("change", function () { myPitchesCurrentPage = 1; renderMyPitches(); });
 document.getElementById("mypitches-filter-status").addEventListener("change", function () { myPitchesCurrentPage = 1; renderMyPitches(); });
 document.getElementById("mypitches-sort").addEventListener("change", function () { myPitchesCurrentPage = 1; renderMyPitches(); });
@@ -4694,27 +4736,35 @@ async function loadAutoFeedSettings() {
   document.getElementById("autofeed-batchsize-input").value = res.batchSize;
 }
 
-document.getElementById("bulk-criteria-analyze-btn").addEventListener("click", async function () {
-  const btn = this;
-  const errEl = document.getElementById("bulk-criteria-error");
-  const reviewEl = document.getElementById("bulk-criteria-review");
-  const blob = document.getElementById("bulk-criteria-input").value.trim();
-  errEl.classList.remove("show");
-  if (!blob) { errEl.textContent = "Paste some text first."; errEl.classList.add("show"); return; }
-  if (btn.disabled) return;
-  btn.disabled = true;
-  btn.textContent = "Analyzing…";
-  reviewEl.innerHTML = "";
-  const res = await api("adminBulkAnalyzeBuyerCriteria", { blob: blob });
-  btn.disabled = false;
-  btn.textContent = "Analyze With AI";
-  if (!res.ok) { errEl.textContent = res.error || "Could not analyze that text."; errEl.classList.add("show"); return; }
-  if (!res.buyers || res.buyers.length === 0) {
-    reviewEl.innerHTML = '<p class="small-muted">Nothing that looked like a buyer contact was found in that text.</p>';
-    return;
-  }
-  renderBulkCriteriaReview(res.buyers);
-});
+// Powers both the admin "Bulk Add Buyers From Purchase Criteria (AI)"
+// tool and the rep-facing equivalent on My Buyer List -- same paste/
+// analyze/review/save flow, just pointed at different API actions and
+// (for the rep version) saving private to that rep instead of the
+// shared pool. cfg: { inputId, analyzeBtnId, errId, reviewId, saveBtnId,
+// saveResultId, analyzeAction, saveAction, afterSave }.
+function wireBulkCriteriaTool(cfg) {
+  document.getElementById(cfg.analyzeBtnId).addEventListener("click", async function () {
+    const btn = this;
+    const errEl = document.getElementById(cfg.errId);
+    const reviewEl = document.getElementById(cfg.reviewId);
+    const blob = document.getElementById(cfg.inputId).value.trim();
+    errEl.classList.remove("show");
+    if (!blob) { errEl.textContent = "Paste some text first."; errEl.classList.add("show"); return; }
+    if (btn.disabled) return;
+    btn.disabled = true;
+    btn.textContent = "Analyzing…";
+    reviewEl.innerHTML = "";
+    const res = await api(cfg.analyzeAction, { blob: blob });
+    btn.disabled = false;
+    btn.textContent = "Analyze With AI";
+    if (!res.ok) { errEl.textContent = res.error || "Could not analyze that text."; errEl.classList.add("show"); return; }
+    if (!res.buyers || res.buyers.length === 0) {
+      reviewEl.innerHTML = '<p class="small-muted">Nothing that looked like a buyer contact was found in that text.</p>';
+      return;
+    }
+    renderBulkCriteriaReview(cfg, res.buyers);
+  });
+}
 
 // Editable review before anything saves -- AI segmentation of a messy
 // paste (like several buyers separated by "***") can misread a name or
@@ -4722,8 +4772,8 @@ document.getElementById("bulk-criteria-analyze-btn").addEventListener("click", a
 // dialog. Each buyer's full parsed object travels along in a data
 // attribute (JSON) so Save All doesn't need to re-derive it from the
 // visible fields alone.
-function renderBulkCriteriaReview(buyers) {
-  const reviewEl = document.getElementById("bulk-criteria-review");
+function renderBulkCriteriaReview(cfg, buyers) {
+  const reviewEl = document.getElementById(cfg.reviewId);
   reviewEl.innerHTML =
     '<p class="small-muted">Review before saving — nothing below is in the system yet. Fix any name/email/phone AI got wrong, remove any row that\'s not really a buyer, then Save All.</p>' +
     buyers.map(function (b, i) {
@@ -4742,9 +4792,9 @@ function renderBulkCriteriaReview(buyers) {
         '</div>';
     }).join("") +
     '<div class="nav-row" style="justify-content:flex-end; margin-top:10px;">' +
-      '<button class="btn primary" id="bulk-criteria-save-btn">Save All</button>' +
+      '<button class="btn primary" id="' + cfg.saveBtnId + '">Save All</button>' +
     '</div>' +
-    '<div id="bulk-criteria-save-result" class="small-muted"></div>';
+    '<div id="' + cfg.saveResultId + '" class="small-muted"></div>';
 
   Array.from(reviewEl.querySelectorAll(".bulk-criteria-remove-btn")).forEach(function (removeBtn) {
     removeBtn.addEventListener("click", function () {
@@ -4752,9 +4802,9 @@ function renderBulkCriteriaReview(buyers) {
     });
   });
 
-  document.getElementById("bulk-criteria-save-btn").addEventListener("click", async function () {
+  document.getElementById(cfg.saveBtnId).addEventListener("click", async function () {
     const saveBtn = this;
-    const resultEl = document.getElementById("bulk-criteria-save-result");
+    const resultEl = document.getElementById(cfg.saveResultId);
     if (saveBtn.disabled) return;
     const rows = Array.from(reviewEl.querySelectorAll(".bulk-criteria-row"));
     if (rows.length === 0) { resultEl.textContent = "Nothing left to save."; return; }
@@ -4768,15 +4818,15 @@ function renderBulkCriteriaReview(buyers) {
     });
     saveBtn.disabled = true;
     resultEl.textContent = "Saving…";
-    const res = await api("adminSaveBulkBuyerCriteria", { entries: entries });
+    const res = await api(cfg.saveAction, { entries: entries });
     saveBtn.disabled = false;
     if (!res.ok) { resultEl.textContent = res.error || "Could not save."; showToast(res.error || "Could not save.", true); return; }
-    document.getElementById("bulk-criteria-input").value = "";
+    document.getElementById(cfg.inputId).value = "";
     showToast(res.count + " buyer" + (res.count === 1 ? "" : "s") + " added.");
     // Confirms exactly what's now in the system for each buyer -- not just
-    // a count -- so admin doesn't have to reopen every one individually to
-    // check a multi-tier spec (like Morgan Development Co's) actually saved
-    // the way it looked in the review step above.
+    // a count -- so the user doesn't have to reopen every one individually
+    // to check a multi-tier spec (like Morgan Development Co's) actually
+    // saved the way it looked in the review step above.
     reviewEl.innerHTML = '<p><strong>Exact Specific Info Saved and summarized as following:</strong></p>' +
       (res.saved || []).map(function (s) {
         return '<div class="item-row">' +
@@ -4785,9 +4835,23 @@ function renderBulkCriteriaReview(buyers) {
           parsedCriteriaDetailListHtml(s.parsed) +
           '</div>';
       }).join("");
-    await loadBuyerLeadsAdmin();
+    if (cfg.afterSave) await cfg.afterSave();
   });
 }
+
+wireBulkCriteriaTool({
+  inputId: "bulk-criteria-input", analyzeBtnId: "bulk-criteria-analyze-btn", errId: "bulk-criteria-error",
+  reviewId: "bulk-criteria-review", saveBtnId: "bulk-criteria-save-btn", saveResultId: "bulk-criteria-save-result",
+  analyzeAction: "adminBulkAnalyzeBuyerCriteria", saveAction: "adminSaveBulkBuyerCriteria",
+  afterSave: loadBuyerLeadsAdmin
+});
+
+wireBulkCriteriaTool({
+  inputId: "rep-bulk-criteria-input", analyzeBtnId: "rep-bulk-criteria-analyze-btn", errId: "rep-bulk-criteria-error",
+  reviewId: "rep-bulk-criteria-review", saveBtnId: "rep-bulk-criteria-save-btn", saveResultId: "rep-bulk-criteria-save-result",
+  analyzeAction: "repBulkAnalyzeBuyerCriteria", saveAction: "repSaveBulkBuyerCriteria",
+  afterSave: loadMyBuyerLeads
+});
 
 document.getElementById("autofeed-save-btn").addEventListener("click", async function () {
   const btn = this;
