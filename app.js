@@ -5252,6 +5252,34 @@ function wireBuyerProfileFieldsHandlers(prefix, buyerLeadId, onSaved) {
   });
 }
 
+// Renders a scrollable rep checklist in batches instead of every row at
+// once -- the first REP_CHECKLIST_BATCH_SIZE render immediately, and more
+// only render as the container is actually scrolled near its bottom.
+// Reuses the already-fetched reps list (no extra network calls -- the
+// team roster is small enough in raw data terms that fetching isn't the
+// cost here, building/laying out hundreds of checkbox rows up front is),
+// so this is about not paying that DOM cost until it's actually needed.
+const REP_CHECKLIST_BATCH_SIZE = 25;
+function renderIncrementalRepChecklist(container, reps, checkedUsernames) {
+  if (!container) return;
+  let rendered = 0;
+  function renderNextBatch() {
+    const batch = reps.slice(rendered, rendered + REP_CHECKLIST_BATCH_SIZE);
+    if (batch.length === 0) return;
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = batch.map(function (r) {
+      const checked = checkedUsernames.indexOf(r.username) !== -1 ? " checked" : "";
+      return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="assigned-rep-checkbox" value="' + esc(r.username) + '"' + checked + '> ' + esc(r.name) + (r.isAdmin ? " — Admin" : "") + '</label>';
+    }).join("");
+    while (wrapper.firstChild) container.appendChild(wrapper.firstChild);
+    rendered += batch.length;
+  }
+  renderNextBatch();
+  container.onscroll = function () {
+    if (container.scrollTop + container.clientHeight >= container.scrollHeight - 40) renderNextBatch();
+  };
+}
+
 async function openAdminBuyerLeadDetail(buyerLeadId) {
   let lead = adminBuyerLeads.find(function (l) { return l.BuyerLeadID === buyerLeadId; });
   // Opened from somewhere other than the Buyer Leads tab (e.g. a deal's
@@ -5374,10 +5402,7 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
 
     '<div class="section-title">Reps Tagged On This Buyer</div>' +
     '<p class="small-muted">Uploaded By and First Response are automatic and can\'t be edited here — this is a separate, freely-editable list for clean record keeping: add a rep who\'s now working this buyer, or remove one who\'s gone unresponsive or stopped working it. Removing someone here only removes their tag, not any pitch or contact history.</p>' +
-    '<div>' + buyerLeadsActiveReps.map(function (r) {
-      const checked = splitCommaList(lead.AssignedReps).indexOf(r.username) !== -1 ? " checked" : "";
-      return '<label class="checkbox-row" style="margin:0 12px 6px 0;"><input type="checkbox" class="assigned-rep-checkbox" value="' + esc(r.username) + '"' + checked + '> ' + esc(r.name) + (r.isAdmin ? " — Admin" : "") + '</label>';
-    }).join("") + '</div>' +
+    '<div id="assigned-rep-list" style="max-height:260px; overflow-y:auto; border:1px solid var(--border); border-radius:6px; padding:6px 10px;"></div>' +
     '<div class="nav-row" style="justify-content:flex-end;"><button class="btn secondary small" id="admin-save-rep-tags-btn">Save Rep Tags</button></div>' +
 
     '<div class="section-title">Do Not Contact</div>' +
@@ -5392,6 +5417,8 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
     '<div class="section-title">Delete This Buyer</div>' +
     '<p class="small-muted">Permanently removes this buyer, including all pitch and contact history on them, from the database. Cannot be undone — use Merge above instead if there\'s any data on this record worth keeping.</p>' +
     '<button class="btn danger small" id="admin-delete-buyerlead-btn">Delete This Buyer</button>';
+
+  renderIncrementalRepChecklist(document.getElementById("assigned-rep-list"), buyerLeadsActiveReps, splitCommaList(lead.AssignedReps));
 
   document.getElementById("close-detail-btn").addEventListener("click", function () { overlay.hidden = true; loadBuyerLeadsAdmin(); });
 
