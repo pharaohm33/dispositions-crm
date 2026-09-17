@@ -807,6 +807,15 @@ async function initRepView() {
     if (buyerLeadsTabBtn) buyerLeadsTabBtn.hidden = isBuyerSession;
     if (isBuyerSession) switchRepTab("deals");
 
+    // The "How to work a deal" SOP banner above the deal list is entirely
+    // rep tooling (calling buyers, logging interested buyers, Facebook
+    // posting) except for the address-disclosure explanation, which
+    // applies to a buyer too -- just worded for someone requesting an
+    // address for themselves instead of pitching a buyer for it.
+    document.getElementById("sop-banner-heading").textContent = isBuyerSession ? "Address Disclosure" : "How to work a deal:";
+    document.getElementById("sop-banner-rep-content").hidden = isBuyerSession;
+    document.getElementById("sop-banner-buyer-content").hidden = !isBuyerSession;
+
     const buildsOwnList = !isBuyerSession;
     document.getElementById("rep-buyerlist-card").hidden = !buildsOwnList;
     document.getElementById("rep-mybuyerlist-card").hidden = !buildsOwnList;

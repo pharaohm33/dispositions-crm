@@ -363,7 +363,8 @@
 
   <div id="rep-tab-deals">
     <div class="banner info" id="sop-banner">
-      <strong>How to work a deal:</strong>
+      <strong id="sop-banner-heading">How to work a deal:</strong>
+      <div id="sop-banner-rep-content">
       <div style="margin-top:8px;">
         <strong>Before you start:</strong> Open the deal's full detail page (click into it, don't just skim the card)
         and read the whole thing — that's where the <strong>Open Drive Folder</strong> link lives, with photos and the
@@ -403,6 +404,22 @@
         to ask admin for it. Never share an address you haven't been granted, and never share a granted address with
         anyone besides that one legitimate, matched buyer who asked for it. Sharing it early, or with the wrong
         person, risks losing us the deal entirely and getting removed as a team member.
+      </div>
+      </div>
+      <div id="sop-banner-buyer-content" hidden>
+        <div style="margin-top:8px;">
+          Every deal's exact street address is locked by default — you'll only see its Deal Code, City/State/Zip,
+          County, price, and other general info until admin grants you access to that specific deal's address.
+        </div>
+        <div style="margin-top:8px;">
+          Once you're seriously interested in a deal and want to see the exact address, click
+          <strong>Request Address Access</strong> on that deal's page to ask admin for it — this just sends the
+          request, it doesn't grant it automatically.
+        </div>
+        <div style="margin-top:8px;">
+          Please don't share a granted address with anyone else — it's provided to you specifically as the buyer
+          reviewing that deal.
+        </div>
       </div>
       <div style="margin-top:8px;" id="rep-text-sop-row" hidden>
         <strong>Got an interested buyer?</strong> Text <span id="rep-text-sop-phone"></span> to let us know, in
@@ -1424,7 +1441,7 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
-<script src="config.js?v=71"></script>
-<script src="app.js?v=71"></script>
+<script src="config.js?v=72"></script>
+<script src="app.js?v=72"></script>
 </body>
 </html>
