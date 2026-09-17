@@ -2676,6 +2676,31 @@ document.getElementById("archive-dead-pages-btn").addEventListener("click", asyn
   showToast("Archived " + res.archivedCount + " dead/sold deal page(s).");
 });
 
+document.getElementById("checkall-buyermatches-btn").addEventListener("click", async function () {
+  const btn = this;
+  const resultEl = document.getElementById("checkall-buyermatches-result");
+  if (btn.disabled) return;
+  const activeDeals = adminDeals.filter(function (d) { return d.Status !== "Dead" && d.Status !== "Sold"; });
+  if (activeDeals.length === 0) { resultEl.textContent = " No active deals to check."; return; }
+  if (!confirm("This runs AI Buyer Matches across all " + activeDeals.length + " active deal(s), one DeepSeek call per deal with candidates. This can take a while and uses AI balance. Continue?")) return;
+  btn.disabled = true;
+
+  let dealsWithMatches = 0;
+  let totalMatches = 0;
+  let errorCount = 0;
+  for (let i = 0; i < activeDeals.length; i++) {
+    resultEl.textContent = " Checking deal " + (i + 1) + " of " + activeDeals.length + "…";
+    const res = await api("adminFindBuyerMatches", { dealId: activeDeals[i].DealID });
+    if (!res.ok) { errorCount++; continue; }
+    if (res.matches && res.matches.length > 0) { dealsWithMatches++; totalMatches += res.matches.length; }
+  }
+
+  btn.disabled = false;
+  resultEl.textContent = " Checked " + activeDeals.length + " deal(s) — " + totalMatches + " match(es) across " + dealsWithMatches + " deal(s)." +
+    (errorCount > 0 ? " " + errorCount + " couldn't be checked." : "");
+  showToast(dealsWithMatches > 0 ? "Found matches on " + dealsWithMatches + " deal(s) — check your email." : "No matches found across any active deal.");
+});
+
 document.getElementById("regenerate-all-pages-btn").addEventListener("click", async function () {
   const btn = this;
   const resultEl = document.getElementById("regenerate-all-pages-result");

@@ -645,6 +645,11 @@
       <span class="small-muted" id="archive-dead-pages-result"></span>
     </div>
     <p class="small-muted" style="margin-top:-4px; margin-bottom:10px;">One-time catch-up for deals that went Dead/Sold before archiving existed — overwrites each one's public page with a plain "no longer available" placeholder instead of leaving stale live-looking content up. Safe to run again any time; already-archived pages are just overwritten with the same placeholder.</p>
+    <div class="nav-row" style="justify-content:flex-start; margin-bottom:10px; flex-wrap:wrap;">
+      <button class="btn secondary small" id="checkall-buyermatches-btn">Check All Deals For Potential Buyer Matches</button>
+      <span class="small-muted" id="checkall-buyermatches-result"></span>
+    </div>
+    <p class="small-muted" style="margin-top:-4px; margin-bottom:10px;">Runs AI Buyer Matches (the same tool on each deal's own page) across every active deal at once — one DeepSeek call per deal with any candidates, so this can take a bit and does use AI balance for a large portfolio. You'll get an email for every deal that turns up a match; this button just saves clicking through each deal one at a time.</p>
     <table class="crm-table">
       <thead><tr><th>Deal Code</th><th>Address</th><th>Asset Type</th><th>Asking Price</th><th>Status</th><th>Coverage</th><th>Access</th></tr></thead>
       <tbody id="admin-deals-tbody"></tbody>

@@ -5943,7 +5943,34 @@ function adminFindBuyerMatches(body) {
   // Confident matches first, so the list leads with what's most actionable.
   matches.sort(function (a, b) { return (a.verdict === 'criteria_match' ? 0 : 1) - (b.verdict === 'criteria_match' ? 0 : 1); });
 
+  // Every time this actually strikes a match, admin gets told -- whether
+  // it was run by hand from one deal's page or swept in by
+  // adminFindBuyerMatchesForAllDeals below. No match found is silent (no
+  // point emailing "nothing here").
+  if (matches.length > 0) notifyAdminOfBuyerMatches(deal, matches);
+
   return { ok: true, matches: matches, consideredCount: capped.length, totalWithCriteria: leadsWithCriteria.length, statusBreakdown: statusBreakdown };
+}
+
+function notifyAdminOfBuyerMatches(deal, matches) {
+  const supportEmail = getSupportEmail();
+  if (!supportEmail) return;
+  try {
+    MailApp.sendEmail({
+      to: supportEmail,
+      subject: 'SendMyBuyer -- AI found ' + matches.length + ' buyer match(es) for ' + (deal['DealCode'] || deal['DealID']),
+      body: 'AI Buyer Matches found the following for ' + (deal['DealCode'] || deal['DealID']) +
+        ' (' + [deal['City'], deal['State']].filter(Boolean).join(', ') + '):\n\n' +
+        matches.map(function (m) {
+          return '- ' + m.label + ': ' + m.buyerName + (m.phone ? ' / ' + m.phone : '') + (m.email ? ' / ' + m.email : '') +
+            (m.uploadedBy ? ' (uploaded by ' + m.uploadedBy + ')' : '') + '\n  ' + m.reason;
+        }).join('\n\n') +
+        '\n\nOpen this deal in the admin panel to give any of these to a rep.'
+    });
+  } catch (err) {
+    // Swallow -- a notification failing must never break the actual
+    // matching result the caller is waiting on.
+  }
 }
 
 // The reverse of adminFindBuyerMatches -- one buyer's criteria against
