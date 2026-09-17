@@ -934,6 +934,16 @@ function renderRepDeals() {
   });
   empty.hidden = filtered.length > 0;
 
+  // repDeals is already scoped to whatever this person has access to (their
+  // assigned deals, or everything if they have all-access/are a Buyer) --
+  // so this count is naturally "active deals you can see," not a raw
+  // site-wide total that might include deals they can't actually open.
+  const activeCountEl = document.getElementById("rep-deals-active-count");
+  if (activeCountEl) {
+    const activeTotal = repDeals.filter(function (d) { return d.Status !== "Dead" && d.Status !== "Sold"; }).length;
+    activeCountEl.textContent = activeTotal + " active deal" + (activeTotal === 1 ? "" : "s") + " available to you right now.";
+  }
+
   if (buyerMatchIds && Object.keys(buyerMatchIds).length > 0) {
     const matches = filtered.filter(function (d) { return buyerMatchIds[d.DealID]; });
     const rest = filtered.filter(function (d) { return !buyerMatchIds[d.DealID]; });
