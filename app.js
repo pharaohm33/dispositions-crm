@@ -5419,6 +5419,7 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
 
     '<div class="section-title">Purchase Criteria (AI-Analyzed)</div>' +
     '<p class="small-muted">Paste what this buyer told you they buy, in your own words — DeepSeek reads it once and uses that read every time you click "Find Buyer Matches" on a deal. Re-save any time their criteria changes.</p>' +
+    '<p class="small-muted"><strong>Keep it short and plain — one or two sentences.</strong> If different asset types have different rules (e.g. "zoned residential for single family, zoned commercial for multifamily"), write each as its own short sentence instead of combining them into one — stacked conditions like that are what confuse the matching AI most.</p>' +
     '<textarea id="purchase-criteria-input" placeholder="e.g. Land has to be within 1 hour drive of Greensboro NC and 1+ acre.">' + esc(lead.PurchaseCriteriaRaw || "") + '</textarea>' +
     (purchaseCriteriaSummaryHtml(lead)) +
     '<div class="nav-row" style="justify-content:flex-end;">' +
