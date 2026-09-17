@@ -1003,12 +1003,24 @@ document.getElementById("rep-checkall-buyermatches-btn").addEventListener("click
   let dealsWithMatches = 0;
   let totalMatches = 0;
   let errorCount = 0;
+  const bulkResults = [];
   for (let i = 0; i < activeDeals.length; i++) {
     resultEl.textContent = " Checking deal " + (i + 1) + " of " + activeDeals.length + "…";
-    const res = await api("repFindMyBuyerMatchesForDeal", { dealId: activeDeals[i].DealID });
+    const deal = activeDeals[i];
+    const res = await api("repFindMyBuyerMatchesForDeal", { dealId: deal.DealID, suppressEmail: true });
     if (!res.ok) { errorCount++; continue; }
-    if (res.matches && res.matches.length > 0) { dealsWithMatches++; totalMatches += res.matches.length; }
+    if (res.matches && res.matches.length > 0) {
+      dealsWithMatches++;
+      totalMatches += res.matches.length;
+      bulkResults.push({
+        deal: { DealID: deal.DealID, DealCode: deal.DealCode, City: deal.City, State: deal.State },
+        matches: res.matches
+      });
+    }
   }
+
+  // One combined email instead of one per deal.
+  if (bulkResults.length > 0) await api("repNotifyBuyerMatchesBulk", { results: bulkResults });
 
   btn.disabled = false;
   resultEl.textContent = " Checked " + activeDeals.length + " deal(s) — " + totalMatches + " match(es) across " + dealsWithMatches + " deal(s)." +
@@ -2727,12 +2739,25 @@ document.getElementById("checkall-buyermatches-btn").addEventListener("click", a
   let dealsWithMatches = 0;
   let totalMatches = 0;
   let errorCount = 0;
+  const bulkResults = [];
   for (let i = 0; i < activeDeals.length; i++) {
     resultEl.textContent = " Checking deal " + (i + 1) + " of " + activeDeals.length + "…";
-    const res = await api("adminFindBuyerMatches", { dealId: activeDeals[i].DealID });
+    const deal = activeDeals[i];
+    const res = await api("adminFindBuyerMatches", { dealId: deal.DealID, suppressEmail: true });
     if (!res.ok) { errorCount++; continue; }
-    if (res.matches && res.matches.length > 0) { dealsWithMatches++; totalMatches += res.matches.length; }
+    if (res.matches && res.matches.length > 0) {
+      dealsWithMatches++;
+      totalMatches += res.matches.length;
+      bulkResults.push({
+        deal: { DealID: deal.DealID, DealCode: deal.DealCode, City: deal.City, State: deal.State },
+        matches: res.matches
+      });
+    }
   }
+
+  // One combined email instead of one per deal -- suppressEmail above
+  // held off every individual notification, this sends them all at once.
+  if (bulkResults.length > 0) await api("adminNotifyBuyerMatchesBulk", { results: bulkResults });
 
   btn.disabled = false;
   resultEl.textContent = " Checked " + activeDeals.length + " deal(s) — " + totalMatches + " match(es) across " + dealsWithMatches + " deal(s)." +

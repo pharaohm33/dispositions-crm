@@ -311,6 +311,8 @@ function doPost(e) {
         return jsonOut(withSession(body, getVisibleBuyerCities));
       case 'repSetBuyerPurchaseCriteria':
         return jsonOut(withSession(body, repSetBuyerPurchaseCriteria));
+      case 'repNotifyBuyerMatchesBulk':
+        return jsonOut(withSession(body, repNotifyBuyerMatchesBulk));
       case 'repFindMyBuyerMatchesForDeal':
         return jsonOut(withSession(body, repFindMyBuyerMatchesForDeal));
       case 'repUpdateMyBuyBox':
@@ -471,6 +473,8 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminSaveBulkBuyerCriteria));
       case 'adminFindBuyerMatches':
         return jsonOut(withAdminSession(body, adminFindBuyerMatches));
+      case 'adminNotifyBuyerMatchesBulk':
+        return jsonOut(withAdminSession(body, adminNotifyBuyerMatchesBulk));
       case 'adminCheckDeepSeekBalanceNow':
         return jsonOut(withAdminSession(body, adminCheckDeepSeekBalanceNow));
       case 'adminGiveBuyerLeadToAllReps':
@@ -5993,10 +5997,12 @@ function adminFindBuyerMatches(body) {
   matches.sort(function (a, b) { return (a.verdict === 'criteria_match' ? 0 : 1) - (b.verdict === 'criteria_match' ? 0 : 1); });
 
   // Every time this actually strikes a match, admin gets told -- whether
-  // it was run by hand from one deal's page or swept in by
-  // adminFindBuyerMatchesForAllDeals below. No match found is silent (no
-  // point emailing "nothing here").
-  if (matches.length > 0) notifyAdminOfBuyerMatches(deal, matches);
+  // it was run by hand from one deal's page, or as part of the "Check All
+  // Deals For Potential Buyer Matches" sweep. That sweep passes
+  // suppressEmail so it can send ONE combined summary at the end instead
+  // of one email per deal. No match found is silent (no point emailing
+  // "nothing here").
+  if (matches.length > 0 && !body.suppressEmail) notifyAdminOfBuyerMatches(deal, matches);
 
   return { ok: true, matches: matches, consideredCount: capped.length, totalWithCriteria: leadsWithCriteria.length, statusBreakdown: statusBreakdown };
 }
@@ -6091,7 +6097,7 @@ function repFindMyBuyerMatchesForDeal(body, session) {
 
   matches.sort(function (a, b) { return (a.verdict === 'criteria_match' ? 0 : 1) - (b.verdict === 'criteria_match' ? 0 : 1); });
 
-  if (matches.length > 0) notifyAdminOfBuyerMatches(deal, matches, session);
+  if (matches.length > 0 && !body.suppressEmail) notifyAdminOfBuyerMatches(deal, matches, session);
 
   return { ok: true, matches: matches, consideredCount: capped.length, totalConsidered: leadsWithCriteria.length };
 }
@@ -6115,6 +6121,63 @@ function notifyAdminOfBuyerMatches(deal, matches, session) {
   } catch (err) {
     // Swallow -- a notification failing must never break the actual
     // matching result the caller is waiting on.
+  }
+}
+
+// Called once by the frontend after its "Check All Deals For Potential
+// Buyer Matches" loop finishes, with every deal that came back with a
+// match (each call to adminFindBuyerMatches during that loop passes
+// suppressEmail so nothing gets sent per-deal). body.results is
+// [{deal: {DealID, DealCode, City, State}, matches: [...]}].
+function adminNotifyBuyerMatchesBulk(body, session) {
+  const results = Array.isArray(body.results) ? body.results : [];
+  const dealsWithMatches = results.filter(function (r) { return r && r.deal && Array.isArray(r.matches) && r.matches.length > 0; });
+  notifyAdminOfBuyerMatchesBulk(dealsWithMatches, session);
+  return { ok: true };
+}
+
+// Same as adminNotifyBuyerMatchesBulk, for the rep-facing "Check My Buyer
+// Matches" sweep -- gated by canAccessDeal so a rep can only trigger the
+// summary email for deals they actually have access to, not arbitrary
+// deal data they could fabricate in the request body.
+function repNotifyBuyerMatchesBulk(body, session) {
+  const results = Array.isArray(body.results) ? body.results : [];
+  const dealsWithMatches = results.filter(function (r) {
+    return r && r.deal && r.deal.DealID && canAccessDeal(session, r.deal.DealID) && Array.isArray(r.matches) && r.matches.length > 0;
+  });
+  notifyAdminOfBuyerMatchesBulk(dealsWithMatches, session);
+  return { ok: true };
+}
+
+// One combined email for the "Check All Deals For Potential Buyer
+// Matches" bulk sweep, instead of adminFindBuyerMatches emailing once per
+// deal (which turned into a flood of separate emails when a lot of deals
+// hit at once). Called once, after the sweep's loop is done, with every
+// deal that came back with at least one match.
+function notifyAdminOfBuyerMatchesBulk(dealsWithMatches, session) {
+  if (!dealsWithMatches || !dealsWithMatches.length) return;
+  const supportEmail = getSupportEmail();
+  if (!supportEmail) return;
+  const totalMatches = dealsWithMatches.reduce(function (sum, d) { return sum + d.matches.length; }, 0);
+  try {
+    MailApp.sendEmail({
+      to: supportEmail,
+      subject: 'SendMyBuyer -- AI found ' + totalMatches + ' buyer match(es) across ' + dealsWithMatches.length + ' deal(s)',
+      body: (session ? 'Run by ' + (session.n || session.u) + '. ' : '') +
+        'Check All Deals For Potential Buyer Matches found the following:\n\n' +
+        dealsWithMatches.map(function (d) {
+          const deal = d.deal;
+          return (deal['DealCode'] || deal['DealID']) +
+            ' (' + [deal['City'], deal['State']].filter(Boolean).join(', ') + ') -- ' + d.matches.length + ' match(es):\n' +
+            d.matches.map(function (m) {
+              return '  - ' + m.label + ': ' + m.buyerName + (m.phone ? ' / ' + m.phone : '') + (m.email ? ' / ' + m.email : '') +
+                (m.uploadedBy ? ' (uploaded by ' + m.uploadedBy + ')' : '') + '\n    ' + m.reason;
+            }).join('\n');
+        }).join('\n\n') +
+        '\n\nOpen each deal in the admin panel to give any of these to a rep.'
+    });
+  } catch (err) {
+    // Swallow -- a notification failing must never break the sweep's result.
   }
 }
 
