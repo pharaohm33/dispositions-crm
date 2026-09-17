@@ -3,257 +3,308 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Coyote Pass at Starr Pass — Gated Custom Homesite | Tucson, AZ</title>
+<title>Coyote Pass at Starr Pass — Gated Custom Homesite | Tucson, AZ | JNA Dynamic Holdings LLC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#f6f1e7;
+    --paper:#f6f1e8;
     --paper-dark:#efe6d6;
-    --ink:#241f1a;
-    --brown:#6b5847;
-    --rust:#a8552f;
-    --line:#d8cbb3;
+    --ink:#2b2621;
+    --ink-soft:#5c5348;
+    --accent:#8a5a34;
+    --line:#d8cbb2;
+    --card:#fffdf9;
   }
   *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
   body{
-    margin:0;
     background:var(--paper);
     color:var(--ink);
-    font-family:'Inter',sans-serif;
+    font-family:'Source Sans 3', sans-serif;
     line-height:1.55;
+    font-size:16px;
   }
-  h1,h2,h3,h4{
-    font-family:'Playfair Display',serif;
-    font-weight:600;
+  h1,h2,h3{
+    font-family:'Playfair Display', serif;
     color:var(--ink);
-    letter-spacing:0.2px;
+    font-weight:600;
+    letter-spacing:0.01em;
   }
   .wrap{
     max-width:960px;
     margin:0 auto;
-    padding:0 28px;
+    padding-left:24px;
+    padding-right:24px;
   }
-  a{color:var(--rust);}
+  a{color:var(--accent);}
 
-  header.topbar{
-    background:var(--ink);
-    color:var(--paper);
+  header.top{
+    background:var(--paper-dark);
     padding-top:14px;
     padding-bottom:14px;
+    border-bottom:1px solid var(--line);
   }
-  header.topbar .wrap{
+  .brandline{
     display:flex;
     justify-content:space-between;
     align-items:center;
     flex-wrap:wrap;
     gap:8px;
   }
-  header.topbar .brand{
-    font-family:'Playfair Display',serif;
+  .brandline .name{
+    font-family:'Playfair Display', serif;
+    font-weight:700;
     font-size:1.05rem;
-    letter-spacing:0.5px;
+    letter-spacing:0.02em;
   }
-  header.topbar .tag{
-    font-size:0.8rem;
-    color:#cbbfa8;
+  .brandline .contact{
+    font-size:0.9rem;
+    color:var(--ink-soft);
   }
 
-  .hero{
-    padding-top:44px;
+  section.hero{
+    padding-top:48px;
     padding-bottom:20px;
-    border-bottom:1px solid var(--line);
   }
   .eyebrow{
     text-transform:uppercase;
-    letter-spacing:1.5px;
+    letter-spacing:0.14em;
     font-size:0.78rem;
-    color:var(--rust);
+    color:var(--accent);
     font-weight:600;
     margin-top:0;
     margin-bottom:10px;
   }
-  .hero h1{
-    font-size:2.4rem;
+  h1.title{
+    font-size:2.5rem;
     margin-top:0;
     margin-bottom:14px;
   }
-  .loc-line{
-    font-size:1.05rem;
-    color:var(--brown);
+  .subtitle{
+    font-size:1.15rem;
+    color:var(--ink-soft);
     margin-top:0;
-    margin-bottom:8px;
+    margin-bottom:18px;
   }
-  .addr-note{
-    display:inline-block;
-    background:var(--paper-dark);
-    border:1px solid var(--line);
-    padding:8px 14px;
-    border-radius:4px;
-    font-size:0.92rem;
-    margin-top:6px;
-    margin-bottom:22px;
+  .locationline{
+    font-size:1rem;
+    margin-top:0;
+    margin-bottom:6px;
   }
-  .price-block{
-    display:flex;
-    gap:36px;
-    flex-wrap:wrap;
-    align-items:baseline;
-    margin-top:8px;
-    margin-bottom:8px;
-  }
-  .price-block .amount{
-    font-family:'Playfair Display',serif;
-    font-size:3rem;
-    color:var(--rust);
-  }
-  .price-block .amount-sub{
+  .address-note{
     font-size:0.95rem;
-    color:var(--brown);
-  }
-  .chips{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    margin-top:18px;
-    margin-bottom:0;
-  }
-  .chip{
-    border:1px solid var(--line);
-    background:#fff;
-    padding:6px 12px;
-    border-radius:999px;
-    font-size:0.82rem;
-    color:var(--brown);
+    color:var(--ink-soft);
+    font-style:italic;
+    margin-top:0;
+    margin-bottom:24px;
   }
 
-  .gallery-section{
-    padding-top:26px;
-    padding-bottom:26px;
-    border-bottom:1px solid var(--line);
+  .price-block{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:22px 26px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    align-items:baseline;
+    margin-top:0;
+    margin-bottom:28px;
+  }
+  .price-block .price{
+    font-family:'Playfair Display', serif;
+    font-size:2.4rem;
+    font-weight:700;
+    color:var(--accent);
+  }
+  .price-block .price-label{
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    font-size:0.75rem;
+    color:var(--ink-soft);
+    display:block;
+    margin-bottom:4px;
+  }
+  .price-block .facts-mini{
+    display:flex;
+    gap:26px;
+    flex-wrap:wrap;
+  }
+  .price-block .facts-mini div span{
+    display:block;
+    font-size:0.75rem;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--ink-soft);
+    margin-bottom:2px;
+  }
+  .price-block .facts-mini div strong{
+    font-size:1.05rem;
+  }
+
+  .gallery-wrap{
+    margin-top:0;
+    margin-bottom:10px;
   }
   .gallery{
     display:flex;
-    gap:14px;
+    gap:12px;
     overflow-x:auto;
-    padding-bottom:10px;
+    padding-bottom:8px;
+    scroll-snap-type:x mandatory;
   }
   .gallery img{
     height:280px;
     width:auto;
     border-radius:6px;
-    flex-shrink:0;
-    box-shadow:0 4px 14px rgba(0,0,0,0.12);
+    flex:0 0 auto;
+    scroll-snap-align:start;
+    border:1px solid var(--line);
   }
   .more-photos{
-    margin-top:10px;
     font-size:0.9rem;
+    margin-top:0;
+    margin-bottom:36px;
+    display:block;
   }
 
   section.block{
     padding-top:34px;
-    padding-bottom:34px;
-    border-bottom:1px solid var(--line);
+    padding-bottom:6px;
+    border-top:1px solid var(--line);
   }
   section.block h2{
-    font-size:1.55rem;
+    font-size:1.5rem;
     margin-top:0;
     margin-bottom:16px;
   }
   section.block h3{
     font-size:1.15rem;
     margin-top:22px;
-    margin-bottom:10px;
+    margin-bottom:8px;
   }
   section.block p{
     margin-top:0;
     margin-bottom:14px;
+    color:var(--ink);
   }
 
-  ul.plain{
-    padding-left:20px;
+  ul.cleanlist{
+    list-style:none;
+    padding-left:0;
     margin-top:0;
-    margin-bottom:14px;
-  }
-  ul.plain li{margin-bottom:6px;}
-
-  .snapshot-grid{
+    margin-bottom:16px;
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:10px 24px;
-    margin-top:14px;
+    grid-template-columns:1fr 1fr;
+    gap:8px 24px;
   }
-  .snapshot-grid div{
-    padding:8px 0;
-    border-bottom:1px dashed var(--line);
-    font-size:0.95rem;
+  ul.cleanlist li{
+    padding-left:18px;
+    position:relative;
+    font-size:0.98rem;
   }
+  ul.cleanlist li::before{
+    content:"—";
+    position:absolute;
+    left:0;
+    color:var(--accent);
+  }
+
+  .cards{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    margin-top:0;
+    margin-bottom:20px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:16px 18px;
+  }
+  .card h4{
+    margin-top:0;
+    margin-bottom:6px;
+    font-family:'Playfair Display', serif;
+    font-size:1.05rem;
+  }
+  .card .figure{
+    color:var(--accent);
+    font-weight:600;
+  }
+  .card p{margin-top:0;margin-bottom:4px;font-size:0.92rem;}
 
   table.deal-table{
     width:100%;
     border-collapse:collapse;
-    margin-top:14px;
+    margin-top:0;
+    margin-bottom:20px;
+    background:var(--card);
+    border:1px solid var(--line);
   }
   table.deal-table td{
-    padding:10px 12px;
+    padding:11px 16px;
     border-bottom:1px solid var(--line);
-    font-size:0.95rem;
-    vertical-align:top;
+    font-size:0.97rem;
   }
-  table.deal-table td:first-child{
-    font-weight:600;
-    color:var(--brown);
+  table.deal-table tr:last-child td{
+    border-bottom:none;
+  }
+  table.deal-table td.label{
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    font-size:0.78rem;
     width:44%;
   }
-
-  .comp-card{
-    background:#fff;
-    border:1px solid var(--line);
-    border-radius:6px;
-    padding:16px 18px;
-    margin-top:14px;
-    margin-bottom:14px;
-  }
-  .comp-card h4{
-    margin-top:0;
-    margin-bottom:8px;
-    font-size:1.05rem;
-  }
-  .comp-card ul{margin-top:0;margin-bottom:0;}
-
-  .sold-list{
-    padding-left:0;
-    list-style:none;
-    margin-top:14px;
-    margin-bottom:0;
-  }
-  .sold-list li{
-    display:flex;
-    justify-content:space-between;
-    padding:9px 0;
-    border-bottom:1px dashed var(--line);
-    font-size:0.95rem;
-    gap:12px;
-    flex-wrap:wrap;
-  }
-  .sold-list li span.price{
-    color:var(--rust);
+  table.deal-table td.value{
     font-weight:600;
   }
 
-  .disclaimer{
-    font-size:0.82rem;
-    color:var(--brown);
-    margin-top:20px;
-    margin-bottom:0;
+  .sold-list{
+    list-style:none;
+    padding-left:0;
+    margin-top:0;
+    margin-bottom:20px;
   }
+  .sold-list li{
+    padding:10px 0;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:6px;
+    font-size:0.95rem;
+  }
+  .sold-list li:last-child{border-bottom:none;}
+  .sold-list .sold-price{
+    color:var(--accent);
+    font-weight:600;
+  }
+
+  .disclaimer-box{
+    background:var(--paper-dark);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:18px 20px;
+    margin-top:10px;
+    margin-bottom:30px;
+    font-size:0.88rem;
+    color:var(--ink-soft);
+  }
+  .disclaimer-box p{margin-top:0;margin-bottom:8px;color:var(--ink-soft);}
+  .disclaimer-box p:last-child{margin-bottom:0;}
 
   .cta-band{
     background:var(--ink);
     color:var(--paper);
-    padding-top:46px;
-    padding-bottom:46px;
+    margin-top:44px;
+    margin-bottom:0;
+    padding-top:48px;
+    padding-bottom:48px;
   }
   .cta-band h2{
     color:var(--paper);
@@ -262,76 +313,94 @@
     margin-bottom:12px;
   }
   .cta-band p{
-    color:#cbbfa8;
+    color:#d9d2c4;
     margin-top:0;
     margin-bottom:22px;
+    font-size:1.02rem;
   }
   .cta-contacts{
     display:flex;
-    gap:26px;
+    gap:28px;
     flex-wrap:wrap;
+    align-items:center;
   }
   .cta-contacts a{
     color:var(--paper);
-    font-size:1.15rem;
     font-weight:600;
+    font-size:1.15rem;
     text-decoration:none;
-    border-bottom:2px solid var(--rust);
-    padding-bottom:2px;
+    border-bottom:1px solid var(--accent);
+    padding-bottom:3px;
+  }
+  .cta-band .tag{
+    margin-top:26px;
+    margin-bottom:0;
+    font-size:0.82rem;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:#a9a08d;
   }
 
-  footer.foot{
-    background:var(--ink);
-    color:#8b7d68;
-    font-size:0.78rem;
-    padding-top:18px;
-    padding-bottom:18px;
-    border-top:1px solid #3a332b;
+  footer.legal{
+    background:var(--paper);
+    padding-top:26px;
+    padding-bottom:40px;
+  }
+  footer.legal p{
+    font-size:0.8rem;
+    color:var(--ink-soft);
+    margin-top:0;
+    margin-bottom:10px;
+  }
+
+  @media (max-width: 640px){
+    ul.cleanlist{grid-template-columns:1fr;}
+    .cards{grid-template-columns:1fr;}
+    h1.title{font-size:1.9rem;}
+    .price-block .price{font-size:1.9rem;}
   }
 </style>
 </head>
 <body><div style="max-width:640px;margin:0 auto 20px;padding:20px 24px;text-align:center;font-family:Arial,sans-serif;border-bottom:1px solid #ddd;"><p style="color:#444;margin-bottom:16px;">Addresses are shared with wholesalers who already have an interested buyer for this deal, or with direct buyers reviewing this listing. Log in or create a free account to request it.</p><a href="https://sendmybuyer.com/?requestAddress=8c9495be-655c-4330-93a4-41fedf8778c1&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F8c9495be-655c-4330-93a4-41fedf8778c1.html" style="display:inline-block;padding:12px 28px;background:#1a73e8;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;">Request the Address</a><p style="margin-top:16px;"><a href="https://sendmybuyer.com" style="color:#1a73e8;">Log in</a> &nbsp;&middot;&nbsp; <a href="https://sendmybuyer.com" style="color:#1a73e8;">Browse all deals</a></p><p style="color:#888;font-size:0.9em;margin-top:20px;">Interested in this deal? This listing isn't searchable once you leave — <strong>save or bookmark this page's link</strong> before heading to the home page, so you can find your way back to it.</p></div>
 
-<header class="topbar">
-  <div class="wrap">
-    <div class="brand">JNA Dynamic Holdings LLC</div>
-    <div class="tag">Wholesale Land Assignment</div>
+<header class="top">
+  <div class="wrap brandline">
+    <div class="name">JNA Dynamic Holdings LLC</div>
+    <div class="contact">520-633-6437 &nbsp;|&nbsp; montanoemmanuel@gmail.com</div>
   </div>
 </header>
 
 <section class="hero">
   <div class="wrap">
-    <p class="eyebrow">Deal Code: AZ-1 (Land) &middot; Assignment of Contract</p>
-    <h1>Coyote Pass at Starr Pass — Gated Custom Homesite</h1>
-    <p class="loc-line">Tucson, Pima County, Arizona &middot; ZIP 85745</p>
-    <div class="addr-note">Address available upon request — contact us and we'll send the full property address and APN packet.</div>
+    <p class="eyebrow">Wholesale Land Assignment &nbsp;·&nbsp; Deal AZ-1 (Land)</p>
+    <h1 class="title">Coyote Pass at Starr Pass — Gated Custom Homesite</h1>
+    <p class="subtitle">Open desert views &nbsp;·&nbsp; Utilities available in community &nbsp;·&nbsp; 0.744&plusmn; acre lot</p>
+    <p class="locationline"><strong>Tucson, Pima County, AZ 85745</strong> — Coyote Pass at Starr Pass</p>
+    <p class="address-note">Address available upon request — contact us and we will send the full street address.</p>
+
     <div class="price-block">
       <div>
-        <div class="amount">$165,000</div>
-        <div class="amount-sub">Purchase Price &middot; Cash or Hard Money Only</div>
+        <span class="price-label">Purchase Price</span>
+        <span class="price">$165,000</span>
+      </div>
+      <div class="facts-mini">
+        <div><span>Lot Size</span><strong>0.744&plusmn; Acres</strong></div>
+        <div><span>Land Area</span><strong>~32,441 SF</strong></div>
+        <div><span>Zoning</span><strong>R-1</strong></div>
+        <div><span>Lot / APN</span><strong>Lot 4 / 116-27-7610</strong></div>
       </div>
     </div>
-    <div class="chips">
-      <span class="chip">0.744&plusmn; Acres / &plusmn;32,441 SF</span>
-      <span class="chip">Lot 4</span>
-      <span class="chip">APN 116-27-7610</span>
-      <span class="chip">R-1 Zoning</span>
-      <span class="chip">Vacant Residential Land</span>
-      <span class="chip">Gated Community</span>
-    </div>
-  </div>
-</section>
 
-<section class="gallery-section">
-  <div class="wrap">
-    <div class="gallery">
-      <img src="/deals/8c9495be-655c-4330-93a4-41fedf8778c1/photos/1.jpg" alt="Coyote Pass homesite view 1">
-      <img src="/deals/8c9495be-655c-4330-93a4-41fedf8778c1/photos/2.jpg" alt="Coyote Pass homesite view 2">
-      <img src="/deals/8c9495be-655c-4330-93a4-41fedf8778c1/photos/3.jpg" alt="Coyote Pass homesite view 3">
-      <img src="/deals/8c9495be-655c-4330-93a4-41fedf8778c1/photos/4.jpg" alt="Coyote Pass homesite view 4">
-      <img src="/deals/8c9495be-655c-4330-93a4-41fedf8778c1/photos/5.jpg" alt="Coyote Pass homesite view 5">
-      <img src="/deals/8c9495be-655c-4330-93a4-41fedf8778c1/photos/6.jpg" alt="Coyote Pass homesite view 6">
-      <img src="/deals/8c9495be-655c-4330-93a4-41fedf8778c1/photos/7.jpg" alt="Coyote Pass homesite view 7">
+    <div class="gallery-wrap">
+      <div class="gallery">
+        <img src="/deals/8c9495be-655c-4330-93a4-41fedf8778c1/photos/1.jpg" alt="Coyote Pass homesite photo 1">
+        <img src="/deals/8c9495be-655c-4330-93a4-41fedf8778c1/photos/2.jpg" alt="Coyote Pass homesite photo 2">
+        <img src="/deals/8c9495be-655c-4330-93a4-41fedf8778c1/photos/3.jpg" alt="Coyote Pass homesite photo 3">
+        <img src="/deals/8c9495be-655c-4330-93a4-41fedf8778c1/photos/4.jpg" alt="Coyote Pass homesite photo 4">
+        <img src="/deals/8c9495be-655c-4330-93a4-41fedf8778c1/photos/5.jpg" alt="Coyote Pass homesite photo 5">
+        <img src="/deals/8c9495be-655c-4330-93a4-41fedf8778c1/photos/6.jpg" alt="Coyote Pass homesite photo 6">
+        <img src="/deals/8c9495be-655c-4330-93a4-41fedf8778c1/photos/7.jpg" alt="Coyote Pass homesite photo 7">
+      </div>
     </div>
   </div>
 </section>
@@ -341,27 +410,34 @@
     <h2>Here Is What We Have</h2>
     <p>This is an off-market custom-home lot inside Coyote Pass, the gated estate section of Tucson's Starr Pass master-planned community.</p>
     <p>The subject contains approximately 0.744 acres / 32,441 square feet, is classified as vacant residential land, and carries R-1 zoning.</p>
-    <p>This is not an isolated desert parcel. Coyote Pass is already built out with substantial custom residences, paved streets, gated access, and utility infrastructure. Comparable vacant lots within Coyote Pass report public water, sewer, electricity, and other utilities at or on the site, although the buyer must independently verify the exact stub locations and connection requirements for this parcel.</p>
+    <p>This is not an isolated desert parcel. Coyote Pass is already built out with substantial custom residences, paved streets, gated access, and utility infrastructure. Comparable vacant lots within Coyote Pass report public water, sewer, electricity, and other utilities at or on the site, although the buyer must independently verify the exact stub locations and connection requirements for the subject lot.</p>
     <p>The subject also benefits from an open rear orientation and desert-view setting, creating the opportunity for a custom residence designed around Tucson's mountain, sunset, and city-light environment.</p>
-    <p>And the finished-product support is directly next door: the adjacent home sold for $1,170,000 on November 24, 2025. That home contains approximately 3,433 SF on roughly 0.74 acres — essentially the same lot-size category as the subject.</p>
+    <p>And the finished-product support is directly next door: 3232 W Tumamoc Dr sold for $1,170,000 on November 24, 2025. That home contains approximately 3,433 SF on roughly 0.74 acres — essentially the same lot-size category as the subject.</p>
     <p>At $165,000, this is a land-entry opportunity into a gated custom-home pocket where seven-figure finished product already exists on the same street.</p>
+  </div>
+</section>
 
-    <h3>Property Snapshot</h3>
-    <div class="snapshot-grid">
-      <div>0.744&plusmn; Acre Custom Homesite</div>
-      <div>Approximately 32,441 SF</div>
-      <div>Community: Coyote Pass at Starr Pass</div>
-      <div>R-1 Residential Zoning</div>
-      <div>Gated Custom-Home Community</div>
-      <div>Paved Streets</div>
-      <div>Utilities Available in Community</div>
-      <div>Mountain / Desert Setting</div>
-      <div>Open Rear Orientation</div>
-      <div>Established Custom Homes Surrounding the Lot</div>
-      <div>Tucson, AZ 85745</div>
-      <div>Buyer Responsible for Full Due Diligence</div>
-    </div>
-    <p style="margin-top:16px;">Public property records independently identify the parcel as vacant residential land in Starr Pass, approximately 0.74 acres, with APN 116-27-7610 (address available upon request).</p>
+<section class="block">
+  <div class="wrap">
+    <h2>Property Snapshot</h2>
+    <ul class="cleanlist">
+      <li>0.744&plusmn; Acre Custom Homesite</li>
+      <li>Approximately 32,441 SF</li>
+      <li>Community: Coyote Pass at Starr Pass</li>
+      <li>Lot 4 / APN 116-27-7610</li>
+      <li>R-1 Residential Zoning</li>
+      <li>Gated Custom-Home Community</li>
+      <li>Paved Streets</li>
+      <li>Utilities Available in Community (Public Water, Sewer, Electric)</li>
+      <li>Mountain / Desert Setting</li>
+      <li>Open Rear Orientation</li>
+      <li>Established Custom Homes Surrounding the Lot</li>
+      <li>Tucson, AZ 85745</li>
+      <li>Cash or Hard Money Only</li>
+      <li>Assignment of Contract</li>
+      <li>Buyer Responsible for Full Due Diligence</li>
+    </ul>
+    <p>Public property records independently identify the subject parcel as vacant residential land in Starr Pass, approximately 0.74 acres, under APN 116-27-7610.</p>
   </div>
 </section>
 
@@ -369,11 +445,10 @@
   <div class="wrap">
     <h2>Why This Lot Makes Sense</h2>
     <p>The biggest advantage here is the relationship between the land basis and finished-product environment.</p>
-    <p>Directly next door, the adjacent home closed at $1.17 million in November 2025. The home contains 4 bedrooms, 3.5 baths and approximately 3,433 square feet on roughly 0.74 acres.</p>
-    <p>That does not mean every home built on the subject will sell for $1.17 million. It does prove that buyers have already paid seven figures for custom residential product on this exact street and on a very similar lot size.</p>
-    <p>Other surrounding properties also demonstrate the upper-end residential character of the street, with existing custom homes throughout the Coyote Pass section.</p>
+    <p>Directly next door, 3232 W Tumamoc Dr closed at $1.17 million in November 2025. The home contains 4 bedrooms, 3.5 baths and approximately 3,433 square feet on roughly 0.74 acres.</p>
+    <p>That does not mean every home built on the subject will sell for $1.17 million. It does prove that buyers have already paid seven figures for custom residential product on this exact street and on a very similar lot size. Other surrounding properties also demonstrate the upper-end residential character of Tumamoc Drive, with existing custom homes throughout the Coyote Pass section.</p>
     <p>For a custom builder, the play is straightforward:</p>
-    <ul class="plain">
+    <ul class="cleanlist">
       <li>Acquire the homesite</li>
       <li>Design around the views and terrain</li>
       <li>Verify the existing utility infrastructure</li>
@@ -387,10 +462,9 @@
   <div class="wrap">
     <h2>Historical Site-Plan Advantage</h2>
     <p>There is another diligence item that makes this parcel particularly interesting.</p>
-    <p>The City of Tucson Maps and Records system shows a 2005 grading plan for a proposed residence on Lot 4, Coyote Pass at Starr Pass (address available on request).</p>
-    <p>The City record identifies:</p>
-    <ul class="plain">
-      <li>GR-2005-011</li>
+    <p>The City of Tucson Maps and Records system shows a 2005 grading plan for a proposed residence on Lot 4, Coyote Pass at Starr Pass. The City record identifies:</p>
+    <ul class="cleanlist">
+      <li>Record No. GR-2005-011</li>
       <li>Skamser Residence</li>
       <li>Lot 4 — Coyote Pass at Starr Pass</li>
       <li>Grading Plan</li>
@@ -403,22 +477,19 @@
 <section class="block">
   <div class="wrap">
     <h2>Current Coyote Pass Land Competition</h2>
-    <div class="comp-card">
-      <h4>3211 W Tumamoc Dr — Coyote Pass</h4>
-      <ul class="plain">
-        <li>0.97 Acres</li>
-        <li>Gated | Public Water | Paved Road</li>
-        <li>Current Ask: $148,800</li>
-      </ul>
-    </div>
-    <div class="comp-card">
-      <h4>3152 W Tumamoc Dr — Coyote Pass</h4>
-      <ul class="plain">
-        <li>1.57 Acres</li>
-        <li>Utilities Reported at Lot Line</li>
-        <li>Mountain &amp; City Views</li>
-        <li>Current Ask: $184,900</li>
-      </ul>
+    <div class="cards">
+      <div class="card">
+        <h4>3211 W Tumamoc Dr — Coyote Pass</h4>
+        <p>0.97 Acres</p>
+        <p>Gated | Public Water | Paved Road</p>
+        <p class="figure">Current Ask: $148,800</p>
+      </div>
+      <div class="card">
+        <h4>3152 W Tumamoc Dr — Coyote Pass</h4>
+        <p>1.57 Acres</p>
+        <p>Utilities Reported at Lot Line | Mountain &amp; City Views</p>
+        <p class="figure">Current Ask: $184,900</p>
+      </div>
     </div>
   </div>
 </section>
@@ -428,27 +499,23 @@
     <h2>Recent Starr Pass Land Sales</h2>
     <p>Recent publicly indexed land sales in and around Starr Pass include:</p>
     <ul class="sold-list">
-      <li>3268 W Saguaro Ridge Dr <span class="price">Sold $120,000 — March 2026</span></li>
-      <li>3820 W Tohono View Pl <span class="price">Sold $175,000 — January 2026</span></li>
-      <li>3270 W Sparkling Starr Dr <span class="price">Sold $155,000 — June 2026</span></li>
-      <li>2012 S Twinkling Starr Dr <span class="price">Sold $150,000 — July 2026</span></li>
-      <li>3197 W Starr Galaxy Dr <span class="price">Sold $149,900 — March 2026</span></li>
+      <li><span>3268 W Saguaro Ridge Dr</span><span class="sold-price">Sold $120,000 — March 2026</span></li>
+      <li><span>3820 W Tohono View Pl</span><span class="sold-price">Sold $175,000 — January 2026</span></li>
+      <li><span>3270 W Sparkling Starr Dr</span><span class="sold-price">Sold $155,000 — June 2026</span></li>
+      <li><span>2012 S Twinkling Starr Dr</span><span class="sold-price">Sold $150,000 — July 2026</span></li>
+      <li><span>3197 W Starr Galaxy Dr</span><span class="sold-price">Sold $149,900 — March 2026</span></li>
     </ul>
-    <p style="margin-top:16px;">Lot values vary based on size, elevation, views, slope, wash conditions, development expense, location and utility configuration. Buyer must independently determine which sales are relevant to the subject.</p>
+    <p>Lot values vary based on size, elevation, views, slope, wash conditions, development expense, location and utility configuration. Buyer must independently determine which sales are relevant to the subject.</p>
   </div>
 </section>
 
 <section class="block">
   <div class="wrap">
     <h2>Same-Street Finished Home Support</h2>
-    <div class="comp-card">
-      <h4>Directly Adjacent Property</h4>
-      <ul class="plain">
-        <li>4 Bed | 3.5 Bath</li>
-        <li>3,433 SF</li>
-        <li>Approx. 0.74 Acres</li>
-        <li>Sold $1,170,000 — November 24, 2025</li>
-      </ul>
+    <div class="card">
+      <h4>3232 W Tumamoc Dr — Directly Adjacent</h4>
+      <p>4 Bed | 3.5 Bath | 3,433 SF | Approx. 0.74 Acres</p>
+      <p class="figure">Sold $1,170,000 — November 24, 2025</p>
     </div>
     <p>This is the strongest finished-product comp because it is immediately next to the subject and sits on essentially the same amount of land.</p>
   </div>
@@ -462,7 +529,7 @@
     <p>Starr Pass also sits directly alongside Tucson's mountain recreation network. The nearby Starr Pass trail system connects into Tucson Mountain Park, which offers hiking, trail running, mountain biking and other non-motorized trail recreation.</p>
 
     <h3>Location Highlights</h3>
-    <ul class="plain">
+    <ul class="cleanlist">
       <li>Coyote Pass at Starr Pass</li>
       <li>Tucson, AZ 85745</li>
       <li>Gated Custom-Home Community</li>
@@ -482,15 +549,15 @@
   <div class="wrap">
     <h2>Utilities</h2>
     <p>Comparable Coyote Pass lots report:</p>
-    <ul class="plain">
+    <ul class="cleanlist">
       <li>Public Water</li>
       <li>Sewer</li>
       <li>Electric</li>
       <li>Paved Street Access</li>
     </ul>
     <p>Some Coyote Pass listings also report gas and communications infrastructure on site.</p>
-    <p>Buyer must independently confirm the following specifically for the subject parcel:</p>
-    <ul class="plain">
+    <p>Buyer must independently confirm the following specifically for the subject lot:</p>
+    <ul class="cleanlist">
       <li>Exact Water Stub Location</li>
       <li>Exact Sewer Stub Location</li>
       <li>Electric Service Location</li>
@@ -506,20 +573,35 @@
 <section class="block">
   <div class="wrap">
     <h2>Exit Strategies</h2>
-    <ul class="plain">
-      <li><strong>Custom Builder Play:</strong> Build a custom residence designed around the lot's desert setting and rear views, then compete within a Coyote Pass finished-home environment where the directly adjacent property recently traded for $1.17 million.</li>
-      <li><strong>Spec Home Play:</strong> Complete updated geotechnical, drainage, grading and architectural work and develop a luxury spec residence designed specifically for the site.</li>
-      <li><strong>Entitlement / Plan Play:</strong> Investigate the historical City grading and site plans, update the engineering and design package as needed, and potentially create a more advanced shovel-ready opportunity for another builder.</li>
-      <li><strong>Retail Lot Flip:</strong> Improve the property's diligence package with a survey, utility confirmations, geotechnical work, conceptual home design and HOA architectural information before remarketing to an end-user or custom builder.</li>
-      <li><strong>Buy and Hold:</strong> Control a vacant custom-home parcel inside an established gated section of Starr Pass while maintaining future development optionality.</li>
-    </ul>
+    <div class="cards">
+      <div class="card">
+        <h4>Custom Builder Play</h4>
+        <p>Build a custom residence designed around the lot's desert setting and rear views, then compete within a Coyote Pass finished-home environment where the directly adjacent property recently traded for $1.17 million.</p>
+      </div>
+      <div class="card">
+        <h4>Spec Home Play</h4>
+        <p>Complete updated geotechnical, drainage, grading and architectural work and develop a luxury spec residence designed specifically for the site.</p>
+      </div>
+      <div class="card">
+        <h4>Entitlement / Plan Play</h4>
+        <p>Investigate the historical City grading and site plans, update the engineering and design package as needed, and potentially create a more advanced shovel-ready opportunity for another builder.</p>
+      </div>
+      <div class="card">
+        <h4>Retail Lot Flip</h4>
+        <p>Improve the property's diligence package with a survey, utility confirmations, geotechnical work, conceptual home design and HOA architectural information before remarketing to an end-user or custom builder.</p>
+      </div>
+      <div class="card">
+        <h4>Buy and Hold</h4>
+        <p>Control a vacant custom-home parcel inside an established gated section of Starr Pass while maintaining future development optionality.</p>
+      </div>
+    </div>
   </div>
 </section>
 
 <section class="block">
   <div class="wrap">
     <h2>HOA &amp; Design Review</h2>
-    <ul class="plain">
+    <ul class="cleanlist">
       <li>Coyote Pass HOA</li>
       <li>Starr Pass Master Community</li>
       <li>Gated</li>
@@ -527,7 +609,7 @@
     </ul>
     <p>Current Coyote Pass land listings confirm mandatory HOA structures and gated-community requirements. Reported HOA fees vary by parcel and listing, so the exact current assessment applicable to Lot 4 must be independently verified.</p>
     <p>Buyer should obtain and review:</p>
-    <ul class="plain">
+    <ul class="cleanlist">
       <li>Current Coyote Pass CC&amp;Rs</li>
       <li>Starr Pass Master CC&amp;Rs</li>
       <li>Architectural Design Guidelines</li>
@@ -542,49 +624,48 @@
 
 <section class="block">
   <div class="wrap">
-    <h2>Buyer Due Diligence Notice</h2>
-    <p>Buyer must independently verify exact acreage, survey boundaries, APN, zoning, permitted uses, setbacks, buildable envelope, slope, hillside requirements, washes, drainage, flood status, geotechnical requirements, grading costs, retaining requirements, utility stub locations, water, sewer, electricity, natural gas, HOA dues, design-review requirements, construction deadlines, architectural restrictions and all development costs prior to closing.</p>
-    <p>The City of Tucson's historical grading/site-plan record is provided for diligence purposes only and does not establish that the former plans remain valid, approved, transferable, or compliant with current building requirements.</p>
-  </div>
-</section>
-
-<section class="block">
-  <div class="wrap">
     <h2>Deal Terms</h2>
     <table class="deal-table">
-      <tr><td>Purchase Price</td><td>$165,000</td></tr>
-      <tr><td>Financing</td><td>Cash or Hard Money Only</td></tr>
-      <tr><td>Transaction Type</td><td>Assignment of Contract</td></tr>
-      <tr><td>Closing Costs</td><td>Buyer Pays Closing Costs</td></tr>
-      <tr><td>Condition</td><td>Property Sold As-Is</td></tr>
-      <tr><td>Requirement</td><td>Proof of Funds Required</td></tr>
-      <tr><td>Process</td><td>First Come, First Served — No Auction, No Highest and Best</td></tr>
-      <tr><td>Lot</td><td>Lot 4</td></tr>
-      <tr><td>APN</td><td>116-27-7610</td></tr>
-      <tr><td>Zoning</td><td>R-1</td></tr>
-      <tr><td>Lot Size</td><td>0.744&plusmn; Acres / Approximately 32,441 SF</td></tr>
-      <tr><td>Property Type</td><td>Vacant Residential Land</td></tr>
-      <tr><td>Community</td><td>Coyote Pass at Starr Pass</td></tr>
+      <tr><td class="label">Purchase Price</td><td class="value">$165,000</td></tr>
+      <tr><td class="label">Financing</td><td class="value">Cash or Hard Money Only</td></tr>
+      <tr><td class="label">Transaction Type</td><td class="value">Assignment of Contract</td></tr>
+      <tr><td class="label">Closing Costs</td><td class="value">Buyer Pays Closing Costs</td></tr>
+      <tr><td class="label">Condition</td><td class="value">Property Sold As-Is</td></tr>
+      <tr><td class="label">Requirement to Transact</td><td class="value">Proof of Funds Required</td></tr>
+      <tr><td class="label">Terms</td><td class="value">First Come First Served — No Auction, No Highest and Best</td></tr>
+      <tr><td class="label">Lot Size</td><td class="value">0.744&plusmn; Acres / ~32,441 SF</td></tr>
+      <tr><td class="label">Lot / APN</td><td class="value">Lot 4 / 116-27-7610</td></tr>
+      <tr><td class="label">Zoning</td><td class="value">R-1</td></tr>
+      <tr><td class="label">Property Type</td><td class="value">Vacant Residential Land</td></tr>
+      <tr><td class="label">Community</td><td class="value">Coyote Pass at Starr Pass</td></tr>
+      <tr><td class="label">Location</td><td class="value">Tucson, Pima County, AZ 85745</td></tr>
     </table>
-    <p style="margin-top:18px;">This is a wholesale assignment. JNA Dynamic Holdings LLC holds equitable interest in the subject transaction under contract with the underlying property owner. The end buyer will receive an assignment of contract, not a direct deed from the seller.</p>
-    <p class="disclaimer">All zoning, utility, HOA, slope, geotechnical, comparable-sale, building and development information must be independently verified by buyer prior to closing. Figures presented on this page have not been independently verified by JNA Dynamic Holdings LLC.</p>
+
+    <div class="disclaimer-box">
+      <p>This is a wholesale assignment of contract. JNA Dynamic Holdings LLC holds equitable interest in the subject transaction under contract with the underlying property owner. The end buyer will receive an assignment of contract, not a direct conveyance from JNA Dynamic Holdings LLC, and this transaction does not involve direct contact with the underlying seller.</p>
+      <p>All zoning, utility, HOA, slope, geotechnical, comparable-sale, building and development information must be independently verified by buyer prior to closing. Buyer must independently verify exact acreage, survey boundaries, APN, zoning, permitted uses, setbacks, buildable envelope, slope, hillside requirements, washes, drainage, flood status, geotechnical requirements, grading costs, retaining requirements, utility stub locations, water, sewer, electricity, natural gas, HOA dues, design-review requirements, construction deadlines, architectural restrictions and all development costs prior to closing.</p>
+      <p>The historical City of Tucson grading/site-plan record referenced above is provided for diligence purposes only and does not establish that the former plans remain valid, approved, transferable, or compliant with current building requirements.</p>
+      <p>Figures, measurements, and comparable-sale data referenced on this page have not been independently verified by JNA Dynamic Holdings LLC and are subject to buyer's own due diligence.</p>
+    </div>
   </div>
 </section>
 
 <section class="cta-band">
   <div class="wrap">
-    <h2>Coyote Pass at Starr Pass. Gated Custom Homesite. 0.744 Acres. Utilities in the Community.</h2>
-    <p>Cash or hard money only. First come, first served — no auction, no highest and best. Contact us today for the full address, APN packet, and due-diligence documents.</p>
+    <h2>Coyote Pass at Starr Pass. Gated Custom Homesite. 0.744&plusmn; Acres.</h2>
+    <p>Utilities available in the community. Cash or hard money only. First come, first served — contact us today to receive the full address, contract details, and diligence package.</p>
     <div class="cta-contacts">
-      <a href="tel:520-633-6437">520-633-6437</a>
+      <a href="tel:5206336437">520-633-6437</a>
       <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
     </div>
+    <p class="tag">JNA Dynamic Holdings LLC — Assignment of Contract</p>
   </div>
 </section>
 
-<footer class="foot">
+<footer class="legal">
   <div class="wrap">
-    JNA Dynamic Holdings LLC &middot; This offering is an assignment of contract. JNA Dynamic Holdings LLC holds equitable interest and is not the titled owner of record.
+    <p>Address available upon request. Individual property address for this deal will be provided directly to interested, qualified buyers upon contact.</p>
+    <p>This offering is presented by JNA Dynamic Holdings LLC as an assignment of a contract held with the underlying property owner. All figures, acreage, zoning, comparable sales, and site-history information are believed to be accurate but have not been independently verified by JNA Dynamic Holdings LLC. Buyer is solely responsible for independent verification of all facts prior to closing.</p>
   </div>
 </footer>
 
