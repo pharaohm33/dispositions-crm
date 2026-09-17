@@ -716,6 +716,19 @@
       </div>
     </div>
 
+    <div class="card">
+      <div class="section-title" style="margin-top:0;">Buyer Address Auto-Disclose</div>
+      <p class="small-muted">Separate from the setting above -- this one is specifically about a registered Buyer account (the actual end buyer browsing deals) requesting an address, not a wholesaler/rep.</p>
+      <select id="buyerautodisclose-mode-input">
+        <option value="off">Off — a Buyer follows the normal flow (manual grant, same as anyone else)</option>
+        <option value="on">On — any Buyer gets the address instantly, every time, no approval step</option>
+        <option value="on_after_contact">On, but only after I've talked to that specific buyer — check "I've Talked To This Buyer" on their Edit Details first</option>
+      </select>
+      <div class="nav-row" style="justify-content:flex-end; margin-top:10px;">
+        <button class="btn secondary small" id="buyerautodisclose-save-btn">Save</button>
+      </div>
+    </div>
+
     <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
       <button class="btn primary" id="add-rep-btn">+ Add Team Member</button>
     </div>
@@ -1354,6 +1367,7 @@
       <input type="text" id="area-buybox-other">
       <label class="field-label">Purchase Criteria Notes <span class="small-muted">(optional)</span></label>
       <textarea id="area-buybox-notes"></textarea>
+      <label class="checkbox-row"><input type="checkbox" id="area-buyercontactconfirmed"> I've Talked To This Buyer <span class="small-muted">(only matters if Buyer Address Auto-Disclose is set to "on after contact")</span></label>
     </div>
 
     <div id="area-dealarea-section" hidden>

@@ -3561,8 +3561,8 @@ function renderAdminFbList(requests) {
 /* ---------- Team tab ---------- */
 
 async function loadReps() {
-  const [repsRes, joinRes, autoApproveRes, autoDiscloseRes, contactDefaultsRes] = await Promise.all([
-    api("adminGetReps", {}), api("getJoinContact", {}), api("adminGetAutoApproveSettings", {}), api("adminGetAutoDiscloseAddressSettings", {}), api("adminGetContactDefaults", {})
+  const [repsRes, joinRes, autoApproveRes, autoDiscloseRes, buyerAutoDiscloseRes, contactDefaultsRes] = await Promise.all([
+    api("adminGetReps", {}), api("getJoinContact", {}), api("adminGetAutoApproveSettings", {}), api("adminGetAutoDiscloseAddressSettings", {}), api("adminGetBuyerAddressAutoDiscloseSettings", {}), api("adminGetContactDefaults", {})
   ]);
   if (repsRes.ok) { adminReps = repsRes.reps; renderReps(); }
   if (joinRes.ok) {
@@ -3575,6 +3575,9 @@ async function loadReps() {
   }
   if (autoDiscloseRes.ok) {
     document.getElementById("autodisclose-mode-input").value = autoDiscloseRes.mode;
+  }
+  if (buyerAutoDiscloseRes.ok) {
+    document.getElementById("buyerautodisclose-mode-input").value = buyerAutoDiscloseRes.mode;
   }
   if (contactDefaultsRes.ok) {
     document.getElementById("contactdefaults-company-input").value = contactDefaultsRes.company || "";
@@ -3624,6 +3627,15 @@ document.getElementById("autodisclose-save-btn").addEventListener("click", async
   const btn = this;
   btn.disabled = true;
   const res = await api("adminSetAutoDiscloseAddress", { mode: document.getElementById("autodisclose-mode-input").value });
+  btn.disabled = false;
+  if (!res.ok) { showToast(res.error || "Could not save.", true); return; }
+  showToast("Saved.");
+});
+
+document.getElementById("buyerautodisclose-save-btn").addEventListener("click", async function () {
+  const btn = this;
+  btn.disabled = true;
+  const res = await api("adminSetBuyerAddressAutoDisclose", { mode: document.getElementById("buyerautodisclose-mode-input").value });
   btn.disabled = false;
   if (!res.ok) { showToast(res.error || "Could not save.", true); return; }
   showToast("Saved.");
@@ -3728,6 +3740,7 @@ function openAreaModal(rep) {
   document.getElementById("area-buybox-cities").value = rep.buyBoxCities || "";
   document.getElementById("area-buybox-other").value = rep.buyBoxOtherAssetClass || "";
   document.getElementById("area-buybox-notes").value = rep.buyBoxNotes || "";
+  document.getElementById("area-buyercontactconfirmed").checked = !!rep.buyerContactConfirmed;
   renderAreaBuyBoxCheckboxes(rep);
   document.getElementById("area-buybox-section").hidden = rep.personType !== "Buyer";
 
@@ -3773,6 +3786,7 @@ document.getElementById("area-modal-save").addEventListener("click", async funct
     dealAreaCities: document.getElementById("area-dealarea-cities").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean),
     paymentEntityName: document.getElementById("area-payment-entity").value.trim(),
     paymentDriveLink: document.getElementById("area-payment-drivelink").value.trim(),
+    buyerContactConfirmed: document.getElementById("area-buyercontactconfirmed").checked,
     buyBox: {
       nationwide: document.getElementById("area-buybox-nationwide").checked,
       states: document.getElementById("area-buybox-states").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean),

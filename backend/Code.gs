@@ -83,7 +83,12 @@ const REP_COLUMNS = ['Username', 'Name', 'Phone', 'Email', 'PasswordHash', 'Salt
   // raw bank account/routing numbers in a sheet cell; PaymentDriveLink
   // points to a Doc/folder the rep controls and shares themselves,
   // containing that detail. Admin-only, see ADMIN_ONLY_REP_FIELDS.
-  'PaymentEntityName', 'PaymentDriveLink'];
+  'PaymentEntityName', 'PaymentDriveLink',
+  // Admin's own manual "yes, I've actually spoken with this Buyer account"
+  // flag -- only ever read when BUYER_ADDRESS_AUTO_DISCLOSE_MODE is
+  // 'on_after_contact' (see requestAddressAccess/publicRequestAddressAccess).
+  // Never set automatically by anything else.
+  'BuyerContactConfirmed'];
 
 // Never sent to any rep-facing response (getMyPitches, a rep's own
 // profile, anywhere else a rep session reads their own or another rep's
@@ -434,6 +439,10 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminGetAutoDiscloseAddressSettings));
       case 'adminSetAutoDiscloseAddress':
         return jsonOut(withAdminSession(body, adminSetAutoDiscloseAddress));
+      case 'adminGetBuyerAddressAutoDiscloseSettings':
+        return jsonOut(withAdminSession(body, adminGetBuyerAddressAutoDiscloseSettings));
+      case 'adminSetBuyerAddressAutoDisclose':
+        return jsonOut(withAdminSession(body, adminSetBuyerAddressAutoDisclose));
       case 'adminGetContactDefaults':
         return jsonOut(withAdminSession(body, adminGetContactDefaults));
       case 'adminSetContactDefaults':
@@ -2568,7 +2577,8 @@ function adminGetReps(body) {
       dealAreaStates: r['DealAreaStates'] || '', dealAreaCities: r['DealAreaCities'] || '',
       // Admin-only -- this whole function requires withAdminSession, so
       // it's safe to include here; never add these to any rep-facing list.
-      paymentEntityName: r['PaymentEntityName'] || '', paymentDriveLink: r['PaymentDriveLink'] || ''
+      paymentEntityName: r['PaymentEntityName'] || '', paymentDriveLink: r['PaymentDriveLink'] || '',
+      buyerContactConfirmed: r['BuyerContactConfirmed'] === true || r['BuyerContactConfirmed'] === 'TRUE'
     };
   });
   return { ok: true, reps: reps };
@@ -2743,15 +2753,15 @@ function requestAddressAccess(body, session) {
   if (!deal) return { ok: false, error: 'Deal not found.' };
 
   // A registered Buyer account (the actual end buyer, not a wholesaler/
-  // rep) gets the address instantly, always -- separate from and in
-  // addition to the site-wide "all_on_request" setting below, which
-  // covers everyone else. Admin still gets notified either way, with
-  // whatever Buyer Leads history overlaps this person (see
-  // buyerLeadContextEmailBlock) -- auto-granting doesn't mean admin
-  // doesn't get told it happened.
+  // rep) auto-grants per BUYER_ADDRESS_AUTO_DISCLOSE_MODE (see
+  // buyerAddressAutoGrantAllowed) -- separate from and in addition to the
+  // site-wide "all_on_request" setting below, which covers everyone else.
+  // Admin still gets notified either way, with whatever Buyer Leads
+  // history overlaps this person (see buyerLeadContextEmailBlock) --
+  // auto-granting doesn't mean admin doesn't get told it happened.
   const rep = findRepByUsername(session.u);
   const isRegisteredBuyer = rep && rep['PersonType'] === 'Buyer';
-  const autoGrant = isRegisteredBuyer || adminGetAutoDiscloseAddressSettings({}).mode === 'all_on_request';
+  const autoGrant = buyerAddressAutoGrantAllowed(rep) || adminGetAutoDiscloseAddressSettings({}).mode === 'all_on_request';
 
   if (autoGrant) {
     adminGrantAddressAccess({ dealId: body.dealId, username: session.u });
@@ -2803,7 +2813,7 @@ function publicRequestAddressAccess(body, session) {
   // setting is on.
   const rep = findRepByUsername(session.u);
   const isRegisteredBuyer = rep && rep['PersonType'] === 'Buyer';
-  const autoGrant = isRegisteredBuyer || adminGetAutoDiscloseAddressSettings({}).mode === 'all_on_request';
+  const autoGrant = buyerAddressAutoGrantAllowed(rep) || adminGetAutoDiscloseAddressSettings({}).mode === 'all_on_request';
 
   if (autoGrant) {
     adminGrantAddressAccess({ dealId: body.dealId, username: session.u });
@@ -4808,6 +4818,7 @@ function adminSetRepPreferredArea(body) {
   }
   if (body.paymentEntityName !== undefined) sheet.getRange(match._row, getColumnIndex(sheet, 'PaymentEntityName')).setValue(body.paymentEntityName || '');
   if (body.paymentDriveLink !== undefined) sheet.getRange(match._row, getColumnIndex(sheet, 'PaymentDriveLink')).setValue(body.paymentDriveLink || '');
+  if (body.buyerContactConfirmed !== undefined) sheet.getRange(match._row, getColumnIndex(sheet, 'BuyerContactConfirmed')).setValue(!!body.buyerContactConfirmed);
   if (body.personType !== undefined) {
     // Blank is allowed here (admin clearing/not setting it for an
     // internally-added rep) even though public signup itself requires a
@@ -4968,6 +4979,46 @@ function adminSetAutoDiscloseAddress(body) {
   const mode = AUTO_DISCLOSE_ADDRESS_MODES.indexOf(body.mode) !== -1 ? body.mode : 'off';
   props.setProperty('AUTO_DISCLOSE_ADDRESS_MODE', mode);
   return { ok: true };
+}
+
+// Separate from AUTO_DISCLOSE_ADDRESS_MODE above -- that one governs
+// wholesalers/reps ('all_on_request' etc). This one is specifically about
+// a registered Buyer account (the actual end buyer) requesting an address,
+// checked in requestAddressAccess/publicRequestAddressAccess:
+//   'off'             -- a Buyer follows the normal flow, same as anyone
+//                        else (manual grant, or the setting above if it's on).
+//   'on'              -- any Buyer gets the address instantly, always.
+//   'on_after_contact' -- only once admin has manually checked
+//                        BuyerContactConfirmed for that specific Buyer
+//                        account (Team tab -> Edit Details); before that,
+//                        falls back to the normal flow like 'off'.
+// Defaults to 'on' -- preserves the behavior this app already had (every
+// registered Buyer auto-granted, unconditionally) until admin dials it
+// back here.
+const BUYER_ADDRESS_AUTO_DISCLOSE_MODES = ['off', 'on', 'on_after_contact'];
+function adminGetBuyerAddressAutoDiscloseSettings(body) {
+  const props = PropertiesService.getScriptProperties();
+  const mode = props.getProperty('BUYER_ADDRESS_AUTO_DISCLOSE_MODE') || 'on';
+  return { ok: true, mode: BUYER_ADDRESS_AUTO_DISCLOSE_MODES.indexOf(mode) !== -1 ? mode : 'on' };
+}
+
+function adminSetBuyerAddressAutoDisclose(body) {
+  const props = PropertiesService.getScriptProperties();
+  const mode = BUYER_ADDRESS_AUTO_DISCLOSE_MODES.indexOf(body.mode) !== -1 ? body.mode : 'on';
+  props.setProperty('BUYER_ADDRESS_AUTO_DISCLOSE_MODE', mode);
+  return { ok: true };
+}
+
+// True only when BUYER_ADDRESS_AUTO_DISCLOSE_MODE actually allows this
+// specific Buyer account through right now -- shared by both
+// requestAddressAccess and publicRequestAddressAccess so the three modes
+// never drift out of sync between the two entry points.
+function buyerAddressAutoGrantAllowed(rep) {
+  if (!rep || rep['PersonType'] !== 'Buyer') return false;
+  const mode = adminGetBuyerAddressAutoDiscloseSettings({}).mode;
+  if (mode === 'off') return false;
+  if (mode === 'on') return true;
+  return rep['BuyerContactConfirmed'] === true || rep['BuyerContactConfirmed'] === 'TRUE';
 }
 
 // Shared by addInterestedBuyer -- grants every eligible active, non-admin
