@@ -4686,7 +4686,7 @@ function adminGetPitchesForDeal(body) {
 // without hunting through individual buyers first.
 function adminGetAllPitches(body) {
   const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
-  const pitches = sheetToObjects(pitchesSheet);
+  let pitches = sheetToObjects(pitchesSheet);
 
   const leadsSheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
   const leadsById = {};
@@ -4695,6 +4695,16 @@ function adminGetAllPitches(body) {
   const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
   const dealsById = {};
   sheetToObjects(dealsSheet).forEach(function (d) { dealsById[d['DealID']] = d; });
+
+  // A Dead deal's pitches aren't actionable -- nothing left to sell, so
+  // nothing here for admin to review across the whole team. Sold is
+  // deliberately kept (that's the record of what actually closed), only
+  // Dead is dropped. A pitch pointing at a deleted deal (dealsById has
+  // nothing for it) is also kept rather than guessed at either way.
+  pitches = pitches.filter(function (p) {
+    const deal = dealsById[p['DealID']];
+    return !deal || deal['Status'] !== 'Dead';
+  });
 
   pitches.forEach(function (p) {
     const lead = leadsById[p['BuyerLeadID']];
@@ -4718,6 +4728,11 @@ function adminGetAllPitches(body) {
 
   const contactsSheet = getSheet(BUYER_LEAD_CONTACTS_SHEET, BUYER_LEAD_CONTACT_COLUMNS);
   const allContacts = sheetToObjects(contactsSheet);
+
+  // Alphabetical by buyer name -- this table spans the whole team, so a
+  // fixed, predictable order matters more than "most recent first" the
+  // way a single rep's own queue would want.
+  pitches.sort(function (a, b) { return String(a.buyerName || '').localeCompare(String(b.buyerName || '')); });
 
   return { ok: true, pitches: pitchesWithStatus(pitches, allContacts, dealsById) };
 }
