@@ -417,6 +417,11 @@
       <select id="rep-deals-filter-category" style="flex:0 0 auto; min-width:180px;"><option value="">All Asset Categories</option></select>
     </div>
     <div class="banner warn" id="rep-deals-buybox-banner" hidden>No deals matching your buy box criteria yet — but here's everything we currently have available.</div>
+    <div class="nav-row" style="justify-content:flex-start; margin-bottom:10px; flex-wrap:wrap;">
+      <button class="btn secondary small" id="rep-checkall-buyermatches-btn">Check My Buyer Matches</button>
+      <span class="small-muted" id="rep-checkall-buyermatches-result"></span>
+    </div>
+    <p class="small-muted" style="margin-top:-4px; margin-bottom:10px;">Runs AI matching across every active deal you have access to, against buyers you have access to (your own uploads plus the shared pool) who are already marked Responsive — buyers with "potential" criteria saved but not yet confirmed Responsive aren't checked yet. Admin gets an email for anything found.</p>
     <div id="rep-deals-container"></div>
     <div id="rep-deals-empty" class="small-muted" style="padding:20px;" hidden>No deals assigned to you yet — check back soon.</div>
   </div>
@@ -551,7 +556,7 @@
       <div id="rep-mybuyerlist-give-result" class="small-muted"></div>
       <div style="overflow-x:auto; margin-top:10px;">
         <table class="crm-table" id="rep-mybuyerlist-table">
-          <thead><tr><th></th><th>Buyer / LLC</th><th>Phone</th><th>City, State</th><th>Asset Categories</th><th>Tagged Deal(s)</th><th>Notes</th><th>DNC</th></tr></thead>
+          <thead><tr><th></th><th>Buyer / LLC</th><th>Phone</th><th>City, State</th><th>Asset Categories</th><th>Tagged Deal(s)</th><th>Notes</th><th>Purchase Criteria</th><th>DNC</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>

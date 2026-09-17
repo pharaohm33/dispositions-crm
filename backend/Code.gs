@@ -309,6 +309,10 @@ function doPost(e) {
         return jsonOut(withSession(body, giveMySelectedBuyerLeads));
       case 'getVisibleBuyerCities':
         return jsonOut(withSession(body, getVisibleBuyerCities));
+      case 'repSetBuyerPurchaseCriteria':
+        return jsonOut(withSession(body, repSetBuyerPurchaseCriteria));
+      case 'repFindMyBuyerMatchesForDeal':
+        return jsonOut(withSession(body, repFindMyBuyerMatchesForDeal));
       case 'repUpdateMyBuyBox':
         return jsonOut(withSession(body, repUpdateMyBuyBox));
       case 'updateBuyerLeadNotes':
@@ -5743,6 +5747,36 @@ function adminSetBuyerPurchaseCriteria(body) {
   return { ok: true, parsed: parsed };
 }
 
+// Same as adminSetBuyerPurchaseCriteria, but only for a buyer this rep
+// personally uploaded -- someone else's private lead, or the shared pool,
+// isn't theirs to set criteria on. A rep who's talked to their own buyer
+// and confirmed real purchase criteria still needs to mark them Responsive
+// separately (updateBuyerLeadResponsive or a logged pitch response) --
+// saving criteria here doesn't do that on its own, so "potential" criteria
+// on a not-yet-responsive buyer is a completely normal, expected state.
+function repSetBuyerPurchaseCriteria(body, session) {
+  const buyerLeadId = body.buyerLeadId;
+  const rawText = String(body.rawText || '').trim();
+  if (!buyerLeadId) return { ok: false, error: 'Missing buyerLeadId.' };
+
+  const sheet = getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS);
+  const lead = sheetToObjects(sheet).find(function (l) { return l['BuyerLeadID'] === buyerLeadId; });
+  if (!lead) return { ok: false, error: 'Buyer lead not found.' };
+  if (String(lead['UploadedBy'] || '').trim().toLowerCase() !== session.u) {
+    return { ok: false, error: 'You can only set purchase criteria on a buyer you personally uploaded.' };
+  }
+
+  const parsed = rawText ? parsePurchaseCriteria(rawText) : null;
+  if (rawText && !parsed) {
+    return { ok: false, error: 'Could not analyze that text right now (DeepSeek unavailable). The raw text was not saved -- try again.' };
+  }
+  const now = new Date().toISOString();
+  sheet.getRange(lead._row, getColumnIndex(sheet, 'PurchaseCriteriaRaw')).setValue(rawText);
+  sheet.getRange(lead._row, getColumnIndex(sheet, 'PurchaseCriteriaParsed')).setValue(parsed ? JSON.stringify(parsed) : '');
+  sheet.getRange(lead._row, getColumnIndex(sheet, 'PurchaseCriteriaUpdatedAt')).setValue(now);
+  return { ok: true, parsed: parsed };
+}
+
 const BULK_CRITERIA_SEGMENT_PROMPT =
   'You read a block of free-form text that may describe ONE OR MORE real estate buyer/investor ' +
   'contacts and what they buy (names, companies, emails, phone numbers, and purchase criteria -- ' +
@@ -5952,14 +5986,110 @@ function adminFindBuyerMatches(body) {
   return { ok: true, matches: matches, consideredCount: capped.length, totalWithCriteria: leadsWithCriteria.length, statusBreakdown: statusBreakdown };
 }
 
-function notifyAdminOfBuyerMatches(deal, matches) {
+// Rep-facing version of adminFindBuyerMatches -- same Stage 1 (cheap
+// state/deal-type elimination) + Stage 2 (single DeepSeek call) approach,
+// just against a narrower pool: only buyers this rep can actually see
+// (their own uploads, plus the shared/admin-uploaded pool -- same
+// leadVisibleToUsername rule used everywhere else) AND already marked
+// Responsive. "Potential" criteria on a buyer who hasn't confirmed yet is
+// deliberately excluded here -- that's still useful context to have saved
+// (see repSetBuyerPurchaseCriteria), just not something to spend a
+// DeepSeek call matching against until it's confirmed real. Same
+// admin-notification-on-match behavior as the admin version.
+function repFindMyBuyerMatchesForDeal(body, session) {
+  const dealId = body.dealId;
+  if (!dealId) return { ok: false, error: 'Missing dealId.' };
+  if (!canAccessDeal(session, dealId)) return { ok: false, error: 'You do not have access to this deal.' };
+
+  const deal = sheetToObjects(getSheet(DEALS_SHEET, DEAL_COLUMNS)).find(function (d) { return d['DealID'] === dealId; });
+  if (!deal) return { ok: false, error: 'Deal not found.' };
+
+  const leadsWithCriteria = sheetToObjects(getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS)).filter(function (l) {
+    return l['PurchaseCriteriaRaw'] && (l['IsResponsive'] === true || l['IsResponsive'] === 'TRUE') && leadVisibleToUsername(l, session.u);
+  });
+  if (!leadsWithCriteria.length) return { ok: true, matches: [], totalConsidered: 0 };
+
+  const dealState = normalizeText(deal['State']);
+  const dealDealTypes = splitCommaList(deal['DealTypes']).map(normalizeText);
+  const candidates = leadsWithCriteria.filter(function (l) {
+    let parsed = null;
+    try { parsed = JSON.parse(l['PurchaseCriteriaParsed'] || 'null'); } catch (e) {}
+    if (!parsed) return true;
+    if (parsed.nationwide) return true;
+    const states = (parsed.states || []).map(normalizeText);
+    if (states.length && dealState && states.indexOf(dealState) === -1) return false;
+    if (parsed.deal_types && parsed.deal_types.length && dealDealTypes.length) {
+      const overlap = parsed.deal_types.map(normalizeText).some(function (t) { return dealDealTypes.indexOf(t) !== -1; });
+      if (!overlap) return false;
+    }
+    return true;
+  });
+  if (!candidates.length) return { ok: true, matches: [], totalConsidered: leadsWithCriteria.length };
+
+  const capped = candidates.slice(0, 40);
+  const byId = {};
+  capped.forEach(function (l) { byId[l['BuyerLeadID']] = l; });
+
+  const dealSummary = 'Deal: ' + [deal['City'], deal['State'], deal['Zip']].filter(Boolean).join(', ') +
+    (deal['County'] ? ' (' + deal['County'] + ' County)' : '') +
+    (deal['AssetCategory'] ? ' | Asset Category: ' + deal['AssetCategory'] : '') +
+    (deal['AssetType'] ? ' | Asset Type: ' + deal['AssetType'] : '') +
+    (deal['DealTypes'] ? ' | Deal Type: ' + deal['DealTypes'] : '') +
+    (deal['Price'] ? ' | Asking Price: ' + deal['Price'] : '') +
+    (deal['Description'] ? ' | Description: ' + deal['Description'] : '');
+
+  const buyersBlock = capped.map(function (l, i) {
+    return (i + 1) + '. BuyerLeadID=' + l['BuyerLeadID'] + ' -- ' + l['PurchaseCriteriaRaw'];
+  }).join('\n');
+
+  const systemPrompt =
+    'You compare ONE real estate deal against a numbered list of buyers\' stated purchase criteria. ' +
+    'For EACH buyer, decide exactly one verdict: ' +
+    '"criteria_match" (the deal clearly satisfies everything concrete they stated -- location, size, price, asset type), ' +
+    '"potential_match" (their stated criteria is too vague/incomplete to be sure either way, or the deal fits some but not all of what they stated), ' +
+    'or "no_match" (a stated requirement is clearly violated -- wrong area, wrong asset type, size or price clearly outside their range). ' +
+    'Return ONLY JSON: {"results": [{"buyerLeadId": "...", "verdict": "criteria_match"|"potential_match"|"no_match", "reason": "one short sentence"}]} ' +
+    '-- exactly one entry per buyer listed, omit none.';
+
+  const result = deepSeekChatJSON(systemPrompt, dealSummary + '\n\nBuyers:\n' + buyersBlock);
+  if (!result || !Array.isArray(result.results)) {
+    return { ok: false, error: 'AI matching is unavailable right now. Try again shortly.' };
+  }
+
+  const matches = result.results
+    .filter(function (r) { return r.verdict === 'criteria_match' || r.verdict === 'potential_match'; })
+    .map(function (r) {
+      const l = byId[r.buyerLeadId];
+      if (!l) return null;
+      return {
+        buyerLeadId: r.buyerLeadId,
+        buyerName: l['BuyerName'],
+        phone: l['Phone'],
+        email: l['Email'],
+        verdict: r.verdict,
+        label: r.verdict === 'criteria_match' ? 'Buyer Purchase Criteria Match' : 'Potential Buyer Match',
+        reason: r.reason || '',
+        uploadedBy: l['UploadedBy'] || ''
+      };
+    })
+    .filter(Boolean);
+
+  matches.sort(function (a, b) { return (a.verdict === 'criteria_match' ? 0 : 1) - (b.verdict === 'criteria_match' ? 0 : 1); });
+
+  if (matches.length > 0) notifyAdminOfBuyerMatches(deal, matches, session);
+
+  return { ok: true, matches: matches, consideredCount: capped.length, totalConsidered: leadsWithCriteria.length };
+}
+
+function notifyAdminOfBuyerMatches(deal, matches, session) {
   const supportEmail = getSupportEmail();
   if (!supportEmail) return;
   try {
     MailApp.sendEmail({
       to: supportEmail,
       subject: 'SendMyBuyer -- AI found ' + matches.length + ' buyer match(es) for ' + (deal['DealCode'] || deal['DealID']),
-      body: 'AI Buyer Matches found the following for ' + (deal['DealCode'] || deal['DealID']) +
+      body: (session ? 'Run by ' + (session.n || session.u) + '. ' : '') +
+        'AI Buyer Matches found the following for ' + (deal['DealCode'] || deal['DealID']) +
         ' (' + [deal['City'], deal['State']].filter(Boolean).join(', ') + '):\n\n' +
         matches.map(function (m) {
           return '- ' + m.label + ': ' + m.buyerName + (m.phone ? ' / ' + m.phone : '') + (m.email ? ' / ' + m.email : '') +

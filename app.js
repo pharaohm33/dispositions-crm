@@ -992,6 +992,30 @@ function dealCardHtml(d) {
       '</div>';
 }
 
+document.getElementById("rep-checkall-buyermatches-btn").addEventListener("click", async function () {
+  const btn = this;
+  const resultEl = document.getElementById("rep-checkall-buyermatches-result");
+  if (btn.disabled) return;
+  const activeDeals = repDeals.filter(function (d) { return d.Status !== "Dead" && d.Status !== "Sold"; });
+  if (activeDeals.length === 0) { resultEl.textContent = " No active deals to check."; return; }
+  btn.disabled = true;
+
+  let dealsWithMatches = 0;
+  let totalMatches = 0;
+  let errorCount = 0;
+  for (let i = 0; i < activeDeals.length; i++) {
+    resultEl.textContent = " Checking deal " + (i + 1) + " of " + activeDeals.length + "…";
+    const res = await api("repFindMyBuyerMatchesForDeal", { dealId: activeDeals[i].DealID });
+    if (!res.ok) { errorCount++; continue; }
+    if (res.matches && res.matches.length > 0) { dealsWithMatches++; totalMatches += res.matches.length; }
+  }
+
+  btn.disabled = false;
+  resultEl.textContent = " Checked " + activeDeals.length + " deal(s) — " + totalMatches + " match(es) across " + dealsWithMatches + " deal(s)." +
+    (errorCount > 0 ? " " + errorCount + " couldn't be checked." : "");
+  showToast(dealsWithMatches > 0 ? "Found matches on " + dealsWithMatches + " deal(s) — admin's been notified." : "No matches found.");
+});
+
 async function openRepDealDetail(dealId) {
   const overlay = document.getElementById("detail-overlay");
   const panel = document.getElementById("detail-panel");
@@ -2237,6 +2261,10 @@ function renderMyBuyerLeadsList() {
       '<td class="small-muted">' + esc(l.AssetCategories || "") + '</td>' +
       '<td class="small-muted">' + (dealTags.length > 0 ? esc(dealTags.map(repDealLabelFor).join(", ")) : "&mdash;") + (dealTypeTagsHtml(l.DealTypes) ? '<div style="margin-top:4px;">' + dealTypeTagsHtml(l.DealTypes) + '</div>' : "") + '</td>' +
       '<td><input type="text" class="mybuyerlist-notes-input" data-lead-id="' + esc(l.BuyerLeadID) + '" value="' + esc(l.GeneralNotes || "") + '" placeholder="Add a note..." style="width:100%;"></td>' +
+      '<td>' +
+        '<input type="text" class="mybuyerlist-criteria-input" data-lead-id="' + esc(l.BuyerLeadID) + '" value="' + esc(l.PurchaseCriteriaRaw || "") + '" placeholder="e.g. Land within 1hr of Greensboro NC, 1+ acre" style="width:100%;">' +
+        (l.PurchaseCriteriaRaw ? '<div class="small-muted" style="margin-top:2px;">' + (l.PurchaseCriteriaParsed ? "Analyzed" : "Save to analyze") + '</div>' : "") +
+      '</td>' +
       '<td><label class="toggle-row"><input type="checkbox" class="mybuyerlist-dnc-toggle" data-lead-id="' + esc(l.BuyerLeadID) + '"' + (isDnc ? " checked" : "") + '></label></td>' +
       '</tr>';
   }).join("");
@@ -2260,6 +2288,17 @@ function renderMyBuyerLeadsList() {
       const lead = repMyBuyerLeads.find(function (l) { return l.BuyerLeadID === cb.getAttribute("data-lead-id"); });
       if (lead) lead.DoNotContact = cb.checked;
       showToast(cb.checked ? "Marked Do Not Contact." : "Do Not Contact removed.");
+    });
+  });
+  Array.from(tbody.querySelectorAll(".mybuyerlist-criteria-input")).forEach(function (input) {
+    input.addEventListener("change", async function () {
+      const leadId = input.getAttribute("data-lead-id");
+      const res = await api("repSetBuyerPurchaseCriteria", { buyerLeadId: leadId, rawText: input.value.trim() });
+      if (!res.ok) { showToast(res.error || "Could not save purchase criteria.", true); return; }
+      const lead = repMyBuyerLeads.find(function (l) { return l.BuyerLeadID === leadId; });
+      if (lead) { lead.PurchaseCriteriaRaw = input.value.trim(); lead.PurchaseCriteriaParsed = res.parsed ? JSON.stringify(res.parsed) : ""; }
+      showToast("Purchase criteria saved.");
+      renderMyBuyerLeadsList();
     });
   });
 }
