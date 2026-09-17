@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Purmela, TX — 2.01 Acres, Pole Barn, Shop &amp; House | JNA Dynamic Holdings LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e9;
+    --paper-dark:#efe7d8;
+    --ink:#2b2620;
+    --ink-soft:#5a5346;
+    --line:#d9cfba;
+    --accent:#8a5a34;
+    --accent-dark:#5f3d22;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Source Sans 3',sans-serif;
+    font-size:16px;
+    line-height:1.55;
+  }
+  h1,h2,h3,.serif{
+    font-family:'Playfair Display',serif;
+  }
+  .wrap{
+    max-width:960px;
+    margin:0 auto;
+    padding-left:24px;
+    padding-right:24px;
+  }
+  header.top{
+    padding-top:48px;
+    padding-bottom:28px;
+    border-bottom:1px solid var(--line);
+  }
+  .deal-code{
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    font-size:13px;
+    color:var(--accent-dark);
+    font-weight:600;
+    margin-bottom:10px;
+  }
+  h1{
+    font-size:40px;
+    line-height:1.15;
+    margin:0 0 10px 0;
+    color:var(--ink);
+  }
+  .location-line{
+    font-size:18px;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .address-note{
+    display:inline-block;
+    background:var(--paper-dark);
+    border:1px solid var(--line);
+    padding:8px 14px;
+    border-radius:4px;
+    font-size:14.5px;
+    color:var(--accent-dark);
+    margin-top:10px;
+    margin-bottom:6px;
+  }
+  .assignment-tag{
+    font-size:14px;
+    color:var(--ink-soft);
+    font-style:italic;
+    margin-top:10px;
+  }
+
+  section{
+    padding-top:36px;
+    padding-bottom:36px;
+    border-bottom:1px solid var(--line);
+  }
+  section.last{
+    border-bottom:none;
+  }
+
+  .price-block{
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+    margin-top:18px;
+  }
+  .price-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:18px 22px;
+    flex:1 1 200px;
+  }
+  .price-card .label{
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .price-card .value{
+    font-family:'Playfair Display',serif;
+    font-size:26px;
+    color:var(--accent-dark);
+  }
+  .price-card.main{
+    background:var(--accent-dark);
+    border-color:var(--accent-dark);
+  }
+  .price-card.main .label{color:#e8dcc7;}
+  .price-card.main .value{color:#fff;font-size:30px;}
+
+  .sub-note{
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:16px;
+  }
+
+  h2.section-title{
+    font-size:26px;
+    margin-top:0;
+    margin-bottom:18px;
+    color:var(--ink);
+  }
+
+  .gallery{
+    display:flex;
+    gap:14px;
+    overflow-x:auto;
+    padding-bottom:12px;
+    margin-top:18px;
+    scroll-snap-type:x mandatory;
+  }
+  .gallery img{
+    height:260px;
+    width:auto;
+    border-radius:6px;
+    border:1px solid var(--line);
+    scroll-snap-align:start;
+    flex-shrink:0;
+  }
+  .more-photos{
+    display:inline-block;
+    margin-top:12px;
+    font-size:14px;
+    color:var(--accent-dark);
+    text-decoration:underline;
+  }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    background:#fff;
+    border:1px solid var(--line);
+  }
+  table caption{
+    text-align:left;
+    font-family:'Playfair Display',serif;
+    font-size:20px;
+    margin-bottom:10px;
+    caption-side:top;
+  }
+  td, th{
+    padding:10px 14px;
+    border-bottom:1px solid var(--line);
+    text-align:left;
+    font-size:15px;
+    vertical-align:top;
+  }
+  tr:last-child td, tr:last-child th{border-bottom:none;}
+  th{
+    width:40%;
+    color:var(--ink-soft);
+    font-weight:600;
+    background:var(--paper-dark);
+  }
+
+  ul.clean{
+    padding-left:20px;
+    margin-top:8px;
+  }
+  ul.clean li{
+    margin-bottom:8px;
+  }
+
+  .comp{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:14px 18px;
+    margin-bottom:12px;
+  }
+  .comp .comp-title{
+    font-weight:600;
+    color:var(--accent-dark);
+    margin-bottom:4px;
+  }
+
+  .disclosure{
+    background:var(--paper-dark);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:18px 20px;
+    font-size:14px;
+    color:var(--ink-soft);
+  }
+  .disclosure p{margin:0 0 12px 0;}
+  .disclosure p:last-child{margin-bottom:0;}
+
+  .cta-band{
+    background:var(--accent-dark);
+    color:#fdf8ee;
+    padding-top:48px;
+    padding-bottom:48px;
+  }
+  .cta-band h2{
+    color:#fff;
+    margin-top:0;
+    margin-bottom:12px;
+    font-size:30px;
+  }
+  .cta-band p{
+    font-size:17px;
+    margin-bottom:20px;
+    color:#f0e6d2;
+  }
+  .cta-contacts{
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+  }
+  .cta-contacts a{
+    color:#fff;
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.35);
+    padding:12px 20px;
+    border-radius:5px;
+    text-decoration:none;
+    font-size:16px;
+    font-weight:600;
+  }
+  footer.legal{
+    padding-top:24px;
+    padding-bottom:40px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+</style>
+</head>
+<body><div style="max-width:640px;margin:0 auto 20px;padding:20px 24px;text-align:center;font-family:Arial,sans-serif;border-bottom:1px solid #ddd;"><p style="color:#444;margin-bottom:16px;">Addresses are shared with wholesalers who already have an interested buyer for this deal, or with direct buyers reviewing this listing. Log in or create a free account to request it.</p><a href="https://sendmybuyer.com/?requestAddress=4314315b-ee4b-4447-8bcd-49018352215f&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F4314315b-ee4b-4447-8bcd-49018352215f.html" style="display:inline-block;padding:12px 28px;background:#1a73e8;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;">Request the Address</a><p style="margin-top:16px;"><a href="https://sendmybuyer.com" style="color:#1a73e8;">Log in</a> &nbsp;&middot;&nbsp; <a href="https://sendmybuyer.com" style="color:#1a73e8;">Browse all deals</a></p><p style="color:#888;font-size:0.9em;margin-top:20px;">Interested in this deal? This listing isn't searchable once you leave — <strong>save or bookmark this page's link</strong> before heading to the home page, so you can find your way back to it.</p></div>
+
+<div class="wrap">
+  <header class="top">
+    <div class="deal-code">Deal Code: TX - 2 (SFH)</div>
+    <h1>2.01 Unrestricted Acres — House, 40x60 Pole Barn &amp; Separate Shop</h1>
+    <div class="location-line">Purmela, TX 76566 &nbsp;·&nbsp; Coryell County &nbsp;·&nbsp; Evant ISD</div>
+    <div class="address-note">Address available upon request — contact us and we'll send the full property address.</div>
+    <div class="assignment-tag">This offering is an assignment of contract — see Wholesale Disclosure below.</div>
+  </header>
+
+  <section>
+    <h2 class="section-title">The Numbers</h2>
+    <div class="price-block">
+      <div class="price-card main">
+        <div class="label">Asking Price</div>
+        <div class="value">$145,000</div>
+      </div>
+      <div class="price-card">
+        <div class="label">ARV (Adjusted, Comp Report)</div>
+        <div class="value">$303,000</div>
+      </div>
+      <div class="price-card">
+        <div class="label">Rehab Budget</div>
+        <div class="value">$55,000</div>
+      </div>
+    </div>
+    <div class="sub-note">
+      Comp report range: $288,026 to $318,344, with an adjusted value of $303,185. Comparable average price per square foot: $328. Price per square foot at asking, house only: $153. Annual property taxes: $1,288.68.
+      No formal rehab scope was provided by the seller on this one — the $55,000 figure is a planning-level estimate; buyer should run their own scope and numbers before closing.
+    </div>
+    <div class="sub-note">
+      Important note on the ARV: the comp report values the house and the land. It does not appear to account for the pole barn or the separate shop. Outbuildings of this size carry real value in rural Coryell County, so underwrite them yourself rather than assuming the report captured them.
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Photos</h2>
+    <div class="gallery">
+      <img src="/deals/4314315b-ee4b-4447-8bcd-49018352215f/photos/1.jpg" alt="Purmela, TX property photo 1">
+      <img src="/deals/4314315b-ee4b-4447-8bcd-49018352215f/photos/2.jpg" alt="Purmela, TX property photo 2">
+      <img src="/deals/4314315b-ee4b-4447-8bcd-49018352215f/photos/3.jpg" alt="Purmela, TX property photo 3">
+      <img src="/deals/4314315b-ee4b-4447-8bcd-49018352215f/photos/4.jpg" alt="Purmela, TX property photo 4">
+      <img src="/deals/4314315b-ee4b-4447-8bcd-49018352215f/photos/5.jpg" alt="Purmela, TX property photo 5">
+      <img src="/deals/4314315b-ee4b-4447-8bcd-49018352215f/photos/6.jpg" alt="Purmela, TX property photo 6">
+      <img src="/deals/4314315b-ee4b-4447-8bcd-49018352215f/photos/7.jpg" alt="Purmela, TX property photo 7">
+      <img src="/deals/4314315b-ee4b-4447-8bcd-49018352215f/photos/8.jpg" alt="Purmela, TX property photo 8">
+      <img src="/deals/4314315b-ee4b-4447-8bcd-49018352215f/photos/9.jpg" alt="Purmela, TX property photo 9">
+      <img src="/deals/4314315b-ee4b-4447-8bcd-49018352215f/photos/10.jpg" alt="Purmela, TX property photo 10">
+      <img src="/deals/4314315b-ee4b-4447-8bcd-49018352215f/photos/11.jpg" alt="Purmela, TX property photo 11">
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Property Snapshot</h2>
+    <table>
+      <tr><th>Location</th><td>Purmela, TX 76566 — address available upon request</td></tr>
+      <tr><th>County</th><td>Coryell County</td></tr>
+      <tr><th>Beds / Baths</th><td>2 Bed / 1 Bath, plus a small laundry room</td></tr>
+      <tr><th>Square Feet</th><td>960 sq ft</td></tr>
+      <tr><th>Lot Size</th><td>2.01 acres</td></tr>
+      <tr><th>Year Built</th><td>1965</td></tr>
+      <tr><th>Stories</th><td>1</td></tr>
+      <tr><th>Pole Barn</th><td>Approximately 40 x 60 ft, roughly 2,400 sq ft of covered space — dimensions are approximate and have not yet been formally measured</td></tr>
+      <tr><th>Shop</th><td>Separate shop building on site; dimensions not yet measured</td></tr>
+      <tr><th>Roof</th><td>Replaced approximately 10 years ago by the current owner, at a reported cost of around $12,000</td></tr>
+      <tr><th>School District</th><td>Evant ISD</td></tr>
+      <tr><th>Subdivision</th><td>Wm Slade</td></tr>
+      <tr><th>Parcel Number</th><td>108374</td></tr>
+      <tr><th>Legal Description</th><td>0943 WM SLADE, ACRES 2.01</td></tr>
+      <tr><th>Zoning</th><td>None on record</td></tr>
+      <tr><th>HOA</th><td>None</td></tr>
+      <tr><th>Fireplace</th><td>No</td></tr>
+      <tr><th>Annual Property Taxes</th><td>$1,288.68</td></tr>
+    </table>
+    <div class="sub-note">Outbuilding dimensions above are approximate and provided in good faith. Exact measurements are being taken and will be circulated when confirmed. Buyer to verify all dimensions independently.</div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Condition — What We Know and What We Do Not</h2>
+    <p>What we know: the roof is roughly ten years old, replaced by the owner rather than a flip-job patch, at a reported cost of about $12,000.</p>
+    <p>What we do not have: no condition report has been provided on the interior, exterior, foundation, electrical, plumbing, or HVAC. Records do not specify water source or sewer system. On rural Coryell County acreage, plan on a private well and a septic system until an inspection proves otherwise, and get both evaluated before closing. A failed septic system or a dry well is a five-figure problem and is the biggest single variable on a property like this.</p>
+    <p>This is an as-is transaction. No representation is made as to the condition of any system, structure, or component.</p>
+  </section>
+
+  <section>
+    <h2 class="section-title">Closed Comps — Coryell / Hamilton County Area</h2>
+    <div class="comp">
+      <div class="comp-title">County Road 158, Evant, TX</div>
+      Sold $425,000 on 05/02/2025 — 2 Bed / 2 Bath / 1,176 sq ft / Built 1965 / $361 per sq ft / 7.3 mi from subject. Comp report adjusts this sale to $357,873 after accounting for lot size and bath count.
+    </div>
+    <div class="comp">
+      <div class="comp-title">FM 183, Evant, TX</div>
+      Sold $255,000 on 05/01/2025 — 2 Bed / 1 Bath / 900 sq ft / Built 2015 / $283 per sq ft / 4.6 mi from subject. Comp report adjusts this sale to $248,497 after accounting for lot size and bath count.
+    </div>
+    <div class="sub-note">
+      Blended, adjusted value across both comps: $303,185. Be a grown-up about this comp set — two sales, roughly sixteen months old, four to seven miles out, both on more acreage than the subject. That is what rural Coryell County gives you, and it is why anybody buying out here underwrites the land and the improvements first. Buyer should pull their own comps.
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Why the Barn Is the Deal</h2>
+    <p>Two acres with no zoning and no HOA, with roughly 2,400 square feet of pole barn and a separate shop already standing. Consider what that supports: equipment storage, a contractor's yard, RV and boat storage in a stretch of Texas where that demand is real, a working shop for a trades buyer, covered space for livestock or hay, or a buyer who wants to run a business off the property while living on it — exactly what unrestricted rural acreage exists for. Price a new 40x60 pole barn today, then compare that to what this whole property costs.</p>
+  </section>
+
+  <section>
+    <h2 class="section-title">Exit Strategies</h2>
+    <ul class="clean">
+      <li><strong>Fix and hold:</strong> Rehab the house, hold the acreage and outbuildings — rural Coryell County rental demand runs off Fort Cavazos and the Copperas Cove corridor.</li>
+      <li><strong>Fix and flip:</strong> Renovate and resell to a buyer who wants two unrestricted acres, a shop, and a barn with a house already on it.</li>
+      <li><strong>Owner finance exit:</strong> Rural Texas acreage with a house, a barn, and a shop is one of the stronger owner-finance products in this market, and the property sits in Evant ISD.</li>
+      <li><strong>Storage or trades income:</strong> No zoning on record and no HOA; buyer to confirm Coryell County requirements before commercial use.</li>
+      <li><strong>Second dwelling:</strong> Buyer to confirm septic capacity, setback, and permitting with Coryell County before planning any additional structure.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="section-title">Deal Terms</h2>
+    <table>
+      <tr><th>Asking Price</th><td>$145,000</td></tr>
+      <tr><th>EMD</th><td>$5,000, non-refundable</td></tr>
+      <tr><th>COE</th><td>October 15, 2026 or sooner</td></tr>
+      <tr><th>Title Company</th><td>Nu World Title (contact: Sally Schopp)</td></tr>
+      <tr><th>Condition of Sale</th><td>Sold as-is</td></tr>
+      <tr><th>Financing</th><td>Cash or hard money only</td></tr>
+      <tr><th>Transaction Coordination Fee</th><td>$425, paid by buyer</td></tr>
+      <tr><th>Access &amp; Occupancy</th><td>Contact for current status</td></tr>
+    </table>
+  </section>
+
+  <section class="last">
+    <h2 class="section-title">Wholesale Disclosure</h2>
+    <div class="disclosure">
+      <p>JNA Dynamic Holdings LLC is not the record owner of this property. We hold, or are in the process of holding, an equitable interest in the property under a purchase and sale agreement, and we are marketing that equitable interest for assignment. We are not a licensed Texas real estate broker or sales agent, and we are not acting as an agent for the seller or for any buyer.</p>
+      <p>Texas Property Code Section 5.086 requires that a person selling an option or assigning an interest in a contract to purchase real property disclose to any potential buyer that they are selling only an option or assigning an interest in a contract and do not hold legal title to the real property. Earnest money on an assignment of contract is non-refundable.</p>
+      <p>All figures above are gathered from comparable sales reports, county tax records, and other public and third-party sources, and have not been independently verified by JNA Dynamic Holdings LLC. Outbuilding dimensions are approximate and unverified. Buyer to perform their own due diligence on condition, square footage, structure dimensions, acreage, water source, septic system, mineral rights, easements, permit history, title, liens, and value.</p>
+    </div>
+  </section>
+</div>
+
+<div class="cta-band">
+  <div class="wrap">
+    <h2 class="serif">Two Unrestricted Acres. A House, a Barn, and a Shop.</h2>
+    <p>2.01 acres, a 40x60 pole barn, a separate shop, a house with a ten-year-old roof, Evant ISD, no HOA, no zoning, $1,288.68 a year in taxes. Asking $145,000. Reach out today for the full address and to move this one forward.</p>
+    <div class="cta-contacts">
+      <a href="tel:5206336437">Call / Text: 520-633-6437</a>
+      <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <footer class="legal">
+    Marketed by JNA Dynamic Holdings LLC. This is an assignment of contract; JNA Dynamic Holdings LLC holds or is acquiring equitable interest only and is not the underlying property owner. Figures presented have not been independently verified by JNA Dynamic Holdings LLC. Buyer to conduct independent due diligence prior to closing.
+  </footer>
+</div>
+
+</body>
+</html>
