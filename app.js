@@ -5769,7 +5769,14 @@ let pitchesCurrentPage = 1;
 async function initAdminPitchesTab() {
   const [repsRes, dealsRes] = await Promise.all([api("adminGetReps", {}), api("getDeals", {})]);
   if (repsRes.ok) pitchesFilterRepsCache = repsRes.reps;
-  if (dealsRes.ok) pitchesFilterDealsCache = dealsRes.deals;
+  // Dead deals have no pitches left in this table to filter down to (see
+  // adminGetAllPitches on the backend), so leaving them in this dropdown
+  // just adds dead-end options. Sold stays since Sold pitches are kept.
+  if (dealsRes.ok) {
+    pitchesFilterDealsCache = dealsRes.deals
+      .filter(function (d) { return d.Status !== "Dead"; })
+      .sort(function (a, b) { return String(a.DealCode || a.Address || "").localeCompare(String(b.DealCode || b.Address || "")); });
+  }
 
   document.getElementById("pitches-filter-rep").innerHTML = '<option value="">All Team Members</option>' +
     pitchesFilterRepsCache.map(function (r) { return '<option value="' + esc(r.username) + '">' + esc(r.name) + (r.isAdmin ? " — Admin" : "") + '</option>'; }).join("");
