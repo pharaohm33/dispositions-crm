@@ -3,310 +3,322 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Currituck Club Golf Homesite — Corolla, NC | 0.38± Acres</title>
+<title>The Currituck Club Golf Homesite — Corolla, NC | 0.38± Acres | JNA Dynamic Holdings LLC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --paper:#f7f2ea;
-    --ink:#2a2521;
-    --ink-soft:#5c534a;
-    --line:#ddd3c2;
-    --accent:#6f7c50;
-    --card:#fffdf9;
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background-color: #f6f1e9;
+    color: #2b2622;
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
   }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    background:var(--paper);
-    color:var(--ink);
-    font-family:'Inter',sans-serif;
-    font-size:16px;
-    line-height:1.55;
+  h1, h2, h3 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    color: #1f2a22;
+    margin-top: 0;
+    margin-bottom: 0.4em;
   }
-  h1,h2,h3,h4{
-    font-family:'Fraunces',serif;
-    font-weight:600;
-    color:var(--ink);
-    line-height:1.15;
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 28px;
   }
-  .wrap{
-    max-width:920px;
-    margin:0 auto;
-    padding:0 24px;
+  a { color: #6b4a2a; }
+
+  header.top {
+    background: #1f2a22;
+    padding-top: 18px;
+    padding-bottom: 18px;
   }
-  header.top{
-    background:var(--ink);
-    color:var(--paper);
-    padding-top:14px;
-    padding-bottom:14px;
+  header.top .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
   }
-  header.top .wrap{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:8px;
+  header.top .brand {
+    color: #f6f1e9;
+    font-family: 'Fraunces', serif;
+    font-size: 1.25rem;
+    letter-spacing: 0.02em;
   }
-  header.top .brand{
-    font-family:'Fraunces',serif;
-    font-size:18px;
-    letter-spacing:0.03em;
+  header.top .brand span {
+    color: #c9a35d;
   }
-  header.top .tag{
-    font-size:13px;
-    color:#c9c1b3;
+  header.top .contact-mini {
+    color: #e7ded0;
+    font-size: 0.9rem;
   }
-  .hero{
-    padding-top:48px;
-    padding-bottom:20px;
+  header.top .contact-mini a { color: #e7ded0; text-decoration: none; }
+
+  section.hero {
+    margin-top: 44px;
+    margin-bottom: 30px;
   }
-  .kicker{
-    text-transform:uppercase;
-    letter-spacing:0.14em;
-    font-size:12px;
-    color:var(--accent);
-    font-weight:600;
-    margin-bottom:10px;
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.78rem;
+    color: #8a7a5c;
+    font-weight: 600;
+    margin-bottom: 14px;
   }
-  h1.title{
-    font-size:40px;
-    margin-top:0;
-    margin-bottom:14px;
+  h1.title {
+    font-size: 2.6rem;
+    line-height: 1.15;
   }
-  .loc-line{
-    font-size:17px;
-    color:var(--ink-soft);
-    margin-bottom:6px;
+  .locline {
+    font-size: 1.15rem;
+    color: #4a4237;
+    margin-bottom: 10px;
   }
-  .addr-note{
-    font-size:14.5px;
-    color:var(--ink-soft);
-    font-style:italic;
-    border-left:3px solid var(--accent);
-    padding-left:12px;
-    margin-top:14px;
-    margin-bottom:0;
+  .addr-note {
+    display: inline-block;
+    background: #efe4cd;
+    border: 1px solid #d8c9a3;
+    color: #6b551f;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 0.92rem;
+    margin-top: 8px;
+    margin-bottom: 20px;
   }
-  .price-block{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:6px;
-    padding:22px 26px;
-    margin-top:26px;
-    margin-bottom:8px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:14px;
+
+  .price-block {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 18px;
+    background: #ffffff;
+    border: 1px solid #e3d9c4;
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-top: 20px;
+    margin-bottom: 22px;
   }
-  .price-block .amount{
-    font-family:'Fraunces',serif;
-    font-size:38px;
-    font-weight:700;
-    color:var(--ink);
+  .price-block .price {
+    font-family: 'Fraunces', serif;
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: #1f2a22;
   }
-  .price-block .amount span{
-    font-size:14px;
-    display:block;
-    font-family:'Inter',sans-serif;
-    font-weight:500;
-    color:var(--ink-soft);
-    text-transform:uppercase;
-    letter-spacing:0.08em;
-    margin-bottom:4px;
+  .price-block .price-label {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.75rem;
+    color: #8a7a5c;
+    display: block;
+    margin-bottom: 4px;
   }
-  .price-block .chips{
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
+  .price-block .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
   }
-  .chip{
-    background:#eee7d8;
-    border:1px solid var(--line);
-    color:var(--ink-soft);
-    font-size:12.5px;
-    padding:6px 11px;
-    border-radius:20px;
-    text-transform:uppercase;
-    letter-spacing:0.04em;
+  .tag {
+    background: #f1eadb;
+    border: 1px solid #ddceac;
+    color: #4a4237;
+    font-size: 0.78rem;
+    padding: 5px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
   }
-  .gallery{
-    display:flex;
-    gap:12px;
-    overflow-x:auto;
-    padding-top:20px;
-    padding-bottom:10px;
-    -webkit-overflow-scrolling:touch;
+
+  .highlights {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px 20px;
+    margin-top: 18px;
+    margin-bottom: 10px;
+    list-style: none;
+    padding-left: 0;
   }
-  .gallery img{
-    height:230px;
-    width:auto;
-    border-radius:6px;
-    border:1px solid var(--line);
-    flex-shrink:0;
-    object-fit:cover;
+  .highlights li {
+    font-size: 0.95rem;
+    color: #3b352c;
+    padding-left: 18px;
+    position: relative;
   }
-  .more-photos{
-    display:inline-block;
-    margin-top:8px;
-    font-size:13.5px;
-    color:var(--accent);
-    text-decoration:underline;
+  .highlights li::before {
+    content: "◆";
+    color: #b98a3f;
+    font-size: 0.6rem;
+    position: absolute;
+    left: 0;
+    top: 6px;
   }
-  section{
-    margin-top:46px;
-    margin-bottom:0;
+
+  section.gallery {
+    margin-top: 30px;
+    margin-bottom: 30px;
   }
-  section h2{
-    font-size:26px;
-    margin-top:0;
-    margin-bottom:16px;
-    border-bottom:2px solid var(--line);
-    padding-bottom:10px;
+  .gallery-scroll {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-snap-type: x mandatory;
   }
-  p{
-    color:var(--ink-soft);
-    margin-top:0;
-    margin-bottom:14px;
+  .gallery-scroll img {
+    height: 320px;
+    width: auto;
+    border-radius: 8px;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+    border: 1px solid #e3d9c4;
   }
-  ul.taglist{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    list-style:none;
-    padding:0;
-    margin-top:0;
-    margin-bottom:0;
+  .more-photos {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #6b4a2a;
+    text-decoration: underline;
   }
-  ul.taglist li{
-    background:#eee7d8;
-    border:1px solid var(--line);
-    padding:7px 12px;
-    border-radius:5px;
-    font-size:13px;
-    color:var(--ink);
+
+  section.block {
+    margin-top: 40px;
+    margin-bottom: 40px;
   }
-  table{
-    width:100%;
-    border-collapse:collapse;
-    background:var(--card);
-    border:1px solid var(--line);
+  section.block h2 {
+    font-size: 1.65rem;
+    border-bottom: 2px solid #c9a35d;
+    padding-bottom: 8px;
+    margin-bottom: 18px;
   }
-  table td, table th{
-    padding:11px 14px;
-    border-bottom:1px solid var(--line);
-    font-size:14.5px;
-    text-align:left;
-    vertical-align:top;
+  section.block p {
+    color: #3b352c;
   }
-  table th{
-    width:38%;
-    color:var(--ink-soft);
-    font-weight:600;
-    text-transform:uppercase;
-    font-size:12.5px;
-    letter-spacing:0.04em;
+
+  table.facts-table, table.terms-table, table.comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    border: 1px solid #e3d9c4;
+    border-radius: 8px;
+    overflow: hidden;
   }
-  table tr:last-child td, table tr:last-child th{
-    border-bottom:none;
+  table.facts-table td, table.terms-table td, table.comp-table td, table.comp-table th {
+    padding: 12px 16px;
+    border-bottom: 1px solid #ece2cb;
+    font-size: 0.95rem;
+    vertical-align: top;
   }
-  .comp-card{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:6px;
-    padding:18px 20px;
-    margin-top:14px;
-    margin-bottom:0;
+  table.facts-table tr:last-child td, table.terms-table tr:last-child td {
+    border-bottom: none;
   }
-  .comp-card h4{
-    margin-top:0;
-    margin-bottom:6px;
-    font-size:18px;
+  table.facts-table td:first-child, table.terms-table td:first-child {
+    color: #8a7a5c;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    width: 40%;
+    font-weight: 600;
   }
-  .comp-card .meta{
-    font-size:13px;
-    color:var(--ink-soft);
-    text-transform:uppercase;
-    letter-spacing:0.03em;
-    margin-bottom:8px;
+  table.comp-table th {
+    text-align: left;
+    background: #f1eadb;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    color: #6b551f;
   }
-  .comp-card .sale{
-    font-family:'Fraunces',serif;
-    font-size:22px;
-    color:var(--accent);
-    font-weight:700;
-    margin-bottom:8px;
+
+  ul.plain {
+    padding-left: 20px;
+    color: #3b352c;
   }
-  .note-box{
-    background:#efe4d4;
-    border:1px solid var(--line);
-    border-radius:6px;
-    padding:16px 20px;
-    margin-top:16px;
-    margin-bottom:0;
-    font-size:14px;
-    color:var(--ink-soft);
+  ul.plain li { margin-bottom: 6px; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
   }
-  .note-box strong{color:var(--ink);}
-  .grid2{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:16px;
+  @media (max-width: 720px) {
+    .two-col { grid-template-columns: 1fr; }
+    h1.title { font-size: 1.9rem; }
+    .price-block .price { font-size: 2rem; }
   }
-  @media (max-width:640px){
-    .grid2{grid-template-columns:1fr;}
-    h1.title{font-size:30px;}
-    .price-block .amount{font-size:30px;}
+
+  .notice-box {
+    background: #fbf6ea;
+    border: 1px solid #e0d3ab;
+    border-left: 4px solid #b98a3f;
+    padding: 18px 20px;
+    border-radius: 6px;
+    font-size: 0.92rem;
+    color: #4a4237;
   }
-  .disclosure{
-    font-size:13px;
-    color:var(--ink-soft);
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:6px;
-    padding:16px 20px;
-    margin-top:16px;
-    margin-bottom:0;
+  .notice-box p { margin: 0 0 10px 0; }
+  .notice-box p:last-child { margin-bottom: 0; }
+
+  .disclaimer {
+    font-size: 0.82rem;
+    color: #7a7166;
+    margin-top: 18px;
   }
-  .cta-band{
-    background:var(--ink);
-    color:var(--paper);
-    padding-top:46px;
-    padding-bottom:46px;
-    margin-top:60px;
-    margin-bottom:0;
+
+  .assignment-note {
+    background: #1f2a22;
+    color: #f0ead9;
+    padding: 20px 24px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    margin-top: 20px;
   }
-  .cta-band h2{
-    color:var(--paper);
-    border-bottom:none;
-    font-size:30px;
+  .assignment-note strong { color: #c9a35d; }
+
+  footer.cta {
+    background: #1f2a22;
+    color: #f6f1e9;
+    margin-top: 60px;
+    padding-top: 50px;
+    padding-bottom: 50px;
   }
-  .cta-band p{
-    color:#d8d1c2;
+  footer.cta h2 {
+    color: #f6f1e9;
+    font-size: 2rem;
+    border-bottom: none;
   }
-  .cta-contacts{
-    display:flex;
-    gap:24px;
-    flex-wrap:wrap;
-    margin-top:18px;
+  footer.cta p {
+    color: #d8cfbc;
+    max-width: 640px;
   }
-  .cta-contacts a{
-    color:var(--paper);
-    font-size:19px;
-    font-family:'Fraunces',serif;
-    text-decoration:none;
-    border-bottom:1px solid #85795f;
+  .cta-contacts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 26px;
+    margin-top: 22px;
   }
-  footer{
-    padding-top:22px;
-    padding-bottom:34px;
+  .cta-contacts a {
+    color: #f6f1e9;
+    background: #c9a35d;
+    padding: 12px 22px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
   }
-  footer p{
-    font-size:12px;
-    color:#948b7c;
+  .cta-contacts a.secondary {
+    background: transparent;
+    border: 1px solid #c9a35d;
+    color: #f6f1e9;
+  }
+  footer.cta .company-sign {
+    margin-top: 30px;
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    color: #c9a35d;
   }
 </style>
 </head>
@@ -314,332 +326,376 @@
 
 <header class="top">
   <div class="wrap">
-    <div class="brand">JNA Dynamic Holdings LLC</div>
-    <div class="tag">Wholesale Land Assignment</div>
-  </div>
-</header>
-
-<div class="hero wrap">
-  <div class="kicker">OBX Infill Lot · Deal Code NC-7</div>
-  <h1 class="title">Golf Course Homesite Inside The Currituck Club</h1>
-  <div class="loc-line">Corolla, North Carolina · Currituck County</div>
-  <p class="addr-note">Address available upon request — contact us and we'll provide the exact property location to qualified buyers.</p>
-</div>
-
-<div class="wrap">
-  <div class="price-block">
-    <div class="amount"><span>Asking Price</span>$176,900</div>
-    <div class="chips">
-      <span class="chip">0.38± Acres</span>
-      <span class="chip">Golf Course Views</span>
-      <span class="chip">Cash or Hard Money</span>
-      <span class="chip">Assignment of Contract</span>
-    </div>
-  </div>
-
-  <div class="gallery">
-    <img src="/deals/ce84348b-ad2c-4bab-b371-b39a01a4f661/photos/1.jpg" alt="Golf course homesite in The Currituck Club, Corolla NC">
-    <img src="/deals/ce84348b-ad2c-4bab-b371-b39a01a4f661/photos/2.jpg" alt="Golf course homesite in The Currituck Club, Corolla NC">
-    <img src="/deals/ce84348b-ad2c-4bab-b371-b39a01a4f661/photos/3.jpg" alt="Golf course homesite in The Currituck Club, Corolla NC">
-    <img src="/deals/ce84348b-ad2c-4bab-b371-b39a01a4f661/photos/4.jpg" alt="Golf course homesite in The Currituck Club, Corolla NC">
-    <img src="/deals/ce84348b-ad2c-4bab-b371-b39a01a4f661/photos/5.jpg" alt="Golf course homesite in The Currituck Club, Corolla NC">
-    <img src="/deals/ce84348b-ad2c-4bab-b371-b39a01a4f661/photos/6.jpg" alt="Golf course homesite in The Currituck Club, Corolla NC">
-    <img src="/deals/ce84348b-ad2c-4bab-b371-b39a01a4f661/photos/7.jpg" alt="Golf course homesite in The Currituck Club, Corolla NC">
-  </div>
-
-  <section>
-    <h2>Here's What We Have</h2>
-    <p>This is an approximately 0.38-acre residential homesite inside The Currituck Club in Corolla, North Carolina. The property offers golf course views inside an established Outer Banks golf community and is positioned for a custom-home builder, spec builder, second-home buyer, or investor targeting the Corolla market.</p>
-    <ul class="taglist">
-      <li>0.38± Acres</li>
-      <li>The Currituck Club</li>
-      <li>Golf Course Views</li>
-      <li>SFO Zoning Reported</li>
-      <li>Public / Municipal Water Reported</li>
-      <li>Electricity Available</li>
-      <li>Wastewater / Septic Arrangement to Be Verified</li>
-      <li>Established Golf Community</li>
-      <li>Corolla / Outer Banks Location</li>
-      <li>Strong Same-Street 2026 Sold Comps</li>
-    </ul>
-  </section>
-
-  <section>
-    <h2>Property Snapshot</h2>
-    <table>
-      <tr><th>Lot Size</th><td>0.38± Acres</td></tr>
-      <tr><th>Property Type</th><td>Vacant Residential Land</td></tr>
-      <tr><th>Subdivision</th><td>The Currituck Club</td></tr>
-      <tr><th>County</th><td>Currituck County</td></tr>
-      <tr><th>Market</th><td>Corolla, NC</td></tr>
-      <tr><th>Zoning</th><td>SFO Reported</td></tr>
-      <tr><th>Golf Course Views</th><td>Yes</td></tr>
-      <tr><th>Water</th><td>Public / Municipal Water Reported</td></tr>
-      <tr><th>Electric</th><td>Available</td></tr>
-      <tr><th>Wastewater</th><td>Buyer to verify exact community septic / sewer arrangement</td></tr>
-      <tr><th>HOA / Community Requirements</th><td>Buyer to verify</td></tr>
-      <tr><th>Flood Zone</th><td>Buyer to verify</td></tr>
-    </table>
-  </section>
-
-  <section>
-    <h2>Why This Lot Makes Sense</h2>
-    <p>The strength of this opportunity is the combination of location, golf-course positioning, lot size, and direct same-street sales inside The Currituck Club. This is not generic Currituck County land.</p>
-    <p>The property is inside an established Corolla golf community where lots are purchased for custom homes, second homes, vacation properties, and higher-end residential construction. The subject is approximately 0.38 acres and offers golf course views. At $176,900, the asking price is positioned directly within the range established by highly relevant 2026 Hunt Club Drive sales.</p>
-  </section>
-
-  <section>
-    <h2>2026 Sold Comp Support</h2>
-    <div class="comp-card">
-      <h4>714 Hunt Club Dr</h4>
-      <div class="meta">0.39± Acres · Same Street · The Currituck Club · Sold January 2026</div>
-      <div class="sale">$180,000</div>
-      <p>This is the strongest direct comp due to the nearly identical lot size, same street, same community, and recent 2026 closing.</p>
-    </div>
-    <div class="comp-card">
-      <h4>679 Hunt Club Dr</h4>
-      <div class="meta">0.40± Acres · Same Street · Golf Course Lot · The Currituck Club · Sold January 2026</div>
-      <div class="sale">$165,000</div>
-      <p>This property was marketed as a golf-course homesite and provides another highly relevant same-street sale.</p>
-    </div>
-    <p style="margin-top:16px;"><strong style="color:var(--ink);">Direct comp range:</strong> $165,000 to $180,000. <strong style="color:var(--ink);">Average of the two strongest same-street sales:</strong> approximately $172,500. <strong style="color:var(--ink);">Subject asking price:</strong> $176,900. The subject is therefore being offered only slightly above the average of the two strongest similar-size same-street 2026 sales and below the strongest $180,000 direct comp.</p>
-    <div class="note-box">
-      <strong>Premium community sale for context only:</strong> Another Hunt Club Drive property sold around $315,000 in 2026. That property had materially superior sound / water-oriented characteristics and should not be treated as a direct comp to the subject. It is relevant primarily as evidence of the wider pricing range that premium homesites can achieve inside The Currituck Club.
-    </div>
-  </section>
-
-  <section>
-    <h2>Market Positioning</h2>
-    <p>At $176,900, the subject is positioned aggressively relative to the strongest direct sales:</p>
-    <table>
-      <tr><th>0.39 AC Same-Street Sold</th><td>$180,000</td></tr>
-      <tr><th>0.40 AC Same-Street Golf Lot Sold</th><td>$165,000</td></tr>
-      <tr><th>Subject Lot Size</th><td>0.38 Acres</td></tr>
-      <tr><th>Subject Ask</th><td>$176,900</td></tr>
-    </table>
-    <p style="margin-top:14px;">For a builder or end user who values the subject's specific golf-course positioning, the pricing provides a straightforward path to underwriting against actual 2026 sales rather than speculative asking prices.</p>
-  </section>
-
-  <section>
-    <h2>Golf Course Location</h2>
-    <p>The golf-course setting is one of the strongest differentiators. A future custom home may potentially capitalize on:</p>
-    <ul class="taglist">
-      <li>Golf Course Views</li>
-      <li>Open Rear-View Corridor</li>
-      <li>Custom-Home Orientation</li>
-      <li>Currituck Club Setting</li>
-      <li>Corolla Location</li>
-      <li>Established Resort-Home Market</li>
-    </ul>
-    <p style="margin-top:14px;">Actual sightlines, vegetation, home orientation, setbacks, and preservation of views must be independently verified by the buyer.</p>
-  </section>
-
-  <section>
-    <h2>The Currituck Club</h2>
-    <p>The property is located within The Currituck Club, an established residential and golf community in Corolla. The community attracts a fundamentally different buyer pool than ordinary inland vacant land.</p>
-    <div class="grid2">
-      <div>
-        <h4 style="margin-bottom:8px;">Potential Buyers Include</h4>
-        <ul class="taglist">
-          <li>Custom Home Builders</li>
-          <li>Spec Builders</li>
-          <li>Luxury Home Builders</li>
-          <li>Owner-Builders</li>
-          <li>Second-Home Buyers</li>
-          <li>Vacation-Home Investors</li>
-          <li>Land Investors</li>
-          <li>Outer Banks Developers</li>
-        </ul>
-      </div>
-      <div>
-        <h4 style="margin-bottom:8px;">Ideal Buyer Profile</h4>
-        <ul class="taglist">
-          <li>Currituck Club Builders</li>
-          <li>Corolla Custom-Home Builders</li>
-          <li>Outer Banks Spec Builders</li>
-          <li>Luxury Residential Builders</li>
-          <li>Second-Home Builders</li>
-          <li>Owner-Builders</li>
-          <li>Vacation-Home Investors</li>
-          <li>Land Investors Familiar with Corolla</li>
-        </ul>
-      </div>
-    </div>
-    <p style="margin-top:14px;">The strongest buyer is likely someone already active in Corolla or the northern Outer Banks who understands the relationship between finished-home values and desirable homesites inside The Currituck Club.</p>
-  </section>
-
-  <section>
-    <h2>Builder Play</h2>
-    <p>This property should be evaluated through finished-home economics rather than generic land-investor pricing. A builder can evaluate:</p>
-    <ul class="taglist">
-      <li>Land Cost</li>
-      <li>Buildable Envelope</li>
-      <li>House Size</li>
-      <li>Construction Cost</li>
-      <li>Site Preparation</li>
-      <li>Foundation Cost</li>
-      <li>Architectural Requirements</li>
-      <li>HOA Requirements</li>
-      <li>Utility Connections</li>
-      <li>Finished Home Value</li>
-      <li>Expected Profit Margin</li>
-    </ul>
-    <p style="margin-top:14px;">The existence of two strong same-street 2026 sold land comps also gives a builder much clearer lot-value support than many off-market land opportunities.</p>
-  </section>
-
-  <section>
-    <h2>Custom Home / End-User Play</h2>
-    <p>For an end user, the property offers the ability to acquire a homesite inside The Currituck Club and design a custom residence subject to applicable approvals. Potential appeal includes:</p>
-    <ul class="taglist">
-      <li>0.38± Acres</li>
-      <li>Golf Course Views</li>
-      <li>The Currituck Club</li>
-      <li>Corolla Location</li>
-      <li>Custom Home Flexibility</li>
-      <li>Established Community</li>
-      <li>Outer Banks Second-Home Market</li>
-    </ul>
-    <p style="margin-top:14px;">A buyer should independently review all HOA and architectural requirements before selecting a house plan.</p>
-  </section>
-
-  <section>
-    <h2>Water / Utilities</h2>
-    <p>Public / municipal water is reported available. Electricity is reported available. The exact wastewater arrangement has not yet been independently verified. Public sewer is not currently being represented as verified. Nearby Currituck Club properties indicate that some homesites may utilize community or shared septic infrastructure rather than conventional public sewer.</p>
-    <p>Buyer should independently verify:</p>
-    <ul class="taglist">
-      <li>Water Provider</li>
-      <li>Water Tap Status</li>
-      <li>Meter Requirements</li>
-      <li>Connection Fees</li>
-      <li>Electric Provider</li>
-      <li>Electric Connection Cost</li>
-      <li>Wastewater System</li>
-      <li>Community Septic Requirements</li>
-      <li>Shared Septic Requirements</li>
-      <li>System Capacity</li>
-      <li>HOA Utility Obligations</li>
-    </ul>
-    <p style="margin-top:14px;">No representation is made that utility taps, meters, connection fees, or wastewater capacity are already installed, paid, or guaranteed.</p>
-  </section>
-
-  <section>
-    <h2>Zoning / Development Diligence</h2>
-    <p>SFO zoning is reported for the property. Buyer should independently confirm:</p>
-    <ul class="taglist">
-      <li>Current Zoning</li>
-      <li>Permitted Residential Use</li>
-      <li>Minimum Lot Requirements</li>
-      <li>Building Setbacks</li>
-      <li>Maximum Building Height</li>
-      <li>Lot Coverage</li>
-      <li>Parking Requirements</li>
-      <li>Driveway Requirements</li>
-      <li>Architectural Review</li>
-      <li>HOA Requirements</li>
-      <li>Short-Term Rental Rules</li>
-      <li>Stormwater Requirements</li>
-    </ul>
-    <p style="margin-top:14px;">Any specific construction plan remains subject to buyer verification and applicable approvals.</p>
-  </section>
-
-  <section>
-    <h2>Site / Buildability Diligence</h2>
-    <p>Buyer should verify the actual usable building envelope before finalizing a home design. Confirm:</p>
-    <ul class="taglist">
-      <li>Lot Dimensions</li>
-      <li>Building Envelope</li>
-      <li>Road Frontage</li>
-      <li>Legal Access</li>
-      <li>Topography</li>
-      <li>Drainage</li>
-      <li>Soils</li>
-      <li>Wetlands</li>
-      <li>Flood Zone</li>
-      <li>Utility Easements</li>
-      <li>Golf Course Setbacks</li>
-      <li>HOA Setbacks</li>
-      <li>Tree Clearing</li>
-      <li>Grading</li>
-      <li>Foundation Requirements</li>
-      <li>View Corridor</li>
-    </ul>
-    <p style="margin-top:14px;">Because this is a golf-oriented homesite, building placement and orientation may materially affect the finished-home value.</p>
-  </section>
-
-  <section>
-    <h2>Value-Add Opportunity</h2>
-    <p>A buyer or investor could further strengthen the property package through:</p>
-    <ul class="taglist">
-      <li>Current Survey</li>
-      <li>Written Zoning Confirmation</li>
-      <li>Building-Envelope Plan</li>
-      <li>HOA / Architectural Guidelines</li>
-      <li>Utility Availability Confirmation</li>
-      <li>Wastewater System Confirmation</li>
-      <li>Flood Determination</li>
-      <li>Wetland Determination</li>
-      <li>Conceptual Home Plan</li>
-      <li>Builder Cost Estimate</li>
-    </ul>
-    <p style="margin-top:14px;">These items could materially improve the speed and confidence with which a builder or end user can underwrite the property.</p>
-  </section>
-
-  <section>
-    <h2>Location Advantage</h2>
-    <ul class="taglist">
-      <li>Corolla, NC</li>
-      <li>Currituck County</li>
-      <li>The Currituck Club</li>
-      <li>Outer Banks</li>
-      <li>Golf Course Setting</li>
-      <li>Established Residential Community</li>
-      <li>Custom / Luxury Home Market</li>
-      <li>Strong Same-Street 2026 Sales</li>
-    </ul>
-    <p style="margin-top:14px;">The investment thesis is straightforward: 0.38 acres inside The Currituck Club, golf course views, public water reported, electric available, same-street $180,000 and $165,000 2026 sold comps, and a $176,900 ask.</p>
-  </section>
-
-  <section>
-    <h2>Deal Terms</h2>
-    <table>
-      <tr><th>Purchase Price</th><td>$176,900</td></tr>
-      <tr><th>Financing</th><td>Cash or Hard Money</td></tr>
-      <tr><th>Transaction Type</th><td>Assignment of Contract</td></tr>
-      <tr><th>Closing Costs</th><td>Buyer pays closing costs</td></tr>
-      <tr><th>Condition</th><td>Property sold as-is</td></tr>
-      <tr><th>Proof of Funds</th><td>Required</td></tr>
-      <tr><th>Process</th><td>First come, first served — no auction, no highest and best</td></tr>
-    </table>
-    <div class="note-box" style="margin-top:16px;">
-      <strong>This is a wholesale assignment.</strong> JNA Dynamic Holdings LLC holds equitable interest in the subject transaction under an assignable purchase contract with the underlying property owner. The end buyer will receive an assignment of contract, not a direct transaction with the underlying seller.
-    </div>
-  </section>
-
-  <section>
-    <h2>Buyer Due Diligence Notice</h2>
-    <p>Buyer must independently verify zoning, permitted use, survey boundaries, acreage, lot dimensions, setbacks, building envelope, road frontage, legal access, public water availability, water tap status, electric service, wastewater / septic arrangement, utility fees, flood-zone designation, wetlands, soils, drainage, topography, easements, HOA requirements, architectural guidelines, golf-course restrictions, rental restrictions, permitting requirements, title conditions, and all development costs prior to closing.</p>
-    <p>Public sewer is not currently being represented as verified. Buyer must independently determine whether the property is served by public sewer, community septic, shared septic, or another wastewater arrangement.</p>
-    <p>Comparable properties are provided for market-reference purposes only. Buyer should independently verify sale details and determine comparability based on lot orientation, golf-course position, views, buildability, utilities, flood conditions, and other site-specific characteristics.</p>
-    <div class="disclosure">
-      All figures, comparable sales, dimensions, and details on this page have not been independently verified by JNA Dynamic Holdings LLC and are subject to buyer's own due diligence. This is a wholesale assignment of contract; JNA Dynamic Holdings LLC is assigning its equitable contract interest and is not the underlying titled owner of the property.
-    </div>
-  </section>
-</div>
-
-<div class="cta-band">
-  <div class="wrap">
-    <h2>0.38± Acres. The Currituck Club. Golf Course Views. $176,900.</h2>
-    <p>Same-street 2026 sales at $180,000 and $165,000. Public / municipal water reported. Electric available. Established Corolla custom-home market. First come, first served — cash or hard money, proof of funds required. Contact us today for the exact property location and full details.</p>
-    <div class="cta-contacts">
-      <a href="tel:520-633-6437">520-633-6437</a>
+    <div class="brand">JNA <span>Dynamic Holdings</span> LLC</div>
+    <div class="contact-mini">
+      <a href="tel:5206336437">520-633-6437</a> &nbsp;|&nbsp;
       <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
     </div>
   </div>
-</div>
+</header>
 
-<footer>
+<section class="hero">
   <div class="wrap">
-    <p>JNA Dynamic Holdings LLC · This offering is a wholesale assignment of contract. Information deemed reliable but not guaranteed; buyer to independently verify all facts, figures, and property conditions prior to closing.</p>
+    <div class="eyebrow">OBX Infill Lot &middot; Deal Code NC-7 &middot; Land</div>
+    <h1 class="title">Golf Course Homesite Inside The Currituck Club</h1>
+    <div class="locline">Corolla, North Carolina &middot; Currituck County</div>
+    <div class="addr-note">Address available upon request — contact us and we'll provide the exact property location to qualified buyers.</div>
+
+    <div class="price-block">
+      <div>
+        <span class="price-label">Asking Price</span>
+        <span class="price">$176,900</span>
+      </div>
+      <div class="tags">
+        <span class="tag">0.38± Acres</span>
+        <span class="tag">Golf Course Views</span>
+        <span class="tag">Vacant Residential Land</span>
+        <span class="tag">Cash or Hard Money</span>
+        <span class="tag">Assignment of Contract</span>
+      </div>
+    </div>
+
+    <ul class="highlights">
+      <li>0.38± acre residential homesite inside The Currituck Club</li>
+      <li>Golf course views within an established Outer Banks golf community</li>
+      <li>SFO zoning reported</li>
+      <li>Public / municipal water reported available</li>
+      <li>Electricity reported available</li>
+      <li>Wastewater / septic arrangement to be verified by buyer</li>
+      <li>Strong same-street 2026 sold comps supporting value</li>
+      <li>Positioned for a custom-home builder, spec builder, second-home buyer, or investor</li>
+    </ul>
+  </div>
+</section>
+
+<section class="gallery">
+  <div class="wrap">
+    <h2 style="border-bottom:none;font-size:1.3rem;">Photos</h2>
+    <div class="gallery-scroll">
+      <img src="/deals/ce84348b-ad2c-4bab-b371-b39a01a4f661/photos/1.jpg" alt="Golf course homesite in The Currituck Club, Corolla, NC">
+      <img src="/deals/ce84348b-ad2c-4bab-b371-b39a01a4f661/photos/2.jpg" alt="Golf course homesite in The Currituck Club, Corolla, NC">
+      <img src="/deals/ce84348b-ad2c-4bab-b371-b39a01a4f661/photos/3.jpg" alt="Golf course homesite in The Currituck Club, Corolla, NC">
+      <img src="/deals/ce84348b-ad2c-4bab-b371-b39a01a4f661/photos/4.jpg" alt="Golf course homesite in The Currituck Club, Corolla, NC">
+      <img src="/deals/ce84348b-ad2c-4bab-b371-b39a01a4f661/photos/5.jpg" alt="Golf course homesite in The Currituck Club, Corolla, NC">
+      <img src="/deals/ce84348b-ad2c-4bab-b371-b39a01a4f661/photos/6.jpg" alt="Golf course homesite in The Currituck Club, Corolla, NC">
+      <img src="/deals/ce84348b-ad2c-4bab-b371-b39a01a4f661/photos/7.jpg" alt="Golf course homesite in The Currituck Club, Corolla, NC">
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Property Snapshot</h2>
+    <table class="facts-table">
+      <tr><td>Lot Size</td><td>0.38± acres</td></tr>
+      <tr><td>Property Type</td><td>Vacant residential land</td></tr>
+      <tr><td>Subdivision / Community</td><td>The Currituck Club</td></tr>
+      <tr><td>County</td><td>Currituck County</td></tr>
+      <tr><td>Market</td><td>Corolla, North Carolina</td></tr>
+      <tr><td>Zoning</td><td>SFO reported</td></tr>
+      <tr><td>Golf Course Views</td><td>Yes</td></tr>
+      <tr><td>Water</td><td>Public / municipal water reported</td></tr>
+      <tr><td>Electric</td><td>Available</td></tr>
+      <tr><td>Wastewater</td><td>Buyer to verify exact community septic / sewer arrangement — public sewer is not currently being represented as verified</td></tr>
+      <tr><td>HOA / Community Requirements</td><td>Buyer to verify</td></tr>
+      <tr><td>Flood Zone</td><td>Buyer to verify</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Why This Lot Makes Sense</h2>
+    <p>The strength of this opportunity is the combination of location, golf-course positioning, lot size, and direct same-street sales inside The Currituck Club. This is not generic Currituck County land.</p>
+    <p>The property sits inside an established Corolla golf community where lots are purchased for custom homes, second homes, vacation properties, and higher-end residential construction. The subject is approximately 0.38 acres and offers golf course views.</p>
+    <p>At $176,900, the asking price is positioned directly within the range established by highly relevant 2026 sold comps on the same street inside The Currituck Club.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>2026 Sold Comp Support</h2>
+    <table class="comp-table">
+      <tr>
+        <th>Comp</th>
+        <th>Lot Size</th>
+        <th>Location</th>
+        <th>Sold</th>
+        <th>Sale Price</th>
+      </tr>
+      <tr>
+        <td>Same-street sale — nearly identical lot size, same community</td>
+        <td>0.39± acres</td>
+        <td>Hunt Club Drive, The Currituck Club</td>
+        <td>January 2026</td>
+        <td>$180,000</td>
+      </tr>
+      <tr>
+        <td>Same-street golf-course homesite sale</td>
+        <td>0.40± acres</td>
+        <td>Hunt Club Drive, The Currituck Club (golf course lot)</td>
+        <td>January 2026</td>
+        <td>$165,000</td>
+      </tr>
+    </table>
+    <p style="margin-top:16px;">The first comp is the strongest direct comp due to the nearly identical lot size, same street, same community, and recent 2026 closing. The second was marketed as a golf-course homesite and provides another highly relevant same-street sale.</p>
+    <p><strong>Direct comp range:</strong> $165,000 to $180,000<br>
+    <strong>Average of the two strongest same-street sales:</strong> approximately $172,500<br>
+    <strong>Subject asking price:</strong> $176,900</p>
+    <p>The subject is therefore being offered only slightly above the average of the two strongest similar-size same-street 2026 sales and below the strongest $180,000 direct comp.</p>
+    <p><strong>Premium community sale for reference:</strong> another Hunt Club Drive property sold around $315,000 in 2026. That property had materially superior sound / water-oriented characteristics and should not be treated as a direct comp to the subject — it is relevant only as evidence of the wider pricing range that premium homesites can achieve inside The Currituck Club.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Market Positioning</h2>
+    <p>At $176,900, the subject is positioned aggressively relative to the strongest direct sales:</p>
+    <ul class="plain">
+      <li>0.39 acre same-street sold: $180,000</li>
+      <li>0.40 acre same-street golf lot sold: $165,000</li>
+      <li>Subject: 0.38 acres</li>
+      <li>Subject ask: $176,900</li>
+    </ul>
+    <p>For a builder or end user who values the subject's specific golf-course positioning, the pricing provides a straightforward path to underwriting against actual 2026 sales rather than speculative asking prices.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="two-col">
+    <div>
+      <h2>Golf Course Location</h2>
+      <p>The golf-course setting is one of the strongest differentiators. A future custom home may potentially capitalize on:</p>
+      <ul class="plain">
+        <li>Golf course views</li>
+        <li>Open rear-view corridor</li>
+        <li>Custom-home orientation</li>
+        <li>Currituck Club setting</li>
+        <li>Corolla location</li>
+        <li>Established resort-home market</li>
+      </ul>
+      <p style="font-size:0.88rem;color:#7a7166;">Actual sightlines, vegetation, home orientation, setbacks, and preservation of views must be independently verified by the buyer.</p>
+    </div>
+    <div>
+      <h2>The Currituck Club</h2>
+      <p>The property is located within The Currituck Club, an established residential and golf community in Corolla that attracts a fundamentally different buyer pool than ordinary inland vacant land. Potential buyers include:</p>
+      <ul class="plain">
+        <li>Custom home builders</li>
+        <li>Spec builders</li>
+        <li>Luxury home builders</li>
+        <li>Owner-builders</li>
+        <li>Second-home buyers</li>
+        <li>Vacation-home investors</li>
+        <li>Land investors</li>
+        <li>Outer Banks developers</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="two-col">
+    <div>
+      <h2>Builder Play</h2>
+      <p>This property should be evaluated through finished-home economics rather than generic land-investor pricing. A builder can evaluate:</p>
+      <ul class="plain">
+        <li>Land cost</li>
+        <li>Buildable envelope</li>
+        <li>House size</li>
+        <li>Construction cost</li>
+        <li>Site preparation</li>
+        <li>Foundation cost</li>
+        <li>Architectural requirements</li>
+        <li>HOA requirements</li>
+        <li>Utility connections</li>
+        <li>Finished home value</li>
+        <li>Expected profit margin</li>
+      </ul>
+      <p>The existence of two strong same-street 2026 sold land comps also gives a builder much clearer lot-value support than many off-market land opportunities.</p>
+    </div>
+    <div>
+      <h2>Custom Home / End-User Play</h2>
+      <p>For an end user, the property offers the ability to acquire a homesite inside The Currituck Club and design a custom residence subject to applicable approvals. Potential appeal includes:</p>
+      <ul class="plain">
+        <li>0.38± acres</li>
+        <li>Golf course views</li>
+        <li>The Currituck Club</li>
+        <li>Corolla location</li>
+        <li>Custom home flexibility</li>
+        <li>Established community</li>
+        <li>Outer Banks second-home market</li>
+      </ul>
+      <p style="font-size:0.88rem;color:#7a7166;">A buyer should independently review all HOA and architectural requirements before selecting a house plan.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Water / Utilities</h2>
+    <p>Public / municipal water is reported available. Electricity is reported available. The exact wastewater arrangement has not yet been independently verified. Public sewer is not currently being represented as verified. Nearby Currituck Club properties indicate that some homesites may utilize community or shared septic infrastructure rather than conventional public sewer.</p>
+    <p>Buyer should independently verify:</p>
+    <ul class="plain">
+      <li>Water provider</li>
+      <li>Water tap status</li>
+      <li>Meter requirements</li>
+      <li>Connection fees</li>
+      <li>Electric provider</li>
+      <li>Electric connection cost</li>
+      <li>Wastewater system</li>
+      <li>Community septic requirements</li>
+      <li>Shared septic requirements</li>
+      <li>System capacity</li>
+      <li>HOA utility obligations</li>
+    </ul>
+    <p style="font-size:0.88rem;color:#7a7166;">No representation is made that utility taps, meters, connection fees, or wastewater capacity are already installed, paid, or guaranteed.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="two-col">
+    <div>
+      <h2>Zoning / Development Diligence</h2>
+      <p>SFO zoning is reported for the property. Buyer should independently confirm:</p>
+      <ul class="plain">
+        <li>Current zoning</li>
+        <li>Permitted residential use</li>
+        <li>Minimum lot requirements</li>
+        <li>Building setbacks</li>
+        <li>Maximum building height</li>
+        <li>Lot coverage</li>
+        <li>Parking requirements</li>
+        <li>Driveway requirements</li>
+        <li>Architectural review</li>
+        <li>HOA requirements</li>
+        <li>Short-term rental rules</li>
+        <li>Stormwater requirements</li>
+      </ul>
+      <p style="font-size:0.88rem;color:#7a7166;">Any specific construction plan remains subject to buyer verification and applicable approvals.</p>
+    </div>
+    <div>
+      <h2>Site / Buildability Diligence</h2>
+      <p>Buyer should verify the actual usable building envelope before finalizing a home design, including:</p>
+      <ul class="plain">
+        <li>Lot dimensions</li>
+        <li>Building envelope</li>
+        <li>Road frontage</li>
+        <li>Legal access</li>
+        <li>Topography</li>
+        <li>Drainage</li>
+        <li>Soils</li>
+        <li>Wetlands</li>
+        <li>Flood zone</li>
+        <li>Utility easements</li>
+        <li>Golf course setbacks</li>
+        <li>HOA setbacks</li>
+        <li>Tree clearing</li>
+        <li>Grading</li>
+        <li>Foundation requirements</li>
+        <li>View corridor</li>
+      </ul>
+      <p style="font-size:0.88rem;color:#7a7166;">Because this is a golf-oriented homesite, building placement and orientation may materially affect the finished-home value.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Value-Add Opportunity</h2>
+    <p>A buyer or investor could further strengthen the property package through:</p>
+    <ul class="plain">
+      <li>Current survey</li>
+      <li>Written zoning confirmation</li>
+      <li>Building-envelope plan</li>
+      <li>HOA / architectural guidelines</li>
+      <li>Utility availability confirmation</li>
+      <li>Wastewater system confirmation</li>
+      <li>Flood determination</li>
+      <li>Wetland determination</li>
+      <li>Conceptual home plan</li>
+      <li>Builder cost estimate</li>
+    </ul>
+    <p>These items could materially improve the speed and confidence with which a builder or end user can underwrite the property.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="two-col">
+    <div>
+      <h2>Ideal Buyer Profile</h2>
+      <ul class="plain">
+        <li>Currituck Club builders</li>
+        <li>Corolla custom-home builders</li>
+        <li>Outer Banks spec builders</li>
+        <li>Luxury residential builders</li>
+        <li>Second-home builders</li>
+        <li>Owner-builders</li>
+        <li>Vacation-home investors</li>
+        <li>Land investors familiar with Corolla</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Location Advantage</h2>
+      <ul class="plain">
+        <li>Corolla, NC</li>
+        <li>Currituck County</li>
+        <li>The Currituck Club</li>
+        <li>Outer Banks</li>
+        <li>Golf course setting</li>
+        <li>Established residential community</li>
+        <li>Custom / luxury home market</li>
+        <li>Strong same-street 2026 sales</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Investment Thesis</h2>
+    <p>0.38 acres + The Currituck Club + golf course views + public water reported + electric available + same-street $180,000 and $165,000 2026 sold comps + $176,900 ask.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Buyer Due Diligence Notice</h2>
+    <div class="notice-box">
+      <p>Buyer must independently verify zoning, permitted use, survey boundaries, acreage, lot dimensions, setbacks, building envelope, road frontage, legal access, public water availability, water tap status, electric service, wastewater / septic arrangement, utility fees, flood-zone designation, wetlands, soils, drainage, topography, easements, HOA requirements, architectural guidelines, golf-course restrictions, rental restrictions, permitting requirements, title conditions, and all development costs prior to closing.</p>
+      <p>Public sewer is not currently being represented as verified. Buyer must independently determine whether the property is served by public sewer, community septic, shared septic, or another wastewater arrangement.</p>
+      <p>Comparable properties are provided for market-reference purposes only. Buyer should independently verify sale details and determine comparability based on lot orientation, golf-course position, views, buildability, utilities, flood conditions, and other site-specific characteristics.</p>
+    </div>
+    <p class="disclaimer">All figures, comps, and facts on this page have not been independently verified by JNA Dynamic Holdings LLC and should be confirmed by the buyer prior to closing.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Deal Terms</h2>
+    <table class="terms-table">
+      <tr><td>Purchase Price</td><td>$176,900</td></tr>
+      <tr><td>Financing</td><td>Cash or hard money</td></tr>
+      <tr><td>Transaction Type</td><td>Assignment of contract</td></tr>
+      <tr><td>Closing Costs</td><td>Buyer pays closing costs</td></tr>
+      <tr><td>Condition</td><td>Property sold as-is</td></tr>
+      <tr><td>Requirement</td><td>Proof of funds required</td></tr>
+      <tr><td>Process</td><td>First come, first served — no auction, no highest and best</td></tr>
+    </table>
+    <div class="assignment-note">
+      <strong>This is a wholesale assignment.</strong> JNA Dynamic Holdings LLC holds equitable interest in the subject transaction under contract with the underlying property owner. The end buyer will receive an assignment of contract, not a direct transfer from JNA Dynamic Holdings LLC as titled owner.
+    </div>
+  </div>
+</section>
+
+<footer class="cta">
+  <div class="wrap">
+    <h2>Ready To Move On This Homesite?</h2>
+    <p>0.38± acres inside The Currituck Club, Corolla, NC — golf course views, same-street 2026 sales at $180,000 and $165,000, public / municipal water reported, electric available, asking $176,900. First come, first served. Contact us for the full address and diligence package.</p>
+    <div class="cta-contacts">
+      <a href="tel:5206336437">Call 520-633-6437</a>
+      <a class="secondary" href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
+    </div>
+    <div class="company-sign">JNA Dynamic Holdings LLC</div>
   </div>
 </footer>
 
