@@ -6041,16 +6041,33 @@ function adminFindBuyerMatches(body) {
   return { ok: true, matches: matches, consideredCount: capped.length, totalWithCriteria: leadsWithCriteria.length, statusBreakdown: statusBreakdown };
 }
 
+// Buyers a rep can run AI matching against: their own uploads, the
+// shared/admin-uploaded pool (leadVisibleToUsername), AND any buyer
+// they've been personally given a Pitch on for ANY deal -- even one
+// someone else uploaded and never shared. A buyer admin (or another rep)
+// hands you for one deal is yours to work everywhere, not just visible
+// on that one deal's page, so matching shouldn't ignore them just
+// because UploadedBy points at someone else.
+function repVisibleBuyerLeadIds(session) {
+  const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
+  const ids = {};
+  sheetToObjects(pitchesSheet).forEach(function (p) {
+    if (String(p['Username'] || '').trim().toLowerCase() === session.u) ids[p['BuyerLeadID']] = true;
+  });
+  return ids;
+}
+
 // Rep-facing version of adminFindBuyerMatches -- same Stage 1 (cheap
 // state/deal-type elimination) + Stage 2 (single DeepSeek call) approach,
 // just against a narrower pool: only buyers this rep can actually see
-// (their own uploads, plus the shared/admin-uploaded pool -- same
-// leadVisibleToUsername rule used everywhere else) AND already marked
-// Responsive. "Potential" criteria on a buyer who hasn't confirmed yet is
-// deliberately excluded here -- that's still useful context to have saved
-// (see repSetBuyerPurchaseCriteria), just not something to spend a
-// DeepSeek call matching against until it's confirmed real. Same
-// admin-notification-on-match behavior as the admin version.
+// (their own uploads, the shared/admin-uploaded pool, and anything
+// they've been given a Pitch on -- see repVisibleBuyerLeadIds) AND
+// already marked Responsive. "Potential" criteria on a buyer who hasn't
+// confirmed yet is deliberately excluded here -- that's still useful
+// context to have saved (see repSetBuyerPurchaseCriteria), just not
+// something to spend a DeepSeek call matching against until it's
+// confirmed real. Same admin-notification-on-match behavior as the
+// admin version.
 function repFindMyBuyerMatchesForDeal(body, session) {
   const dealId = body.dealId;
   if (!dealId) return { ok: false, error: 'Missing dealId.' };
@@ -6059,8 +6076,10 @@ function repFindMyBuyerMatchesForDeal(body, session) {
   const deal = sheetToObjects(getSheet(DEALS_SHEET, DEAL_COLUMNS)).find(function (d) { return d['DealID'] === dealId; });
   if (!deal) return { ok: false, error: 'Deal not found.' };
 
+  const givenBuyerLeadIds = repVisibleBuyerLeadIds(session);
   const leadsWithCriteria = sheetToObjects(getSheet(BUYER_LEADS_SHEET, BUYER_LEAD_COLUMNS)).filter(function (l) {
-    return l['PurchaseCriteriaRaw'] && (l['IsResponsive'] === true || l['IsResponsive'] === 'TRUE') && leadVisibleToUsername(l, session.u);
+    return l['PurchaseCriteriaRaw'] && (l['IsResponsive'] === true || l['IsResponsive'] === 'TRUE') &&
+      (leadVisibleToUsername(l, session.u) || givenBuyerLeadIds[l['BuyerLeadID']]);
   });
   if (!leadsWithCriteria.length) return { ok: true, matches: [], totalConsidered: 0 };
 
