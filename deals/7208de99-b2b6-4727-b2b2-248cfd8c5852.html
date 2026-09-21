@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TN-1 — West Nashville Two-Parcel Builder Opportunity | JNA Dynamic Holdings LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e8;
+    --ink:#242019;
+    --ink-soft:#5c5548;
+    --line:#ddd3c1;
+    --accent:#8a5a34;
+    --card:#fffdf9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    line-height:1.55;
+  }
+  h1,h2,h3{
+    font-family:'Playfair Display',serif;
+    font-weight:600;
+    color:var(--ink);
+    letter-spacing:0.2px;
+  }
+  .wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding:0 28px;
+  }
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding-top:42px;
+    padding-bottom:28px;
+  }
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:2.5px;
+    font-size:12px;
+    color:var(--accent);
+    font-weight:600;
+    margin-bottom:10px;
+  }
+  h1.title{
+    font-size:38px;
+    margin-top:0;
+    margin-bottom:10px;
+  }
+  .location-line{
+    font-size:17px;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .address-note{
+    display:inline-block;
+    background:#efe4d3;
+    border:1px solid var(--line);
+    color:var(--accent);
+    padding:6px 12px;
+    border-radius:4px;
+    font-size:13.5px;
+    font-weight:600;
+    margin-top:10px;
+  }
+  .assignment-note{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    margin-top:14px;
+    font-style:italic;
+  }
+  section{
+    padding-top:38px;
+    padding-bottom:8px;
+  }
+  section.tight{
+    padding-top:22px;
+  }
+  .price-block{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:26px 30px;
+    margin-top:20px;
+    margin-bottom:8px;
+  }
+  .price-main{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .price-main .amount{
+    font-family:'Playfair Display',serif;
+    font-size:44px;
+    font-weight:700;
+    color:var(--accent);
+  }
+  .price-main .label{
+    font-size:14px;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+  }
+  .price-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:18px;
+    margin-top:22px;
+  }
+  .price-grid .item{
+    border-top:1px solid var(--line);
+    padding-top:10px;
+  }
+  .price-grid .item .k{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .price-grid .item .v{
+    font-size:18px;
+    font-weight:600;
+  }
+  .gallery{
+    display:flex;
+    gap:14px;
+    overflow-x:auto;
+    padding-top:16px;
+    padding-bottom:16px;
+    margin-top:14px;
+  }
+  .gallery img{
+    height:280px;
+    width:auto;
+    border-radius:6px;
+    border:1px solid var(--line);
+    flex-shrink:0;
+    object-fit:cover;
+  }
+  .more-photos{
+    display:inline-block;
+    margin-top:8px;
+    font-size:13.5px;
+    color:var(--accent);
+    text-decoration:underline;
+  }
+  h2.section-title{
+    font-size:26px;
+    margin-top:0;
+    margin-bottom:16px;
+    border-bottom:2px solid var(--accent);
+    display:inline-block;
+    padding-bottom:6px;
+  }
+  p{
+    color:var(--ink);
+    margin-top:0;
+  }
+  .lede{
+    font-size:17px;
+    color:var(--ink-soft);
+  }
+  ul{
+    padding-left:20px;
+  }
+  li{
+    margin-bottom:6px;
+  }
+  .parcel-cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:20px;
+    margin-top:18px;
+  }
+  .parcel-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:20px 22px;
+  }
+  .parcel-card h3{
+    font-size:19px;
+    margin-top:0;
+    margin-bottom:4px;
+  }
+  .parcel-card .sub{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-bottom:12px;
+  }
+  .parcel-card table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+  }
+  .parcel-card table td{
+    padding:6px 0;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  .parcel-card table td:first-child{
+    color:var(--ink-soft);
+    width:52%;
+    padding-right:10px;
+  }
+  table.terms{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:18px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden;
+  }
+  table.terms td{
+    padding:12px 18px;
+    border-bottom:1px solid var(--line);
+    font-size:15px;
+  }
+  table.terms tr:last-child td{
+    border-bottom:none;
+  }
+  table.terms td:first-child{
+    color:var(--ink-soft);
+    width:42%;
+  }
+  table.terms td:last-child{
+    font-weight:600;
+  }
+  .comp-box{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:4px solid var(--accent);
+    padding:16px 20px;
+    border-radius:4px;
+    margin-top:16px;
+  }
+  .disclosure{
+    font-size:13px;
+    color:var(--ink-soft);
+    background:#efe9dc;
+    border:1px solid var(--line);
+    padding:18px 22px;
+    border-radius:6px;
+    margin-top:18px;
+  }
+  .disclosure p{
+    margin-bottom:10px;
+    color:var(--ink-soft);
+  }
+  .disclosure p:last-child{
+    margin-bottom:0;
+  }
+  .cta-band{
+    background:var(--ink);
+    color:#f6f1e8;
+    margin-top:50px;
+    padding-top:44px;
+    padding-bottom:44px;
+  }
+  .cta-band h2{
+    color:#f6f1e8;
+    font-size:30px;
+    margin-top:0;
+    margin-bottom:12px;
+  }
+  .cta-band p{
+    color:#d8d0c0;
+    font-size:15.5px;
+    margin-bottom:22px;
+  }
+  .cta-contacts{
+    display:flex;
+    gap:26px;
+    flex-wrap:wrap;
+  }
+  .cta-contacts a{
+    color:#f6f1e8;
+    font-size:19px;
+    font-weight:600;
+    text-decoration:none;
+    border-bottom:2px solid var(--accent);
+    padding-bottom:3px;
+  }
+  footer.bottom{
+    padding-top:24px;
+    padding-bottom:40px;
+  }
+  footer.bottom p{
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+</style>
+</head>
+<body><div style="max-width:640px;margin:0 auto 20px;padding:20px 24px;text-align:center;font-family:Arial,sans-serif;border-bottom:1px solid #ddd;"><p style="color:#444;margin-bottom:16px;">Addresses are shared with wholesalers who already have an interested buyer for this deal, or with direct buyers reviewing this listing. Log in or create a free account to request it.</p><a href="https://sendmybuyer.com/?requestAddress=7208de99-b2b6-4727-b2b2-248cfd8c5852&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F7208de99-b2b6-4727-b2b2-248cfd8c5852.html" style="display:inline-block;padding:12px 28px;background:#1a73e8;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;">Request the Address</a><p style="margin-top:16px;"><a href="https://sendmybuyer.com" style="color:#1a73e8;">Log in</a> &nbsp;&middot;&nbsp; <a href="https://sendmybuyer.com" style="color:#1a73e8;">Browse all deals</a></p><p style="color:#888;font-size:0.9em;margin-top:20px;">Interested in this deal? This listing isn't searchable once you leave — <strong>save or bookmark this page's link</strong> before heading to the home page, so you can find your way back to it.</p></div>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Deal Code TN-1 &middot; Assignment of Contract</div>
+    <h1 class="title">West Nashville Builder Play — Two Deeded Parcels</h1>
+    <div class="location-line">Nashville, Davidson County, Tennessee &middot; 37209</div>
+    <div class="address-note">Address available upon request — contact us for the full parcel address list.</div>
+    <p class="assignment-note">JNA Dynamic Holdings LLC holds an equitable interest in this property under a purchase and sale agreement with the underlying seller and is marketing and assigning that equitable interest. This is an assignment of contract, not a direct sale of the real property.</p>
+  </header>
+
+  <section class="tight">
+    <div class="price-block">
+      <div class="price-main">
+        <span class="amount">$275,000</span>
+        <span class="label">Assignment Price — Both Parcels</span>
+      </div>
+      <div class="price-grid">
+        <div class="item">
+          <div class="k">Price Per Parcel</div>
+          <div class="v">$137,500</div>
+        </div>
+        <div class="item">
+          <div class="k">As-Is Value</div>
+          <div class="v">$478,000</div>
+        </div>
+        <div class="item">
+          <div class="k">Combined Land Value (Assessor)</div>
+          <div class="v">$324,000</div>
+        </div>
+        <div class="item">
+          <div class="k">Estimated Rehab</div>
+          <div class="v">$45,000</div>
+        </div>
+        <div class="item">
+          <div class="k">Deal Type</div>
+          <div class="v">Fix and Flip, Land</div>
+        </div>
+        <div class="item">
+          <div class="k">Combined Land Area</div>
+          <div class="v">10,550 SF</div>
+        </div>
+        <div class="item">
+          <div class="k">Combined Road Frontage</div>
+          <div class="v">71 Feet</div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin-top:8px;">As-Is Value reflects the 2026 Davidson County Assessor total appraised value across both parcels; figures are provided from public records and are deemed reliable but not independently verified by JNA Dynamic Holdings LLC.</p>
+  </section>
+
+  <section class="tight">
+    <div class="gallery">
+      <img src="/deals/7208de99-b2b6-4727-b2b2-248cfd8c5852/photos/1.jpg" alt="Exterior view of the improved parcel">
+      <img src="/deals/7208de99-b2b6-4727-b2b2-248cfd8c5852/photos/2.jpg" alt="Exterior view of the property lot">
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">The Opportunity</h2>
+    <p class="lede">Two separate deeded lots in The Nations, and one is already vacant.</p>
+    <p>Most two-build pitches sell buyers a hope: one parcel, one tax card, and a promise that Metro will approve a split down the road. This is not that. These two parcels are separate parcels of record — two parcel numbers, two legal descriptions, two deeds, recorded in 1963 and 1964. The Davidson County Assessor already classifies one parcel as vacant residential land. The split happened sixty years ago; no subdivision approval is required.</p>
+    <p>Both parcels sit under RS3.75 zoning with the Urban Zoning Overlay. RS3.75 requires a minimum 3,750 square foot lot. One parcel is 5,148 square feet, the other is 5,401 square feet — both clear the minimum with room to spare.</p>
+    <p>Davidson County appraises the two parcels at $478,000 combined for 2026. The land value alone, before counting the existing structure, is $324,000. The ask is $275,000 — below the county's own combined land value, in The Nations, on a street where new construction has closed at $850,000.</p>
+  </section>
+
+  <section>
+    <h2 class="section-title">Property Snapshot</h2>
+    <div class="parcel-cards">
+      <div class="parcel-card">
+        <h3>Parcel A — The Vacant Lot</h3>
+        <div class="sub">Address available upon request</div>
+        <table>
+          <tr><td>Parcel ID</td><td>092 06 0 409.00</td></tr>
+          <tr><td>Land Area</td><td>5,401 SF</td></tr>
+          <tr><td>Dimensions</td><td>43 ft frontage x 125 ft deep</td></tr>
+          <tr><td>Shape</td><td>Clean rectangle</td></tr>
+          <tr><td>Assessor Land Use</td><td>Vacant Residential Land</td></tr>
+          <tr><td>Assessor Land Value</td><td>$180,000</td></tr>
+          <tr><td>Improvements</td><td>None</td></tr>
+          <tr><td>Legal Description</td><td>PT Lot 4, Wills Sub of Barrow-Wills Sub</td></tr>
+          <tr><td>Instrument Recorded</td><td>12/11/1964</td></tr>
+        </table>
+      </div>
+      <div class="parcel-card">
+        <h3>Parcel B — The Improved Lot</h3>
+        <div class="sub">Address available upon request</div>
+        <table>
+          <tr><td>Parcel ID</td><td>092 06 0 408.01</td></tr>
+          <tr><td>Land Area</td><td>5,148 SF</td></tr>
+          <tr><td>Dimensions</td><td>28 ft frontage x 125 ft deep, widens toward rear</td></tr>
+          <tr><td>Assessor Land Use</td><td>Single Family</td></tr>
+          <tr><td>Assessor Total Appraised Value</td><td>$298,000</td></tr>
+          <tr><td>Assessor Land Value</td><td>$144,000</td></tr>
+          <tr><td>Beds / Baths</td><td>3 BR / 1 BA (per seller)</td></tr>
+          <tr><td>Sq. Ft.</td><td>1,358</td></tr>
+          <tr><td>Year Built</td><td>1930</td></tr>
+          <tr><td>Construction</td><td>Frame, one story, crawl space foundation, asphalt roof</td></tr>
+          <tr><td>Assessor Building Grade</td><td>C, condition average</td></tr>
+          <tr><td>Legal Description</td><td>P/O Lot 4, Wills Sub of Barrow-Wills Sub</td></tr>
+          <tr><td>Instrument Recorded</td><td>10/25/1963</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Zoning</h2>
+    <ul>
+      <li>Base zoning: RS3.75, medium density residential, minimum 3,750 SF lot, single-family dwellings at 9.87 units per acre</li>
+      <li>Overlay: OV-UZO, Urban Zoning Overlay</li>
+      <li>Both current, effective 2007 under ordinance BL2007-1334</li>
+      <li>Previously zoned R6 from 1974 until 2007</li>
+      <li>Both parcels exceed the RS3.75 minimum lot area independently</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="section-title">Utilities</h2>
+    <ul>
+      <li>Metro Water Services mapping confirms a 6-inch water main and a 36-inch main running along the road frontage of both parcels</li>
+      <li>The improved parcel is an existing occupied single-family residence with active service</li>
+      <li>Buyer to verify sanitary sewer tap availability and Metro Water capacity for the vacant parcel during the inspection period</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="section-title">Comp Support</h2>
+    <div class="comp-box">
+      <strong>3120 Torbett St — sold $850,000.</strong> Torbett runs the block directly behind this pocket — same submarket, same buyer pool, same product.
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Exit Strategies</h2>
+    <ul>
+      <li><strong>Scrape and build two:</strong> demo the 1930 structure on the improved parcel, build new on both parcels, two finished exits on one acquisition.</li>
+      <li><strong>Build one, hold one:</strong> the vacant parcel is ready for a permit set. Build there first, land-bank the improved parcel or rent the existing house while you go.</li>
+      <li><strong>Renovate and build:</strong> keep the 1930 bungalow as a rehab or rental, put new construction on the vacant parcel, sell separately.</li>
+      <li><strong>Split and flip the dirt:</strong> two deeded parcels means you can resell them individually to two different builders without touching Metro.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="section-title">Deal Terms</h2>
+    <table class="terms">
+      <tr><td>Purchase Price</td><td>$275,000</td></tr>
+      <tr><td>Earnest Money Deposit</td><td>$10,000, non-refundable</td></tr>
+      <tr><td>Inspection Period Ends</td><td>September 25, 2026</td></tr>
+      <tr><td>Closing Date</td><td>September 29, 2026</td></tr>
+      <tr><td>Post-Occupancy</td><td>Sellers remain in the structure through October 13, 2026; $20,000 held in escrow until sellers and personal property have fully vacated</td></tr>
+      <tr><td>Title Company</td><td>Rudy Title</td></tr>
+      <tr><td>Transaction Coordinator Fee</td><td>$425, paid by buyer</td></tr>
+      <tr><td>Financing</td><td>Cash or hard money only</td></tr>
+    </table>
+    <p style="margin-top:14px;font-size:14.5px;color:var(--ink-soft);">Inspection closes September 25 and closing is set for September 29 — a nine-day window for deeded, pre-split urban-core land priced below assessed land value.</p>
+  </section>
+
+  <section>
+    <h2 class="section-title">Disclosures &amp; Disclaimer</h2>
+    <div class="disclosure">
+      <p>JNA Dynamic Holdings LLC is not a licensed real estate brokerage and is not acting as an agent for the buyer or the seller. JNA Dynamic Holdings LLC holds an equitable interest in this property under a purchase and sale agreement and is marketing and assigning that equitable interest, not the real property itself. This is an assignment of contract.</p>
+      <p>All property information, including square footage, parcel dimensions, zoning, utility availability, structural condition, and comparable sales, is provided from public records and seller representations and is deemed reliable but not guaranteed or independently verified by JNA Dynamic Holdings LLC.</p>
+      <p>Buyer is responsible for conducting independent due diligence, including verification of zoning, buildability, setbacks, utility taps, survey, and title, within the inspection period. Property is sold strictly as-is, where-is, with no warranties expressed or implied. Earnest money is non-refundable upon execution.</p>
+    </div>
+  </section>
+</div>
+
+<div class="cta-band">
+  <div class="wrap">
+    <h2>Two Deeded Lots. One Already Vacant. Below County Land Value.</h2>
+    <p>The full parcel address list, both parcel record cards, the zoning history, the Metro Water map, and the assignment contract are ready to send as soon as you reach out. No proof of funds required to receive the file.</p>
+    <div class="cta-contacts">
+      <a href="tel:5206336437">520-633-6437</a>
+      <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <footer class="bottom">
+    <p>&copy; JNA Dynamic Holdings LLC. Information deemed reliable but not guaranteed and not independently verified. This is an assignment of contract; JNA Dynamic Holdings LLC holds an equitable interest in the property under agreement with the underlying seller and does not claim direct ownership of the real property.</p>
+  </footer>
+</div>
+
+</body>
+</html>
