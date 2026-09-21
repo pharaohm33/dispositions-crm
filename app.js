@@ -1056,10 +1056,12 @@ function dealCardHtml(d) {
 document.getElementById("rep-checkall-buyermatches-btn").addEventListener("click", async function () {
   const btn = this;
   const resultEl = document.getElementById("rep-checkall-buyermatches-result");
+  const listEl = document.getElementById("rep-checkall-buyermatches-list");
   if (btn.disabled) return;
   const activeDeals = repDeals.filter(function (d) { return d.Status !== "Dead" && d.Status !== "Sold"; });
   if (activeDeals.length === 0) { resultEl.textContent = " No active deals to check."; return; }
   btn.disabled = true;
+  listEl.innerHTML = "";
 
   let dealsWithMatches = 0;
   let totalMatches = 0;
@@ -1086,7 +1088,26 @@ document.getElementById("rep-checkall-buyermatches-btn").addEventListener("click
   btn.disabled = false;
   resultEl.textContent = " Checked " + activeDeals.length + " deal(s) — " + totalMatches + " match(es) across " + dealsWithMatches + " deal(s)." +
     (errorCount > 0 ? " " + errorCount + " couldn't be checked." : "");
-  showToast(dealsWithMatches > 0 ? "Found matches on " + dealsWithMatches + " deal(s) — admin's been notified." : "No matches found.");
+  showToast(dealsWithMatches > 0 ? "Found matches on " + dealsWithMatches + " deal(s)." : "No matches found.");
+
+  // Shown right here, not just emailed to admin -- so a rep can act on a
+  // match immediately (call the buyer, open the deal) instead of waiting
+  // to hear back.
+  if (bulkResults.length > 0) {
+    listEl.innerHTML = bulkResults.map(function (r) {
+      const deal = r.deal;
+      return '<div class="item-row">' +
+        '<strong>' + esc(deal.DealCode || "Deal") + '</strong> — ' + esc([deal.City, deal.State].filter(Boolean).join(", ")) +
+        r.matches.map(function (m) {
+          return '<div style="margin-top:6px; padding-top:6px; border-top:1px solid rgba(0,0,0,0.06);">' +
+            '<strong>' + esc(m.label) + ':</strong> ' + esc(m.buyerName) +
+            (m.phone ? ' &middot; ' + esc(m.phone) : "") + (m.email ? ' &middot; ' + esc(m.email) : "") +
+            '<div class="small-muted">' + esc(m.reason || "") + '</div>' +
+            '</div>';
+        }).join("") +
+        '</div>';
+    }).join("");
+  }
 });
 
 async function openRepDealDetail(dealId) {
