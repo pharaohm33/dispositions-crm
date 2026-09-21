@@ -309,8 +309,8 @@
       <label class="field-label">Cities <span class="small-muted">(comma separated, optional — in addition to any states above)</span></label>
       <input type="text" id="signup-dealarea-cities">
 
-      <div class="section-title">Getting Paid</div>
-      <p class="small-muted">Optional, but saves time later — if you bring in a deal that closes, this is how we pay you. <strong>Never type your bank account or routing number anywhere on this site.</strong> Instead, create one Google Doc or a Google Drive folder with the following filled out exactly, share it (view access), and paste that link below. Admin-only — no other rep can see this.</p>
+      <div class="section-title">Getting Paid <span class="small-muted">(optional — skip this and add it later if you'd rather)</span></div>
+      <p class="small-muted"><strong>Optional, but saves time later</strong> — if you bring in a deal that closes, this is how we pay you. You don't need to fill this out to sign up. <strong>Never type your bank account or routing number anywhere on this site.</strong> Instead, create one Google Doc or a Google Drive folder with the following filled out exactly, share it (view access), and paste that link below. Admin-only — no other rep can see this.</p>
       <ul class="small-muted" style="margin-top:0;">
         <li>Entity / account holder name (exactly as it appears on the bank account)</li>
         <li>Payment method: ACH or Wire</li>
@@ -320,9 +320,9 @@
         <li>Account type (Checking or Savings)</li>
         <li>A voided check or bank letter confirming the above, if you have one</li>
       </ul>
-      <label class="field-label">Entity / Name to Pay</label>
+      <label class="field-label">Entity / Name to Pay <span class="small-muted">(optional)</span></label>
       <input type="text" id="signup-payment-entity" placeholder="e.g. your LLC name, or your own full name">
-      <label class="field-label">Google Doc or Drive Folder Link (with the above filled out)</label>
+      <label class="field-label">Google Doc or Drive Folder Link (with the above filled out) <span class="small-muted">(optional)</span></label>
       <input type="text" id="signup-payment-drivelink" placeholder="https://drive.google.com/...">
     </div>
 
@@ -1421,11 +1421,11 @@
       <label class="field-label">Cities <span class="small-muted">(comma separated, optional)</span></label>
       <input type="text" id="area-dealarea-cities">
 
-      <div class="section-title">Getting Paid <span class="small-muted">(admin-only)</span></div>
-      <p class="small-muted">Never store a raw bank account/routing number here — this should only ever be a link to a Doc/folder the rep controls.</p>
-      <label class="field-label">Entity / Name to Pay</label>
+      <div class="section-title">Getting Paid <span class="small-muted">(admin-only, optional)</span></div>
+      <p class="small-muted">Optional for the rep to provide — leave blank if they haven't sent it yet. Never store a raw bank account/routing number here — this should only ever be a link to a Doc/folder the rep controls.</p>
+      <label class="field-label">Entity / Name to Pay <span class="small-muted">(optional)</span></label>
       <input type="text" id="area-payment-entity">
-      <label class="field-label">Google Doc or Drive Folder Link</label>
+      <label class="field-label">Google Doc or Drive Folder Link <span class="small-muted">(optional)</span></label>
       <input type="text" id="area-payment-drivelink" placeholder="https://drive.google.com/...">
     </div>
 
