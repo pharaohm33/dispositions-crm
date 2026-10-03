@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FL-1 (SFH) — Apopka, Orange County, FL | JNA Dynamic Holdings LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #f6f1e7;
+    color: #2b2621;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+  }
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    color: #1f1b16;
+  }
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  header.top {
+    background: #1f1b16;
+    color: #f6f1e7;
+    padding-top: 36px;
+    padding-bottom: 28px;
+  }
+  header.top .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 12px;
+    color: #c9a876;
+    margin-bottom: 10px;
+  }
+  header.top h1 {
+    color: #faf7f1;
+    font-size: 34px;
+    margin-top: 0;
+    margin-bottom: 8px;
+  }
+  header.top .loc {
+    font-size: 16px;
+    color: #e4dccc;
+    margin-bottom: 4px;
+  }
+  header.top .addr-note {
+    font-size: 14px;
+    color: #c9a876;
+    font-style: italic;
+    margin-top: 10px;
+  }
+
+  section {
+    margin-top: 44px;
+    margin-bottom: 44px;
+  }
+
+  .price-block {
+    background: #fffdf9;
+    border: 1px solid #e4d9c4;
+    border-radius: 10px;
+    padding: 28px;
+    margin-top: 28px;
+    margin-bottom: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+  }
+  .price-item { flex: 1 1 140px; }
+  .price-item .label {
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: #8a7c63;
+    margin-bottom: 6px;
+  }
+  .price-item .value {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: #1f1b16;
+  }
+
+  .gallery {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    margin-top: 18px;
+  }
+  .gallery img {
+    height: 230px;
+    width: auto;
+    border-radius: 8px;
+    flex-shrink: 0;
+    object-fit: cover;
+    border: 1px solid #e4d9c4;
+  }
+  .more-photos {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #7a5a2e;
+    text-decoration: underline;
+  }
+
+  h2.section-title {
+    font-size: 24px;
+    border-bottom: 2px solid #c9a876;
+    padding-bottom: 8px;
+    margin-bottom: 18px;
+  }
+
+  ul.clean {
+    padding-left: 20px;
+    margin: 0;
+  }
+  ul.clean li { margin-bottom: 8px; }
+
+  table.facts-table, table.comps-table, table.terms-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fffdf9;
+  }
+  table.facts-table td, table.comps-table td, table.comps-table th,
+  table.terms-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #e4d9c4;
+    font-size: 15px;
+    text-align: left;
+  }
+  table.facts-table td:first-child, table.terms-table td:first-child {
+    color: #6d6253;
+    width: 42%;
+  }
+  table.comps-table th {
+    background: #efe6d2;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: #6d6253;
+  }
+
+  .subnote {
+    font-size: 13.5px;
+    color: #6d6253;
+    margin-top: 10px;
+  }
+
+  .callout {
+    background: #efe6d2;
+    border-left: 4px solid #c9a876;
+    padding: 16px 18px;
+    border-radius: 4px;
+    font-size: 15px;
+  }
+
+  .assignment-note {
+    background: #fff;
+    border: 1px dashed #c9a876;
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-size: 14px;
+    color: #4a4237;
+  }
+
+  .cta-band {
+    background: #1f1b16;
+    color: #f6f1e7;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    margin-top: 0;
+    margin-bottom: 0;
+    text-align: center;
+  }
+  .cta-band h2 {
+    color: #faf7f1;
+    margin-top: 0;
+  }
+  .cta-band a {
+    color: #f6f1e7;
+    font-size: 19px;
+    text-decoration: none;
+    font-weight: 600;
+    display: block;
+    margin-top: 10px;
+  }
+  .cta-band .company {
+    color: #c9a876;
+    margin-top: 16px;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+  }
+
+  footer.disclaimer {
+    padding-top: 24px;
+    padding-bottom: 36px;
+    font-size: 12.5px;
+    color: #8a7c63;
+  }
+</style>
+</head>
+<body><div style="max-width:640px;margin:0 auto 20px;padding:20px 24px;text-align:center;font-family:Arial,sans-serif;border-bottom:1px solid #ddd;"><p style="color:#444;margin-bottom:16px;">Addresses are shared with wholesalers who already have an interested buyer for this deal, or with direct buyers reviewing this listing. Log in or create a free account to request it.</p><a href="https://sendmybuyer.com/?requestAddress=5c999190-af91-4fe5-9af6-c258fe6cb9ba&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F5c999190-af91-4fe5-9af6-c258fe6cb9ba.html" style="display:inline-block;padding:12px 28px;background:#1a73e8;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;">Request the Address</a><p style="margin-top:16px;"><a href="https://sendmybuyer.com" style="color:#1a73e8;">Log in</a> &nbsp;&middot;&nbsp; <a href="https://sendmybuyer.com" style="color:#1a73e8;">Browse all deals</a></p><p style="color:#888;font-size:0.9em;margin-top:20px;">Interested in this deal? This listing isn't searchable once you leave — <strong>save or bookmark this page's link</strong> before heading to the home page, so you can find your way back to it.</p></div>
+
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">Assignment of Contract Opportunity — Deal FL-1 (SFH)</div>
+    <h1>Fix &amp; Flip / BRRRR Opportunity in Apopka, Florida</h1>
+    <div class="loc">Apopka, Orange County, FL 32703 — Southwest Apopka / Ocoee–Winter Garden border</div>
+    <div class="addr-note">Address available upon request — contact us for the full property address.</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="price-block">
+    <div class="price-item">
+      <div class="label">Assignment Price</div>
+      <div class="value">$143,000</div>
+    </div>
+    <div class="price-item">
+      <div class="label">After Repair Value (ARV)</div>
+      <div class="value">$320,000</div>
+    </div>
+    <div class="price-item">
+      <div class="label">Rehab Estimate</div>
+      <div class="value">$70,000</div>
+    </div>
+  </div>
+
+  <section id="gallery-section">
+    <h2 class="section-title">Photos</h2>
+    <div class="gallery">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/1.jpg" alt="Apopka FL fix and flip property photo 1">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/2.jpg" alt="Apopka FL fix and flip property photo 2">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/3.jpg" alt="Apopka FL fix and flip property photo 3">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/4.jpg" alt="Apopka FL fix and flip property photo 4">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/5.jpg" alt="Apopka FL fix and flip property photo 5">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/6.jpg" alt="Apopka FL fix and flip property photo 6">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/7.jpg" alt="Apopka FL fix and flip property photo 7">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/8.jpg" alt="Apopka FL fix and flip property photo 8">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/9.jpg" alt="Apopka FL fix and flip property photo 9">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/10.jpg" alt="Apopka FL fix and flip property photo 10">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/11.jpg" alt="Apopka FL fix and flip property photo 11">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/12.jpg" alt="Apopka FL fix and flip property photo 12">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/13.jpg" alt="Apopka FL fix and flip property photo 13">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/14.jpg" alt="Apopka FL fix and flip property photo 14">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/15.jpg" alt="Apopka FL fix and flip property photo 15">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/16.jpg" alt="Apopka FL fix and flip property photo 16">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/17.jpg" alt="Apopka FL fix and flip property photo 17">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/18.jpg" alt="Apopka FL fix and flip property photo 18">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/19.jpg" alt="Apopka FL fix and flip property photo 19">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/20.jpg" alt="Apopka FL fix and flip property photo 20">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/21.jpg" alt="Apopka FL fix and flip property photo 21">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/22.jpg" alt="Apopka FL fix and flip property photo 22">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/23.jpg" alt="Apopka FL fix and flip property photo 23">
+      <img src="/deals/5c999190-af91-4fe5-9af6-c258fe6cb9ba/photos/24.jpg" alt="Apopka FL fix and flip property photo 24">
+    </div>
+    <a class="more-photos" href="https://drive.google.com/drive/folders/17S3gucWBnaKM6ePturKow1-I-Kx1GP7i?usp=sharing" target="_blank" rel="noopener">View full photo set &rarr;</a>
+  </section>
+
+  <section>
+    <h2 class="section-title">Property Overview</h2>
+    <table class="facts-table">
+      <tr><td>Property Type</td><td>Single Family Residence</td></tr>
+      <tr><td>Bedrooms / Bathrooms</td><td>3 bed / 2 bath</td></tr>
+      <tr><td>Living Area</td><td>1,600 sq ft</td></tr>
+      <tr><td>Lot Size</td><td>~8,732 sq ft</td></tr>
+      <tr><td>Year Built</td><td>1945 (classic Florida character home)</td></tr>
+      <tr><td>Neighborhood</td><td>Apopka 32703 — Southwest Apopka / Ocoee–Winter Garden border</td></tr>
+      <tr><td>County</td><td>Orange County, FL</td></tr>
+      <tr><td>APN</td><td>282129664021010</td></tr>
+      <tr><td>Annual Property Tax</td><td>~$1,500 (low for the price band)</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2 class="section-title">Property Highlights</h2>
+    <ul class="clean">
+      <li>$143,000 acquisition in one of Orlando metro's strongest growth corridors — Apopka has been absorbing new construction and appreciation for years.</li>
+      <li>The surrounding street features a mix of newer builds (2007–2008 homes trading $260+/sqft) alongside classic Florida character homes — the subject sits in this appreciating pocket.</li>
+      <li>20 minutes to Downtown Orlando, 25 minutes to Winter Park, 30 minutes to the Disney corridor — direct access to the Orlando tourism and jobs engine.</li>
+      <li>Ultra-low property tax base (~$1,500/yr) keeps carry costs minimal during renovation and hold.</li>
+      <li>Established rental market — 3BR homes in this Apopka corridor rent $1,500–$1,900/mo for updated units.</li>
+      <li>Multiple exit strategies: fix-and-flip, BRRRR refi, buy-and-hold cashflow, or short-term rental (inside the Orlando tourism drive market).</li>
+      <li>Character home with classic Florida bones — the kind of property retail buyers pay a premium for once updated.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="section-title">Repairs Needed</h2>
+    <ul class="clean">
+      <li>Full interior cosmetic renovation (paint, flooring, fixtures)</li>
+      <li>Kitchen and bathroom refresh</li>
+      <li>System verification during due diligence (electrical, plumbing typical for era)</li>
+    </ul>
+    <p class="subnote">Estimated repair cost range per scope of work: $40,000 – $60,000. (Deal-level rehab estimate carried in the price block above: $70,000.)</p>
+  </section>
+
+  <section>
+    <h2 class="section-title">Comparable Sales &amp; ARV Analysis</h2>
+    <table class="comps-table">
+      <tr><th>Comparable</th><th>Status / Date</th><th>Price</th></tr>
+      <tr><td>Summer Haven Ln, Apopka, FL 32703 (address available on request)</td><td>Sold 09/08/2026</td><td>$350,000</td></tr>
+      <tr><td>Cochran St, Apopka, FL 32703 (address available on request)</td><td>Listed 08/07/2026</td><td>$294,000</td></tr>
+      <tr><td>Rollin O Ln, Apopka, FL 32703 (address available on request)</td><td>Listed 08/14/2026</td><td>$339,000</td></tr>
+      <tr><td>Nearby comp — 3/2, 1,608 sqft, built 2007 (sqft nearly identical to subject)</td><td>—</td><td>—</td></tr>
+      <tr><td>Nearby comp — 3/2, 1,766 sqft, built 2008</td><td>—</td><td>—</td></tr>
+    </table>
+    <p class="subnote">Nearby homes have sold from $203,000 to $647,000 at an average of $260/sqft (Redfin-verified). Subject at 1,600 sqft &times; $200–$215/sqft post-renovation implies an ARV of $320,000–$344,000. A more conservative ARV band of $280,000–$320,000 is applied given the 1945 build vintage. Overall ARV range across these analyses: $290,000–$340,000.</p>
+  </section>
+
+  <section>
+    <h2 class="section-title">Potential Rent Returns</h2>
+    <div class="callout">
+      Apopka 32703 3BR/2BA market rents run $1,500–$1,900/mo for updated units. At $1,700/mo gross ($20,400 annual), less 40% expenses, that's $12,240 NOI. On an all-in basis of ~$205,000, this pencils to a strong single-digit cap rate with double-digit cash-on-cash return after a BRRRR refinance.
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Fix-and-Flip Math</h2>
+    <table class="facts-table">
+      <tr><td>All-in cost</td><td>~$220,000 (purchase + rehab + holding/closing/sale)</td></tr>
+      <tr><td>Exit at mid-ARV</td><td>$310,000</td></tr>
+      <tr><td>Gross spread</td><td>$90,000</td></tr>
+      <tr><td>Estimated net profit</td><td>~$65,000</td></tr>
+      <tr><td>Target cycle</td><td>90–120 days</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2 class="section-title">BRRRR Math</h2>
+    <table class="facts-table">
+      <tr><td>All-in cost</td><td>~$205,000 (purchase + rehab)</td></tr>
+      <tr><td>Refinance</td><td>75% LTV on $310,000 stabilized BPO = $232,000 cash-out</td></tr>
+      <tr><td>Capital recovery</td><td>113% of capital recovered — a cashflowing Orlando-metro rental with zero cash left in the deal</td></tr>
+      <tr><td>Bonus upside</td><td>Short-term rental potential — Apopka sits inside the Orlando tourism drive market for weekender guests</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2 class="section-title">Deal Terms</h2>
+    <table class="terms-table">
+      <tr><td>Deal Code</td><td>FL-1 (SFH)</td></tr>
+      <tr><td>Deal Type</td><td>Fix and Flip (assignment of contract)</td></tr>
+      <tr><td>Assignment Price</td><td>$143,000</td></tr>
+      <tr><td>Earnest Money Deposit (EMD)</td><td>$10,000</td></tr>
+      <tr><td>Close of Escrow (COE)</td><td>September 8, 2026</td></tr>
+      <tr><td>Financing</td><td>Cash or Hard Money Only — Proof of Funds (POF) required</td></tr>
+      <tr><td>ARV</td><td>$320,000 (range across analysis: $290,000–$344,000)</td></tr>
+      <tr><td>Rehab Estimate</td><td>$70,000 (scope-level range: $40,000–$60,000)</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <div class="assignment-note">
+      This offering is an assignment of contract. JNA Dynamic Holdings LLC holds an equitable contract interest on this property and is marketing that contract interest for assignment; this is not a direct sale by, and does not involve direct contact with, the underlying property owner. Figures above — including square footage, lot size, year built, tax amount, comparable sales, rent estimates, and projected returns — are provided by the assigning party and have not been independently verified by JNA Dynamic Holdings LLC. Buyers should perform their own due diligence prior to submitting an offer.
+    </div>
+  </section>
+
+</div>
+
+<div class="cta-band">
+  <div class="wrap">
+    <h2>Ready to Move on Deal FL-1 (SFH)?</h2>
+    <p>Motivated seller, defensible comps, multiple exit paths, and a low tax base. Reach out today for the full address, documents, and additional photos.</p>
+    <a href="tel:5206336437">520-633-6437</a>
+    <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
+    <div class="company">JNA Dynamic Holdings LLC</div>
+  </div>
+</div>
+
+<footer class="disclaimer">
+  <div class="wrap">
+    This material is for informational purposes only and does not constitute an offer to sell real estate. This is an assignment of contract opportunity; the assignee named above (JNA Dynamic Holdings LLC) holds a contractual interest in the property and is offering that interest for assignment. All figures, including price, ARV, rehab estimates, rent estimates, and comparable sales, are believed to be accurate but have not been independently verified by JNA Dynamic Holdings LLC. Buyers are encouraged to conduct independent due diligence, including title, inspection, and valuation review, before entering into any agreement.
+  </div>
+</footer>
+
+</body>
+</html>
