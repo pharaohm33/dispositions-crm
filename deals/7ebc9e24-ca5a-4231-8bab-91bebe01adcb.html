@@ -1,272 +1,267 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NC-2 (SFH) — Winston-Salem, NC Fix & Flip Assignment | JNA Dynamic Holdings LLC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --paper:#f6f1e7;
-    --paper-dark:#efe7d6;
-    --ink:#2b241b;
-    --ink-soft:#5c5245;
-    --line:#d9cdb5;
-    --accent:#8a5a35;
-    --accent-dark:#6e4527;
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: #f4ede3;
+    color: #2b2420;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.55;
   }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    background:var(--paper);
-    color:var(--ink);
-    font-family:'Inter',sans-serif;
-    line-height:1.55;
+  .wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
   }
-  h1,h2,h3{
-    font-family:'Playfair Display',serif;
-    font-weight:600;
-    color:var(--ink);
-    margin:0;
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    color: #211b16;
   }
-  .wrap{
-    max-width:960px;
-    margin:0 auto;
-    padding:0 28px;
-  }
-  a{color:var(--accent-dark);}
+  a { color: inherit; }
 
-  header.top{
-    background:var(--paper-dark);
-    border-bottom:1px solid var(--line);
-    padding-top:36px;
-    padding-bottom:28px;
+  header.top {
+    background: #211b16;
+    color: #f4ede3;
+    padding-top: 14px;
+    padding-bottom: 14px;
   }
-  .eyebrow{
-    text-transform:uppercase;
-    letter-spacing:.14em;
-    font-size:12px;
-    color:var(--ink-soft);
-    font-weight:600;
-  }
-  header.top h1{
-    font-size:38px;
-    margin-top:10px;
-    line-height:1.15;
-  }
-  .location-line{
-    margin-top:10px;
-    font-size:17px;
-    color:var(--ink-soft);
-  }
-  .addr-note{
-    margin-top:14px;
-    display:inline-block;
-    background:#fff;
-    border:1px solid var(--line);
-    padding:9px 14px;
-    border-radius:4px;
-    font-size:14px;
-    font-weight:600;
-    color:var(--accent-dark);
+  header.top .code {
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #c9a876;
   }
 
-  section.price-band{
-    background:var(--ink);
-    color:#f6f1e7;
-    padding-top:26px;
-    padding-bottom:26px;
+  .hero {
+    padding-top: 48px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid #ddd0bd;
   }
-  .price-grid{
-    display:flex;
-    flex-wrap:wrap;
-    gap:28px;
+  .hero h1 {
+    font-size: 40px;
+    margin-top: 0;
+    margin-bottom: 10px;
   }
-  .price-item{
-    min-width:150px;
+  .hero .location {
+    font-size: 18px;
+    color: #4a4038;
+    margin-top: 0;
+    margin-bottom: 6px;
   }
-  .price-item .label{
-    text-transform:uppercase;
-    letter-spacing:.1em;
-    font-size:11px;
-    color:#cfc6b0;
+  .hero .addr-note {
+    font-size: 14.5px;
+    color: #80553d;
+    background: #fbe9dc;
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 4px;
+    margin-top: 6px;
+    margin-bottom: 22px;
   }
-  .price-item .value{
-    font-family:'Playfair Display',serif;
-    font-size:26px;
-    margin-top:4px;
+  .price-block {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 36px;
+    margin-top: 10px;
+    margin-bottom: 10px;
   }
-  .price-item .sub{
-    font-size:12px;
-    color:#b9af98;
-    margin-top:3px;
+  .price-item .label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6b5f54;
+    margin-bottom: 4px;
   }
-
-  section.gallery-sec{
-    padding-top:26px;
-    padding-bottom:10px;
+  .price-item .value {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: #211b16;
   }
-  .gallery-scroll{
-    display:flex;
-    gap:12px;
-    overflow-x:auto;
-    padding-bottom:12px;
+  .tags {
+    margin-top: 18px;
   }
-  .gallery-scroll img{
-    height:260px;
-    width:auto;
-    flex:0 0 auto;
-    border-radius:6px;
-    border:1px solid var(--line);
-    object-fit:cover;
-  }
-  .more-photos{
-    margin-top:10px;
-    font-size:14px;
-  }
-
-  section.body-sec{
-    padding-top:34px;
-    padding-bottom:10px;
-  }
-  section.body-sec h2{
-    font-size:24px;
-    border-bottom:2px solid var(--accent);
-    display:inline-block;
-    padding-bottom:4px;
-    margin-bottom:18px;
-  }
-  .lede{
-    font-size:16px;
-    color:var(--ink-soft);
-    max-width:720px;
+  .tag {
+    display: inline-block;
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: #211b16;
+    color: #f4ede3;
+    padding: 5px 12px;
+    border-radius: 999px;
+    margin-right: 8px;
   }
 
-  .fact-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:14px 26px;
-    margin-top:6px;
+  section.gallery {
+    padding-top: 32px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #ddd0bd;
   }
-  .fact{
-    border-top:1px solid var(--line);
-    padding-top:8px;
+  section.gallery h2 {
+    font-size: 22px;
+    margin-top: 0;
+    margin-bottom: 14px;
   }
-  .fact .k{
-    font-size:11px;
-    text-transform:uppercase;
-    letter-spacing:.08em;
-    color:var(--ink-soft);
+  .scroller {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 10px;
   }
-  .fact .v{
-    font-size:15px;
-    font-weight:600;
-    margin-top:2px;
+  .scroller img {
+    height: 260px;
+    width: auto;
+    border-radius: 6px;
+    flex: 0 0 auto;
+    object-fit: cover;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
   }
-
-  ul.clean{
-    margin:0;
-    padding-left:20px;
-  }
-  ul.clean li{
-    margin-bottom:7px;
-  }
-  .subhead{
-    font-size:16px;
-    font-weight:700;
-    margin-top:22px;
-    margin-bottom:8px;
-    font-family:'Inter',sans-serif;
+  .more-photos {
+    display: inline-block;
+    margin-top: 14px;
+    font-size: 14px;
+    text-decoration: underline;
+    color: #80553d;
   }
 
-  table.terms{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:10px;
-    font-size:15px;
+  section.terms {
+    padding-top: 36px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid #ddd0bd;
   }
-  table.terms td{
-    padding:10px 8px;
-    border-bottom:1px solid var(--line);
-    vertical-align:top;
+  section.terms h2 {
+    font-size: 24px;
+    margin-top: 0;
+    margin-bottom: 18px;
   }
-  table.terms td:first-child{
-    width:40%;
-    color:var(--ink-soft);
-    font-weight:600;
+  table.terms-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
   }
-
-  .comp-card{
-    border:1px solid var(--line);
-    border-radius:6px;
-    padding:14px 16px;
-    margin-bottom:12px;
-    background:#fffdf8;
+  table.terms-table tr {
+    border-bottom: 1px solid #e3d8c7;
   }
-  .comp-card .sold{
-    font-weight:700;
-    color:var(--accent-dark);
+  table.terms-table td {
+    padding: 11px 6px;
+    vertical-align: top;
   }
-
-  .callout{
-    background:var(--paper-dark);
-    border-left:4px solid var(--accent);
-    padding:14px 18px;
-    margin-top:16px;
-    font-size:15px;
+  table.terms-table td.label {
+    width: 42%;
+    color: #6b5f54;
+    font-weight: 500;
+  }
+  table.terms-table td.value {
+    color: #211b16;
   }
 
-  .disclosure-box{
-    background:#fffdf8;
-    border:1px solid var(--line);
-    border-radius:6px;
-    padding:18px 20px;
-    font-size:14px;
-    color:var(--ink-soft);
-    margin-top:10px;
+  section.numbers {
+    padding-top: 36px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid #ddd0bd;
+  }
+  section.numbers h2 {
+    font-size: 24px;
+    margin-top: 0;
+    margin-bottom: 18px;
+  }
+  .numbers-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .numbers-grid .card {
+    background: #fff;
+    border: 1px solid #e3d8c7;
+    border-radius: 8px;
+    padding: 18px 20px;
+    flex: 1 1 200px;
+  }
+  .numbers-grid .card .label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #6b5f54;
+    margin-bottom: 6px;
+  }
+  .numbers-grid .card .value {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
   }
 
-  section.cta{
-    background:var(--accent-dark);
-    color:#fbf6ec;
-    padding-top:40px;
-    padding-bottom:40px;
-    margin-top:40px;
+  section.disclosure {
+    padding-top: 30px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #ddd0bd;
+    font-size: 14px;
+    color: #5a4f44;
   }
-  section.cta h2{
-    color:#fbf6ec;
-    font-size:30px;
+  section.disclosure h3 {
+    font-size: 17px;
+    margin-top: 0;
+    margin-bottom: 8px;
   }
-  section.cta p{
-    color:#f0e3cf;
-    max-width:600px;
-  }
-  .cta-contact{
-    margin-top:18px;
-    display:flex;
-    flex-wrap:wrap;
-    gap:24px;
-  }
-  .cta-contact a{
-    color:#fbf6ec;
-    font-weight:700;
-    font-size:18px;
-    text-decoration:none;
-    border-bottom:2px solid #d6a96b;
-    padding-bottom:2px;
+  section.disclosure p {
+    margin-top: 0;
+    margin-bottom: 12px;
   }
 
-  footer.fine{
-    padding-top:22px;
-    padding-bottom:40px;
-    font-size:12px;
-    color:var(--ink-soft);
+  .cta-band {
+    background: #211b16;
+    color: #f4ede3;
+    padding-top: 44px;
+    padding-bottom: 44px;
   }
-  footer.fine p{
-    margin-top:0;
-    margin-bottom:10px;
+  .cta-band h2 {
+    color: #f4ede3;
+    font-size: 28px;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  .cta-band p {
+    color: #d8cdbf;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 15.5px;
+  }
+  .cta-buttons {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .cta-buttons a {
+    text-decoration: none;
+    padding: 13px 24px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .cta-buttons a.phone {
+    background: #c9a876;
+    color: #211b16;
+  }
+  .cta-buttons a.email {
+    border: 1px solid #c9a876;
+    color: #f4ede3;
+  }
+
+  footer.bottom {
+    background: #1a1511;
+    color: #8c8278;
+    font-size: 12.5px;
+    padding-top: 18px;
+    padding-bottom: 18px;
+    text-align: center;
   }
 </style>
 </head>
@@ -274,249 +269,174 @@
 
 <header class="top">
   <div class="wrap">
-    <div class="eyebrow">Deal NC-2 (SFH) &middot; Assignment of Contract</div>
-    <h1>Full-Gut Single Family on a Big Lot in 27104</h1>
-    <div class="location-line">Winston-Salem, Forsyth County, North Carolina 27104</div>
-    <div class="addr-note">Address available upon request — contact us and we'll send the exact location.</div>
+    <div class="code">Deal Code: NC-2 (SFH) &nbsp;|&nbsp; JNA Dynamic Holdings LLC</div>
   </div>
 </header>
 
-<section class="price-band">
+<section class="hero">
   <div class="wrap">
-    <div class="price-grid">
+    <h1>Single-Family Fix &amp; Flip Opportunity</h1>
+    <p class="location">Winston-Salem, Forsyth County, North Carolina</p>
+    <div class="addr-note">Address available upon request — contact us directly for the full property address.</div>
+
+    <div class="price-block">
       <div class="price-item">
         <div class="label">Asking Price</div>
         <div class="value">$155,000</div>
-        <div class="sub">$63 / sq ft at asking</div>
       </div>
       <div class="price-item">
-        <div class="label">Comp-Report Adjusted ARV</div>
-        <div class="value">$458,637</div>
-        <div class="sub">Range $435,705 – $481,569</div>
+        <div class="label">After Repair Value (ARV)</div>
+        <div class="value">$458,000</div>
       </div>
       <div class="price-item">
-        <div class="label">Estimated Rehab Budget</div>
+        <div class="label">Estimated Rehab</div>
         <div class="value">$90,000</div>
-        <div class="sub">JNA Dynamic Holdings ballpark; no formal contractor scope was provided — buyer to run own numbers</div>
-      </div>
-      <div class="price-item">
-        <div class="label">Comparable $/sq ft</div>
-        <div class="value">$182 – $190</div>
-        <div class="sub">Average $185/sq ft, 27104 renovated sales</div>
       </div>
     </div>
+
+    <div class="tags">
+      <span class="tag">Fix and Flip</span>
+      <span class="tag">Vacant</span>
+      <span class="tag">Cash / Hard Money Only</span>
+    </div>
   </div>
 </section>
 
-<section class="gallery-sec">
+<section class="gallery">
   <div class="wrap">
-    <div class="gallery-scroll">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/1.jpg" alt="Winston-Salem NC fix and flip property photo 1">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/2.jpg" alt="Winston-Salem NC fix and flip property photo 2">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/3.jpg" alt="Winston-Salem NC fix and flip property photo 3">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/4.jpg" alt="Winston-Salem NC fix and flip property photo 4">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/5.jpg" alt="Winston-Salem NC fix and flip property photo 5">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/6.jpg" alt="Winston-Salem NC fix and flip property photo 6">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/7.jpg" alt="Winston-Salem NC fix and flip property photo 7">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/8.jpg" alt="Winston-Salem NC fix and flip property photo 8">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/9.jpg" alt="Winston-Salem NC fix and flip property photo 9">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/10.jpg" alt="Winston-Salem NC fix and flip property photo 10">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/11.jpg" alt="Winston-Salem NC fix and flip property photo 11">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/12.jpg" alt="Winston-Salem NC fix and flip property photo 12">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/13.jpg" alt="Winston-Salem NC fix and flip property photo 13">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/14.jpg" alt="Winston-Salem NC fix and flip property photo 14">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/15.jpg" alt="Winston-Salem NC fix and flip property photo 15">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/16.jpg" alt="Winston-Salem NC fix and flip property photo 16">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/17.jpg" alt="Winston-Salem NC fix and flip property photo 17">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/18.jpg" alt="Winston-Salem NC fix and flip property photo 18">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/19.jpg" alt="Winston-Salem NC fix and flip property photo 19">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/20.jpg" alt="Winston-Salem NC fix and flip property photo 20">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/21.jpg" alt="Winston-Salem NC fix and flip property photo 21">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/22.jpg" alt="Winston-Salem NC fix and flip property photo 22">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/23.jpg" alt="Winston-Salem NC fix and flip property photo 23">
-      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/24.jpg" alt="Winston-Salem NC fix and flip property photo 24">
+    <h2>Property Photos</h2>
+    <div class="scroller">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/1.jpg" alt="Property photo 1">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/2.jpg" alt="Property photo 2">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/3.jpg" alt="Property photo 3">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/4.jpg" alt="Property photo 4">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/5.jpg" alt="Property photo 5">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/6.jpg" alt="Property photo 6">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/7.jpg" alt="Property photo 7">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/8.jpg" alt="Property photo 8">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/9.jpg" alt="Property photo 9">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/10.jpg" alt="Property photo 10">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/11.jpg" alt="Property photo 11">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/12.jpg" alt="Property photo 12">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/13.jpg" alt="Property photo 13">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/14.jpg" alt="Property photo 14">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/15.jpg" alt="Property photo 15">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/16.jpg" alt="Property photo 16">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/17.jpg" alt="Property photo 17">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/18.jpg" alt="Property photo 18">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/19.jpg" alt="Property photo 19">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/20.jpg" alt="Property photo 20">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/21.jpg" alt="Property photo 21">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/22.jpg" alt="Property photo 22">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/23.jpg" alt="Property photo 23">
+      <img src="/deals/7ebc9e24-ca5a-4231-8bab-91bebe01adcb/photos/24.jpg" alt="Property photo 24">
     </div>
-    <div class="more-photos"><a href="https://drive.google.com/drive/folders/15ZphL0_SBdYtJExpxO6AQPEqxxQqdE3E?usp=sharing" target="_blank" rel="noopener">View full photo set &rarr;</a></div>
+    <a class="more-photos" href="https://drive.google.com/drive/folders/15ZphL0_SBdYtJExpxO6AQPEqxxQqdE3E?usp=sharing" target="_blank" rel="noopener">View full photo set</a>
   </div>
 </section>
 
-<section class="body-sec">
+<section class="numbers">
   <div class="wrap">
-    <h2>The Short Version</h2>
-    <p class="lede">This house needs everything — not paint and carpet, everything. There is a professional condition report on the property and it is not a pretty document. Roof over twenty years old and leaking, both HVAC systems over twenty years old, plumbing needing full replacement, an electrical panel with double-lugged breakers and cut wires, fungal growth in the crawlspace and through walls and ceilings, kitchen cabinets already removed, trash and animal waste inside, and three rear additions that appear to have been built without permits. If you are looking for a light flip, this is not it.</p>
-    <p class="lede" style="margin-top:14px;">Here is why it's still worth a look: $155,000 on a 2,470 square foot house sitting on 16,988 square feet in 27104, one of the better addresses in Winston-Salem. That is $63 a square foot going in. Renovated product within a mile is closing between $182 and $190 a foot, with three sales this year at $430,000 and $455,000. Ugly house, good street, big spread, and a contractor's scope of work.</p>
-  </div>
-</section>
-
-<section class="body-sec">
-  <div class="wrap">
-    <h2>Property Snapshot</h2>
-    <div class="fact-grid">
-      <div class="fact"><div class="k">Beds / Baths</div><div class="v">4 Bed / 3 Full Bath</div></div>
-      <div class="fact"><div class="k">Square Feet</div><div class="v">2,470 sq ft (per tax records)</div></div>
-      <div class="fact"><div class="k">Lot Size</div><div class="v">16,988 sq ft (approx. 0.39 acres)</div></div>
-      <div class="fact"><div class="k">Year Built</div><div class="v">1953</div></div>
-      <div class="fact"><div class="k">Water / Sewer</div><div class="v">City</div></div>
-      <div class="fact"><div class="k">Utilities</div><div class="v">Power, gas and water currently off</div></div>
-      <div class="fact"><div class="k">Driveway</div><div class="v">Concrete</div></div>
-      <div class="fact"><div class="k">Fence</div><div class="v">None</div></div>
-      <div class="fact"><div class="k">Occupancy</div><div class="v">Vacant</div></div>
-      <div class="fact"><div class="k">Access</div><div class="v">By appointment, first come first served</div></div>
-    </div>
-
-    <div class="callout">
-      Square footage note: tax records show 2,470 sq ft total. The inspection report breaks that out as 1,934 sq ft on the main floor, an 824 sq ft upstairs addition, and a 320 sq ft rear sunroom — and the additions do not appear to have been permitted. Confirm what is permitted, what counts as heated living area, and what an appraiser will credit before setting your ARV.
-    </div>
-
-    <div class="subhead">Layout</div>
-    <ul class="clean">
-      <li>Main floor: 3 bedrooms and 2 full baths, approximately 1,934 sq ft</li>
-      <li>Upstairs addition: 1 bedroom and 1 full bath, approximately 824 sq ft, converted attic space with significant unused room</li>
-      <li>Rear left enclosed sunroom: approximately 320 sq ft</li>
-      <li>The upstairs has room to add bedrooms, a bath, or closets to create additional bedrooms</li>
-    </ul>
-  </div>
-</section>
-
-<section class="body-sec">
-  <div class="wrap">
-    <h2>Condition — Read All of It</h2>
-    <p class="lede">Taken from a professional inspection, not a seller's description. The full inspection report is available on request.</p>
-
-    <div class="subhead">Structural and Exterior</div>
-    <ul class="clean">
-      <li>Concrete block foundation and block piers; no major foundation damage observed</li>
-      <li>Large holes busted through the foundation for crawlspace access</li>
-      <li>Fungal growth throughout the floor system</li>
-      <li>Left side family room joists are supported by 2x4 stiff knees on brick at each span</li>
-      <li>Rear left sunroom has a poorly built dry-stacked block foundation, a sagging floor system, and a sagging roof</li>
-      <li>Roof is 3-tab shingle and flat sections, all over 20 years old, all leaking</li>
-      <li>Left side storage room is crumbling; rear right shed roof has collapsed</li>
-      <li>Deck is fully waterlogged and rotted</li>
-      <li>Vinyl siding is in good shape</li>
-      <li>Windows are old fixed and crank-out units, several rotted</li>
-      <li>All exterior doors damaged</li>
-    </ul>
-
-    <div class="subhead">Crawlspace and Attic</div>
-    <ul class="clean">
-      <li>High moisture, fungal growth, damaged insulation in the crawlspace</li>
-      <li>Attic has been converted to a bedroom and bathroom</li>
-    </ul>
-
-    <div class="subhead">Mechanical</div>
-    <ul class="clean">
-      <li>200 amp older panel with multiple double-lugged breakers and cut wires in the panel</li>
-      <li>Open and spliced wires in the crawlspace and inside the home</li>
-      <li>Water lines are a mix of CPVC, galvanized and copper, all in poor condition with leaks; ABS drains; full plumbing replacement needed</li>
-      <li>Water heater manufactured 1994</li>
-      <li>Both HVAC systems over 20 years old; ductwork under the home heavily damaged</li>
-    </ul>
-
-    <div class="subhead">Interior</div>
-    <ul class="clean">
-      <li>Kitchen cabinets removed</li>
-      <li>Bathrooms old and in poor condition</li>
-      <li>Walls, ceilings, trim, interior and closet doors all damaged</li>
-      <li>Multiple floor levels and sloped ceilings throughout</li>
-      <li>Strong odors, animal feces, large amounts of trash</li>
-      <li>Moisture in ceilings and crawlspace, fungal growth in crawlspace, walls and ceilings</li>
-      <li>No termite damage observed</li>
-    </ul>
-
-    <div class="subhead">Permits</div>
-    <ul class="clean">
-      <li>None of the three rear additions appear to have been permitted</li>
-    </ul>
-
-    <p class="lede" style="margin-top:16px;">JNA Dynamic Holdings LLC makes no representation as to condition. This property is sold strictly as-is.</p>
-  </div>
-</section>
-
-<section class="body-sec">
-  <div class="wrap">
-    <h2>Closed Comps — 27104</h2>
-
-    <div class="comp-card">
-      <div class="sold">341 N Peace Haven Rd — Sold $455,000 on 03/26/2026</div>
-      <div>4 Bed / 3 Bath / 2,389 sq ft / Built 2020 / $190 per sq ft / 0.7 mi from subject</div>
-    </div>
-    <div class="comp-card">
-      <div class="sold">470 Westoak Trl — Sold $455,000 on 07/20/2026</div>
-      <div>3 Bed / 2.5 Bath / 2,504 sq ft / Built 1966 / $182 per sq ft / 0.4 mi from subject / renovated</div>
-    </div>
-    <div class="comp-card">
-      <div class="sold">252 Lucerne Ln NW — Sold $430,000 on 09/23/2026</div>
-      <div>3 Bed / 3 Bath / 2,345 sq ft / Built 1956 / $183 per sq ft / 1.0 mi from subject / renovated</div>
-    </div>
-
-    <p class="lede" style="margin-top:14px;">Comp report figures: adjusted values of $480,425, $466,572 and $428,914, averaging $458,637. Average price per square foot $185. Average distance 0.7 miles. Average three months since sale.</p>
-
-    <div class="callout">
-      One more comp, read correctly: a house four doors down on this same street sold at 101 Tipperary Ln for $255,000 on 08/14/2026. That house sold in unrenovated, as-is condition, the same way the subject is selling today — it is not a finished-product comp. It is a useful data point for what tired inventory on this street trades for, and it is a floor, not a ceiling. The finished comps are the three above at $430,000 to $455,000, all within a mile, all closed in the last six months — that is what you are renovating toward.
+    <h2>Investment Snapshot</h2>
+    <div class="numbers-grid">
+      <div class="card">
+        <div class="label">Asking Price</div>
+        <div class="value">$155,000</div>
+      </div>
+      <div class="card">
+        <div class="label">After Repair Value</div>
+        <div class="value">$458,000</div>
+      </div>
+      <div class="card">
+        <div class="label">Estimated Rehab Cost</div>
+        <div class="value">$90,000</div>
+      </div>
+      <div class="card">
+        <div class="label">Deal Type</div>
+        <div class="value" style="font-size:18px;">Fix and Flip</div>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="body-sec">
-  <div class="wrap">
-    <h2>How This Pencils</h2>
-    <p class="lede">Buying at $63 a foot. Renovated 27104 product is trading at $182 to $190 a foot. The comp report puts adjusted value at $458,637. The scope is heavy: roof, both HVAC systems, full plumbing replacement, electrical remediation, crawlspace and fungal work, kitchen from scratch, all baths, floor system repairs, and a trash-out. The sunroom and the unpermitted additions are their own decision, and some of that square footage may be worth removing rather than repairing. Price the scope yourself, take the permit question seriously, and the spread on this street still supports the work. Buyer to run their own comps and confirm their own ARV.</p>
-
-    <div class="subhead">Exit Strategies</div>
-    <ul class="clean">
-      <li><strong>Full gut flip:</strong> Buy at $155,000, complete a full renovation, resell into a comp set that closed at $430,000 to $455,000 in the last six months</li>
-      <li><strong>Buy and hold:</strong> Four bedrooms and three baths in 27104; the comp report carries a rent estimate of $4,494 per month on the subject, which should be verified against an independent rent survey</li>
-      <li><strong>BRRRR:</strong> Renovate, lease, refinance against a comp-supported value in the mid four-hundreds</li>
-      <li><strong>Reconfigure and expand:</strong> The upstairs has significant unused room and can support additional bedrooms, a bath, or added closets, subject to permitting</li>
-    </ul>
-  </div>
-</section>
-
-<section class="body-sec">
+<section class="terms">
   <div class="wrap">
     <h2>Deal Terms</h2>
-    <table class="terms">
-      <tr><td>Asking Price</td><td>$155,000</td></tr>
-      <tr><td>Occupancy</td><td>Vacant</td></tr>
-      <tr><td>Access</td><td>By appointment — call or text to schedule your walkthrough; first come, first served</td></tr>
-      <tr><td>Condition</td><td>Sold strictly as-is</td></tr>
-      <tr><td>Financing</td><td>Cash or hard money only</td></tr>
-      <tr><td>Closing Costs</td><td>Buyer pays all closing costs, including escrow, title and title insurance</td></tr>
-      <tr><td>Transaction Coordination Fee</td><td>$425, paid by buyer</td></tr>
-      <tr><td>EMD</td><td>$10,000, non-refundable on assignment of contract</td></tr>
-      <tr><td>COE</td><td>Contact for terms</td></tr>
-      <tr><td>Title Company</td><td>Lowry Law Firm</td></tr>
-      <tr><td>Inspection Report</td><td>Full report available on request</td></tr>
+    <table class="terms-table">
+      <tr>
+        <td class="label">Asking Price</td>
+        <td class="value">$155,000</td>
+      </tr>
+      <tr>
+        <td class="label">Occupancy</td>
+        <td class="value">Vacant</td>
+      </tr>
+      <tr>
+        <td class="label">Access</td>
+        <td class="value">By appointment only — call or text to schedule a walkthrough</td>
+      </tr>
+      <tr>
+        <td class="label">Priority</td>
+        <td class="value">First come, first served</td>
+      </tr>
+      <tr>
+        <td class="label">Condition</td>
+        <td class="value">Sold strictly as-is</td>
+      </tr>
+      <tr>
+        <td class="label">Financing</td>
+        <td class="value">Cash or hard money only</td>
+      </tr>
+      <tr>
+        <td class="label">Closing Costs</td>
+        <td class="value">Buyer pays all closing costs, including escrow, title, and title insurance</td>
+      </tr>
+      <tr>
+        <td class="label">Transaction Coordination Fee</td>
+        <td class="value">$425, paid by buyer</td>
+      </tr>
+      <tr>
+        <td class="label">EMD (Earnest Money Deposit)</td>
+        <td class="value">$10,000, non-refundable on assignment of contract</td>
+      </tr>
+      <tr>
+        <td class="label">COE (Close of Escrow)</td>
+        <td class="value">Contact for terms</td>
+      </tr>
+      <tr>
+        <td class="label">Title Company</td>
+        <td class="value">Lowry Law Firm</td>
+      </tr>
+      <tr>
+        <td class="label">Inspection Report</td>
+        <td class="value">Full inspection report available on request</td>
+      </tr>
     </table>
   </div>
 </section>
 
-<section class="body-sec">
+<section class="disclosure">
   <div class="wrap">
-    <h2>Wholesale / Assignment Disclosure</h2>
-    <div class="disclosure-box">
-      <p>This is an assignment of contract, not a direct sale of real property. JNA Dynamic Holdings LLC is not the record owner of this property. We hold, or are in the process of holding, an equitable interest in the property under a purchase and sale agreement with the underlying owner, and we are marketing that equitable interest for assignment. We are not a licensed North Carolina real estate broker and are not acting as an agent for the seller or for any buyer. Earnest money on an assignment of contract is non-refundable.</p>
-      <p style="margin-bottom:0;">Figures referenced on this page — including square footage, lot size, comparable sales, condition details, and rent and value estimates — have not been independently verified by JNA Dynamic Holdings LLC. Buyer is responsible for conducting their own due diligence on condition, square footage, heated living area, permit history and permitted additions, structural condition, mold and moisture remediation, mechanical systems, title, liens, zoning, and value before making an offer.</p>
+    <h3>Assignment of Contract</h3>
+    <p>This offering is an assignment of contract. JNA Dynamic Holdings LLC holds an equitable interest in this property under contract with the underlying property owner and is marketing that contract position for assignment; this is not a direct sale by, or direct contact with, the property owner.</p>
+    <p>All figures, measurements, and estimates presented on this page — including price, ARV, and rehab estimate — have not been independently verified by JNA Dynamic Holdings LLC and should be independently confirmed by any prospective buyer prior to entering an agreement.</p>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="wrap">
+    <h2>Interested in this deal?</h2>
+    <p>Reach out today to request the full property address, schedule a walkthrough, or ask about terms.</p>
+    <div class="cta-buttons">
+      <a class="phone" href="tel:520-633-6437">Call / Text: 520-633-6437</a>
+      <a class="email" href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
     </div>
   </div>
 </section>
 
-<section class="cta">
+<footer class="bottom">
   <div class="wrap">
-    <h2>Let's Get You Inside With Your GC</h2>
-    <p>Sixty-three dollars a foot in 27104, with three renovated sales within a mile at $430,000 to $455,000 in the last six months. Vacant, first come first served. Reach out to schedule a walkthrough or request the full inspection report.</p>
-    <div class="cta-contact">
-      <a href="tel:5206336437">520-633-6437</a>
-      <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
-    </div>
-  </div>
-</section>
-
-<footer class="fine">
-  <div class="wrap">
-    <p>JNA Dynamic Holdings LLC &middot; Deal NC-2 (SFH) &middot; Winston-Salem, Forsyth County, NC 27104</p>
-    <p>Individual property address available upon request. Contact us for the full address and inspection report.</p>
+    JNA Dynamic Holdings LLC — Deal Code NC-2 (SFH) — Winston-Salem, Forsyth County, NC
   </div>
 </footer>
 
