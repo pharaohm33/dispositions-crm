@@ -395,13 +395,20 @@
       </div>
 
       <h4>Before you start</h4>
-      <p>Open the deal you're working and note only its general info: <strong>City / State / Zip</strong>, <strong>price</strong> and
-        <strong>asset type</strong>. The street address stays locked until admin grants it, and you don't need it &mdash; you're
-        sourcing buyers around the deal's <em>area</em>, not the property itself.</p>
+      <p>Open the deal you're working and note its general info: <strong>City / State / Zip</strong>, <strong>price</strong> and
+        <strong>asset type</strong>.</p>
+      <ul>
+        <li><strong>If admin has granted you the deal's address,</strong> use it: it's the best way to source the buyers
+          <strong>closest to the subject property</strong> &mdash; start your listing search right around that exact address.</li>
+        <li><strong>If you haven't been given the address,</strong> hit <strong>Request Address Access</strong> on the deal (or ask admin)
+          so you can search for buyers closest to the subject property. Until it's granted, work from the deal's city / zip.</li>
+        <li>Either way, the address is for <strong>searching only</strong>. Never share it with a buyer unless it has been granted for that
+          specific matched buyer &mdash; the address rules on the Deals tab still apply.</li>
+      </ul>
 
       <h4>Step 1 &mdash; Pull the nearby listings</h4>
       <ul>
-        <li>Search the deal's <strong>city / zip</strong> on <a href="https://www.zillow.com" target="_blank" rel="noopener">Zillow</a> and <a href="https://www.redfin.com" target="_blank" rel="noopener">Redfin</a>. Always start with the listings <strong>closest to the deal</strong>, then work outward.</li>
+        <li>Search the deal's <strong>city / zip</strong> on <a href="https://www.zillow.com" target="_blank" rel="noopener">Zillow</a> and <a href="https://www.redfin.com" target="_blank" rel="noopener">Redfin</a>. Always start with the listings <strong>closest to the subject property</strong> (right around the exact address if you have it), then work outward.</li>
         <li><strong>Zillow:</strong> click <strong>Filters</strong> &rarr; under <strong>Listing type</strong> tick <strong>New construction</strong> and/or <strong>Agent listed</strong>.</li>
         <li><strong>Redfin:</strong> homes for sale listed by an agent (flippers rarely self-list), active listings only.</li>
       </ul>
@@ -425,7 +432,12 @@ Put it in a table with the property address, owner or company name, phone, email
       <p class="small-muted">For new construction listings, add the listing photos or link and ask it to look for builder signs, logos and permit boards to identify the builder or LLC behind it.</p>
 
       <h4>Step 4 &mdash; Organize your call list by price and distance</h4>
-      <p>Run this second prompt on the list it just gave you, filling in the deal's <strong>city / state / zip</strong> and <strong>price</strong> (not the street address):</p>
+      <p>Run a second prompt on the list it just gave you. <strong>If you've been granted the address,</strong> use this one so the list is sorted by distance to the exact subject property:</p>
+      <div class="sop-prompt-wrap">
+        <pre class="sop-prompt" id="sop-prompt-sort-address">My subject property is at [SUBJECT PROPERTY ADDRESS] and my deal is priced at [DEAL PRICE]. Take the list above and organize it by price (closest to my deal's price first) and by distance to that address (closest first), so I know who to call first to sell this deal. Add a column for the distance in miles.</pre>
+        <button type="button" class="btn secondary small sop-copy-btn" data-copy-target="sop-prompt-sort-address">Copy</button>
+      </div>
+      <p><strong>No address yet?</strong> Request it (see Before you start), and in the meantime use this version with the deal's <strong>city / state / zip</strong> and <strong>price</strong>:</p>
       <div class="sop-prompt-wrap">
         <pre class="sop-prompt" id="sop-prompt-sort">My deal is in [CITY, STATE ZIP] and is priced at [DEAL PRICE]. Take the list above and organize it by price (closest to my deal's price first) and by distance to that zip code (closest first), so I know who to call first to sell this deal. Add a column for the distance in miles.</pre>
         <button type="button" class="btn secondary small sop-copy-btn" data-copy-target="sop-prompt-sort">Copy</button>
@@ -441,7 +453,7 @@ Put it in a table with the property address, owner or company name, phone, email
       </ul>
 
       <div class="sop-warn">
-        <strong>Verify before you rely on it.</strong> AI tools can guess, mix up companies, or return old contact details &mdash; treat every result as a lead to confirm. Only paste public listing information (addresses, photos, listing details) into these tools, never private information about our buyers, sellers or deals.
+        <strong>Verify before you rely on it.</strong> AI tools can guess, mix up companies, or return old contact details &mdash; treat every result as a lead to confirm. Only paste public listing information (listing addresses, photos, listing details) into these tools, never private information about our buyers or sellers. A granted subject-property address is for searching and sorting only &mdash; never share it with a buyer unless it's granted for that matched buyer.
       </div>
     </div>
   </details>

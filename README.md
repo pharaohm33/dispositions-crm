@@ -585,9 +585,13 @@ backend (see [SETUP.md](SETUP.md)).
   DeepSeek or Google AI Mode, run a second prompt that sorts the list by
   price and by distance to the deal's zip, import it on the Buyer Leads
   tab, and call (never cold text; 20+ calls the first hour, 50+ a day). It
-  deliberately says nothing about sourcing deals, and it uses only a deal's
-  general info (city/state/zip, price, asset type) so the locked street
-  address is never needed. Both prompts have **Copy** buttons, the bar
+  deliberately says nothing about sourcing deals. Reps who've been granted a
+  deal's address use it to source the buyers closest to the exact subject
+  property (with a distance-sort prompt for the address); reps who haven't
+  are told to hit **Request Address Access** (or ask admin), and meanwhile
+  work from the deal's general info (city/state/zip, price, asset type).
+  The address is for searching only and is never shared with a buyer unless
+  granted for that matched buyer. Both prompts have **Copy** buttons, the bar
   remembers whether a rep left it open (per browser), and it's hidden for
   **Buyer** signups the same way the build-your-own-list card is.
 - **Buyer Leads** — a collapsible **"How to Build a Buyer List"** guide sits
