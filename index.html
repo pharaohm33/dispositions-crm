@@ -126,6 +126,29 @@
   }
   .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
+  /* High-intent buyer sourcing SOP -- compact, collapsed-by-default bar at the very top of the rep view */
+  details.top-sop { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 12px; margin-bottom: 14px; box-shadow: 0 1px 2px rgba(30,25,15,0.04); }
+  details.top-sop[hidden] { display: none; }
+  details.top-sop > summary { list-style: none; cursor: pointer; padding: 12px 16px; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; color: var(--text); user-select: none; }
+  details.top-sop > summary::-webkit-details-marker { display: none; }
+  details.top-sop > summary::before { content: "\25B8"; color: var(--accent); font-size: 17px; line-height: 1; transition: transform 0.15s; flex: 0 0 auto; }
+  details.top-sop[open] > summary::before { transform: rotate(90deg); }
+  details.top-sop > summary:hover { background: var(--surface-muted); border-radius: 8px; }
+  details.top-sop .sop-hint { font-weight: 400; font-size: 12px; color: var(--muted); margin-left: auto; white-space: nowrap; }
+  details.top-sop[open] .sop-hint-closed { display: none; }
+  details.top-sop:not([open]) .sop-hint-open { display: none; }
+  details.top-sop .sop-body { padding: 4px 18px 18px; font-size: 13px; line-height: 1.55; }
+  details.top-sop .sop-body h4 { font-family: var(--serif); font-size: 15px; margin: 16px 0 4px; }
+  details.top-sop .sop-body p { margin: 4px 0 8px; }
+  details.top-sop .sop-body ul { margin: 4px 0 8px 20px; padding: 0; }
+  details.top-sop .sop-body li { margin: 3px 0; }
+  details.top-sop .sop-lead { background: var(--accent-light); border: 1px solid #cfe6d8; border-radius: 8px; padding: 10px 12px; color: #145039; margin: 10px 0 4px; }
+  details.top-sop .sop-prompt-wrap { position: relative; margin: 6px 0 10px; }
+  details.top-sop .sop-prompt { background: var(--surface-muted); border: 1px solid var(--border); border-radius: 8px; padding: 10px 76px 10px 12px; margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; white-space: pre-wrap; word-break: break-word; }
+  details.top-sop .sop-copy-btn { position: absolute; top: 8px; right: 8px; }
+  details.top-sop .sop-warn { background: var(--warn-light); border: 1px solid #f0d9a6; border-radius: 8px; padding: 10px 12px; color: #7a4d0a; margin: 10px 0 4px; }
+  @media (max-width: 480px) { details.top-sop .sop-hint { display: none; } }
+
   table.crm-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
   table.crm-table th, table.crm-table td { padding: 10px 12px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
   table.crm-table th { background: var(--surface-muted); color: var(--muted); font-weight: 600; }
@@ -356,6 +379,73 @@
   <div class="banner info" id="rep-loading-banner" hidden>
     Please wait for full page to load<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>
   </div>
+  <!-- High-intent buyer sourcing SOP: collapsed by default so it barely takes up space up top.
+       Shown to everyone except self-identified Buyers (see initRepView). -->
+  <details class="top-sop" id="rep-buyer-sourcing-sop" hidden>
+    <summary>
+      High-Intent Buyer Sourcing SOP
+      <span class="sop-hint"><span class="sop-hint-closed">Find buyers who are active right now &mdash; click to expand</span><span class="sop-hint-open">click to collapse</span></span>
+    </summary>
+    <div class="sop-body">
+      <div class="sop-lead">
+        <strong>The idea:</strong> the best buyer for a deal is an investor who is <strong>active right now</strong> and
+        <strong>local</strong> &mdash; someone who just sold or is selling an investment property near the deal. They have fresh
+        cash, they're in the market this month, and they're far more likely to say yes than a name pulled from a broad list.
+        This SOP builds that list in about an hour, then puts you on the phone with it.
+      </div>
+
+      <h4>Before you start</h4>
+      <p>Open the deal you're working and note only its general info: <strong>City / State / Zip</strong>, <strong>price</strong> and
+        <strong>asset type</strong>. The street address stays locked until admin grants it, and you don't need it &mdash; you're
+        sourcing buyers around the deal's <em>area</em>, not the property itself.</p>
+
+      <h4>Step 1 &mdash; Pull the nearby listings</h4>
+      <ul>
+        <li>Search the deal's <strong>city / zip</strong> on <a href="https://www.zillow.com" target="_blank" rel="noopener">Zillow</a> and <a href="https://www.redfin.com" target="_blank" rel="noopener">Redfin</a>. Always start with the listings <strong>closest to the deal</strong>, then work outward.</li>
+        <li><strong>Zillow:</strong> click <strong>Filters</strong> &rarr; under <strong>Listing type</strong> tick <strong>New construction</strong> and/or <strong>Agent listed</strong>.</li>
+        <li><strong>Redfin:</strong> homes for sale listed by an agent (flippers rarely self-list), active listings only.</li>
+      </ul>
+
+      <h4>Step 2 &mdash; Spot the high-intent signal (about 10 seconds a listing)</h4>
+      <ul>
+        <li>Open a listing and press <strong>Ctrl + F</strong> (<strong>Cmd + F</strong> on Mac). Search <strong>"price history"</strong> on Zillow or <strong>"sale history"</strong> on Redfin &mdash; the page jumps straight to it.</li>
+        <li><strong>Fix &amp; flipper signal:</strong> the property <strong>sold within the past 6 months</strong> and is now <strong>listed for $40,000 or more above that sold price</strong>. That jump is a flip being sold.</li>
+        <li><strong>Developer / builder signal:</strong> a <strong>New construction</strong> listing from a small or mid-size builder. They're building and listing right now &mdash; and builders are the buyers for land and lots.</li>
+        <li>Skip listings with no recent sale and skip the huge national builders (they buy through corporate land teams). <strong>Save the address of every match</strong> in a doc or sheet and keep going.</li>
+      </ul>
+
+      <h4>Step 3 &mdash; Skip trace the owners with AI</h4>
+      <p>After every 5&ndash;10 saved addresses, paste them under this prompt into <a href="https://chat.deepseek.com" target="_blank" rel="noopener">DeepSeek</a> or Google AI Mode (try both and keep whichever gives you more complete results):</p>
+      <div class="sop-prompt-wrap">
+        <pre class="sop-prompt" id="sop-prompt-skip">Please give me a list of owners for each property in my list and skip trace the owners contact.
+
+Put it in a table with the property address, owner or company name, phone, email, mailing address and the property's price.</pre>
+        <button type="button" class="btn secondary small sop-copy-btn" data-copy-target="sop-prompt-skip">Copy</button>
+      </div>
+      <p class="small-muted">For new construction listings, add the listing photos or link and ask it to look for builder signs, logos and permit boards to identify the builder or LLC behind it.</p>
+
+      <h4>Step 4 &mdash; Organize your call list by price and distance</h4>
+      <p>Run this second prompt on the list it just gave you, filling in the deal's <strong>city / state / zip</strong> and <strong>price</strong> (not the street address):</p>
+      <div class="sop-prompt-wrap">
+        <pre class="sop-prompt" id="sop-prompt-sort">My deal is in [CITY, STATE ZIP] and is priced at [DEAL PRICE]. Take the list above and organize it by price (closest to my deal's price first) and by distance to that zip code (closest first), so I know who to call first to sell this deal. Add a column for the distance in miles.</pre>
+        <button type="button" class="btn secondary small sop-copy-btn" data-copy-target="sop-prompt-sort">Copy</button>
+      </div>
+
+      <h4>Step 5 &mdash; Import it, then call</h4>
+      <ul>
+        <li>Save the sorted list as a CSV (name, phone, city, state) and upload it on the <button type="button" class="link-btn" id="sop-go-buyerleads-btn">Buyer Leads tab</button> under <strong>Upload Your Buyer List</strong>. It stays private to you; give it to the deal when you're ready to pitch.</li>
+        <li><strong>Call first &mdash; never cold text.</strong> Leave a voicemail if there's no answer. Texting only opens up after someone has responded to a call. Best window is 8am&ndash;7pm in their time zone.</li>
+        <li>Start at the top of the sorted list. <strong>Goal: 20+ calls in your first hour</strong>, and 50+ buyers a day as you keep adding addresses.</li>
+        <li>Pitch from the general info only. <em>"Hi [name], this is [you]. I saw you recently [listed / sold] a property near [area]. I have a [asset type] deal in [city], priced at $[price]. Do you buy deals like that? What are you looking for?"</em></li>
+        <li>The moment someone is interested, log them under <strong>Interested Buyers</strong> on the deal. Follow up with anyone who asked for more info every 1&ndash;3 days. Never share an address you haven't been granted.</li>
+      </ul>
+
+      <div class="sop-warn">
+        <strong>Verify before you rely on it.</strong> AI tools can guess, mix up companies, or return old contact details &mdash; treat every result as a lead to confirm. Only paste public listing information (addresses, photos, listing details) into these tools, never private information about our buyers, sellers or deals.
+      </div>
+    </div>
+  </details>
+
   <div class="tabs">
     <button class="tab-btn active" data-rep-tab="deals">Deals</button>
     <button class="tab-btn" data-rep-tab="buyerleads">Buyer Leads</button>

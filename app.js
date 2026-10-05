@@ -818,6 +818,7 @@ async function initRepView() {
 
     const buildsOwnList = !isBuyerSession;
     document.getElementById("rep-buyerlist-card").hidden = !buildsOwnList;
+    document.getElementById("rep-buyer-sourcing-sop").hidden = !buildsOwnList;
     document.getElementById("rep-mybuyerlist-card").hidden = !buildsOwnList;
     if (buildsOwnList) loadMyBuyerLeads();
     document.getElementById("rep-buybox-edit-row").hidden = !isBuyerSession;
@@ -1453,6 +1454,37 @@ function switchRepTab(tab) {
   document.getElementById("rep-tab-buyerleads").hidden = tab !== "buyerleads";
   if (tab === "buyerleads") loadMyPitches();
 }
+
+/* ------------------------------------------------------------
+   High-intent buyer sourcing SOP (top of the rep view)
+   Collapsed by default; remembers if the rep left it open.
+   ------------------------------------------------------------ */
+(function initBuyerSourcingSop() {
+  const sop = document.getElementById("rep-buyer-sourcing-sop");
+  if (!sop) return;
+  const KEY = "smb_buyer_sourcing_sop_open";
+  try { sop.open = localStorage.getItem(KEY) === "1"; } catch (e) { /* storage blocked -- stay collapsed */ }
+  sop.addEventListener("toggle", function () {
+    try { localStorage.setItem(KEY, sop.open ? "1" : "0"); } catch (e) { /* ignore */ }
+  });
+  Array.from(sop.querySelectorAll(".sop-copy-btn")).forEach(function (btn) {
+    btn.addEventListener("click", async function () {
+      const target = document.getElementById(btn.getAttribute("data-copy-target"));
+      if (!target) return;
+      try {
+        await navigator.clipboard.writeText(target.textContent);
+        showToast("Prompt copied.");
+      } catch (e) {
+        showToast("Couldn't copy automatically -- select the text and copy it.", true);
+      }
+    });
+  });
+  const goBtn = document.getElementById("sop-go-buyerleads-btn");
+  if (goBtn) goBtn.addEventListener("click", function () {
+    switchRepTab("buyerleads");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+})();
 
 const LEAD_STATUS_PRIORITY = ["Follow-Up Due", "Follow-Up In Progress", "Awaiting Response", "Not Contacted", "Responded", "Fully Worked"];
 let myPitchesCurrentPage = 1;

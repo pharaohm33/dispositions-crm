@@ -573,6 +573,23 @@ backend (see [SETUP.md](SETUP.md)).
   the conversation (rep's notes are visible to you the moment they're
   logged) to close the deal yourself, keeping the rep who brought the buyer
   updated as it moves.
+- **High-Intent Buyer Sourcing SOP** — a compact, collapsed-by-default bar
+  at the very top of the rep view (above the Deals / Buyer Leads tabs, so
+  it's one click away from either) that expands into a step-by-step SOP for
+  finding buyers who are active right now: pull the listings nearest the
+  deal's city/zip on Zillow (Listing type: New construction and/or Agent
+  listed) or Redfin (agent-listed, active), press Ctrl/Cmd+F for "price
+  history" / "sale history" and flag a sale within 6 months relisted
+  $40,000+ higher (fix &amp; flippers) or a small/mid-size builder's new
+  construction listing (developers), skip trace the saved addresses with
+  DeepSeek or Google AI Mode, run a second prompt that sorts the list by
+  price and by distance to the deal's zip, import it on the Buyer Leads
+  tab, and call (never cold text; 20+ calls the first hour, 50+ a day). It
+  deliberately says nothing about sourcing deals, and it uses only a deal's
+  general info (city/state/zip, price, asset type) so the locked street
+  address is never needed. Both prompts have **Copy** buttons, the bar
+  remembers whether a rep left it open (per browser), and it's hidden for
+  **Buyer** signups the same way the build-your-own-list card is.
 - **Buyer Leads** — a collapsible **"How to Build a Buyer List"** guide sits
   above the importer for anyone new to this: find cash buyers on Propwire
   (Cash Buyers filter, plus Fix &amp; Flip or switch Property Type to Land
