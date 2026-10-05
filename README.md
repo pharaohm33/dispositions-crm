@@ -595,8 +595,8 @@ backend (see [SETUP.md](SETUP.md)).
   from the deal's general info (city/state/zip, price, asset type). The
   Deals-tab **Address disclosure** paragraph spells out both reasons to ask
   for an address (a buyer is interested vs. using the SOP). The address is
-  for searching only: never posted online, and never shared with a buyer
-  unless granted for that matched buyer. Both prompts have **Copy** buttons, the bar
+  for searching only: never posted online, and only ever disclosed to end
+  buyers (and only a matched buyer it has been granted for). Both prompts have **Copy** buttons, the bar
   remembers whether a rep left it open (per browser), and it's hidden for
   **Buyer** signups the same way the build-your-own-list card is.
 - **Buyer Leads** — a collapsible **"How to Build a Buyer List"** guide sits
