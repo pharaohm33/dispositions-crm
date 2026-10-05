@@ -588,10 +588,15 @@ backend (see [SETUP.md](SETUP.md)).
   deliberately says nothing about sourcing deals. Reps who've been granted a
   deal's address use it to source the buyers closest to the exact subject
   property (with a distance-sort prompt for the address); reps who haven't
-  are told to hit **Request Address Access** (or ask admin), and meanwhile
-  work from the deal's general info (city/state/zip, price, asset type).
-  The address is for searching only and is never shared with a buyer unless
-  granted for that matched buyer. Both prompts have **Copy** buttons, the bar
+  are told to hit **Request Address Access** and say they're using the SOP
+  (admin discloses it when they'll actually pull the nearest comparable
+  listings to find flippers or developers and won't post the address online
+  anywhere), and meanwhile work
+  from the deal's general info (city/state/zip, price, asset type). The
+  Deals-tab **Address disclosure** paragraph spells out both reasons to ask
+  for an address (a buyer is interested vs. using the SOP). The address is
+  for searching only: never posted online, and never shared with a buyer
+  unless granted for that matched buyer. Both prompts have **Copy** buttons, the bar
   remembers whether a rep left it open (per browser), and it's hidden for
   **Buyer** signups the same way the build-your-own-list card is.
 - **Buyer Leads** — a collapsible **"How to Build a Buyer List"** guide sits
