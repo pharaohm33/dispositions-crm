@@ -421,15 +421,48 @@
         <li>Skip listings with no recent sale and skip the huge national builders (they buy through corporate land teams). <strong>Save the address of every match</strong> in a doc or sheet and keep going.</li>
       </ul>
 
-      <h4>Step 3 &mdash; Skip trace the owners with AI</h4>
-      <p>After every 5&ndash;10 saved addresses, paste them under this prompt into <a href="https://chat.deepseek.com" target="_blank" rel="noopener">DeepSeek</a> or Google AI Mode (try both and keep whichever gives you more complete results):</p>
-      <div class="sop-prompt-wrap">
-        <pre class="sop-prompt" id="sop-prompt-skip">Please give me a list of owners for each property in my list and skip trace the owners contact.
+      <h4>Step 3 &mdash; Skip trace the owners</h4>
+      <p>For every address you saved in Step 2, get the owner's phone and email. Start with the Propwire lookup, then pick the free or the paid skip trace.</p>
+
+      <p><strong>Step 3a &mdash; Find the owner on Propwire (every method starts here)</strong></p>
+      <ul>
+        <li>Go to <a href="https://propwire.com" target="_blank" rel="noopener">propwire.com</a> and <strong>search the property address</strong> you saved.</li>
+        <li><strong>Open the property</strong> from the search result.</li>
+        <li>Click the <strong>Owner</strong> tab. That's where the owner's full name (or the LLC / company behind it) lives, and it's where the skip trace button is.</li>
+      </ul>
+
+      <p><strong>Option A &mdash; Propwire skip trace (fast, paid)</strong></p>
+      <ul>
+        <li>On the <strong>Owner</strong> tab, press <strong>Skip Trace</strong>. At the time of writing it costs about <strong>10 cents per record</strong> (100 owners is roughly $10) &mdash; check the current price on the site before you run it.</li>
+        <li>The phone numbers and emails appear instantly. Copy them into your call list.</li>
+        <li><strong>Best for:</strong> a long list, when your time is worth more than 10 cents a record.</li>
+      </ul>
+
+      <p><strong>Option B &mdash; TruePeopleSearch (free, a little slower)</strong></p>
+      <ul>
+        <li>It takes longer because you look up one owner at a time, but it finds the same contact details. In testing it returned the same mobile number Propwire's paid skip trace found.</li>
+        <li><strong>1.</strong> Copy the owner's <strong>full name</strong> from the Propwire <strong>Owner</strong> tab, plus the <strong>city and state</strong> of the property.</li>
+        <li><strong>2.</strong> Go to <a href="https://www.truepeoplesearch.com" target="_blank" rel="noopener">truepeoplesearch.com</a>, stay on the <strong>Name</strong> tab, paste the name, add the city and state, and press search.</li>
+        <li><strong>3.</strong> Open the result that matches: <strong>same age range, same city, and a name that matches your owner</strong>. Click <strong>View Details</strong>.</li>
+        <li><strong>4.</strong> Copy the phone numbers and emails into your call list. The numbers listed first are usually the most current.</li>
+        <li><strong>Best for:</strong> when you're just starting out or only have a handful of owners to look up.</li>
+      </ul>
+
+      <div class="sop-lead">
+        <strong>Check before you call.</strong> Whichever method you use, confirm the <strong>name, age and city</strong> match the owner before you dial, so you reach the right person. If the owner is an LLC, look up the person named on the Owner tab.
+      </div>
+
+      <details style="margin:8px 0;">
+        <summary class="small-muted" style="cursor:pointer;">Quick option: skip trace a batch with AI instead (less reliable)</summary>
+        <p style="margin-top:6px;">After every 5&ndash;10 saved addresses, paste them under this prompt into <a href="https://chat.deepseek.com" target="_blank" rel="noopener">DeepSeek</a> or Google AI Mode (try both and keep whichever gives you more complete results):</p>
+        <div class="sop-prompt-wrap">
+          <pre class="sop-prompt" id="sop-prompt-skip">Please give me a list of owners for each property in my list and skip trace the owners contact.
 
 Put it in a table with the property address, owner or company name, phone, email, mailing address and the property's price.</pre>
-        <button type="button" class="btn secondary small sop-copy-btn" data-copy-target="sop-prompt-skip">Copy</button>
-      </div>
-      <p class="small-muted">For new construction listings, add the listing photos or link and ask it to look for builder signs, logos and permit boards to identify the builder or LLC behind it.</p>
+          <button type="button" class="btn secondary small sop-copy-btn" data-copy-target="sop-prompt-skip">Copy</button>
+        </div>
+        <p class="small-muted">For new construction listings, add the listing photos or link and ask it to look for builder signs, logos and permit boards to identify the builder or LLC behind it. AI can guess or return old contact details &mdash; Propwire or TruePeopleSearch is more dependable.</p>
+      </details>
 
       <h4>Step 4 &mdash; Organize your call list by price and distance</h4>
       <p>Run a second prompt on the list it just gave you. <strong>If you've been granted the address,</strong> use this one so the list is sorted by distance to the exact subject property:</p>
