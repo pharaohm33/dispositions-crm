@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verrado Foothill Homesite — 1.08 Acres | Buckeye, AZ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #f6f1e9;
+    color: #2c2621;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.55;
+  }
+  h1, h2, h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    color: #211c17;
+    letter-spacing: 0.3px;
+  }
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  header.top {
+    background: #211c17;
+    color: #f6f1e9;
+    padding-top: 36px;
+    padding-bottom: 36px;
+  }
+  header.top .tag {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 13px;
+    color: #cbb892;
+    margin-bottom: 10px;
+  }
+  header.top h1 {
+    color: #f6f1e9;
+    font-size: 34px;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  header.top .location {
+    font-size: 16px;
+    color: #e6ddcf;
+    margin-bottom: 6px;
+  }
+  header.top .addr-note {
+    font-size: 14px;
+    color: #cbb892;
+    font-style: italic;
+    margin-top: 10px;
+  }
+
+  section.price-block {
+    background: #fffaf0;
+    border: 1px solid #e3d8c2;
+    border-radius: 6px;
+    padding: 26px 28px;
+    margin-top: 28px;
+    margin-bottom: 28px;
+    text-align: center;
+  }
+  section.price-block .price {
+    font-family: 'Fraunces', serif;
+    font-size: 44px;
+    color: #7a3b1e;
+    font-weight: 700;
+  }
+  section.price-block .sub {
+    font-size: 14px;
+    color: #5c5347;
+    margin-top: 6px;
+  }
+
+  section.gallery {
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
+  .gallery-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 14px;
+    padding-bottom: 10px;
+  }
+  .gallery-scroll img {
+    height: 220px;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+  .more-photos-link {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #7a3b1e;
+    text-decoration: underline;
+  }
+
+  section.description {
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
+  section.description p {
+    font-size: 16px;
+    color: #3a332c;
+  }
+
+  h2.section-title {
+    font-size: 24px;
+    border-bottom: 2px solid #cbb892;
+    padding-bottom: 8px;
+    margin-top: 0;
+    margin-bottom: 18px;
+  }
+
+  table.facts-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+  table.facts-table tr {
+    border-bottom: 1px solid #e3d8c2;
+  }
+  table.facts-table td {
+    padding: 10px 6px;
+    vertical-align: top;
+  }
+  table.facts-table td.label {
+    width: 42%;
+    color: #6b5f4f;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12.5px;
+    letter-spacing: 0.4px;
+  }
+  table.facts-table td.value {
+    color: #231f1a;
+  }
+
+  section.numbers {
+    margin-top: 36px;
+    margin-bottom: 36px;
+  }
+
+  section.features {
+    margin-top: 36px;
+    margin-bottom: 36px;
+  }
+  section.features ul {
+    columns: 2;
+    column-gap: 30px;
+    padding-left: 18px;
+    font-size: 15px;
+  }
+  section.features li {
+    margin-bottom: 8px;
+    break-inside: avoid;
+  }
+
+  section.terms {
+    margin-top: 36px;
+    margin-bottom: 36px;
+  }
+
+  section.disclosures {
+    margin-top: 36px;
+    margin-bottom: 36px;
+    background: #efe6d4;
+    border-radius: 6px;
+    padding: 20px 24px;
+    font-size: 13.5px;
+    color: #4a4237;
+  }
+  section.disclosures p {
+    margin: 8px 0;
+  }
+
+  .cta-band {
+    background: #7a3b1e;
+    color: #fdf6ea;
+    margin-top: 40px;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    text-align: center;
+  }
+  .cta-band h2 {
+    color: #fdf6ea;
+    font-size: 28px;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  .cta-band p {
+    font-size: 15px;
+    color: #f1e3cf;
+    margin-bottom: 20px;
+  }
+  .cta-band a.btn {
+    display: inline-block;
+    background: #fdf6ea;
+    color: #7a3b1e;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 12px 26px;
+    border-radius: 4px;
+    margin: 6px 10px;
+    font-size: 15px;
+  }
+  .cta-band .company {
+    margin-top: 22px;
+    font-size: 14px;
+    color: #e6ccae;
+    letter-spacing: 0.5px;
+  }
+
+  footer.legal {
+    text-align: center;
+    font-size: 12px;
+    color: #8a8070;
+    padding-top: 24px;
+    padding-bottom: 40px;
+  }
+</style>
+</head>
+<body><div style="max-width:640px;margin:0 auto 20px;padding:20px 24px;text-align:center;font-family:Arial,sans-serif;border-bottom:1px solid #ddd;"><p style="color:#444;margin-bottom:16px;">Addresses are shared with wholesalers who already have an interested buyer for this deal, or with direct buyers reviewing this listing. Log in or create a free account to request it.</p><a href="https://sendmybuyer.com/?requestAddress=a0c47e92-1e9a-4f10-9f38-2108a09887c0&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2Fa0c47e92-1e9a-4f10-9f38-2108a09887c0.html" style="display:inline-block;padding:12px 28px;background:#1a73e8;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;">Request the Address</a><p style="margin-top:16px;"><a href="https://sendmybuyer.com" style="color:#1a73e8;">Log in</a> &nbsp;&middot;&nbsp; <a href="https://sendmybuyer.com" style="color:#1a73e8;">Browse all deals</a></p><p style="color:#888;font-size:0.9em;margin-top:20px;">Interested in this deal? This listing isn't searchable once you leave — <strong>save or bookmark this page's link</strong> before heading to the home page, so you can find your way back to it.</p></div>
+
+<header class="top">
+  <div class="wrap">
+    <div class="tag">Deal Code: AZ-5 (Land)</div>
+    <h1>Verrado Natural Foothill Custom Homesite</h1>
+    <div class="location">Buckeye, Maricopa County, Arizona</div>
+    <div class="location">1.08&plusmn; Acre Lot &middot; Designated Building Envelope &middot; White Tank Mountain Setting</div>
+    <div class="addr-note">Address available upon request — contact us below for the full parcel address.</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="price-block">
+    <div class="price">$199,000</div>
+    <div class="sub">1.08&plusmn; Acre Natural Foothill Custom Homesite | Designated Building Envelope | White Tank Mountain Setting | $225K</div>
+  </section>
+
+  <section class="description">
+    <h2 class="section-title">Overview</h2>
+    <p>
+      This is a 1.08&plusmn; acre natural foothill custom homesite located within the Verrado master-planned
+      community in Buckeye, Arizona, set against the backdrop of the White Tank Mountains. The lot carries a
+      designated, lot-specific building envelope and sits on a natural foothill parcel with paved street frontage
+      and curb and sidewalk already in place. This opportunity is being offered as an assignment of contract.
+    </p>
+  </section>
+
+  <section class="numbers">
+    <h2 class="section-title">The Numbers</h2>
+    <table class="facts-table">
+      <tr><td class="label">Asking Price</td><td class="value">$199,000</td></tr>
+      <tr><td class="label">Lot Size</td><td class="value">1.08&plusmn; acres</td></tr>
+      <tr><td class="label">Land Area</td><td class="value">Approximately 47,178 SF</td></tr>
+      <tr><td class="label">Lot</td><td class="value">Lot 9</td></tr>
+      <tr><td class="label">Subdivision</td><td class="value">Verrado Parcel 3.101</td></tr>
+      <tr><td class="label">APN</td><td class="value">502-80-086</td></tr>
+      <tr><td class="label">Property Type</td><td class="value">Vacant custom residential homesite</td></tr>
+      <tr><td class="label">Public Data Zoning</td><td class="value">PAD — buyer to verify</td></tr>
+    </table>
+  </section>
+
+  <section class="features">
+    <h2 class="section-title">Site Features</h2>
+    <ul>
+      <li>Designated lot-specific building envelope</li>
+      <li>Natural foothill lot</li>
+      <li>Paved street frontage</li>
+      <li>Curb and sidewalk in place</li>
+      <li>Utility infrastructure nearby — buyer to verify service</li>
+      <li>Part of the Verrado Community Association</li>
+      <li>White Tank Mountain setting</li>
+    </ul>
+  </section>
+
+  <section class="terms">
+    <h2 class="section-title">Deal Terms</h2>
+    <table class="facts-table">
+      <tr><td class="label">Purchase Price</td><td class="value">$199,000</td></tr>
+      <tr><td class="label">Financing</td><td class="value">Cash or hard money only</td></tr>
+      <tr><td class="label">Transaction Type</td><td class="value">Assignment of contract</td></tr>
+      <tr><td class="label">Closing Costs</td><td class="value">Buyer pays closing costs</td></tr>
+      <tr><td class="label">Condition</td><td class="value">Property sold as-is</td></tr>
+      <tr><td class="label">Proof of Funds</td><td class="value">Required</td></tr>
+      <tr><td class="label">Offer Process</td><td class="value">First come, first served — no auction, no highest and best</td></tr>
+    </table>
+  </section>
+
+  <section class="disclosures">
+    <p>This is a wholesale assignment of contract. JNA Dynamic Holdings LLC holds equitable interest in the subject
+    transaction pursuant to its contract with the underlying property owner. The end buyer will receive an assignment
+    of that contract, not a direct conveyance from JNA Dynamic Holdings LLC, and will not be dealing directly with the
+    underlying seller.</p>
+    <p>All zoning, utility, HOA, slope, geotechnical, comparable-sale, building-envelope, and development information
+    must be independently verified by the buyer prior to closing.</p>
+    <p>All figures, measurements, and details on this page have not been independently verified by JNA Dynamic Holdings
+    LLC and are provided for general informational purposes only.</p>
+  </section>
+
+</div>
+
+<div class="cta-band">
+  <div class="wrap">
+    <h2>1.08 Acres in Verrado — $199,000</h2>
+    <p>Natural foothill lot. Designated building envelope. White Tank Mountain setting. Cash or hard money only. Contact us today.</p>
+    <a class="btn" href="tel:5206336437">Call 520-633-6437</a>
+    <a class="btn" href="mailto:montanoemmanuel@gmail.com">Email montanoemmanuel@gmail.com</a>
+    <div class="company">JNA Dynamic Holdings LLC</div>
+  </div>
+</div>
+
+<footer class="legal">
+  <div class="wrap">
+    &copy; JNA Dynamic Holdings LLC. This offering is subject to prior sale, price change, or withdrawal without notice.
+  </div>
+</footer>
+
+</body>
+</html>
