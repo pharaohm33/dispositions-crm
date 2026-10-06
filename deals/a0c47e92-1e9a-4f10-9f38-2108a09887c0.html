@@ -3,308 +3,383 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Verrado Foothill Homesite — Buckeye, AZ | 1.08± Acres</title>
+<title>1.08 Acre Foothill Homesite — Verrado, Buckeye AZ | JNA Dynamic Holdings LLC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; }
-  html, body {
+  body {
     margin: 0;
-    padding: 0;
-    background: #f4efe7;
-    color: #2b2620;
-    font-family: 'Jost', sans-serif;
-    font-weight: 300;
+    background: #f6f1e9;
+    color: #2b2621;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+  }
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    color: #1c1813;
+    font-weight: 600;
   }
   .wrap {
     max-width: 920px;
     margin: 0 auto;
-    padding-left: 24px;
-    padding-right: 24px;
+    padding: 0 28px;
   }
-  h1, h2, h3 {
-    font-family: 'Playfair Display', serif;
-    font-weight: 600;
-    color: #1f1b15;
-  }
-  a { color: inherit; }
 
-  header.top {
-    border-bottom: 1px solid #ddd3c2;
-    margin-bottom: 36px;
+  header.topband {
+    background: #1c1813;
+    color: #f6f1e9;
+    padding-top: 14px;
+    padding-bottom: 14px;
   }
-  header.top .innerpad { padding-top: 34px; padding-bottom: 28px; }
-  .eyebrow {
+  header.topband .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  header.topband .brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    letter-spacing: 0.03em;
+  }
+  header.topband .brand span {
+    color: #c9a24b;
+  }
+  header.topband .contactline {
+    font-size: 0.92rem;
+  }
+  header.topband a {
+    color: #f6f1e9;
+    text-decoration: none;
+    border-bottom: 1px solid #c9a24b;
+  }
+
+  .hero {
+    margin-top: 46px;
+    margin-bottom: 10px;
+  }
+  .hero .tag {
+    display: inline-block;
+    background: #e7dcc5;
+    color: #6b5a33;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    letter-spacing: 0.18em;
-    font-size: 12px;
-    color: #8a6f4b;
-    margin-bottom: 10px;
+    padding: 5px 12px;
+    border-radius: 2px;
+    margin-bottom: 14px;
   }
-  h1.title {
-    font-size: 36px;
-    line-height: 1.2;
-    margin-top: 0;
-    margin-bottom: 10px;
+  .hero h1 {
+    font-size: 2.3rem;
+    line-height: 1.25;
+    margin: 0 0 10px 0;
   }
-  .location-line {
-    font-size: 18px;
+  .hero .locline {
+    font-size: 1.05rem;
     color: #4a4136;
-    margin-top: 0;
     margin-bottom: 6px;
   }
-  .address-note {
-    font-size: 14px;
+  .hero .addrnote {
+    font-size: 0.95rem;
+    color: #7a5b2a;
     font-style: italic;
-    color: #7a6f5c;
-    margin-top: 4px;
-    margin-bottom: 0;
   }
 
-  .price-block {
-    background: #1f1b15;
-    color: #f4efe7;
+  .pricebar {
+    margin-top: 26px;
+    margin-bottom: 10px;
+    background: #fffdf9;
+    border: 1px solid #e3d8c0;
     border-radius: 6px;
-    margin-top: 28px;
-    margin-bottom: 36px;
-    padding: 26px 30px;
+    padding: 22px 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: center;
+    justify-content: space-between;
   }
-  .price-block .label {
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-size: 12px;
-    color: #cbb892;
-    margin-bottom: 8px;
-  }
-  .price-block .amount {
+  .pricebar .price {
     font-family: 'Playfair Display', serif;
-    font-size: 44px;
-    font-weight: 700;
+    font-size: 2.2rem;
+    color: #1c1813;
   }
-  .price-block .sub {
-    margin-top: 8px;
-    font-size: 14px;
-    color: #d9cfbd;
+  .pricebar .price small {
+    display: block;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8a7a55;
+    margin-bottom: 4px;
+  }
+  .pricebar .stats {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+  }
+  .pricebar .stats div span {
+    display: block;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #8a7a55;
+    margin-bottom: 2px;
+  }
+  .pricebar .stats div strong {
+    font-size: 1.05rem;
+    color: #2b2621;
   }
 
   .gallery {
-    display: flex;
-    gap: 14px;
-    overflow-x: auto;
-    padding-bottom: 12px;
-    margin-top: 0;
-    margin-bottom: 10px;
-    -webkit-overflow-scrolling: touch;
+    margin-top: 28px;
+    margin-bottom: 8px;
   }
-  .gallery img {
+  .gallery h2 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+  .scrollrow {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+  .scrollrow img {
     height: 230px;
     width: auto;
-    border-radius: 5px;
+    border-radius: 6px;
     flex: 0 0 auto;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+    border: 1px solid #e3d8c0;
   }
-  .gallery-wrap { margin-bottom: 36px; }
-  .more-photos {
-    display: inline-block;
-    font-size: 13px;
-    text-decoration: underline;
-    color: #6b5736;
-    margin-top: 2px;
+  .morelink {
+    margin-top: 8px;
+    font-size: 0.9rem;
+  }
+  .morelink a {
+    color: #7a5b2a;
   }
 
-  section.block { margin-top: 0; margin-bottom: 42px; }
+  section.block {
+    margin-top: 40px;
+    margin-bottom: 8px;
+  }
   section.block h2 {
-    font-size: 24px;
-    border-bottom: 2px solid #c9a86a;
+    font-size: 1.4rem;
+    border-bottom: 2px solid #e3d8c0;
     padding-bottom: 8px;
-    margin-top: 0;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
   }
 
-  ul.facts-list {
+  .desc p {
+    font-size: 1.02rem;
+    color: #3a332a;
+  }
+
+  ul.featlist {
     list-style: none;
     padding: 0;
-    margin-top: 0;
-    margin-bottom: 0;
-    columns: 2;
-    column-gap: 30px;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 28px;
   }
-  ul.facts-list li {
-    break-inside: avoid;
-    padding: 6px 0;
-    border-bottom: 1px dashed #ddd3c2;
-    font-size: 15px;
+  ul.featlist li {
+    padding-left: 18px;
+    position: relative;
+    font-size: 0.97rem;
+  }
+  ul.featlist li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: #c9a24b;
   }
 
   table.terms {
     width: 100%;
     border-collapse: collapse;
-    font-size: 15px;
+    font-size: 0.97rem;
+    background: #fffdf9;
+    border: 1px solid #e3d8c0;
+  }
+  table.terms tr {
+    border-bottom: 1px solid #e9ddc4;
+  }
+  table.terms tr:last-child {
+    border-bottom: none;
   }
   table.terms td {
-    padding: 11px 6px;
-    border-bottom: 1px solid #e3d9c6;
+    padding: 11px 16px;
   }
-  table.terms td.k {
-    color: #6b5736;
+  table.terms td:first-child {
+    font-weight: 600;
+    color: #5b4d2e;
     width: 42%;
-    font-weight: 500;
   }
 
-  .desc-text {
-    font-size: 16px;
-    line-height: 1.7;
-    margin-top: 0;
-    margin-bottom: 14px;
-  }
-
-  .disclosure-box {
-    background: #ece4d3;
-    border-left: 4px solid #8a6f4b;
+  .assignbox {
+    margin-top: 18px;
+    background: #efe6d3;
+    border-left: 4px solid #c9a24b;
     padding: 16px 20px;
-    font-size: 13.5px;
-    line-height: 1.6;
-    color: #4a4136;
-    margin-top: 0;
-    margin-bottom: 0;
+    font-size: 0.95rem;
+    color: #3a332a;
   }
-  .disclosure-box p { margin: 0 0 10px 0; }
-  .disclosure-box p:last-child { margin-bottom: 0; }
 
-  .cta-band {
-    background: #c9a86a;
-    color: #1f1b15;
-    padding: 40px 0 46px 0;
-    margin-top: 10px;
+  .disclaimer {
+    margin-top: 18px;
+    font-size: 0.85rem;
+    color: #7a7164;
   }
-  .cta-band h2 {
-    font-size: 28px;
-    color: #1f1b15;
+
+  .ctaband {
+    margin-top: 50px;
+    background: #1c1813;
+    color: #f6f1e9;
+    padding: 40px 0;
+  }
+  .ctaband h2 {
+    color: #f6f1e9;
+    font-size: 1.7rem;
     margin-top: 0;
     margin-bottom: 10px;
   }
-  .cta-band p {
-    font-size: 15px;
-    margin-top: 0;
-    margin-bottom: 18px;
+  .ctaband p {
+    color: #d8cfbd;
+    margin-bottom: 20px;
   }
-  .cta-buttons a {
-    display: inline-block;
-    background: #1f1b15;
-    color: #f4efe7;
+  .ctaband .contactrow {
+    display: flex;
+    gap: 26px;
+    flex-wrap: wrap;
+    font-size: 1.1rem;
+  }
+  .ctaband .contactrow a {
+    color: #f6f1e9;
     text-decoration: none;
-    padding: 12px 22px;
-    border-radius: 4px;
-    margin-right: 12px;
-    font-size: 14px;
-    letter-spacing: 0.03em;
+    border-bottom: 1px solid #c9a24b;
+    font-weight: 600;
   }
+
   footer.foot {
+    padding: 22px 0 40px 0;
+  }
+  footer.foot .wrap {
+    font-size: 0.82rem;
+    color: #8a7a55;
     text-align: center;
-    font-size: 12.5px;
-    color: #8a7f6c;
-    padding-top: 22px;
-    padding-bottom: 30px;
   }
 </style>
 </head>
 <body><div style="max-width:640px;margin:0 auto 20px;padding:20px 24px;text-align:center;font-family:Arial,sans-serif;border-bottom:1px solid #ddd;"><p style="color:#444;margin-bottom:16px;">Addresses are shared with wholesalers who already have an interested buyer for this deal, or with direct buyers reviewing this listing. Log in or create a free account to request it.</p><a href="https://sendmybuyer.com/?requestAddress=a0c47e92-1e9a-4f10-9f38-2108a09887c0&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2Fa0c47e92-1e9a-4f10-9f38-2108a09887c0.html" style="display:inline-block;padding:12px 28px;background:#1a73e8;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;">Request the Address</a><p style="margin-top:16px;"><a href="https://sendmybuyer.com" style="color:#1a73e8;">Log in</a> &nbsp;&middot;&nbsp; <a href="https://sendmybuyer.com" style="color:#1a73e8;">Browse all deals</a></p><p style="color:#888;font-size:0.9em;margin-top:20px;">Interested in this deal? This listing isn't searchable once you leave — <strong>save or bookmark this page's link</strong> before heading to the home page, so you can find your way back to it.</p></div>
 
-<header class="top">
-  <div class="wrap innerpad">
-    <div class="eyebrow">Deal Code: AZ-5 (Land) &nbsp;·&nbsp; Wholesale Assignment of Contract</div>
-    <h1 class="title">Natural Foothill Custom Homesite — Verrado</h1>
-    <p class="location-line">Buckeye, Maricopa County, Arizona</p>
-    <p class="address-note">Address available upon request — contact us for the full parcel address.</p>
+<header class="topband">
+  <div class="wrap">
+    <div class="brand">JNA <span>Dynamic Holdings LLC</span></div>
+    <div class="contactline"><a href="tel:5206336437">520-633-6437</a> &nbsp;|&nbsp; <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a></div>
   </div>
 </header>
 
-<div class="wrap">
+<main class="wrap">
 
-  <div class="price-block">
-    <div class="label">Asking Price</div>
-    <div class="amount">$199,000</div>
-    <div class="sub">1.08± Acre Designated-Envelope Homesite · White Tank Mountain Setting · Cash or Hard Money Only</div>
-  </div>
+  <section class="hero">
+    <span class="tag">Land / Wholesale Assignment · AZ-5</span>
+    <h1>1.08 Acre Natural Foothill Custom Homesite — White Tank Mountain Setting</h1>
+    <div class="locline">Verrado, Buckeye, Maricopa County, Arizona</div>
+    <div class="addrnote">Address available upon request — contact us for the full parcel address.</div>
+  </section>
 
-  <div class="gallery-wrap">
-    <div class="gallery">
-      <img src="/deals/a0c47e92-1e9a-4f10-9f38-2108a09887c0/photos/1.jpg" alt="Verrado foothill homesite view 1">
-      <img src="/deals/a0c47e92-1e9a-4f10-9f38-2108a09887c0/photos/2.jpg" alt="Verrado foothill homesite view 2">
-      <img src="/deals/a0c47e92-1e9a-4f10-9f38-2108a09887c0/photos/3.jpg" alt="Verrado foothill homesite view 3">
-      <img src="/deals/a0c47e92-1e9a-4f10-9f38-2108a09887c0/photos/4.jpg" alt="Verrado foothill homesite view 4">
-      <img src="/deals/a0c47e92-1e9a-4f10-9f38-2108a09887c0/photos/5.jpg" alt="Verrado foothill homesite view 5">
-      <img src="/deals/a0c47e92-1e9a-4f10-9f38-2108a09887c0/photos/6.jpg" alt="Verrado foothill homesite view 6">
-      <img src="/deals/a0c47e92-1e9a-4f10-9f38-2108a09887c0/photos/7.jpg" alt="Verrado foothill homesite view 7">
-      <img src="/deals/a0c47e92-1e9a-4f10-9f38-2108a09887c0/photos/8.jpg" alt="Verrado foothill homesite view 8">
-      <img src="/deals/a0c47e92-1e9a-4f10-9f38-2108a09887c0/photos/9.jpg" alt="Verrado foothill homesite view 9">
-      <img src="/deals/a0c47e92-1e9a-4f10-9f38-2108a09887c0/photos/10.jpg" alt="Verrado foothill homesite view 10">
+  <section class="pricebar">
+    <div class="price">
+      <small>Purchase Price</small>
+      $199,000
     </div>
-  </div>
+    <div class="stats">
+      <div><span>Lot Size</span><strong>1.08± Acres</strong></div>
+      <div><span>Land Area</span><strong>≈47,178 SF</strong></div>
+      <div><span>Lot</span><strong>9</strong></div>
+      <div><span>Deal Type</span><strong>Land</strong></div>
+    </div>
+  </section>
+
+  <section class="gallery">
+    <h2>Property Photos</h2>
+    <div class="scrollrow">
+      <img src="/deals/a0c47e92-1e9a-4f10-9f38-2108a09887c0/photos/1.jpg" alt="Verrado foothill homesite photo 1">
+      <img src="/deals/a0c47e92-1e9a-4f10-9f38-2108a09887c0/photos/2.jpg" alt="Verrado foothill homesite photo 2">
+      <img src="/deals/a0c47e92-1e9a-4f10-9f38-2108a09887c0/photos/3.jpg" alt="Verrado foothill homesite photo 3">
+      <img src="/deals/a0c47e92-1e9a-4f10-9f38-2108a09887c0/photos/4.jpg" alt="Verrado foothill homesite photo 4">
+      <img src="/deals/a0c47e92-1e9a-4f10-9f38-2108a09887c0/photos/5.jpg" alt="Verrado foothill homesite photo 5">
+      <img src="/deals/a0c47e92-1e9a-4f10-9f38-2108a09887c0/photos/6.jpg" alt="Verrado foothill homesite photo 6">
+      <img src="/deals/a0c47e92-1e9a-4f10-9f38-2108a09887c0/photos/7.jpg" alt="Verrado foothill homesite photo 7">
+      <img src="/deals/a0c47e92-1e9a-4f10-9f38-2108a09887c0/photos/8.jpg" alt="Verrado foothill homesite photo 8">
+      <img src="/deals/a0c47e92-1e9a-4f10-9f38-2108a09887c0/photos/9.jpg" alt="Verrado foothill homesite photo 9">
+      <img src="/deals/a0c47e92-1e9a-4f10-9f38-2108a09887c0/photos/10.jpg" alt="Verrado foothill homesite photo 10">
+    </div>
+  </section>
+
+  <section class="block desc">
+    <h2>Overview</h2>
+    <p>1.08 acre natural foothill custom homesite with a designated building envelope, set against a White Tank Mountain backdrop in the Verrado community of Buckeye, Arizona. A rare custom-lot opportunity in one of the West Valley's established master-planned communities.</p>
+  </section>
 
   <section class="block">
-    <h2>Property Overview</h2>
-    <p class="desc-text">
-      1.08 Acre Natural Foothill Custom Homesite in the Verrado master-planned community of Buckeye, Arizona,
-      set against a White Tank Mountain backdrop. The lot carries a designated, lot-specific building envelope
-      and is offered at $199,000. (Note: the originating property brief also referenced a $225K figure alongside
-      this description; the confirmed asking price for this assignment is $199,000 as detailed below.)
-    </p>
-    <ul class="facts-list">
-      <li>Lot Size: 1.08± Acres</li>
-      <li>Land Area: Approximately 47,178 SF</li>
+    <h2>Lot & Parcel Facts</h2>
+    <ul class="featlist">
+      <li>Lot Size: 1.08± acres</li>
+      <li>Land Area: approximately 47,178 SF</li>
       <li>Lot: 9</li>
       <li>Subdivision: Verrado Parcel 3.101</li>
       <li>APN: 502-80-086</li>
-      <li>Property Type: Vacant Custom Residential Homesite</li>
-      <li>Public Data Zoning: PAD — Buyer to Verify</li>
-      <li>Designated Lot-Specific Building Envelope</li>
-      <li>Natural Foothill Lot</li>
-      <li>Paved Street Frontage</li>
-      <li>Curb &amp; Sidewalk</li>
-      <li>Utility Infrastructure Nearby — Buyer to Verify Service</li>
-      <li>Verrado Community Association</li>
+      <li>Property Type: Vacant custom residential homesite</li>
+      <li>Public Data Zoning: PAD — buyer to verify</li>
+      <li>Designated lot-specific building envelope</li>
+      <li>Natural foothill lot</li>
+      <li>Paved street frontage</li>
+      <li>Curb & sidewalk in place</li>
+      <li>Utility infrastructure nearby — buyer to verify service</li>
+      <li>Part of the Verrado Community Association</li>
+      <li>Cash or hard money only</li>
     </ul>
   </section>
 
   <section class="block">
     <h2>Deal Terms</h2>
     <table class="terms">
-      <tr><td class="k">Purchase Price</td><td>$199,000</td></tr>
-      <tr><td class="k">Financing</td><td>Cash or Hard Money Only</td></tr>
-      <tr><td class="k">Transaction Type</td><td>Assignment of Contract</td></tr>
-      <tr><td class="k">Closing Costs</td><td>Buyer Pays Closing Costs</td></tr>
-      <tr><td class="k">Condition</td><td>Property Sold As-Is</td></tr>
-      <tr><td class="k">Proof of Funds</td><td>Required</td></tr>
-      <tr><td class="k">Offer Process</td><td>First Come, First Served — No Auction, No Highest and Best</td></tr>
+      <tr><td>Purchase Price</td><td>$199,000</td></tr>
+      <tr><td>Financing</td><td>Cash or hard money only</td></tr>
+      <tr><td>Transaction Type</td><td>Assignment of contract</td></tr>
+      <tr><td>Closing Costs</td><td>Buyer pays closing costs</td></tr>
+      <tr><td>Condition</td><td>Property sold as-is</td></tr>
+      <tr><td>Buyer Requirement</td><td>Proof of funds required</td></tr>
+      <tr><td>Process</td><td>First come, first served — no auction, no highest and best</td></tr>
     </table>
-  </section>
-
-  <section class="block">
-    <h2>Disclosures</h2>
-    <div class="disclosure-box">
-      <p>This is a wholesale assignment. JNA Dynamic Holdings LLC holds equitable interest in the subject transaction under contract with the underlying property owner. The end buyer will receive an assignment of contract, not a direct deed from the owner.</p>
-      <p>All zoning, utility, HOA, slope, geotechnical, comparable-sale, building-envelope, and development information must be independently verified by the buyer prior to closing. Figures and details presented here have not been independently verified by JNA Dynamic Holdings LLC.</p>
+    <div class="assignbox">
+      This is a wholesale assignment of contract. JNA Dynamic Holdings LLC holds equitable interest in the subject transaction under an assignable purchase agreement with the underlying property owner. The end buyer will receive an assignment of that contract, not a direct deed from JNA Dynamic Holdings LLC.
     </div>
+    <p class="disclaimer">All zoning, utility, HOA, slope, geotechnical, comparable-sale, building-envelope, and development information must be independently verified by the buyer prior to closing. Figures above have not been independently verified by JNA Dynamic Holdings LLC.</p>
   </section>
 
-</div>
+</main>
 
-<div class="cta-band">
+<section class="ctaband">
   <div class="wrap">
     <h2>Interested in This Homesite?</h2>
-    <p>1.08 Acres in Verrado — Natural Foothill Lot — Designated Building Envelope — White Tank Mountain Setting — $199,000. Cash or hard money, first come first served. Reach out for the full parcel address and contract details.</p>
-    <div class="cta-buttons">
-      <a href="tel:5206336437">Call 520-633-6437</a>
-      <a href="mailto:montanoemmanuel@gmail.com">Email montanoemmanuel@gmail.com</a>
+    <p>1.08 acres in Verrado. Natural foothill lot. Designated building envelope. White Tank Mountain setting. $199,000. Cash or hard money, first come first served — reach out today for the full parcel address and details.</p>
+    <div class="contactrow">
+      <a href="tel:5206336437">520-633-6437</a>
+      <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
     </div>
   </div>
-</div>
+</section>
 
 <footer class="foot">
   <div class="wrap">
-    JNA Dynamic Holdings LLC — 520-633-6437 — montanoemmanuel@gmail.com
+    JNA Dynamic Holdings LLC — This offering is a wholesale assignment of contract. JNA Dynamic Holdings LLC is not the owner of the subject property and makes no representations beyond what is disclosed here; all information should be independently verified by the buyer.
   </div>
 </footer>
 
