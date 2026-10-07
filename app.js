@@ -312,6 +312,15 @@ function truncateText(text, maxLen) {
   return text.slice(0, maxLen).replace(/\s+\S*$/, "") + "...";
 }
 
+function buildRepDealLink(pageUrl, fee, name, phone, email) {
+  const params = [];
+  if (fee > 0) params.push("fee=" + encodeURIComponent(String(Math.round(fee))));
+  if (String(name || "").trim()) params.push("rn=" + encodeURIComponent(String(name).trim()));
+  if (String(phone || "").trim()) params.push("rp=" + encodeURIComponent(String(phone).trim()));
+  if (String(email || "").trim()) params.push("re=" + encodeURIComponent(String(email).trim()));
+  return params.length ? pageUrl + (pageUrl.indexOf("?") === -1 ? "?" : "&") + params.join("&") : pageUrl;
+}
+
 function parseMoneyNumber(raw) {
   const cleaned = String(raw || "").replace(/[$,\s]/g, "");
   return /^\d+(\.\d+)?$/.test(cleaned) ? Number(cleaned) : null;
@@ -326,7 +335,7 @@ function quotedPriceWithFee(price, fee) {
 // set, the quoted Asking Price includes it, and the Gross Margin / As-Is
 // Equity lines are left out since admin's figures were computed off the
 // unmarked price and would no longer be accurate.
-function buildBuyerShareText(deal, shortenDescription, repFee) {
+function buildBuyerShareText(deal, shortenDescription, repFee, repLink) {
   const lines = [];
   const quotedPrice = repFee > 0 ? quotedPriceWithFee(deal.Price, repFee) : null;
   const priceMarkedUp = quotedPrice !== null;
@@ -345,7 +354,7 @@ function buildBuyerShareText(deal, shortenDescription, repFee) {
   // Reads live off the deal record every time this is copied -- never
   // baked into the stored Description text itself, so it's always
   // current with no regeneration step needed if the page URL ever changes.
-  if (deal.PublicPageUrl) lines.push("Full listing: " + deal.PublicPageUrl);
+  if (deal.PublicPageUrl) lines.push("Full listing: " + (repLink || deal.PublicPageUrl));
   if (deal.GeneralDriveLink) lines.push("Deal Link with pictures: " + deal.GeneralDriveLink);
   return lines.join("\n");
 }
@@ -1214,6 +1223,17 @@ async function openRepDealDetail(dealId) {
         '<div><label class="field-label">Price to quote your buyer</label><div id="rep-fee-quote" style="font-weight:700; font-size:18px; padding-top:6px;"></div></div>' +
       '</div>' +
       '<div class="small-muted" id="rep-fee-breakdown" style="margin-top:4px;"></div>' +
+      (deal.PublicPageUrl
+        ? '<div style="margin-top:12px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.1);"><strong>Your own deal page link</strong>' +
+          '<p class="small-muted" style="margin:4px 0 8px;">Send this link instead of the normal one. Your buyer sees the page with <strong>+ your assignment fee added to the title</strong> and <strong>your contact info instead of ours</strong>. The source description and all its numbers stay exactly as they are.</p>' +
+          '<div class="row3">' +
+            '<div><label class="field-label">Your name</label><input type="text" id="rep-link-name"></div>' +
+            '<div><label class="field-label">Your phone</label><input type="text" id="rep-link-phone"></div>' +
+            '<div><label class="field-label">Your email</label><input type="text" id="rep-link-email"></div>' +
+          '</div>' +
+          '<div class="nav-row" style="justify-content:flex-start;"><button class="btn secondary small" id="rep-link-copy-btn">Copy My Link</button></div>' +
+          '<div class="small-muted" id="rep-link-note"></div></div>'
+        : '') +
       '<div class="sop-lead" style="margin-top:10px;"><strong>If your buyer comes in low,</strong> we won\'t just let the deal die. <strong>Admin will split the dispo assignment fee with you</strong> if we come to a deal, and <strong>admin stays in contact with you throughout the whole closing process.</strong> Tell admin as soon as a buyer makes an offer.</div>' +
     '</div>') +
 
@@ -1274,7 +1294,12 @@ async function openRepDealDetail(dealId) {
   document.getElementById("copy-buyer-info-btn").addEventListener("click", async function () {
     const shortenCheckbox = document.getElementById("copy-buyer-info-shorten");
     const feeInput = document.getElementById("rep-fee-input");
-    const text = buildBuyerShareText(deal, !shortenCheckbox || shortenCheckbox.checked, feeInput ? (parseMoneyNumber(feeInput.value) || 0) : 0);
+    const copyFee = feeInput ? (parseMoneyNumber(feeInput.value) || 0) : 0;
+    const linkNameEl = document.getElementById("rep-link-name");
+    const repLink = deal.PublicPageUrl && linkNameEl
+      ? buildRepDealLink(deal.PublicPageUrl, copyFee, linkNameEl.value, document.getElementById("rep-link-phone").value, document.getElementById("rep-link-email").value)
+      : null;
+    const text = buildBuyerShareText(deal, !shortenCheckbox || shortenCheckbox.checked, copyFee, repLink);
     try {
       await navigator.clipboard.writeText(text);
       showToast("Copied — paste it into a text or email.");
@@ -1307,6 +1332,36 @@ async function openRepDealDetail(dealId) {
       try { localStorage.setItem(feeKey, feeInput.value); } catch (e) {}
       renderFeeQuote();
     });
+
+    const linkBtn = document.getElementById("rep-link-copy-btn");
+    if (linkBtn) {
+      const sess = getSession() || {};
+      const contactKey = "rep_link_contact_" + (sess.username || "");
+      let saved = {};
+      try { saved = JSON.parse(localStorage.getItem(contactKey) || "{}"); } catch (e) {}
+      const nameEl = document.getElementById("rep-link-name");
+      const phoneEl = document.getElementById("rep-link-phone");
+      const emailEl = document.getElementById("rep-link-email");
+      nameEl.value = saved.name || sess.name || "";
+      phoneEl.value = saved.phone || "";
+      emailEl.value = saved.email || sess.username || "";
+      [nameEl, phoneEl, emailEl].forEach(function (el) {
+        el.addEventListener("input", function () {
+          try { localStorage.setItem(contactKey, JSON.stringify({ name: nameEl.value, phone: phoneEl.value, email: emailEl.value })); } catch (e) {}
+        });
+      });
+      linkBtn.addEventListener("click", async function () {
+        const noteEl = document.getElementById("rep-link-note");
+        const link = buildRepDealLink(deal.PublicPageUrl, parseMoneyNumber(feeInput.value) || 0, nameEl.value, phoneEl.value, emailEl.value);
+        try {
+          await navigator.clipboard.writeText(link);
+          noteEl.textContent = "Copied. Open it once to check how it looks to your buyer.";
+          showToast("Link copied.");
+        } catch (err) {
+          noteEl.textContent = link;
+        }
+      });
+    }
 
     wireBuyerMatchListHandlers(document.getElementById("buyer-list"), function () { return refreshBuyerMatchList(dealId, "buyer-list"); });
     if (visibleCities.length > 0) renderCityCheckboxList("give-myself-cities", visibleCities);

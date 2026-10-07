@@ -2135,7 +2135,11 @@ function generateDealPageHtml(deal, sourceListingText, photoPaths, morePhotosLin
   const withAddressRequest = /<body[^>]*>/i.test(html)
     ? html.replace(/(<body[^>]*>)/i, '$1' + buttonHtml)
     : buttonHtml + html;
-  return withAddressRequest;
+  // Rep-link support (?fee=&rn=&rp=&re=) -- see /rep-link.js. Inserted in
+  // fixed code so every generated page gets it regardless of Claude's layout.
+  const repLinkTag = '<script src="/rep-link.js" defer></script>';
+  const idx = withAddressRequest.toLowerCase().lastIndexOf('</body>');
+  return idx === -1 ? withAddressRequest + repLinkTag : withAddressRequest.slice(0, idx) + repLinkTag + withAddressRequest.slice(idx);
 }
 
 function requestAddressButtonHtml(dealId) {
