@@ -340,21 +340,14 @@ function buildBuyerShareText(deal, shortenDescription, repFee, repLink) {
   if (deal.FinancingType) lines.push("Financing Type: " + deal.FinancingType);
   if (deal.Description) {
     let desc = shortenDescription ? truncateText(deal.Description, 220) : deal.Description;
-    // Same rule as the rep's public page: a price figure becomes the raised
-    // price, except in sentences about the deal's cost (purchase price,
-    // all-in...), where the original stays and reads "+ assignment fee".
+    // Same rule as the rep's public page: any figure equal to the deal's
+    // price becomes the raised price. Derived all-in / profit figures get
+    // flagged below since they can't be recomputed.
     if (priceMarkedUp) {
       const basePrice = parseMoneyNumber(deal.Price);
-      const costWords = /all[\s-]?in|purchase price|total price|total cost|total investment|total basis|cost basis|acquisition (?:cost|price)|buy[\s-]?in|contract price|sales? price|total acquisition|asking price|total ask|list price/i;
-      desc = desc.replace(/\$\s?\d{1,3}(?:,\d{3})+(?:\.\d+)?/g, function (m, offset, whole) {
-        if (Math.round(parseMoneyNumber(m.replace("$", ""))) !== Math.round(basePrice)) return m;
-        let start = offset;
-        while (start > 0 && !/[.!?:;\n]/.test(whole.charAt(start - 1))) start--;
-        let end = offset + m.length;
-        while (end < whole.length && !/[.!?:;\n]/.test(whole.charAt(end))) end++;
-        return costWords.test(whole.slice(start, end)) ? m + " + assignment fee" : formatAdminMoney(String(quotedPrice));
+      desc = desc.replace(/\$\s?\d{1,3}(?:,\d{3})+(?:\.\d+)?/g, function (m) {
+        return Math.round(parseMoneyNumber(m.replace("$", ""))) === Math.round(basePrice) ? formatAdminMoney(String(quotedPrice)) : m;
       });
-      // All-in / total-cost style figures include the purchase price too.
       // Profit-style figures were computed off the source price.
       desc = desc.replace(/((?:net |gross |estimated |projected |potential )?(?:profit|spread|margin|roi|return|equity|capital recovered|cash[\s-]?on[\s-]?cash)(?: of| at| is| =|:)?[^$\d%]{0,20})(~?\d+(?:\.\d+)?\s?%|~?\$\s?\d+(?:,\d{3})*(?:\.\d+)?(?:\s?(?:MM|M|K|k)\b)?)(?! \(before assignment fee\))/gi, "$1$2 (before assignment fee)");
       desc = desc.replace(/(all[\s-]?in(?: cost| basis)?|total (?:cost|investment|basis|capital|acquisition(?: cost)?)|cost basis)([^$\d]{0,30})(~?\$\s?\d+(?:,\d{3})*(?:\.\d+)?(?:\s?(?:MM|M|K|k)\b)?)(?! \+ assignment fee)/gi, "$1$2$3 + assignment fee");

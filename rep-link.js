@@ -27,18 +27,7 @@
   }
 
   // Every place the page states the deal's price becomes price + the rep's
-  // fee, with no fee wording. The one exception is description text where the
-  // sentence is about the deal's cost itself (purchase price, all-in cost,
-  // total price...): there the original figure stays and reads "+ assignment
-  // fee", so the source's math still reads correctly.
-  var COST_WORDS = /all[\s-]?in|purchase price|total price|total cost|total investment|total basis|cost basis|acquisition (?:cost|price)|buy[\s-]?in|contract price|sales? price|total acquisition|asking price|total ask|list price/i;
-
-  function costContext(node, figure) {
-    var el = node.parentNode && node.parentNode.closest && node.parentNode.closest("p, li");
-    if (!el) return false;
-    var sentences = el.textContent.split(/(?<=[.!?:;])\s+/);
-    return sentences.some(function (sn) { return sn.indexOf(figure) !== -1 && COST_WORDS.test(sn); });
-  }
+  // fee, with no fee wording and no mention of the original figure.
 
   // Derived cost figures (all-in cost, total investment...) include the
   // purchase price, so they get "+ assignment fee" too -- we can't recompute
@@ -99,18 +88,17 @@
     var total = Math.round(base + fee);
     function fmtMoney(n) { return "$" + Math.round(n).toLocaleString("en-US"); }
     function trimZeros(str) { return str.indexOf(".") === -1 ? str : str.replace(/0+$/, "").replace(/\.$/, ""); }
-    function swap(text, node) {
+    function swap(text) {
       text = text.replace(/\$\s?(\d+(?:\.\d+)?)\s?(MM|M|million|K|k)\b/g, function (m, num, unit) {
         var mult = /^(MM|M|million)$/.test(unit) ? 1e6 : 1e3;
         var d = (num.split(".")[1] || "").length;
         if (Number((base / mult).toFixed(d)) !== Number(num)) return m;
-        if (costContext(node, m)) return m + " + assignment fee";
         var gap = /\s/.test(m.charAt(m.length - unit.length - 1)) ? " " : "";
         return "$" + trimZeros((total / mult).toFixed(Math.max(d, 3))) + gap + unit;
       });
       text = text.replace(/\$\s?\d{1,3}(?:,\d{3})+(?:\.\d+)?/g, function (m) {
         if (Math.round(Number(m.replace(/[$,\s]/g, ""))) !== Math.round(base)) return m;
-        return costContext(node, m) ? m + " + assignment fee" : fmtMoney(total);
+        return fmtMoney(total);
       });
       return text;
     }
@@ -120,7 +108,7 @@
     nodes.forEach(function (n) {
       var parent = n.parentNode;
       if (!parent || parent.nodeName === "SCRIPT" || parent.nodeName === "STYLE") return;
-      var t = swap(n.nodeValue, n);
+      var t = swap(n.nodeValue);
       if (t !== n.nodeValue) n.nodeValue = t;
     });
   }
