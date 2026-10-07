@@ -312,14 +312,31 @@ function truncateText(text, maxLen) {
   return text.slice(0, maxLen).replace(/\s+\S*$/, "") + "...";
 }
 
-function buildBuyerShareText(deal, shortenDescription) {
+function parseMoneyNumber(raw) {
+  const cleaned = String(raw || "").replace(/[$,\s]/g, "");
+  return /^\d+(\.\d+)?$/.test(cleaned) ? Number(cleaned) : null;
+}
+
+function quotedPriceWithFee(price, fee) {
+  const base = parseMoneyNumber(price);
+  return base === null ? null : Math.round(base + fee);
+}
+
+// repFee (optional) is the rep's own fee on top of the deal's price. When
+// set, the quoted Asking Price includes it, and the Gross Margin / As-Is
+// Equity lines are left out since admin's figures were computed off the
+// unmarked price and would no longer be accurate.
+function buildBuyerShareText(deal, shortenDescription, repFee) {
   const lines = [];
-  if (deal.Price) lines.push("Asking Price: " + formatAdminMoney(deal.Price));
+  const quotedPrice = repFee > 0 ? quotedPriceWithFee(deal.Price, repFee) : null;
+  const priceMarkedUp = quotedPrice !== null;
+  if (priceMarkedUp) lines.push("Asking Price: " + formatAdminMoney(String(quotedPrice)));
+  else if (deal.Price) lines.push("Asking Price: " + formatAdminMoney(deal.Price));
   if (deal.ARV) lines.push("ARV: " + formatAdminMoney(deal.ARV));
   if (deal.RehabEstimate) lines.push("Rehab Estimate: " + formatAdminMoney(deal.RehabEstimate));
-  if (deal.ARV || deal.RehabEstimate) lines.push("Gross Margin: " + formatGrossMargin(deal.GrossMargin).replace(/&mdash;/g, "—"));
+  if (!priceMarkedUp && (deal.ARV || deal.RehabEstimate)) lines.push("Gross Margin: " + formatGrossMargin(deal.GrossMargin).replace(/&mdash;/g, "—"));
   if (deal.AsIsValue) lines.push("As-Is Value: " + formatAdminMoney(deal.AsIsValue));
-  if (deal.AsIsValue) lines.push("As-Is Equity: " + formatAsIsEquity(deal.AsIsEquity).replace(/&mdash;/g, "—"));
+  if (!priceMarkedUp && deal.AsIsValue) lines.push("As-Is Equity: " + formatAsIsEquity(deal.AsIsEquity).replace(/&mdash;/g, "—"));
   if (deal.FinancingType) lines.push("Financing Type: " + deal.FinancingType);
   if (deal.Description) lines.push(shortenDescription ? truncateText(deal.Description, 220) : deal.Description);
   // Reads live off the deal record every time this is copied -- never
@@ -1186,6 +1203,18 @@ async function openRepDealDetail(dealId) {
     '</div>' +
 
     (isBuyerView ? "" :
+    '<div class="banner warn" id="rep-fee-card" style="margin-top:12px;">' +
+      '<strong>Add Your Own Fee On Top</strong>' +
+      '<p class="small-muted" style="margin:6px 0 8px;">Enter the fee you want to earn. We add it to the deal price so you know exactly what to quote your buyer, and "Copy Info" uses that number.</p>' +
+      '<div class="row2">' +
+        '<div><label class="field-label">Your fee ($)</label><input type="text" id="rep-fee-input" inputmode="numeric" placeholder="e.g. 5000"></div>' +
+        '<div><label class="field-label">Price to quote your buyer</label><div id="rep-fee-quote" style="font-weight:700; font-size:18px; padding-top:6px;"></div></div>' +
+      '</div>' +
+      '<div class="small-muted" id="rep-fee-breakdown" style="margin-top:4px;"></div>' +
+      '<div class="sop-lead" style="margin-top:10px;"><strong>If your buyer comes in low,</strong> we won\'t just let the deal die. <strong>Admin will split the dispo assignment fee with you</strong> if we come to a deal, and <strong>admin stays in contact with you throughout the whole closing process.</strong> Tell admin as soon as a buyer makes an offer.</div>' +
+    '</div>') +
+
+    (isBuyerView ? "" :
     '<div class="section-title">Already Talked To A Buyer About This Deal?</div>' +
     '<p class="small-muted">If you sent someone this deal directly (e.g. the public listing link) and they\'re already on the calling list or just registered, enter what you have below to match yourself to them — no need to wait for auto-matching.</p>' +
     '<div class="row2">' +
@@ -1241,7 +1270,8 @@ async function openRepDealDetail(dealId) {
 
   document.getElementById("copy-buyer-info-btn").addEventListener("click", async function () {
     const shortenCheckbox = document.getElementById("copy-buyer-info-shorten");
-    const text = buildBuyerShareText(deal, !shortenCheckbox || shortenCheckbox.checked);
+    const feeInput = document.getElementById("rep-fee-input");
+    const text = buildBuyerShareText(deal, !shortenCheckbox || shortenCheckbox.checked, feeInput ? (parseMoneyNumber(feeInput.value) || 0) : 0);
     try {
       await navigator.clipboard.writeText(text);
       showToast("Copied — paste it into a text or email.");
@@ -1253,6 +1283,28 @@ async function openRepDealDetail(dealId) {
   document.getElementById("close-detail-btn").addEventListener("click", function () { overlay.hidden = true; });
 
   if (!isBuyerView) {
+    const feeInput = document.getElementById("rep-fee-input");
+    const feeQuote = document.getElementById("rep-fee-quote");
+    const feeBreakdown = document.getElementById("rep-fee-breakdown");
+    const feeKey = "rep_fee_" + ((getSession() || {}).username || "") + "_" + deal.DealID;
+    function renderFeeQuote() {
+      const fee = parseMoneyNumber(feeInput.value) || 0;
+      const base = parseMoneyNumber(deal.Price);
+      if (base === null) {
+        feeQuote.textContent = "—";
+        feeBreakdown.textContent = "This deal's price isn't a plain number, so we can't add your fee automatically.";
+        return;
+      }
+      feeQuote.textContent = formatAdminMoney(String(base + fee));
+      feeBreakdown.textContent = formatAdminMoney(String(base)) + " deal price + " + formatAdminMoney(String(fee)) + " your fee";
+    }
+    try { feeInput.value = localStorage.getItem(feeKey) || ""; } catch (e) {}
+    renderFeeQuote();
+    feeInput.addEventListener("input", function () {
+      try { localStorage.setItem(feeKey, feeInput.value); } catch (e) {}
+      renderFeeQuote();
+    });
+
     wireBuyerMatchListHandlers(document.getElementById("buyer-list"), function () { return refreshBuyerMatchList(dealId, "buyer-list"); });
     if (visibleCities.length > 0) renderCityCheckboxList("give-myself-cities", visibleCities);
 
