@@ -50,6 +50,15 @@
   var DERIVED_IN_TEXT = new RegExp("(all[\\s-]?in(?: cost| basis)?|total (?:cost|investment|basis|capital|acquisition(?: cost)?)|cost basis)([^$\\d]{0,30})(" + FIGURE + ")(,?)(?! \\+ assignment fee)", "gi");
   var FIGURE_RE = new RegExp(FIGURE);
 
+  // Profit-style figures (spread, net profit, margin, ROI, equity, capital
+  // recovered...) were computed off the source price, so they are really
+  // "before assignment fee". Same approach: flag, never recompute.
+  var PROFIT_LABEL = /profit|spread|margin|\broi\b|return on|capital recover|recovered|equity|cash[\s-]?on[\s-]?cash|\bgain\b|\bupside\b/i;
+  var PROFIT_EXCLUDE = /\barv\b|rehab|rent|\bnoi\b|exit|\bvalue\b|price|refinance|tax|insurance|closing|holding/i;
+  var PCT_OR_FIGURE = new RegExp("(?:~?\\d+(?:\\.\\d+)?\\s?%|" + FIGURE + ")");
+  var PROFIT_IN_TEXT = new RegExp("((?:net |gross |estimated |projected |potential )?(?:profit|spread|margin|roi|return|equity|capital recovered|cash[\\s-]?on[\\s-]?cash)(?: of| at| is| =|:)?[^$\\d%]{0,20})(" + PCT_OR_FIGURE.source + ")(?! \\(before assignment fee\\))", "gi");
+  var BEFORE = " (before assignment fee)";
+
   function flagDerivedCosts() {
     var done = [];
     var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
@@ -68,7 +77,20 @@
           return;
         }
       }
-      var t = n.nodeValue.replace(DERIVED_IN_TEXT, function (all, kw, mid, fig, comma) { return kw + mid + fig + " + assignment fee" + comma; });
+      if (row && cell !== row.cells[0] && done.indexOf(cell) === -1) {
+        var label = row.cells[0].textContent;
+        if (PROFIT_LABEL.test(label) && !PROFIT_EXCLUDE.test(label)) {
+          var pm = PCT_OR_FIGURE.exec(n.nodeValue);
+          if (pm) {
+            done.push(cell);
+            n.nodeValue = n.nodeValue.slice(0, pm.index + pm[0].length) + BEFORE + n.nodeValue.slice(pm.index + pm[0].length);
+            return;
+          }
+        }
+      }
+      var t = n.nodeValue.replace(PROFIT_IN_TEXT, function (all, kw, fig) { return kw + fig + BEFORE; });
+      if (t !== n.nodeValue) { n.nodeValue = t; return; }
+      t = n.nodeValue.replace(DERIVED_IN_TEXT, function (all, kw, mid, fig, comma) { return kw + mid + fig + " + assignment fee" + comma; });
       if (t !== n.nodeValue) n.nodeValue = t;
     });
   }

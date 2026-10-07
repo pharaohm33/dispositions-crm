@@ -355,6 +355,8 @@ function buildBuyerShareText(deal, shortenDescription, repFee, repLink) {
         return costWords.test(whole.slice(start, end)) ? m + " + assignment fee" : formatAdminMoney(String(quotedPrice));
       });
       // All-in / total-cost style figures include the purchase price too.
+      // Profit-style figures were computed off the source price.
+      desc = desc.replace(/((?:net |gross |estimated |projected |potential )?(?:profit|spread|margin|roi|return|equity|capital recovered|cash[\s-]?on[\s-]?cash)(?: of| at| is| =|:)?[^$\d%]{0,20})(~?\d+(?:\.\d+)?\s?%|~?\$\s?\d+(?:,\d{3})*(?:\.\d+)?(?:\s?(?:MM|M|K|k)\b)?)(?! \(before assignment fee\))/gi, "$1$2 (before assignment fee)");
       desc = desc.replace(/(all[\s-]?in(?: cost| basis)?|total (?:cost|investment|basis|capital|acquisition(?: cost)?)|cost basis)([^$\d]{0,30})(~?\$\s?\d+(?:,\d{3})*(?:\.\d+)?(?:\s?(?:MM|M|K|k)\b)?)(?! \+ assignment fee)/gi, "$1$2$3 + assignment fee");
     }
     lines.push(desc);
