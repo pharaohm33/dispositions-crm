@@ -1946,6 +1946,7 @@ function generateDeadDealPlaceholderHtml(deal) {
     '<h1>This deal is no longer available.</h1>' +
     '<p>' + (deal['DealCode'] ? esc_(deal['DealCode']) + ' has closed or is no longer active.' : 'This listing has closed or is no longer active.') + '</p>' +
     '<a class="cta" href="https://sendmybuyer.com">See more deals</a>' +
+    '<script src="/rep-link.js" defer></script>' +
     '</body></html>';
 }
 

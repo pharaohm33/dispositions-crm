@@ -41,6 +41,37 @@
     });
 
     var h1 = document.querySelector("h1");
+
+    // Dead / closed deal: no fee or price to show, but keep the rep in front
+    // of the buyer -- show their contact to ask for more deals, and drop the
+    // link back to the SendMyBuyer marketplace.
+    if (h1 && /no longer available/i.test(h1.textContent)) {
+      Array.prototype.forEach.call(document.querySelectorAll('a[href*="sendmybuyer.com"]'), function (a) { a.parentNode.removeChild(a); });
+      var box = document.createElement("div");
+      box.style.cssText = "margin-top:24px;padding:18px;border:1px solid #ddd;border-radius:8px;font-family:Arial,sans-serif;";
+      var head = document.createElement("div");
+      head.style.cssText = "font-weight:bold;margin-bottom:8px;";
+      head.textContent = "Looking for more deals?" + (name ? " Contact " + name + "." : "");
+      box.appendChild(head);
+      if (phone) {
+        var pa = document.createElement("a");
+        pa.href = "tel:" + (phone.charAt(0) === "+" ? "+" : "") + phoneDigits;
+        pa.textContent = "Call " + phone;
+        pa.style.cssText = "display:inline-block;margin:4px 8px;";
+        box.appendChild(pa);
+      }
+      if (email) {
+        var ea = document.createElement("a");
+        ea.href = "mailto:" + email;
+        ea.textContent = "Email " + email;
+        ea.style.cssText = "display:inline-block;margin:4px 8px;";
+        box.appendChild(ea);
+      }
+      document.body.appendChild(box);
+      showPage();
+      return;
+    }
+
     if (isFinite(fee) && fee > 0) {
       var feeText = " + $" + Math.round(fee).toLocaleString("en-US") + " Assignment Fee";
       if (h1) h1.appendChild(document.createTextNode(feeText));
