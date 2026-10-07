@@ -40,6 +40,39 @@
     return sentences.some(function (sn) { return sn.indexOf(figure) !== -1 && COST_WORDS.test(sn); });
   }
 
+  // Derived cost figures (all-in cost, total investment...) include the
+  // purchase price, so they get "+ assignment fee" too -- we can't recompute
+  // them without disclosing the fee, so the figure stays as the source wrote
+  // it. Matches "All-in cost ~$220,000" inside a sentence, or a table row
+  // whose label is all-in/total cost and whose value cell starts with a figure.
+  var DERIVED_LABEL = /all[\s-]?in|total (?:cost|investment|basis|capital|acquisition)|cost basis/i;
+  var FIGURE = "~?\\$\\s?\\d+(?:,\\d{3})*(?:\\.\\d+)?(?:\\s?(?:MM|M|K|k)\\b)?";
+  var DERIVED_IN_TEXT = new RegExp("(all[\\s-]?in(?: cost| basis)?|total (?:cost|investment|basis|capital|acquisition(?: cost)?)|cost basis)([^$\\d]{0,30})(" + FIGURE + ")(,?)(?! \\+ assignment fee)", "gi");
+  var FIGURE_RE = new RegExp(FIGURE);
+
+  function flagDerivedCosts() {
+    var done = [];
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+    var node, nodes = [];
+    while ((node = walker.nextNode())) nodes.push(node);
+    nodes.forEach(function (n) {
+      var parent = n.parentNode;
+      if (!parent || parent.nodeName === "SCRIPT" || parent.nodeName === "STYLE") return;
+      var cell = parent.closest && parent.closest("td, th");
+      var row = cell && cell.closest("tr");
+      if (row && cell !== row.cells[0] && DERIVED_LABEL.test(row.cells[0].textContent) && done.indexOf(cell) === -1) {
+        var m = FIGURE_RE.exec(n.nodeValue);
+        if (m) {
+          done.push(cell);
+          n.nodeValue = n.nodeValue.slice(0, m.index + m[0].length) + " + assignment fee" + n.nodeValue.slice(m.index + m[0].length);
+          return;
+        }
+      }
+      var t = n.nodeValue.replace(DERIVED_IN_TEXT, function (all, kw, mid, fig, comma) { return kw + mid + fig + " + assignment fee" + comma; });
+      if (t !== n.nodeValue) n.nodeValue = t;
+    });
+  }
+
   function raisePrice(base, fee) {
     var total = Math.round(base + fee);
     function fmtMoney(n) { return "$" + Math.round(n).toLocaleString("en-US"); }
@@ -117,7 +150,7 @@
     }
 
     var base = Number(page.basePrice);
-    if (isFinite(fee) && fee > 0 && isFinite(base) && base > 0) raisePrice(base, fee);
+    if (isFinite(fee) && fee > 0 && isFinite(base) && base > 0) { raisePrice(base, fee); flagDerivedCosts(); }
     if (name && h1) {
       var by = document.createElement("div");
       by.textContent = "Presented by " + name;

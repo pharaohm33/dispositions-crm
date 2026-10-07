@@ -354,6 +354,8 @@ function buildBuyerShareText(deal, shortenDescription, repFee, repLink) {
         while (end < whole.length && !/[.!?:;\n]/.test(whole.charAt(end))) end++;
         return costWords.test(whole.slice(start, end)) ? m + " + assignment fee" : formatAdminMoney(String(quotedPrice));
       });
+      // All-in / total-cost style figures include the purchase price too.
+      desc = desc.replace(/(all[\s-]?in(?: cost| basis)?|total (?:cost|investment|basis|capital|acquisition(?: cost)?)|cost basis)([^$\d]{0,30})(~?\$\s?\d+(?:,\d{3})*(?:\.\d+)?(?:\s?(?:MM|M|K|k)\b)?)(?! \+ assignment fee)/gi, "$1$2$3 + assignment fee");
     }
     lines.push(desc);
   }
