@@ -386,6 +386,95 @@ function formatDate(iso) {
     " " + d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
 }
 
+
+/* ============================================================
+   HELP CHAT (DeepSeek answers from site knowledge; unanswered
+   questions go to admin by email, with a text-message option)
+   ============================================================ */
+
+const helpChatMessages = [];
+
+function helpChatAdd(role, text) {
+  const log = document.getElementById("help-chat-log");
+  const div = document.createElement("div");
+  div.className = "help-msg " + (role === "user" ? "user" : "bot");
+  div.textContent = text;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+  return div;
+}
+
+function setHelpChatVisible(visible) {
+  document.getElementById("help-chat-btn").hidden = !visible;
+  if (!visible) {
+    document.getElementById("help-chat-panel").hidden = true;
+    helpChatMessages.length = 0;
+    document.getElementById("help-chat-log").innerHTML = "";
+    document.getElementById("help-chat-admin-note").textContent = "";
+  }
+}
+
+function openHelpChat() {
+  document.getElementById("help-chat-panel").hidden = false;
+  document.getElementById("help-chat-btn").hidden = true;
+  if (!helpChatMessages.length && !document.getElementById("help-chat-log").children.length) {
+    helpChatAdd("bot", "Hi! Ask me how anything on SendMyBuyer works. If I can't answer, press \"Talk to admin\" below.");
+  }
+  document.getElementById("help-chat-input").focus();
+}
+
+document.getElementById("help-chat-btn").addEventListener("click", openHelpChat);
+document.getElementById("help-chat-close").addEventListener("click", function () {
+  document.getElementById("help-chat-panel").hidden = true;
+  document.getElementById("help-chat-btn").hidden = !getSession();
+});
+
+async function sendHelpChat() {
+  const input = document.getElementById("help-chat-input");
+  const sendBtn = document.getElementById("help-chat-send");
+  const text = input.value.trim();
+  if (!text || sendBtn.disabled) return;
+  input.value = "";
+  helpChatMessages.push({ role: "user", text: text });
+  helpChatAdd("user", text);
+  sendBtn.disabled = true;
+  const thinking = helpChatAdd("bot", "Thinking…");
+  const res = await api("helpChat", { messages: helpChatMessages.slice(-8) });
+  sendBtn.disabled = false;
+  if (!res.ok) { thinking.textContent = res.error || "Something went wrong. Try again or press Talk to admin."; helpChatMessages.pop(); return; }
+  thinking.textContent = res.answer;
+  helpChatMessages.push({ role: "assistant", text: res.answer });
+  if (res.answered === false) document.getElementById("help-chat-admin-note").textContent = "Not what you needed? Press the button above to reach admin.";
+}
+
+document.getElementById("help-chat-send").addEventListener("click", sendHelpChat);
+document.getElementById("help-chat-input").addEventListener("keydown", function (e) {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendHelpChat(); }
+});
+
+document.getElementById("help-chat-admin-btn").addEventListener("click", async function () {
+  const btn = this;
+  const noteEl = document.getElementById("help-chat-admin-note");
+  if (btn.disabled) return;
+  const lastQuestion = helpChatMessages.filter(function (m) { return m.role === "user"; }).slice(-1)[0];
+  btn.disabled = true;
+  const res = await api("helpTalkToAdmin", { messages: helpChatMessages.slice(-12), note: lastQuestion ? lastQuestion.text : "" });
+  btn.disabled = false;
+  if (!res.ok) { noteEl.textContent = res.error || "Could not reach admin."; return; }
+  helpChatAdd("bot", "Sent. Admin got your question and will get back to you at your account email.");
+  noteEl.textContent = "";
+  const phone = joinContactCache && joinContactCache.phone;
+  if (phone) {
+    const smsBody = "SendMyBuyer help: " + (lastQuestion ? lastQuestion.text : "I have a question") + " (" + ((getSession() || {}).name || "") + ")";
+    const digits = phone.replace(/[^\d+]/g, "");
+    const link = document.createElement("a");
+    link.href = "sms:" + digits + "?&body=" + encodeURIComponent(smsBody);
+    link.textContent = "Text admin at " + phone + " too";
+    link.style.cssText = "display:inline-block;margin-top:4px;font-weight:600;";
+    noteEl.appendChild(link);
+  }
+});
+
 /* ============================================================
    BOOT / ROUTING
    ============================================================ */
@@ -449,6 +538,7 @@ function showView(session) {
   els["switch-view-buyer-btn"].hidden = !showSwitchButtons || actingAsSomeone;
   els["switch-view-back-btn"].hidden = !showSwitchButtons || !actingAsSomeone;
   updateHeaderSupportLabel();
+  setHelpChatVisible(!!session);
 
   if (!session) return;
   els["who-label"].textContent = session.name + (session.isAdmin ? " (Admin)" : "") +
