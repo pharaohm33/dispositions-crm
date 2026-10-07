@@ -340,12 +340,19 @@ function buildBuyerShareText(deal, shortenDescription, repFee, repLink) {
   if (deal.FinancingType) lines.push("Financing Type: " + deal.FinancingType);
   if (deal.Description) {
     let desc = shortenDescription ? truncateText(deal.Description, 220) : deal.Description;
-    // Same rule as the rep's public page: where the description's math walks
-    // through the deal's price, keep that figure and add "+ assignment fee".
+    // Same rule as the rep's public page: a price figure becomes the raised
+    // price, except in sentences about the deal's cost (purchase price,
+    // all-in...), where the original stays and reads "+ assignment fee".
     if (priceMarkedUp) {
       const basePrice = parseMoneyNumber(deal.Price);
-      desc = desc.replace(/\$\s?\d{1,3}(?:,\d{3})+(?:\.\d+)?/g, function (m) {
-        return Math.round(parseMoneyNumber(m.replace("$", ""))) === Math.round(basePrice) ? m + " + assignment fee" : m;
+      const costWords = /all[\s-]?in|purchase price|total price|total cost|total investment|total basis|cost basis|acquisition (?:cost|price)|buy[\s-]?in|contract price|sales? price|total acquisition|asking price|total ask|list price/i;
+      desc = desc.replace(/\$\s?\d{1,3}(?:,\d{3})+(?:\.\d+)?/g, function (m, offset, whole) {
+        if (Math.round(parseMoneyNumber(m.replace("$", ""))) !== Math.round(basePrice)) return m;
+        let start = offset;
+        while (start > 0 && !/[.!?:;\n]/.test(whole.charAt(start - 1))) start--;
+        let end = offset + m.length;
+        while (end < whole.length && !/[.!?:;\n]/.test(whole.charAt(end))) end++;
+        return costWords.test(whole.slice(start, end)) ? m + " + assignment fee" : formatAdminMoney(String(quotedPrice));
       });
     }
     lines.push(desc);
