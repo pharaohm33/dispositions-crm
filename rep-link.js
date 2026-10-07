@@ -1,6 +1,6 @@
 /* Rep-specific view of a public deal page. A link ending in ?r=<id> loads
    that rep's saved page (fee + contact) from the SendMyBuyer backend and,
-   while it is active: (1) adds the rep's assignment fee to the page title,
+   while it is active: (1) raises every purchase/asking price on the page by the rep's fee (and writes "+ assignment fee" next to the price in description math),
    (2) removes the sign-up / request-address block, and (3) swaps the admin
    phone/email for the rep's. The source description, ROI math, and every
    other figure stay exactly as published. If the rep deleted the page (or it
@@ -24,6 +24,40 @@
     d.style.cssText = "font-family:Arial,sans-serif;text-align:center;padding:80px 24px;font-size:1.1rem;color:#444;";
     document.body.appendChild(d);
     showPage();
+  }
+
+  // Every place the page states the deal's price becomes price + the rep's
+  // fee. Inside running description text (<p>/<li>, where the source walks
+  // through the math) the original figure stays and reads "+ assignment fee"
+  // instead, so the breakdown still makes sense.
+  function raisePrice(base, fee) {
+    var total = Math.round(base + fee);
+    function fmtMoney(n) { return "$" + Math.round(n).toLocaleString("en-US"); }
+    function trimZeros(str) { return str.indexOf(".") === -1 ? str : str.replace(/0+$/, "").replace(/\.$/, ""); }
+    function swap(text, inDesc) {
+      text = text.replace(/\$\s?(\d+(?:\.\d+)?)\s?(MM|M|million|K|k)\b/g, function (m, num, unit) {
+        var mult = /^(MM|M|million)$/.test(unit) ? 1e6 : 1e3;
+        var d = (num.split(".")[1] || "").length;
+        if (Number((base / mult).toFixed(d)) !== Number(num)) return m;
+        if (inDesc) return m + " + assignment fee";
+        return "$" + trimZeros((total / mult).toFixed(Math.max(d, 3))) + (/^(MM|M)$/.test(unit) ? unit : " " + unit).replace(/^ /, unit.length > 1 && unit !== "MM" && unit !== "M" ? " " : "");
+      });
+      text = text.replace(/\$\s?\d{1,3}(?:,\d{3})+(?:\.\d+)?/g, function (m) {
+        if (Math.round(Number(m.replace(/[$,\s]/g, ""))) !== Math.round(base)) return m;
+        return inDesc ? m + " + assignment fee" : fmtMoney(total);
+      });
+      return text;
+    }
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+    var node, nodes = [];
+    while ((node = walker.nextNode())) nodes.push(node);
+    nodes.forEach(function (n) {
+      var parent = n.parentNode;
+      if (!parent || parent.nodeName === "SCRIPT" || parent.nodeName === "STYLE") return;
+      var inDesc = !!(parent.closest && parent.closest("p, li"));
+      var t = swap(n.nodeValue, inDesc);
+      if (t !== n.nodeValue) n.nodeValue = t;
+    });
   }
 
   function apply(page) {
@@ -72,11 +106,8 @@
       return;
     }
 
-    if (isFinite(fee) && fee > 0) {
-      var feeText = " + $" + Math.round(fee).toLocaleString("en-US") + " Assignment Fee";
-      if (h1) h1.appendChild(document.createTextNode(feeText));
-      document.title = document.title + feeText;
-    }
+    var base = Number(page.basePrice);
+    if (isFinite(fee) && fee > 0 && isFinite(base) && base > 0) raisePrice(base, fee);
     if (name && h1) {
       var by = document.createElement("div");
       by.textContent = "Presented by " + name;

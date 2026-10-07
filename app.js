@@ -330,7 +330,7 @@ function buildBuyerShareText(deal, shortenDescription, repFee, repLink) {
   const lines = [];
   const quotedPrice = repFee > 0 ? quotedPriceWithFee(deal.Price, repFee) : null;
   const priceMarkedUp = quotedPrice !== null;
-  if (priceMarkedUp) lines.push("Asking Price: " + formatAdminMoney(deal.Price) + " + " + formatAdminMoney(String(repFee)) + " assignment fee = " + formatAdminMoney(String(quotedPrice)));
+  if (priceMarkedUp) lines.push("Asking Price: " + formatAdminMoney(String(quotedPrice)));
   else if (deal.Price) lines.push("Asking Price: " + formatAdminMoney(deal.Price));
   if (deal.ARV) lines.push("ARV: " + formatAdminMoney(deal.ARV));
   if (deal.RehabEstimate) lines.push("Rehab Estimate: " + formatAdminMoney(deal.RehabEstimate));
@@ -338,10 +338,18 @@ function buildBuyerShareText(deal, shortenDescription, repFee, repLink) {
   if (deal.AsIsValue) lines.push("As-Is Value: " + formatAdminMoney(deal.AsIsValue));
   if (!priceMarkedUp && deal.AsIsValue) lines.push("As-Is Equity: " + formatAsIsEquity(deal.AsIsEquity).replace(/&mdash;/g, "—"));
   if (deal.FinancingType) lines.push("Financing Type: " + deal.FinancingType);
-  if (deal.Description) lines.push(shortenDescription ? truncateText(deal.Description, 220) : deal.Description);
-  // Any cost figures inside the source description are the source's own
-  // numbers, not the total -- say so whenever an assignment fee is on top.
-  if (priceMarkedUp && deal.Description) lines.push("Note: any price in the listing details above is the source price, + assignment fee.");
+  if (deal.Description) {
+    let desc = shortenDescription ? truncateText(deal.Description, 220) : deal.Description;
+    // Same rule as the rep's public page: where the description's math walks
+    // through the deal's price, keep that figure and add "+ assignment fee".
+    if (priceMarkedUp) {
+      const basePrice = parseMoneyNumber(deal.Price);
+      desc = desc.replace(/\$\s?\d{1,3}(?:,\d{3})+(?:\.\d+)?/g, function (m) {
+        return Math.round(parseMoneyNumber(m.replace("$", ""))) === Math.round(basePrice) ? m + " + assignment fee" : m;
+      });
+    }
+    lines.push(desc);
+  }
   // Reads live off the deal record every time this is copied -- never
   // baked into the stored Description text itself, so it's always
   // current with no regeneration step needed if the page URL ever changes.
@@ -1217,7 +1225,7 @@ async function openRepDealDetail(dealId) {
       '<div class="small-muted" id="rep-fee-breakdown" style="margin-top:4px;"></div>' +
       (deal.PublicPageUrl
         ? '<div style="margin-top:12px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.1);"><strong>Your own deal page link</strong>' +
-          '<p class="small-muted" style="margin:4px 0 8px;">Send this link instead of the normal one. Your buyer sees the page with <strong>+ your assignment fee added to the title</strong> and <strong>your contact info instead of ours</strong>. The source description and all its numbers stay exactly as they are. Change your fee any time and press Save &mdash; the same link updates. Delete your page and the link stops working.</p>' +
+          '<p class="small-muted" style="margin:4px 0 8px;">Send this link instead of the normal one. Your buyer sees the page with <strong>every price raised by your fee</strong> (where the description walks through the math it reads "+ assignment fee") and <strong>your contact info instead of ours</strong>. Change your fee any time and press Save &mdash; the same link updates. Delete your page and the link stops working.</p>' +
           '<div class="row3">' +
             '<div><label class="field-label">Your name</label><input type="text" id="rep-link-name"></div>' +
             '<div><label class="field-label">Your phone</label><input type="text" id="rep-link-phone"></div>' +
@@ -1358,7 +1366,7 @@ async function openRepDealDetail(dealId) {
         });
         if (!res.ok) { noteEl.textContent = res.error || "Could not save your page."; showToast(res.error || "Could not save your page.", true); return null; }
         deleteBtn.hidden = false;
-        noteEl.textContent = "Saved. Your link is live and shows your fee of " + formatAdminMoney(String(res.fee)) + " + assignment fee.";
+        noteEl.textContent = "Saved. Your link is live with your " + formatAdminMoney(String(res.fee)) + " fee added to the price.";
         return res.url;
       };
 

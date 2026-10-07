@@ -2244,7 +2244,9 @@ function publicGetRepPage(body) {
   if (!id) return { ok: false };
   const row = sheetToObjects(getSheet(REP_PAGES_SHEET, REP_PAGE_COLUMNS)).find(function (r) { return r['RepPageID'] === id; });
   if (!row || !repPageIsActive(row)) return { ok: false };
-  return { ok: true, fee: Number(row['Fee']) || 0, name: row['Name'] || '', phone: row['Phone'] || '', email: row['Email'] || '' };
+  const deal = sheetToObjects(getSheet(DEALS_SHEET, DEAL_COLUMNS)).find(function (d) { return d['DealID'] === row['DealID']; });
+  const basePrice = deal ? Number(String(deal['Price'] || '').replace(/[^\d.]/g, '')) : 0;
+  return { ok: true, fee: Number(row['Fee']) || 0, basePrice: basePrice || 0, name: row['Name'] || '', phone: row['Phone'] || '', email: row['Email'] || '' };
 }
 
 function requestAddressButtonHtml(dealId) {
