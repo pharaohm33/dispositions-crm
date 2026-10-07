@@ -312,15 +312,6 @@ function truncateText(text, maxLen) {
   return text.slice(0, maxLen).replace(/\s+\S*$/, "") + "...";
 }
 
-function buildRepDealLink(pageUrl, fee, name, phone, email) {
-  const params = [];
-  if (fee > 0) params.push("fee=" + encodeURIComponent(String(Math.round(fee))));
-  if (String(name || "").trim()) params.push("rn=" + encodeURIComponent(String(name).trim()));
-  if (String(phone || "").trim()) params.push("rp=" + encodeURIComponent(String(phone).trim()));
-  if (String(email || "").trim()) params.push("re=" + encodeURIComponent(String(email).trim()));
-  return params.length ? pageUrl + (pageUrl.indexOf("?") === -1 ? "?" : "&") + params.join("&") : pageUrl;
-}
-
 function parseMoneyNumber(raw) {
   const cleaned = String(raw || "").replace(/[$,\s]/g, "");
   return /^\d+(\.\d+)?$/.test(cleaned) ? Number(cleaned) : null;
@@ -1164,6 +1155,7 @@ async function openRepDealDetail(dealId) {
   // found, requesting a Facebook post approval). None of that belongs in
   // front of an actual buyer.
   const isBuyerView = (getEffectiveSession() || {}).personType === "Buyer";
+  let repDealPageSaver = null;
 
   const addressBanner = deal.addressGranted && deal.Address
     ? '<div class="banner danger"><strong>Confidential &mdash; do not share.</strong> Admin has given you access to this deal\'s exact address. Only share it with a legitimate, matched buyer' +
@@ -1225,13 +1217,13 @@ async function openRepDealDetail(dealId) {
       '<div class="small-muted" id="rep-fee-breakdown" style="margin-top:4px;"></div>' +
       (deal.PublicPageUrl
         ? '<div style="margin-top:12px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.1);"><strong>Your own deal page link</strong>' +
-          '<p class="small-muted" style="margin:4px 0 8px;">Send this link instead of the normal one. Your buyer sees the page with <strong>+ your assignment fee added to the title</strong> and <strong>your contact info instead of ours</strong>. The source description and all its numbers stay exactly as they are.</p>' +
+          '<p class="small-muted" style="margin:4px 0 8px;">Send this link instead of the normal one. Your buyer sees the page with <strong>+ your assignment fee added to the title</strong> and <strong>your contact info instead of ours</strong>. The source description and all its numbers stay exactly as they are. Change your fee any time and press Save &mdash; the same link updates. Delete your page and the link stops working.</p>' +
           '<div class="row3">' +
             '<div><label class="field-label">Your name</label><input type="text" id="rep-link-name"></div>' +
             '<div><label class="field-label">Your phone</label><input type="text" id="rep-link-phone"></div>' +
             '<div><label class="field-label">Your email</label><input type="text" id="rep-link-email"></div>' +
           '</div>' +
-          '<div class="nav-row" style="justify-content:flex-start;"><button class="btn secondary small" id="rep-link-copy-btn">Copy My Link</button></div>' +
+          '<div class="nav-row" style="justify-content:flex-start;"><button class="btn secondary small" id="rep-link-copy-btn">Save &amp; Copy My Link</button> <button class="btn danger small" id="rep-link-delete-btn" hidden>Delete My Page</button></div>' +
           '<div class="small-muted" id="rep-link-note"></div></div>'
         : '') +
       '<div class="sop-lead" style="margin-top:10px;"><strong>If your buyer comes in low,</strong> we won\'t just let the deal die. <strong>Admin will split the dispo assignment fee with you</strong> if we come to a deal, and <strong>admin stays in contact with you throughout the whole closing process.</strong> Tell admin as soon as a buyer makes an offer.</div>' +
@@ -1295,10 +1287,14 @@ async function openRepDealDetail(dealId) {
     const shortenCheckbox = document.getElementById("copy-buyer-info-shorten");
     const feeInput = document.getElementById("rep-fee-input");
     const copyFee = feeInput ? (parseMoneyNumber(feeInput.value) || 0) : 0;
-    const linkNameEl = document.getElementById("rep-link-name");
-    const repLink = deal.PublicPageUrl && linkNameEl
-      ? buildRepDealLink(deal.PublicPageUrl, copyFee, linkNameEl.value, document.getElementById("rep-link-phone").value, document.getElementById("rep-link-email").value)
-      : null;
+    // With a fee set, the text must point at the rep's own page (saved or
+    // updated now) -- the normal link would show the original price and our
+    // contact instead of theirs.
+    let repLink = null;
+    if (copyFee > 0 && deal.PublicPageUrl && repDealPageSaver) {
+      repLink = await repDealPageSaver();
+      if (!repLink) return;
+    }
     const text = buildBuyerShareText(deal, !shortenCheckbox || shortenCheckbox.checked, copyFee, repLink);
     try {
       await navigator.clipboard.writeText(text);
@@ -1342,6 +1338,8 @@ async function openRepDealDetail(dealId) {
       const nameEl = document.getElementById("rep-link-name");
       const phoneEl = document.getElementById("rep-link-phone");
       const emailEl = document.getElementById("rep-link-email");
+      const noteEl = document.getElementById("rep-link-note");
+      const deleteBtn = document.getElementById("rep-link-delete-btn");
       nameEl.value = saved.name || sess.name || "";
       phoneEl.value = saved.phone || "";
       emailEl.value = saved.email || sess.username || "";
@@ -1350,21 +1348,49 @@ async function openRepDealDetail(dealId) {
           try { localStorage.setItem(contactKey, JSON.stringify({ name: nameEl.value, phone: phoneEl.value, email: emailEl.value })); } catch (e) {}
         });
       });
+
+      // Saves (creates, or updates in place so the same link keeps working)
+      // and returns the rep's link, or null after showing why it couldn't.
+      repDealPageSaver = async function () {
+        const res = await api("repSaveRepPage", {
+          dealId: deal.DealID, fee: parseMoneyNumber(feeInput.value) || 0,
+          name: nameEl.value, phone: phoneEl.value, email: emailEl.value
+        });
+        if (!res.ok) { noteEl.textContent = res.error || "Could not save your page."; showToast(res.error || "Could not save your page.", true); return null; }
+        deleteBtn.hidden = false;
+        noteEl.textContent = "Saved. Your link is live and shows your fee of " + formatAdminMoney(String(res.fee)) + " + assignment fee.";
+        return res.url;
+      };
+
       linkBtn.addEventListener("click", async function () {
-        const noteEl = document.getElementById("rep-link-note");
-        const link = buildRepDealLink(deal.PublicPageUrl, parseMoneyNumber(feeInput.value) || 0, nameEl.value, phoneEl.value, emailEl.value);
-        try {
-          await navigator.clipboard.writeText(link);
-          noteEl.textContent = "Copied. Open it once to check how it looks to your buyer.";
-          showToast("Link copied.");
-        } catch (err) {
-          noteEl.textContent = link;
-        }
+        if (linkBtn.disabled) return;
+        linkBtn.disabled = true;
+        const url = await repDealPageSaver();
+        linkBtn.disabled = false;
+        if (!url) return;
+        try { await navigator.clipboard.writeText(url); showToast("Saved. Link copied."); }
+        catch (err) { noteEl.textContent = url; }
+      });
+
+      deleteBtn.addEventListener("click", async function () {
+        if (!confirm("Delete your page for this deal? Any link you already sent will stop working. You can make a new one later.")) return;
+        const res = await api("repDeleteRepPage", { dealId: deal.DealID });
+        if (!res.ok) { showToast(res.error || "Could not delete.", true); return; }
+        deleteBtn.hidden = true;
+        noteEl.textContent = "Your page was deleted. The old link no longer works.";
+        showToast("Page deleted.");
+      });
+
+      api("repGetRepPage", { dealId: deal.DealID }).then(function (res) {
+        if (!res.ok || !res.page) return;
+        if (res.page.fee > 0) { feeInput.value = String(res.page.fee); renderFeeQuote(); }
+        if (res.page.name) nameEl.value = res.page.name;
+        if (res.page.phone) phoneEl.value = res.page.phone;
+        if (res.page.email) emailEl.value = res.page.email;
+        deleteBtn.hidden = false;
+        noteEl.textContent = "Your page is live. Change your fee and press Save to update the same link.";
       });
     }
-
-    wireBuyerMatchListHandlers(document.getElementById("buyer-list"), function () { return refreshBuyerMatchList(dealId, "buyer-list"); });
-    if (visibleCities.length > 0) renderCityCheckboxList("give-myself-cities", visibleCities);
 
     document.getElementById("selfmatch-btn").addEventListener("click", async function () {
       const btn = this;

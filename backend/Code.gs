@@ -58,6 +58,7 @@ const FB_SHEET = 'FBPostRequests';
 const STATUS_SHEET = 'StatusOptions';
 const BUYER_LEADS_SHEET = 'BuyerLeads';
 const PITCHES_SHEET = 'Pitches';
+const REP_PAGES_SHEET = 'RepPages';
 const BUYER_LEAD_CONTACTS_SHEET = 'BuyerLeadContacts';
 const ADDRESS_GRANTS_SHEET = 'AddressGrants';
 const ADDRESS_GRANT_COLUMNS = ['DealID', 'Username', 'GrantedAt'];
@@ -213,6 +214,11 @@ const BUYER_LEAD_COLUMNS = ['BuyerLeadID', 'BuyerName', 'Phone', 'PhoneType', 'P
 // most specifically-vetted lead a rep can be handed. Blank Source (every
 // pitch before this field existed, and any created some other way) is
 // treated as normal priority, same as always.
+// One row per rep per deal: the rep's own version of a public deal page
+// (their fee on top + their contact). The public page loads it by
+// RepPageID (see publicGetRepPage), so editing the row updates the same
+// link and Active=FALSE kills it.
+const REP_PAGE_COLUMNS = ['RepPageID', 'DealID', 'Username', 'Fee', 'Name', 'Phone', 'Email', 'CreatedAt', 'UpdatedAt', 'Active'];
 const PITCH_COLUMNS = ['PitchID', 'BuyerLeadID', 'DealID', 'Username', 'GivenAt', 'Source'];
 
 // One row per contact attempt against a specific Pitch -- this is both the
@@ -257,6 +263,8 @@ function doPost(e) {
         return jsonOut(login(body));
       case 'publicSignup':
         return jsonOut(publicSignup(body));
+      case 'publicGetRepPage':
+        return jsonOut(publicGetRepPage(body));
       case 'getSignupCaptcha':
         return jsonOut(getSignupCaptcha());
       case 'getSignupAssetCategoryOptions':
@@ -311,6 +319,12 @@ function doPost(e) {
         return jsonOut(withSession(body, getVisibleBuyerCities));
       case 'repSetBuyerPurchaseCriteria':
         return jsonOut(withSession(body, repSetBuyerPurchaseCriteria));
+      case 'repSaveRepPage':
+        return jsonOut(withSession(body, repSaveRepPage));
+      case 'repDeleteRepPage':
+        return jsonOut(withSession(body, repDeleteRepPage));
+      case 'repGetRepPage':
+        return jsonOut(withSession(body, repGetRepPage));
       case 'repNotifyBuyerMatchesBulk':
         return jsonOut(withSession(body, repNotifyBuyerMatchesBulk));
       case 'repBulkAnalyzeBuyerCriteria':
@@ -2140,6 +2154,96 @@ function generateDealPageHtml(deal, sourceListingText, photoPaths, morePhotosLin
   const repLinkTag = '<script src="/rep-link.js" defer></script>';
   const idx = withAddressRequest.toLowerCase().lastIndexOf('</body>');
   return idx === -1 ? withAddressRequest + repLinkTag : withAddressRequest.slice(0, idx) + repLinkTag + withAddressRequest.slice(idx);
+}
+
+
+// ---------- Rep-specific public deal pages ----------
+
+function repPageIsActive(row) {
+  return row['Active'] === true || row['Active'] === 'TRUE';
+}
+
+function repPageUrl(deal, repPageId) {
+  return deal['PublicPageUrl'] ? deal['PublicPageUrl'] + '?r=' + encodeURIComponent(repPageId) : '';
+}
+
+function findMyActiveRepPage(session, dealId) {
+  return sheetToObjects(getSheet(REP_PAGES_SHEET, REP_PAGE_COLUMNS)).find(function (r) {
+    return r['DealID'] === dealId && String(r['Username'] || '').trim().toLowerCase() === session.u && repPageIsActive(r);
+  });
+}
+
+// Creates the rep's page for a deal, or updates their existing one in place
+// so the link they already sent keeps working with the new fee/contact.
+function repSaveRepPage(body, session) {
+  const dealId = body.dealId;
+  if (!dealId) return { ok: false, error: 'Missing dealId.' };
+  if (!canAccessDeal(session, dealId)) return { ok: false, error: 'You do not have access to this deal.' };
+  const deal = sheetToObjects(getSheet(DEALS_SHEET, DEAL_COLUMNS)).find(function (d) { return d['DealID'] === dealId; });
+  if (!deal) return { ok: false, error: 'Deal not found.' };
+  if (!deal['PublicPageUrl']) return { ok: false, error: 'This deal has no public page yet.' };
+
+  const fee = Math.round(Number(String(body.fee || '').replace(/[^\d.]/g, '')));
+  if (!isFinite(fee) || fee <= 0) return { ok: false, error: 'Enter your fee as a dollar amount above $0 -- it is added on top of the deal price.' };
+  const name = String(body.name || '').replace(/[<>"']/g, '').trim().slice(0, 60);
+  const phone = String(body.phone || '').replace(/[^\d+()\-.\s]/g, '').trim().slice(0, 25);
+  const email = String(body.email || '').trim().slice(0, 80);
+  if (phone && phone.replace(/\D/g, '').length < 7) return { ok: false, error: 'Enter a full phone number.' };
+  if (email && !/^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/.test(email)) return { ok: false, error: 'Enter a valid email address.' };
+  if (!phone && !email) return { ok: false, error: 'Add a phone number or email so buyers know how to reach you.' };
+
+  const sheet = getSheet(REP_PAGES_SHEET, REP_PAGE_COLUMNS);
+  const now = new Date().toISOString();
+  const existing = findMyActiveRepPage(session, dealId);
+  if (existing) {
+    const set = function (col, v) { sheet.getRange(existing._row, getColumnIndex(sheet, col)).setValue(v); };
+    set('Fee', fee); set('Name', name); set('Phone', phone); set('Email', email); set('UpdatedAt', now);
+    return { ok: true, repPageId: existing['RepPageID'], url: repPageUrl(deal, existing['RepPageID']), fee: fee };
+  }
+  const id = Utilities.getUuid();
+  appendRowByHeaders(sheet, {
+    'RepPageID': id, 'DealID': dealId, 'Username': session.u, 'Fee': fee, 'Name': name, 'Phone': phone,
+    'Email': email, 'CreatedAt': now, 'UpdatedAt': now, 'Active': true
+  });
+  return { ok: true, repPageId: id, url: repPageUrl(deal, id), fee: fee };
+}
+
+// A rep deleting their page turns the link off for good -- a later save
+// makes a brand new page with a new link.
+function repDeleteRepPage(body, session) {
+  const dealId = body.dealId;
+  if (!dealId) return { ok: false, error: 'Missing dealId.' };
+  const sheet = getSheet(REP_PAGES_SHEET, REP_PAGE_COLUMNS);
+  const rows = sheetToObjects(sheet).filter(function (r) {
+    return r['DealID'] === dealId && String(r['Username'] || '').trim().toLowerCase() === session.u && repPageIsActive(r);
+  });
+  rows.forEach(function (r) {
+    sheet.getRange(r._row, getColumnIndex(sheet, 'Active')).setValue(false);
+    sheet.getRange(r._row, getColumnIndex(sheet, 'UpdatedAt')).setValue(new Date().toISOString());
+  });
+  return { ok: true, deleted: rows.length };
+}
+
+function repGetRepPage(body, session) {
+  const dealId = body.dealId;
+  if (!dealId) return { ok: false, error: 'Missing dealId.' };
+  const row = findMyActiveRepPage(session, dealId);
+  if (!row) return { ok: true, page: null };
+  const deal = sheetToObjects(getSheet(DEALS_SHEET, DEAL_COLUMNS)).find(function (d) { return d['DealID'] === dealId; });
+  return { ok: true, page: {
+    repPageId: row['RepPageID'], fee: Number(row['Fee']) || 0, name: row['Name'] || '', phone: row['Phone'] || '',
+    email: row['Email'] || '', url: deal ? repPageUrl(deal, row['RepPageID']) : ''
+  } };
+}
+
+// No login -- called by /rep-link.js on the public deal page. Returns only
+// what the page needs, and only while the rep's page is still active.
+function publicGetRepPage(body) {
+  const id = String(body.repPageId || '').trim();
+  if (!id) return { ok: false };
+  const row = sheetToObjects(getSheet(REP_PAGES_SHEET, REP_PAGE_COLUMNS)).find(function (r) { return r['RepPageID'] === id; });
+  if (!row || !repPageIsActive(row)) return { ok: false };
+  return { ok: true, fee: Number(row['Fee']) || 0, name: row['Name'] || '', phone: row['Phone'] || '', email: row['Email'] || '' };
 }
 
 function requestAddressButtonHtml(dealId) {
