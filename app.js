@@ -330,7 +330,7 @@ function buildBuyerShareText(deal, shortenDescription, repFee) {
   const lines = [];
   const quotedPrice = repFee > 0 ? quotedPriceWithFee(deal.Price, repFee) : null;
   const priceMarkedUp = quotedPrice !== null;
-  if (priceMarkedUp) lines.push("Asking Price: " + formatAdminMoney(String(quotedPrice)));
+  if (priceMarkedUp) lines.push("Asking Price: " + formatAdminMoney(deal.Price) + " + " + formatAdminMoney(String(repFee)) + " assignment fee = " + formatAdminMoney(String(quotedPrice)));
   else if (deal.Price) lines.push("Asking Price: " + formatAdminMoney(deal.Price));
   if (deal.ARV) lines.push("ARV: " + formatAdminMoney(deal.ARV));
   if (deal.RehabEstimate) lines.push("Rehab Estimate: " + formatAdminMoney(deal.RehabEstimate));
@@ -339,6 +339,9 @@ function buildBuyerShareText(deal, shortenDescription, repFee) {
   if (!priceMarkedUp && deal.AsIsValue) lines.push("As-Is Equity: " + formatAsIsEquity(deal.AsIsEquity).replace(/&mdash;/g, "—"));
   if (deal.FinancingType) lines.push("Financing Type: " + deal.FinancingType);
   if (deal.Description) lines.push(shortenDescription ? truncateText(deal.Description, 220) : deal.Description);
+  // Any cost figures inside the source description are the source's own
+  // numbers, not the total -- say so whenever an assignment fee is on top.
+  if (priceMarkedUp && deal.Description) lines.push("Note: any price in the listing details above is the source price, + assignment fee.");
   // Reads live off the deal record every time this is copied -- never
   // baked into the stored Description text itself, so it's always
   // current with no regeneration step needed if the page URL ever changes.
@@ -1296,7 +1299,7 @@ async function openRepDealDetail(dealId) {
         return;
       }
       feeQuote.textContent = formatAdminMoney(String(base + fee));
-      feeBreakdown.textContent = formatAdminMoney(String(base)) + " deal price + " + formatAdminMoney(String(fee)) + " your fee";
+      feeBreakdown.textContent = formatAdminMoney(String(base)) + " deal price + " + formatAdminMoney(String(fee)) + " assignment fee. Any cost figure in the source description is the source price, + assignment fee.";
     }
     try { feeInput.value = localStorage.getItem(feeKey) || ""; } catch (e) {}
     renderFeeQuote();
