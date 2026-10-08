@@ -44,49 +44,123 @@
       if (box && box.parentNode === document.body) box.parentNode.removeChild(box);
     });
   }
-  function showAddress(addr) {
+  var APP = "https://sendmybuyer.com";
+  function post(payload) {
+    return fetch(API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) }).then(function (r) { return r.json(); });
+  }
+  function holderAfterNote() {
+    var note = addressSlot();
+    var holder = document.createElement("div");
+    holder.style.cssText = "margin:8px 0;";
+    note.parentNode.insertBefore(holder, note.nextSibling);
+    return { holder: holder, note: note };
+  }
+  function smallButton(text, primary) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.textContent = text;
+    b.style.cssText = "padding:8px 16px;border-radius:6px;font-weight:600;font-size:0.9rem;cursor:pointer;border:1px solid #1a73e8;" +
+      (primary ? "background:#1a73e8;color:#fff;" : "background:transparent;color:inherit;");
+    return b;
+  }
+  // Same agreement as inside the app, before the address can be viewed.
+  function disclaimerGate(holder, note, company, getAddress) {
+    holder.textContent = "";
+    var co = company || "the Disposition Manager";
+    var label = document.createElement("label");
+    label.style.cssText = "display:flex;gap:8px;align-items:flex-start;font-size:0.85rem;margin-bottom:8px;max-width:640px;";
+    var cb = document.createElement("input");
+    cb.type = "checkbox";
+    var span = document.createElement("span");
+    span.textContent = "I agree to conduct all inquiries into and discussions about this property solely through " + co +
+      " and will not directly contact the seller. Any unauthorized contact with the seller will be considered intentional interference with a contract, and I agree to pay damages of $100,000 to " +
+      co + " if I attempt to circumvent or interfere with it.";
+    label.appendChild(cb); label.appendChild(span);
+    var view = smallButton("View Full Address", true);
+    view.disabled = true;
+    view.style.opacity = "0.5";
+    cb.addEventListener("change", function () { view.disabled = !cb.checked; view.style.opacity = cb.checked ? "1" : "0.5"; });
+    view.addEventListener("click", function () {
+      view.disabled = true;
+      getAddress().then(function (addr) {
+        if (!addr) { view.textContent = "Address not available"; return; }
+        if (holder.parentNode) holder.parentNode.removeChild(holder);
+        showAddress(addr, note);
+      }).catch(function () { view.disabled = false; });
+    });
+    holder.appendChild(label); holder.appendChild(view);
+  }
+  function showAddress(addr, noteEl) {
     if (isDeadPage()) return;
     noindex();
-    var slot = addressSlot();
+    var slot = noteEl || addressSlot();
     slot.setAttribute("data-nosnippet", "");
     slot.textContent = "Address: " + String(addr).slice(0, 200);
     removeRequestBlock();
   }
-  // Logged-in team member whose address request was approved (or admin) sees
-  // it on the normal public page. Read from their own session -- a crawler
-  // has none, so it can never see this.
-  function showAddressForSession() {
+
+  // Normal public page: a normal-sized "Request the Address" button next to
+  // the location. Logged in: pressing it auto-grants the address (admin is
+  // emailed), then the agreement must be ticked before it is shown. Not
+  // logged in: goes through log in / sign up and comes back here. Someone who
+  // already holds the address skips straight to the agreement. All of it is
+  // read from the visitor's own session, so a crawler never sees an address.
+  function setupAddressButton() {
+    removeRequestBlock();
+    if (isDeadPage()) return;
+    var m = location.pathname.match(/\/deals\/([\w-]+)\.html$/);
+    if (!m) return;
+    var dealId = m[1];
     var sess = null;
     try { sess = JSON.parse(localStorage.getItem("disp_crm_session") || "null"); } catch (e) {}
-    var m = location.pathname.match(/\/deals\/([\w-]+)\.html$/);
-    if (!sess || !sess.token || !m) return;
-    fetch(API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "getDeal", token: sess.token, dealId: m[1] }) })
-      .then(function (r) { return r.json(); })
-      .then(function (j) { if (j && j.ok && j.deal && j.deal.Address) showAddress(j.deal.Address); })
-      .catch(function () {});
-  }
-  // On a rep's link the address is only fetched when a visitor presses the
-  // button, so it is never in the page as loaded.
-  function offerAddress(repId) {
-    if (isDeadPage()) return;
-    var slot = addressSlot();
-    slot.textContent = "";
-    var btn = document.createElement("button");
-    btn.type = "button";
-    btn.textContent = "Show address";
-    btn.style.cssText = "padding:8px 16px;border-radius:6px;border:1px solid currentColor;background:transparent;color:inherit;font-weight:600;cursor:pointer;";
+    var token = sess && sess.token;
+    var h = holderAfterNote();
+    var holder = h.holder, note = h.note;
+    var btn = smallButton("Request the Address", true);
+    holder.appendChild(btn);
+    var msg = document.createElement("span");
+    msg.style.cssText = "margin-left:10px;font-size:0.85rem;";
+    holder.appendChild(msg);
+
+    function goLogin() {
+      location.href = APP + "/?requestAddress=" + encodeURIComponent(dealId) + "&returnTo=" + encodeURIComponent(location.origin + location.pathname);
+    }
+    function fetchAddress() {
+      return post({ action: "publicGetDealAddress", token: token, dealId: dealId });
+    }
+    function gateFrom(j) {
+      disclaimerGate(holder, note, j.company, function () { return fetchAddress().then(function (r) { return r && r.granted ? r.address : null; }); });
+    }
+
+    if (token) {
+      fetchAddress().then(function (j) { if (j && j.ok && j.granted) gateFrom(j); }).catch(function () {});
+    }
     btn.addEventListener("click", function () {
-      btn.disabled = true;
-      fetch(API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "publicGetRepPage", repPageId: repId, includeAddress: true }) })
-        .then(function (r) { return r.json(); })
-        .then(function (j) { if (j && j.ok && j.address) showAddress(j.address); else { btn.disabled = false; btn.textContent = "Address not available"; } })
-        .catch(function () { btn.disabled = false; });
+      if (!token) { goLogin(); return; }
+      btn.disabled = true; msg.textContent = "Requesting…";
+      post({ action: "publicRequestAddressAccess", token: token, dealId: dealId, claim: true }).then(function (r) {
+        if (r && r.sessionExpired) { goLogin(); return; }
+        if (!r || !r.ok) { btn.disabled = false; msg.textContent = (r && r.error) || "Could not request the address."; return; }
+        return fetchAddress().then(function (j) {
+          if (j && j.ok && j.granted) gateFrom(j); else { btn.disabled = false; msg.textContent = "Request sent. Admin will follow up."; }
+        });
+      }).catch(function () { btn.disabled = false; msg.textContent = "Could not reach the server. Try again."; });
     });
-    slot.appendChild(btn);
+  }
+
+  // On a rep's link the address is only fetched when a visitor presses the
+  // button, after ticking the agreement, so it is never in the page as loaded.
+  function offerAddress(repId, company) {
+    if (isDeadPage()) return;
+    var h = holderAfterNote();
+    var note = h.note;
+    disclaimerGate(h.holder, note, company, function () {
+      return post({ action: "publicGetRepPage", repPageId: repId, includeAddress: true }).then(function (j) { return j && j.ok ? j.address : null; });
+    });
   }
 
   if (!id) {
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", showAddressForSession); else showAddressForSession();
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", setupAddressButton); else setupAddressButton();
     return;
   }
   id = String(id).replace(/[^\w-]/g, "").slice(0, 64);
@@ -274,7 +348,7 @@
         if (t !== orig) node.nodeValue = t;
       }
     }
-    if (page.hasAddress) { noindex(); offerAddress(id); }
+    if (page.hasAddress) { noindex(); offerAddress(id, page.company); }
     showPage();
   }
 

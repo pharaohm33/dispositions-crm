@@ -305,6 +305,8 @@ function doPost(e) {
         return jsonOut(withSession(body, repMatchSelfToBuyer));
       case 'publicRequestAddressAccess':
         return jsonOut(withSession(body, publicRequestAddressAccess));
+      case 'publicGetDealAddress':
+        return jsonOut(withSession(body, publicGetDealAddress));
       case 'importBuyerLeads':
         return jsonOut(withSession(body, importBuyerLeads));
       case 'getMyBuyerLeads':
@@ -2260,32 +2262,20 @@ function publicGetRepPage(body) {
     loadAddressGrantsSet()[deal['DealID'] + '::' + username] ||
     (rep && (rep['IsAdmin'] === true || rep['IsAdmin'] === 'TRUE'))
   ));
-  const out = { ok: true, fee: Number(row['Fee']) || 0, basePrice: basePrice || 0, name: row['Name'] || '', phone: row['Phone'] || '', email: row['Email'] || '', hasAddress: approved };
+  const out = { ok: true, fee: Number(row['Fee']) || 0, basePrice: basePrice || 0, name: row['Name'] || '', phone: row['Phone'] || '', email: row['Email'] || '', hasAddress: approved, company: deal ? resolveDealContactInfo(deal).company : '' };
   if (approved && body.includeAddress) out.address = String(deal['Address']);
   return out;
 }
 
 function requestAddressButtonHtml(dealId) {
+  // The visible "Request the Address" button is built by /rep-link.js and
+  // placed next to the property location (normal-sized, with the disclaimer
+  // before the address is shown). This is only the no-JavaScript fallback.
   const homeUrl = 'https://sendmybuyer.com';
-  // returnTo brings the visitor back to THIS listing once the request
-  // fires (see maybeFireAddressRequestFromUrl) -- Log In / Browse All
-  // Deals below deliberately don't carry it, since choosing either of
-  // those is choosing to leave this listing on purpose.
   const pageUrl = homeUrl + '/deals/' + encodeURIComponent(dealId) + '.html';
   const requestUrl = homeUrl + '/?requestAddress=' + encodeURIComponent(dealId) + '&returnTo=' + encodeURIComponent(pageUrl);
-  return '<div style="max-width:640px;margin:0 auto 20px;padding:20px 24px;text-align:center;' +
-    'font-family:Arial,sans-serif;border-bottom:1px solid #ddd;">' +
-    '<p style="color:#444;margin-bottom:16px;">Addresses are shared with wholesalers who already have ' +
-    'an interested buyer for this deal, or with direct buyers reviewing this listing. Log in or create ' +
-    'a free account to request it.</p>' +
-    '<a href="' + esc_(requestUrl) + '" style="display:inline-block;padding:12px 28px;background:#1a73e8;' +
-    'color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;">Request the Address</a>' +
-    '<p style="margin-top:16px;"><a href="' + esc_(homeUrl) + '" style="color:#1a73e8;">Log in</a>' +
-    ' &nbsp;&middot;&nbsp; <a href="' + esc_(homeUrl) + '" style="color:#1a73e8;">Browse all deals</a></p>' +
-    '<p style="color:#888;font-size:0.9em;margin-top:20px;">Interested in this deal? This listing isn\'t ' +
-    'searchable once you leave — <strong>save or bookmark this page\'s link</strong> before heading to the ' +
-    'home page, so you can find your way back to it.</p>' +
-    '</div>';
+  return '<noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;">' +
+    '<a href="' + esc_(requestUrl) + '">Request the Address</a></div></noscript>';
 }
 
 // Creates or overwrites deals/<dealId>.html in the GitHub Pages repo behind
@@ -2952,7 +2942,9 @@ function publicRequestAddressAccess(body, session) {
   // setting is on.
   const rep = findRepByUsername(session.u);
   const isRegisteredBuyer = rep && rep['PersonType'] === 'Buyer';
-  const autoGrant = buyerAddressAutoGrantAllowed(rep) || adminGetAutoDiscloseAddressSettings({}).mode === 'all_on_request';
+  // body.claim: the public page's "Request the Address" button auto-grants
+  // to any logged-in account (admin gets the notification email below).
+  const autoGrant = body.claim === true || buyerAddressAutoGrantAllowed(rep) || adminGetAutoDiscloseAddressSettings({}).mode === 'all_on_request';
 
   if (autoGrant) {
     adminGrantAddressAccess({ dealId: body.dealId, username: session.u });
@@ -2981,6 +2973,20 @@ function publicRequestAddressAccess(body, session) {
       buyerLeadContextEmailBlock(session)
   });
   return { ok: true };
+}
+
+// Used by the public deal page: tells a logged-in visitor whether they hold
+// the address for this deal (admin always does) and returns it plus the
+// company name for the disclaimer. Deliberately no canAccessDeal gate -- a
+// person who got the address through the public page's button may have no
+// standing assignment to the deal.
+function publicGetDealAddress(body, session) {
+  if (!body.dealId) return { ok: false, error: 'Missing dealId.' };
+  const deal = sheetToObjects(getSheet(DEALS_SHEET, DEAL_COLUMNS)).find(function (d) { return d['DealID'] === body.dealId; });
+  if (!deal || !deal['Address']) return { ok: true, granted: false };
+  const granted = session.a || !!loadAddressGrantsSet()[deal['DealID'] + '::' + session.u];
+  if (!granted) return { ok: true, granted: false };
+  return { ok: true, granted: true, address: String(deal['Address']), company: resolveDealContactInfo(deal).company };
 }
 
 // ---------- Interested buyers ----------

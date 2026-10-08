@@ -861,7 +861,7 @@ async function maybeFireAddressRequestFromUrl() {
     return;
   }
   window.history.replaceState(null, "", window.location.pathname);
-  const res = await api("publicRequestAddressAccess", { dealId: dealId });
+  const res = await api("publicRequestAddressAccess", { dealId: dealId, claim: true });
   if (!res.ok) { showToast(res.error || "Could not send the address request.", true); return; }
   showToast(res.autoGranted ? "Address granted — taking you back to the listing…" : "Request sent — admin will grant the address shortly. Taking you back to the listing…");
   if (returnTo) setTimeout(function () { window.location.href = returnTo; }, 1200);
