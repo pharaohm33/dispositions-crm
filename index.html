@@ -854,6 +854,11 @@ Put it in a table with the property address, owner or company name, phone, email
     </div>
     <p class="small-muted" style="margin-top:-4px; margin-bottom:10px;">One-time catch-up for deals that went Dead/Sold before archiving existed — overwrites each one's public page with a plain "no longer available" placeholder instead of leaving stale live-looking content up. Safe to run again any time; already-archived pages are just overwritten with the same placeholder.</p>
     <div class="nav-row" style="justify-content:flex-start; margin-bottom:10px; flex-wrap:wrap;">
+      <button class="btn secondary small" id="export-master-deals-btn">Export Master Deal List (CSV)</button>
+      <span class="small-muted" id="export-master-deals-result"></span>
+    </div>
+    <p class="small-muted" style="margin-top:-4px; margin-bottom:10px;">Downloads every active deal as of today: Deal Code, full address, purchase price, rehab and ARV (when set), and its SendMyBuyer link, with a confidentiality disclaimer at the top (don't post the addresses online, view-only once shared, send buyer inquiries to your contact, and reps can build their own fee-added page on SendMyBuyer.com). Treat the file as confidential &mdash; it contains full addresses.</p>
+    <div class="nav-row" style="justify-content:flex-start; margin-bottom:10px; flex-wrap:wrap;">
       <button class="btn secondary small" id="checkall-buyermatches-btn">Check All Deals For Potential Buyer Matches</button>
       <span class="small-muted" id="checkall-buyermatches-result"></span>
     </div>
@@ -1627,7 +1632,7 @@ Put it in a table with the property address, owner or company name, phone, email
   </div>
 </div>
 
-<script src="config.js?v=83"></script>
-<script src="app.js?v=83"></script>
+<script src="config.js?v=84"></script>
+<script src="app.js?v=84"></script>
 </body>
 </html>

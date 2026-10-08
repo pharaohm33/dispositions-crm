@@ -3147,6 +3147,66 @@ document.getElementById("checkall-buyermatches-btn").addEventListener("click", a
   showToast(dealsWithMatches > 0 ? "Found matches on " + dealsWithMatches + " deal(s) — check your email." : "No matches found across any active deal.");
 });
 
+
+// Master deal list: every active deal as of today, with the full address and
+// SendMyBuyer link, behind a confidentiality disclaimer. Built entirely from
+// what admin's Deals tab already holds -- nothing is sent anywhere.
+function csvCell(v) {
+  let s = String(v === undefined || v === null ? "" : v);
+  if (/^[=+\-@]/.test(s)) s = "'" + s;
+  return '"' + s.replace(/"/g, '""') + '"';
+}
+
+document.getElementById("export-master-deals-btn").addEventListener("click", async function () {
+  const btn = this;
+  const resultEl = document.getElementById("export-master-deals-result");
+  if (btn.disabled) return;
+  btn.disabled = true;
+  resultEl.textContent = " Building…";
+  const defaults = await api("adminGetContactDefaults", {});
+  const now = new Date();
+  const today = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
+  const active = adminDeals.filter(function (d) { return d.Status !== "Dead" && d.Status !== "Sold"; })
+    .sort(function (x, y) {
+      return String(x.State || "").localeCompare(String(y.State || "")) || String(x.City || "").localeCompare(String(y.City || ""));
+    });
+  if (active.length === 0) { btn.disabled = false; resultEl.textContent = " No active deals to export."; return; }
+
+  const company = (defaults.ok && defaults.company) || "us";
+  const phone = defaults.ok ? defaults.phone : "";
+  const email = defaults.ok ? defaults.email : "";
+  const contactLine = [company, phone, email].filter(Boolean).join(" / ");
+  const disclaimer = [
+    "CONFIDENTIAL - MASTER DEAL LIST AS OF " + today,
+    "These full addresses are shared with you in confidence. Do NOT post, publish, advertise or share any of these addresses online anywhere (social media, groups, listing sites, ads, texts to the public) and do not forward this file.",
+    "This list is VIEW ONLY once shared with you. Use it to find buyers; do not copy it into other lists or posts.",
+    "When any buyer has an inquiry about a deal, contact us right away: " + contactLine + ". Do not give a buyer the address yourself.",
+    "Want to add your own fee on top? At SendMyBuyer.com you can make your own page for any deal that adds your fee to the price and shows your own contact info. Send buyers that link instead of ours."
+  ];
+  const header = ["Deal Code", "Asset Type", "City", "State", "Full Address", "Purchase Price", "Rehab Estimate", "ARV", "SendMyBuyer Link", "Contact", "Contact Phone", "Contact Email"];
+  const rows = active.map(function (d) {
+    return [
+      d.DealCode || "", d.AssetType || "", d.City || "", d.State || "", d.Address || "",
+      d.Price ? formatAdminMoney(d.Price) : "", d.RehabEstimate ? formatAdminMoney(d.RehabEstimate) : "", d.ARV ? formatAdminMoney(d.ARV) : "",
+      d.PublicPageUrl || "", d.CompanyName || (defaults.ok ? defaults.company : ""),
+      d.ContactPhone || (defaults.ok ? defaults.phone : ""), d.ContactEmail || (defaults.ok ? defaults.email : "")
+    ];
+  });
+  const lines = disclaimer.map(function (t) { return csvCell(t); }).concat([""], [header.map(csvCell).join(",")], rows.map(function (r) { return r.map(csvCell).join(","); }));
+  const blob = new Blob(["\ufeff" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "master-deal-list-" + today + ".csv";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  btn.disabled = false;
+  resultEl.textContent = " Exported " + active.length + " active deal(s) as of " + today + ".";
+  showToast("Exported " + active.length + " deals.");
+});
+
 document.getElementById("regenerate-all-pages-btn").addEventListener("click", async function () {
   const btn = this;
   const resultEl = document.getElementById("regenerate-all-pages-result");
