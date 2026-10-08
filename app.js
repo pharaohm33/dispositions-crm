@@ -1301,10 +1301,10 @@ async function openRepDealDetail(dealId) {
           ? '<label class="checkbox-row" style="margin:0 0 6px;"><input type="checkbox" id="copy-buyer-info-shorten" checked> Shorten the long description (adds "...")</label>'
           : "") +
         '<div class="nav-row" style="justify-content:flex-start;">' +
-          '<button class="btn secondary small" id="copy-buyer-info-btn">' + (isBuyerView ? "Copy Info" : "Copy Info To Send Buyer") + '</button>' +
+          '<button class="btn secondary small" id="copy-buyer-info-btn">' + (isBuyerView ? "Copy Info" : "Copy Info To Send Buyer (share this with buyers)") + '</button>' +
         '</div>' +
         (isBuyerView ? "" :
-          '<p class="small-muted" style="margin-top:6px;"><strong>This does NOT add your fee</strong> &mdash; it copies the deal at the price shown above with the normal link. To send a price with your fee on top, use the yellow box below.</p>') +
+          '<p class="small-muted" style="margin-top:6px;"><strong>Share this with buyers.</strong> This does <strong>not</strong> add a fee on top for them &mdash; it copies the deal at the price shown above with the normal link. To send a price with your own fee on top, use the yellow box below.</p>') +
         (isBuyerView ? "" :
           '<p class="small-muted" style="margin-top:6px;"><strong>The moment a buyer you send this to says they\'re interested, contact admin immediately</strong> so we can get them the address — don\'t wait on it, and don\'t send the address yourself.</p>') +
       '</div>' +
