@@ -3183,10 +3183,10 @@ document.getElementById("export-master-deals-btn").addEventListener("click", asy
     "It is fine to give the address to a buyer who is genuinely interested in that deal. When any buyer has an inquiry about a deal, contact us right away: " + contactLine + ".",
     "Want to add your own fee on top? At SendMyBuyer.com you can make your own page for any deal that adds your fee to the price and shows your own contact info. Send buyers that link instead of ours."
   ];
-  const header = ["Deal Code", "Asset Type", "City", "State", "Full Address", "Purchase Price", "Rehab Estimate", "ARV", "SendMyBuyer Link", "Contact", "Contact Phone", "Contact Email"];
+  const header = ["Deal Code", "Asset Category", "Deal Type", "Asset Details", "City", "State", "Full Address", "Purchase Price", "Rehab Estimate", "ARV", "SendMyBuyer Link", "Contact", "Contact Phone", "Contact Email"];
   const rows = active.map(function (d) {
     return [
-      d.DealCode || "", d.AssetType || "", d.City || "", d.State || "", d.Address || "",
+      d.DealCode || "", d.AssetCategory || d.AssetType || "", splitCommaList(d.DealTypes).join(" / "), d.AssetType || "", d.City || "", d.State || "", d.Address || "",
       d.Price ? formatAdminMoney(d.Price) : "", d.RehabEstimate ? formatAdminMoney(d.RehabEstimate) : "", d.ARV ? formatAdminMoney(d.ARV) : "",
       d.PublicPageUrl || "", d.CompanyName || (defaults.ok ? defaults.company : ""),
       d.ContactPhone || (defaults.ok ? defaults.phone : ""), d.ContactEmail || (defaults.ok ? defaults.email : "")
