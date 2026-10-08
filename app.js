@@ -3178,9 +3178,9 @@ document.getElementById("export-master-deals-btn").addEventListener("click", asy
   const contactLine = [company, phone, email].filter(Boolean).join(" / ");
   const disclaimer = [
     "CONFIDENTIAL - MASTER DEAL LIST AS OF " + today,
-    "These full addresses are shared with you in confidence. Do NOT post, publish, advertise or share any of these addresses online anywhere (social media, groups, listing sites, ads, texts to the public) and do not forward this file.",
+    "These full addresses are shared with you in confidence. Do NOT post, publish or advertise any of these addresses online anywhere (social media, groups, listing sites, ads). Do NOT share them with other wholesalers, and do not forward this file.",
     "This list is VIEW ONLY once shared with you. Use it to find buyers; do not copy it into other lists or posts.",
-    "When any buyer has an inquiry about a deal, contact us right away: " + contactLine + ". Do not give a buyer the address yourself.",
+    "It is fine to give the address to a buyer who is genuinely interested in that deal. When any buyer has an inquiry about a deal, contact us right away: " + contactLine + ".",
     "Want to add your own fee on top? At SendMyBuyer.com you can make your own page for any deal that adds your fee to the price and shows your own contact info. Send buyers that link instead of ours."
   ];
   const header = ["Deal Code", "Asset Type", "City", "State", "Full Address", "Purchase Price", "Rehab Estimate", "ARV", "SendMyBuyer Link", "Contact", "Contact Phone", "Contact Email"];
