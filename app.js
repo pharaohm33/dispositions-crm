@@ -1304,6 +1304,8 @@ async function openRepDealDetail(dealId) {
           '<button class="btn secondary small" id="copy-buyer-info-btn">' + (isBuyerView ? "Copy Info" : "Copy Info To Send Buyer") + '</button>' +
         '</div>' +
         (isBuyerView ? "" :
+          '<p class="small-muted" style="margin-top:6px;"><strong>This does NOT add your fee</strong> &mdash; it copies the deal at the price shown above with the normal link. To send a price with your fee on top, use the yellow box below.</p>') +
+        (isBuyerView ? "" :
           '<p class="small-muted" style="margin-top:6px;"><strong>The moment a buyer you send this to says they\'re interested, contact admin immediately</strong> so we can get them the address — don\'t wait on it, and don\'t send the address yourself.</p>') +
       '</div>' +
     '</div>' +
@@ -1311,12 +1313,14 @@ async function openRepDealDetail(dealId) {
     (isBuyerView ? "" :
     '<div class="banner warn" id="rep-fee-card" style="margin-top:12px;">' +
       '<strong>Add Your Own Fee On Top</strong>' +
-      '<p class="small-muted" style="margin:6px 0 8px;">Enter the fee you want to earn. We add it to the deal price so you know exactly what to quote your buyer, and "Copy Info" uses that number.</p>' +
+      '<p class="small-muted" style="margin:6px 0 8px;">Enter the fee you want to earn. We add it to the deal price so you know exactly what to quote your buyer. Use the buttons in this yellow box to send it &mdash; the regular "Copy Info To Send Buyer" button above does not add your fee.</p>' +
       '<div class="row2">' +
         '<div><label class="field-label">Your fee ($)</label><input type="text" id="rep-fee-input" inputmode="numeric" placeholder="e.g. 5000"></div>' +
         '<div><label class="field-label">Price to quote your buyer</label><div id="rep-fee-quote" style="font-weight:700; font-size:18px; padding-top:6px;"></div></div>' +
       '</div>' +
       '<div class="small-muted" id="rep-fee-breakdown" style="margin-top:4px;"></div>' +
+      '<div class="nav-row" style="justify-content:flex-start; margin-top:8px;"><button class="btn primary small" id="rep-fee-copy-btn">Copy Info With My Fee</button></div>' +
+      '<div class="small-muted">This is the one that <strong>adds your fee on top</strong> &mdash; it quotes the raised price and uses your own page link.</div>' +
       (deal.PublicPageUrl
         ? '<div style="margin-top:12px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.1);"><strong>Your own deal page link</strong>' +
           '<p class="small-muted" style="margin:4px 0 8px;">Send this link instead of the normal one. Your buyer sees the page with <strong>every price raised by your fee</strong> (where the description walks through the math it reads "+ assignment fee") and <strong>your contact info instead of ours</strong>. Change your fee any time and press Save &mdash; the same link updates. Delete your page and the link stops working.</p>' +
@@ -1385,13 +1389,13 @@ async function openRepDealDetail(dealId) {
 
   wireRequestAddressButton();
 
-  document.getElementById("copy-buyer-info-btn").addEventListener("click", async function () {
+  // withFee=false: the deal exactly as shown (original price, normal link).
+  // withFee=true: the rep's raised price, pointed at their own saved page.
+  async function copyDealInfo(withFee) {
     const shortenCheckbox = document.getElementById("copy-buyer-info-shorten");
     const feeInput = document.getElementById("rep-fee-input");
-    const copyFee = feeInput ? (parseMoneyNumber(feeInput.value) || 0) : 0;
-    // With a fee set, the text must point at the rep's own page (saved or
-    // updated now) -- the normal link would show the original price and our
-    // contact instead of theirs.
+    const copyFee = withFee && feeInput ? (parseMoneyNumber(feeInput.value) || 0) : 0;
+    if (withFee && !(copyFee > 0)) { showToast("Enter your fee in the yellow box first.", true); return; }
     let repLink = null;
     if (copyFee > 0 && deal.PublicPageUrl && repDealPageSaver) {
       repLink = await repDealPageSaver();
@@ -1400,11 +1404,15 @@ async function openRepDealDetail(dealId) {
     const text = buildBuyerShareText(deal, !shortenCheckbox || shortenCheckbox.checked, copyFee, repLink);
     try {
       await navigator.clipboard.writeText(text);
-      showToast("Copied — paste it into a text or email.");
+      showToast(withFee ? "Copied with your fee — paste it into a text or email." : "Copied — paste it into a text or email.");
     } catch (err) {
       showToast("Could not copy — try selecting the text manually.", true);
     }
-  });
+  }
+
+  document.getElementById("copy-buyer-info-btn").addEventListener("click", function () { copyDealInfo(false); });
+  const feeCopyBtn = document.getElementById("rep-fee-copy-btn");
+  if (feeCopyBtn) feeCopyBtn.addEventListener("click", function () { copyDealInfo(true); });
 
   document.getElementById("close-detail-btn").addEventListener("click", function () { overlay.hidden = true; });
 
