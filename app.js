@@ -1304,7 +1304,7 @@ async function openRepDealDetail(dealId) {
           '<button class="btn secondary small" id="copy-buyer-info-btn">' + (isBuyerView ? "Copy Info" : "Copy Info To Send Buyer (share this with buyers)") + '</button>' +
         '</div>' +
         (isBuyerView ? "" :
-          '<p class="small-muted" style="margin-top:6px;"><strong>Share this with buyers.</strong> This does <strong>not</strong> add a fee on top for them &mdash; it copies the deal at the price shown above with the normal link. To send a price with your own fee on top, use the yellow box below.</p>') +
+          '<p class="small-muted" style="margin-top:6px;"><strong>Share this with buyers.</strong> This does <strong>not</strong> add a fee on top for them &mdash; it copies the deal at the price shown above with the normal link. <strong>Pictures are inside each deal link</strong>, so buyers can see them there. To send a price with your own fee on top, use the yellow box below.</p>') +
         (isBuyerView ? "" :
           '<p class="small-muted" style="margin-top:6px;"><strong>The moment a buyer you send this to says they\'re interested, contact admin immediately</strong> so we can get them the address — don\'t wait on it, and don\'t send the address yourself.</p>') +
       '</div>' +
