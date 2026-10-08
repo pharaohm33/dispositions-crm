@@ -5,11 +5,90 @@
    phone/email for the rep's. The source description, ROI math, and every
    other figure stay exactly as published. If the rep deleted the page (or it
    can't be loaded) the visitor sees a "no longer active" notice instead --
-   never the admin contact. All values are written with textContent. */
+   never the admin contact. All values are written with textContent.
+   Address: a logged-in team member approved for the address (or admin) sees it
+   on the normal page; on a rep link it appears only after "Show address" is
+   pressed (rep approved for it). Pages showing it are marked noindex. */
 (function () {
   var API = "https://script.google.com/macros/s/AKfycbymgyKuPpDw_5sVhlZC_DeRBS0tM7IhW6C7f90uGwFyTdA3BvEmwSjCzyWu_Fklfq7j/exec";
   var id = new URLSearchParams(location.search).get("r");
-  if (!id) return;
+
+  // ---- Address display (never indexable) ----
+  var ADDRESS_NOTE = /address\s+(?:is\s+)?available\s+(?:upon|on)\s+request/i;
+  function isDeadPage() { var h = document.querySelector("h1"); return !!(h && /no longer available/i.test(h.textContent)); }
+  function noindex() {
+    if (document.querySelector('meta[name="robots"][data-addr]')) return;
+    var m = document.createElement("meta");
+    m.name = "robots"; m.content = "noindex, nofollow, noarchive, nosnippet"; m.setAttribute("data-addr", "1");
+    document.head.appendChild(m);
+  }
+  function findAddressNote() {
+    var found = null;
+    Array.prototype.forEach.call(document.querySelectorAll("div, p, span"), function (el) {
+      if (!found && el.children.length === 0 && el.textContent.length < 200 && ADDRESS_NOTE.test(el.textContent) && !el.closest("table")) found = el;
+    });
+    return found;
+  }
+  function addressSlot() {
+    var note = findAddressNote();
+    if (note) return note;
+    var slot = document.createElement("div");
+    slot.style.cssText = "margin:8px 0;font-weight:600;";
+    var h1 = document.querySelector("h1");
+    if (h1 && h1.parentNode) h1.parentNode.insertBefore(slot, h1.nextSibling); else document.body.insertBefore(slot, document.body.firstChild);
+    return slot;
+  }
+  function removeRequestBlock() {
+    Array.prototype.forEach.call(document.querySelectorAll('a[href*="requestAddress="]'), function (a) {
+      var box = a.parentNode;
+      if (box && box.parentNode === document.body) box.parentNode.removeChild(box);
+    });
+  }
+  function showAddress(addr) {
+    if (isDeadPage()) return;
+    noindex();
+    var slot = addressSlot();
+    slot.setAttribute("data-nosnippet", "");
+    slot.textContent = "Address: " + String(addr).slice(0, 200);
+    removeRequestBlock();
+  }
+  // Logged-in team member whose address request was approved (or admin) sees
+  // it on the normal public page. Read from their own session -- a crawler
+  // has none, so it can never see this.
+  function showAddressForSession() {
+    var sess = null;
+    try { sess = JSON.parse(localStorage.getItem("disp_crm_session") || "null"); } catch (e) {}
+    var m = location.pathname.match(/\/deals\/([\w-]+)\.html$/);
+    if (!sess || !sess.token || !m) return;
+    fetch(API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "getDeal", token: sess.token, dealId: m[1] }) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) { if (j && j.ok && j.deal && j.deal.Address) showAddress(j.deal.Address); })
+      .catch(function () {});
+  }
+  // On a rep's link the address is only fetched when a visitor presses the
+  // button, so it is never in the page as loaded.
+  function offerAddress(repId) {
+    if (isDeadPage()) return;
+    var slot = addressSlot();
+    slot.textContent = "";
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "Show address";
+    btn.style.cssText = "padding:8px 16px;border-radius:6px;border:1px solid currentColor;background:transparent;color:inherit;font-weight:600;cursor:pointer;";
+    btn.addEventListener("click", function () {
+      btn.disabled = true;
+      fetch(API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "publicGetRepPage", repPageId: repId, includeAddress: true }) })
+        .then(function (r) { return r.json(); })
+        .then(function (j) { if (j && j.ok && j.address) showAddress(j.address); else { btn.disabled = false; btn.textContent = "Address not available"; } })
+        .catch(function () { btn.disabled = false; });
+    });
+    slot.appendChild(btn);
+  }
+
+  if (!id) {
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", showAddressForSession); else showAddressForSession();
+    return;
+  }
   id = String(id).replace(/[^\w-]/g, "").slice(0, 64);
 
   var hideStyle = document.createElement("style");
@@ -195,6 +274,7 @@
         if (t !== orig) node.nodeValue = t;
       }
     }
+    if (page.hasAddress) { noindex(); offerAddress(id); }
     showPage();
   }
 
