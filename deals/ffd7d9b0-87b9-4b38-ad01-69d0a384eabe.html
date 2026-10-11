@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Knightdale, NC Infill Lot | Wake County | NC-2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e9;
+    --ink:#2b2621;
+    --rule:#d9cfbf;
+    --accent:#8a5a3b;
+    --card:#fffdf9;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Jost',sans-serif;
+    font-size:16px;
+    line-height:1.55;
+  }
+  h1,h2,h3{
+    font-family:'Playfair Display',serif;
+    font-weight:600;
+    margin:0;
+  }
+  .wrap{
+    max-width:880px;
+    margin:0 auto;
+    padding:0 28px;
+  }
+
+  header.top{
+    border-bottom:1px solid var(--rule);
+    padding-top:40px;
+    padding-bottom:30px;
+  }
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:12.5px;
+    color:var(--accent);
+    font-weight:600;
+  }
+  h1.title{
+    font-size:38px;
+    margin-top:10px;
+    line-height:1.15;
+  }
+  .location-line{
+    margin-top:14px;
+    font-size:17px;
+  }
+  .addr-note{
+    margin-top:8px;
+    font-size:14.5px;
+    font-style:italic;
+    color:#5c5248;
+  }
+
+  .price-band{
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:4px;
+    padding:26px 30px;
+    margin-top:28px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:30px;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .price-main .label{
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    font-size:12px;
+    color:#6b6052;
+  }
+  .price-main .value{
+    font-family:'Playfair Display',serif;
+    font-size:40px;
+    font-weight:700;
+    color:var(--ink);
+  }
+  .price-sub .label{
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    font-size:12px;
+    color:#6b6052;
+  }
+  .price-sub .value{
+    font-family:'Playfair Display',serif;
+    font-size:24px;
+    font-weight:600;
+    color:var(--accent);
+  }
+
+  section{
+    margin-top:46px;
+    margin-bottom:0;
+  }
+  section:last-of-type{
+    margin-bottom:46px;
+  }
+
+  h2.section-title{
+    font-size:24px;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:8px;
+    margin-bottom:18px;
+  }
+
+  .gallery-link{
+    margin-top:10px;
+    font-size:14px;
+  }
+  .gallery-link a{
+    color:var(--accent);
+  }
+
+  .gallery{
+    display:flex;
+    gap:14px;
+    overflow-x:auto;
+    padding-bottom:10px;
+    margin-top:18px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .gallery img{
+    height:320px;
+    width:auto;
+    border-radius:3px;
+    border:1px solid var(--rule);
+    flex-shrink:0;
+  }
+
+  p{
+    margin:0 0 14px 0;
+  }
+  p:last-child{margin-bottom:0;}
+
+  table.details{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--card);
+    border:1px solid var(--rule);
+  }
+  table.details tr{
+    border-bottom:1px solid var(--rule);
+  }
+  table.details tr:last-child{
+    border-bottom:none;
+  }
+  table.details td{
+    padding:12px 16px;
+    vertical-align:top;
+  }
+  table.details td.k{
+    width:38%;
+    font-weight:600;
+    color:#5c5248;
+    text-transform:uppercase;
+    font-size:12.5px;
+    letter-spacing:.05em;
+  }
+  table.details td.v{
+    font-size:16px;
+  }
+
+  ul.points{
+    list-style:none;
+    padding:0;
+    margin:0;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px 24px;
+  }
+  ul.points li{
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-left:4px solid var(--accent);
+    padding:10px 14px;
+    font-size:14.5px;
+    letter-spacing:.01em;
+  }
+  @media (max-width:620px){
+    ul.points{grid-template-columns:1fr;}
+  }
+
+  .diligence{
+    background:var(--card);
+    border:1px solid var(--rule);
+    padding:20px 22px;
+  }
+
+  .disclosure-box{
+    background:#efe7d8;
+    border:1px solid var(--rule);
+    padding:18px 22px;
+    font-size:14.5px;
+  }
+
+  footer.cta{
+    background:var(--ink);
+    color:var(--paper);
+    padding-top:50px;
+    padding-bottom:50px;
+    margin-top:60px;
+  }
+  footer.cta h2{
+    font-size:30px;
+    color:var(--paper);
+    margin-bottom:12px;
+  }
+  footer.cta p{
+    color:#d8d0c3;
+    font-size:16px;
+  }
+  .contact-row{
+    margin-top:22px;
+    display:flex;
+    gap:28px;
+    flex-wrap:wrap;
+  }
+  .contact-row a{
+    color:var(--paper);
+    font-family:'Playfair Display',serif;
+    font-size:20px;
+    text-decoration:none;
+    border-bottom:1px solid var(--accent);
+    padding-bottom:3px;
+  }
+  .fine{
+    margin-top:30px;
+    font-size:12.5px;
+    color:#a69c8d;
+    line-height:1.6;
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=ffd7d9b0-87b9-4b38-ad01-69d0a384eabe&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2Fffd7d9b0-87b9-4b38-ad01-69d0a384eabe.html">Request the Address</a></div></noscript>
+
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">Deal Code NC-2 &middot; Wholesale Assignment</div>
+    <h1 class="title">Knightdale Infill Lot &mdash; Established Wake County Neighborhood</h1>
+    <div class="location-line">Knightdale, North Carolina &middot; Wake County &middot; ZIP 27545</div>
+    <div class="addr-note">Address available upon request &mdash; contact us for the exact parcel location.</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="price-band">
+    <div class="price-main">
+      <div class="label">Asking Price</div>
+      <div class="value">$63,500</div>
+    </div>
+    <div class="price-sub">
+      <div class="label">2026 Assessed Land Value</div>
+      <div class="value">$85,000</div>
+    </div>
+  </div>
+
+  <section>
+    <h2 class="section-title">Gallery</h2>
+    <div class="gallery">
+      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/1.jpg" alt="Vacant infill parcel in Knightdale, Wake County, NC">
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Here Is What We Have</h2>
+    <p>Opportunity to acquire approximately 0.59 acres / 25,700 SF of vacant land in an established Knightdale residential pocket.</p>
+    <p>The subject is a separate vacant parcel positioned between existing homes on Daniel Cir. It is not either of the neighboring residences that may appear when searching for the property online.</p>
+    <p>The property has direct frontage along Daniel Cir and is surrounded by established residential development, making it an infill-style opportunity for a builder, land investor, or cash buyer.</p>
+  </section>
+
+  <section>
+    <h2 class="section-title">Core Property Details</h2>
+    <table class="details">
+      <tr><td class="k">Location</td><td class="v">Knightdale, NC 27545</td></tr>
+      <tr><td class="k">County</td><td class="v">Wake County</td></tr>
+      <tr><td class="k">Lot Size</td><td class="v">Approximately 0.59 acres / 25,700 SF</td></tr>
+      <tr><td class="k">Property Type</td><td class="v">Vacant land</td></tr>
+      <tr><td class="k">Site</td><td class="v">Wooded, irregular-shaped parcel</td></tr>
+      <tr><td class="k">Access</td><td class="v">Direct frontage along Daniel Cir</td></tr>
+      <tr><td class="k">Setting</td><td class="v">Established residential neighborhood with existing homes surrounding the parcel</td></tr>
+      <tr><td class="k">2026 Assessed Land Value</td><td class="v">$85,000</td></tr>
+      <tr><td class="k">Asking Price</td><td class="v">$63,500</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2 class="section-title">Location Clarification</h2>
+    <p>The subject is a separate vacant parcel located directly between two existing neighboring homes on Daniel Cir in Knightdale (street address available upon request).</p>
+    <p>Those neighboring homes sit on separate parcels and are NOT part of this offering.</p>
+    <p>If an address search pulls up either neighboring house, refer to the parcel map and aerial outline for the correct vacant lot location.</p>
+    <p>Qualified buyers can request the parcel map, aerial boundary image, and property details confirming the subject parcel.</p>
+  </section>
+
+  <section>
+    <h2 class="section-title">Why Buyers Should Look At This</h2>
+    <p>The strongest feature is the setting.</p>
+    <p>This is not isolated acreage. The parcel sits within an established Knightdale residential neighborhood with existing homes immediately surrounding it and direct road frontage along Daniel Cir.</p>
+    <p>At approximately 0.59 acres, the property provides more than half an acre in the Knightdale / Wake County market at a $63,500 asking price.</p>
+    <p>Wake County reports a 2026 assessed land value of $85,000. The assessment is provided as a supporting value indicator only and is not being represented as guaranteed market value or as a comparable sale.</p>
+    <p>For a builder, land investor, or cash buyer, the opportunity is straightforward: evaluate a residential infill parcel in an already developed Wake County neighborhood at a price below the current assessed land value.</p>
+  </section>
+
+  <section>
+    <h2 class="section-title">Strongest Selling Points</h2>
+    <ul class="points">
+      <li>Knightdale / Wake County location</li>
+      <li>Established residential infill setting</li>
+      <li>0.59&plusmn; acres / 25,700&plusmn; SF</li>
+      <li>Direct Daniel Cir frontage</li>
+      <li>Vacant parcel between existing homes</li>
+      <li>Surrounding residential development already in place</li>
+      <li>$63,500 asking price</li>
+      <li>$85,000 2026 assessed land value</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="section-title">Buyer Due Diligence</h2>
+    <div class="diligence">
+      <p>Buyer should independently verify zoning, permitted use, exact parcel boundaries, survey, setbacks, building envelope, road access, utility availability, water and sewer availability, septic feasibility, flood conditions, wetlands, drainage, easements, title conditions, and all development costs.</p>
+      <p>No representation is being made that the property is currently permit-ready, buildable, utility-served, or septic-approved.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Deal Terms</h2>
+    <table class="details">
+      <tr><td class="k">Purchase Price</td><td class="v">$63,500</td></tr>
+      <tr><td class="k">Financing</td><td class="v">Cash or hard money</td></tr>
+      <tr><td class="k">Transaction Type</td><td class="v">Assignment of contract</td></tr>
+      <tr><td class="k">Closing Costs</td><td class="v">Paid by buyer</td></tr>
+      <tr><td class="k">TC Fee</td><td class="v">$425 Transaction Coordinator fee, paid by buyer as part of closing costs</td></tr>
+      <tr><td class="k">Condition</td><td class="v">Property sold as-is</td></tr>
+      <tr><td class="k">Requirement</td><td class="v">Proof of funds required</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <div class="disclosure-box">
+      <p>This is a wholesale assignment of contract. JNA Dynamic Holdings LLC holds an equitable interest in the subject property under contract with the current property owner. The end buyer will receive an assignment of contract, not a direct deed from JNA Dynamic Holdings LLC.</p>
+      <p>Figures referenced above, including the 2026 assessed land value, have not been independently verified by JNA Dynamic Holdings LLC and should be confirmed by the buyer during due diligence.</p>
+    </div>
+  </section>
+
+</div>
+
+<footer class="cta">
+  <div class="wrap">
+    <h2>0.59&plusmn; Acres. Knightdale. Wake County. Ask Below Assessed Value.</h2>
+    <p>Reach out for the parcel map, aerial boundary image, property information, and available due-diligence materials, including the exact parcel address.</p>
+    <div class="contact-row">
+      <a href="tel:5206336437">520-633-6437</a>
+      <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
+    </div>
+    <div class="fine">JNA Dynamic Holdings LLC &mdash; this offering is an assignment of contract and not a direct sale by the underlying property owner.</div>
+  </div>
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
