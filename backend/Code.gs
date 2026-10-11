@@ -473,6 +473,8 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminSetAutoApprove));
       case 'adminGetAutoDiscloseAddressSettings':
         return jsonOut(withAdminSession(body, adminGetAutoDiscloseAddressSettings));
+      case 'adminSetPublicPageButtonAutoGrant':
+        return jsonOut(withAdminSession(body, adminSetPublicPageButtonAutoGrant));
       case 'adminSetAutoDiscloseAddress':
         return jsonOut(withAdminSession(body, adminSetAutoDiscloseAddress));
       case 'adminGetBuyerAddressAutoDiscloseSettings':
@@ -2913,7 +2915,7 @@ function processAddressRequest(body, session, deal, source) {
   const fromPublic = source === 'public_page_button';
   // body.claim: the public page's "Request the Address" button auto-grants to
   // any logged-in account.
-  const autoGrant = (fromPublic && body.claim === true) || buyerAddressAutoGrantAllowed(rep) || adminGetAutoDiscloseAddressSettings({}).mode === 'all_on_request';
+  const autoGrant = (fromPublic && body.claim === true && publicPageButtonAutoGrants()) || buyerAddressAutoGrantAllowed(rep) || adminGetAutoDiscloseAddressSettings({}).mode === 'all_on_request';
 
   if (autoGrant) {
     adminGrantAddressAccess({ dealId: body.dealId, username: session.u });
@@ -5157,7 +5159,19 @@ const AUTO_DISCLOSE_ADDRESS_MODES = ['off', 'all_on_interest', 'trusted_on_inter
 function adminGetAutoDiscloseAddressSettings(body) {
   const props = PropertiesService.getScriptProperties();
   const mode = props.getProperty('AUTO_DISCLOSE_ADDRESS_MODE') || 'off';
-  return { ok: true, mode: AUTO_DISCLOSE_ADDRESS_MODES.indexOf(mode) !== -1 ? mode : 'off' };
+  return { ok: true, mode: AUTO_DISCLOSE_ADDRESS_MODES.indexOf(mode) !== -1 ? mode : 'off', publicButton: publicPageButtonAutoGrants() ? 'on' : 'off' };
+}
+
+// Whether the public deal page's "Request the Address" button grants the
+// address the moment a logged-in visitor presses it. Defaults to on; when off,
+// pressing it just emails admin like any other request and admin grants it.
+function publicPageButtonAutoGrants() {
+  return (PropertiesService.getScriptProperties().getProperty('PUBLIC_PAGE_BUTTON_AUTOGRANT') || 'on') !== 'off';
+}
+
+function adminSetPublicPageButtonAutoGrant(body) {
+  PropertiesService.getScriptProperties().setProperty('PUBLIC_PAGE_BUTTON_AUTOGRANT', body.mode === 'off' ? 'off' : 'on');
+  return { ok: true };
 }
 
 function adminSetAutoDiscloseAddress(body) {

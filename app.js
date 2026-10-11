@@ -4147,6 +4147,7 @@ async function loadReps() {
   }
   if (autoDiscloseRes.ok) {
     document.getElementById("autodisclose-mode-input").value = autoDiscloseRes.mode;
+    document.getElementById("publicbutton-mode-input").value = autoDiscloseRes.publicButton || "on";
   }
   if (buyerAutoDiscloseRes.ok) {
     document.getElementById("buyerautodisclose-mode-input").value = buyerAutoDiscloseRes.mode;
@@ -4199,6 +4200,15 @@ document.getElementById("autodisclose-save-btn").addEventListener("click", async
   const btn = this;
   btn.disabled = true;
   const res = await api("adminSetAutoDiscloseAddress", { mode: document.getElementById("autodisclose-mode-input").value });
+  btn.disabled = false;
+  if (!res.ok) { showToast(res.error || "Could not save.", true); return; }
+  showToast("Saved.");
+});
+
+document.getElementById("publicbutton-save-btn").addEventListener("click", async function () {
+  const btn = this;
+  btn.disabled = true;
+  const res = await api("adminSetPublicPageButtonAutoGrant", { mode: document.getElementById("publicbutton-mode-input").value });
   btn.disabled = false;
   if (!res.ok) { showToast(res.error || "Could not save.", true); return; }
   showToast("Saved.");

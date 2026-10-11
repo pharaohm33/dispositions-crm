@@ -941,6 +941,18 @@ Put it in a table with the property address, owner or company name, phone, email
     </div>
 
     <div class="card">
+      <div class="section-title" style="margin-top:0;">Public Deal Page "Request the Address" Button</div>
+      <p class="small-muted">The button next to the location on each public deal page. A visitor has to be logged in (or sign up) first.</p>
+      <select id="publicbutton-mode-input">
+        <option value="on">On — pressing it grants the address instantly (they still tick the agreement before viewing)</option>
+        <option value="off">Off — pressing it only emails me; the address stays locked until I grant it</option>
+      </select>
+      <div class="nav-row" style="justify-content:flex-end; margin-top:10px;">
+        <button class="btn secondary small" id="publicbutton-save-btn">Save</button>
+      </div>
+    </div>
+
+    <div class="card">
       <div class="section-title" style="margin-top:0;">Buyer Address Auto-Disclose</div>
       <p class="small-muted">Separate from the setting above -- this one is specifically about a registered Buyer account (the actual end buyer browsing deals) requesting an address, not a wholesaler/rep.</p>
       <select id="buyerautodisclose-mode-input">
@@ -1638,7 +1650,7 @@ Put it in a table with the property address, owner or company name, phone, email
   </div>
 </div>
 
-<script src="config.js?v=87"></script>
-<script src="app.js?v=87"></script>
+<script src="config.js?v=88"></script>
+<script src="app.js?v=88"></script>
 </body>
 </html>
