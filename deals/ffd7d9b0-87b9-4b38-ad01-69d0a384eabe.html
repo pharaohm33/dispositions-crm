@@ -1,357 +1,423 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vacant Land Opportunity — Knightdale, NC | JNA Dynamic Holdings LLC</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Knightdale, NC Infill Lot — Wake County | JNA Dynamic Holdings LLC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background-color: #f6f1e9;
-    color: #2b2621;
-    font-family: 'Inter', sans-serif;
-    line-height: 1.55;
+  :root{
+    --paper:#f6f1e8;
+    --paper-dark:#ece4d4;
+    --ink:#2a241c;
+    --ink-soft:#5c5346;
+    --rule:#d8cdb8;
+    --accent:#8a5a34;
+    --accent-dark:#5f3d20;
   }
-  h1, h2, h3 {
-    font-family: 'Playfair Display', serif;
-    font-weight: 600;
-    color: #211d19;
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Jost',sans-serif;
+    font-weight:400;
+    line-height:1.6;
   }
-  .wrap {
-    max-width: 880px;
-    margin: 0 auto;
-    padding: 0 24px;
+  h1,h2,h3{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    color:var(--ink);
+    margin:0;
   }
-  header.top {
-    background-color: #2b2621;
-    color: #f6f1e9;
-    padding: 14px 0;
+  .wrap{
+    max-width:880px;
+    margin:0 auto;
+    padding-left:28px;
+    padding-right:28px;
   }
-  header.top .wrap {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-  header.top .brand {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    letter-spacing: 0.02em;
-  }
-  header.top .contactline {
-    font-size: 0.9rem;
-    color: #e6ddcc;
-  }
-  header.top .contactline a { color: #f6f1e9; text-decoration: none; }
+  a{color:var(--accent-dark);}
 
-  section.hero {
-    margin-top: 48px;
-    margin-bottom: 8px;
+  header.hero{
+    background:var(--paper-dark);
+    padding-top:48px;
+    padding-bottom:36px;
+    border-bottom:1px solid var(--rule);
   }
-  .eyebrow {
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-size: 0.78rem;
-    color: #8a6d3b;
-    font-weight: 600;
-    margin-bottom: 10px;
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:12.5px;
+    color:var(--accent-dark);
+    margin-bottom:14px;
   }
-  h1.title {
-    font-size: 2.3rem;
-    margin: 0 0 10px 0;
-    line-height: 1.15;
+  h1.title{
+    font-size:38px;
+    line-height:1.15;
+    margin-bottom:14px;
   }
-  .location-line {
-    font-size: 1.05rem;
-    color: #4a433a;
-    margin-bottom: 6px;
+  .loc-line{
+    font-size:17px;
+    color:var(--ink-soft);
+    margin-bottom:6px;
   }
-  .address-note {
-    font-size: 0.95rem;
-    color: #6b5a3a;
-    font-style: italic;
-    margin-bottom: 20px;
+  .addr-note{
+    font-size:14.5px;
+    font-style:italic;
+    color:var(--accent-dark);
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px dashed var(--rule);
   }
 
-  .price-block {
-    margin-top: 20px;
-    margin-bottom: 36px;
-    background-color: #fffaf0;
-    border: 1px solid #e3d8c0;
-    border-radius: 10px;
-    padding: 26px 30px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
-    justify-content: space-between;
-    align-items: center;
+  .price-band{
+    background:var(--ink);
+    color:var(--paper);
   }
-  .price-block .price {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.4rem;
-    color: #211d19;
+  .price-band .wrap{
+    padding-top:26px;
+    padding-bottom:26px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    align-items:baseline;
   }
-  .price-block .price-label {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #8a6d3b;
-    margin-bottom: 4px;
+  .price-main{
+    font-family:'Fraunces',serif;
+    font-size:40px;
+    font-weight:700;
   }
-  .price-block .secondary-value {
-    font-size: 1.15rem;
-    color: #4a433a;
+  .price-label{
+    text-transform:uppercase;
+    font-size:11.5px;
+    letter-spacing:.12em;
+    opacity:.75;
+    display:block;
+    margin-bottom:4px;
   }
-  .price-block .secondary-label {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #8a6d3b;
-    margin-bottom: 4px;
+  .price-sub{
+    font-size:20px;
+    font-family:'Fraunces',serif;
+    font-weight:500;
   }
 
-  .gallery-section {
-    margin-top: 10px;
-    margin-bottom: 44px;
+  section{
+    padding-top:40px;
+    padding-bottom:40px;
   }
-  .gallery {
-    display: flex;
-    overflow-x: auto;
-    gap: 14px;
-    padding-bottom: 10px;
-    scroll-snap-type: x mandatory;
+  section.alt{
+    background:var(--paper-dark);
   }
-  .gallery img {
-    height: 260px;
-    width: auto;
-    flex: 0 0 auto;
-    border-radius: 8px;
-    object-fit: cover;
-    scroll-snap-align: start;
-    border: 1px solid #e3d8c0;
+  h2.section-title{
+    font-size:26px;
+    margin-bottom:18px;
+    position:relative;
   }
-
-  section.narrative {
-    margin-top: 8px;
-    margin-bottom: 44px;
-  }
-  section.narrative h2 {
-    font-size: 1.5rem;
-    margin-bottom: 14px;
-  }
-  section.narrative p {
-    margin: 0 0 14px 0;
-    color: #352f29;
-  }
-  .callout-box {
-    background-color: #efe6d2;
-    border-left: 4px solid #8a6d3b;
-    padding: 14px 18px;
-    font-size: 0.95rem;
-    color: #3a331f;
-    margin-top: 16px;
+  h2.section-title::after{
+    content:"";
+    display:block;
+    width:52px;
+    height:3px;
+    background:var(--accent);
+    margin-top:12px;
   }
 
-  section.terms {
-    margin-top: 8px;
-    margin-bottom: 44px;
+  .gallery-link{
+    display:inline-block;
+    margin-top:12px;
+    margin-bottom:4px;
+    font-size:14px;
+    text-decoration:underline;
+    color:var(--accent-dark);
   }
-  section.terms h2 {
-    font-size: 1.5rem;
-    margin-bottom: 16px;
+  .gallery{
+    display:flex;
+    gap:14px;
+    overflow-x:auto;
+    padding-top:18px;
+    padding-bottom:10px;
+    -webkit-overflow-scrolling:touch;
   }
-  table.terms-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #fffaf0;
-    border: 1px solid #e3d8c0;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  table.terms-table tr {
-    border-bottom: 1px solid #e9ddc5;
-  }
-  table.terms-table tr:last-child {
-    border-bottom: none;
-  }
-  table.terms-table td {
-    padding: 13px 20px;
-    font-size: 0.97rem;
-  }
-  table.terms-table td.label {
-    color: #8a6d3b;
-    font-weight: 600;
-    width: 46%;
-  }
-  table.terms-table td.value {
-    color: #211d19;
+  .gallery img{
+    height:260px;
+    width:auto;
+    flex:0 0 auto;
+    border-radius:4px;
+    border:1px solid var(--rule);
+    object-fit:cover;
   }
 
-  section.assignment-note {
-    margin-top: 8px;
-    margin-bottom: 44px;
-    font-size: 0.9rem;
-    color: #5a5146;
-    background-color: #f0ebe0;
-    border-radius: 8px;
-    padding: 18px 22px;
+  ul.clean{
+    margin:0;
+    padding-left:20px;
   }
-  section.assignment-note strong {
-    color: #2b2621;
+  ul.clean li{
+    margin-bottom:9px;
   }
 
-  .cta-band {
-    background-color: #2b2621;
-    color: #f6f1e9;
-    padding: 46px 0;
-    margin-top: 10px;
+  .points-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px 24px;
+    margin-top:10px;
   }
-  .cta-band h2 {
-    color: #f6f1e9;
-    font-size: 1.8rem;
-    margin-bottom: 10px;
-  }
-  .cta-band p {
-    color: #d8cfbd;
-    margin-bottom: 22px;
-    font-size: 1rem;
-  }
-  .cta-contacts {
-    display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
-  }
-  .cta-contacts a {
-    color: #f6f1e9;
-    text-decoration: none;
-    font-size: 1.1rem;
-    font-weight: 600;
-    border-bottom: 1px solid #8a6d3b;
-    padding-bottom: 3px;
+  .points-grid div{
+    background:var(--paper);
+    border:1px solid var(--rule);
+    padding:12px 14px;
+    font-size:14.5px;
+    border-radius:3px;
   }
 
-  footer.disclaimer {
-    padding: 22px 0 50px 0;
-    font-size: 0.78rem;
-    color: #8a8070;
+  table.facts{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:12px;
+    font-size:15px;
+  }
+  table.facts tr{
+    border-bottom:1px solid var(--rule);
+  }
+  table.facts td{
+    padding:11px 6px;
+    vertical-align:top;
+  }
+  table.facts td.k{
+    width:38%;
+    color:var(--ink-soft);
+    font-weight:500;
+  }
+
+  table.terms{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:12px;
+    font-size:15px;
+    background:var(--paper);
+  }
+  table.terms tr{
+    border-bottom:1px solid var(--rule);
+  }
+  table.terms td{
+    padding:12px 8px;
+  }
+  table.terms td.k{
+    width:34%;
+    font-weight:600;
+    font-family:'Fraunces',serif;
+  }
+
+  .notice-box{
+    border:1px solid var(--accent);
+    background:#fbf6ec;
+    padding:16px 18px;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:18px;
+    border-radius:3px;
+  }
+  .notice-box strong{color:var(--ink);}
+
+  .disclaimer{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-top:18px;
+    line-height:1.65;
+  }
+
+  .cta-band{
+    background:var(--accent-dark);
+    color:var(--paper);
+    padding-top:46px;
+    padding-bottom:46px;
+    text-align:center;
+  }
+  .cta-band h2{
+    font-size:30px;
+    color:var(--paper);
+    margin-bottom:12px;
+  }
+  .cta-band p{
+    font-size:15.5px;
+    opacity:.9;
+    margin-bottom:22px;
+  }
+  .cta-contacts{
+    display:flex;
+    justify-content:center;
+    gap:30px;
+    flex-wrap:wrap;
+    font-size:17px;
+  }
+  .cta-contacts a{
+    color:var(--paper);
+    font-weight:500;
+    text-decoration:none;
+    border-bottom:1px solid rgba(246,241,232,.5);
+    padding-bottom:2px;
+  }
+  footer{
+    background:var(--ink);
+    color:var(--paper-dark);
+    text-align:center;
+    font-size:12px;
+    padding-top:18px;
+    padding-bottom:18px;
+    opacity:.85;
+  }
+
+  @media (max-width:560px){
+    h1.title{font-size:28px;}
+    .points-grid{grid-template-columns:1fr;}
+    .price-main{font-size:32px;}
   }
 </style>
 </head>
 <body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=ffd7d9b0-87b9-4b38-ad01-69d0a384eabe&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2Fffd7d9b0-87b9-4b38-ad01-69d0a384eabe.html">Request the Address</a></div></noscript>
 
-<header class="top">
+<header class="hero">
   <div class="wrap">
-    <div class="brand">JNA Dynamic Holdings LLC</div>
-    <div class="contactline">
-      <a href="tel:520-633-6437">520-633-6437</a> &nbsp;|&nbsp;
-      <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
-    </div>
+    <div class="eyebrow">Deal Code: NC-2 &nbsp;·&nbsp; Land / Infill Lot</div>
+    <h1 class="title">Knightdale Infill Lot in an Established Wake County Neighborhood</h1>
+    <div class="loc-line">Knightdale, North Carolina 27545 &nbsp;·&nbsp; Wake County</div>
+    <div class="loc-line">Parcel ID: 1744238408</div>
+    <div class="addr-note">Address available upon request — contact us for the exact property location.</div>
   </div>
 </header>
 
-<section class="hero">
+<div class="price-band">
   <div class="wrap">
-    <div class="eyebrow">Deal Code: NC-2 &middot; Vacant Land</div>
-    <h1 class="title">Infill Vacant Lot in Knightdale, NC</h1>
-    <div class="location-line">Knightdale, Wake County, North Carolina</div>
-    <div class="address-note">Address available upon request — contact us and we'll send the full parcel details.</div>
-  </div>
-</section>
-
-<div class="wrap">
-  <div class="price-block">
     <div>
-      <div class="price-label">Assignment Price</div>
-      <div class="price">$63,500</div>
+      <span class="price-label">Asking Price</span>
+      <span class="price-main">$63,500</span>
     </div>
     <div>
-      <div class="secondary-label">2026 Assessed Land Value</div>
-      <div class="secondary-value">$85,000</div>
+      <span class="price-label">2026 Assessed Land Value</span>
+      <span class="price-sub">$85,000</span>
+    </div>
+    <div>
+      <span class="price-label">Lot Size</span>
+      <span class="price-sub">≈0.59 Acres / 25,700 SF</span>
     </div>
   </div>
 </div>
 
-<section class="gallery-section">
+<section>
   <div class="wrap">
+    <h2 class="section-title">Photos</h2>
     <div class="gallery">
-      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/1.jpg" alt="Vacant land parcel in Knightdale, NC - photo 1">
-      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/2.jpg" alt="Vacant land parcel in Knightdale, NC - photo 2">
-      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/3.jpg" alt="Vacant land parcel in Knightdale, NC - photo 3">
-      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/4.jpg" alt="Vacant land parcel in Knightdale, NC - photo 4">
-      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/5.jpg" alt="Vacant land parcel in Knightdale, NC - photo 5">
-      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/6.jpg" alt="Vacant land parcel in Knightdale, NC - photo 6">
-      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/7.jpg" alt="Vacant land parcel in Knightdale, NC - photo 7">
-      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/8.jpg" alt="Vacant land parcel in Knightdale, NC - photo 8">
-      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/9.jpg" alt="Vacant land parcel in Knightdale, NC - photo 9">
-      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/10.jpg" alt="Vacant land parcel in Knightdale, NC - photo 10">
+      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/2.jpg" alt="Vacant land parcel in Knightdale, NC">
+      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/3.jpg" alt="Vacant land parcel in Knightdale, NC">
+      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/4.jpg" alt="Vacant land parcel in Knightdale, NC">
+      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/5.jpg" alt="Vacant land parcel in Knightdale, NC">
+      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/6.jpg" alt="Vacant land parcel in Knightdale, NC">
+      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/7.jpg" alt="Vacant land parcel in Knightdale, NC">
+      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/8.jpg" alt="Vacant land parcel in Knightdale, NC">
+      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/9.jpg" alt="Vacant land parcel in Knightdale, NC">
+      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/10.jpg" alt="Vacant land parcel in Knightdale, NC">
+      <img src="/deals/ffd7d9b0-87b9-4b38-ad01-69d0a384eabe/photos/11.jpg" alt="Vacant land parcel in Knightdale, NC">
     </div>
+    <a class="gallery-link" href="https://drive.google.com/drive/folders/1eMjOA7ExBxYIgGadHm8897GhudRMQuib?usp=sharing" target="_blank" rel="noopener">View all photos →</a>
   </div>
 </section>
 
-<section class="narrative">
+<section class="alt">
   <div class="wrap">
-    <h2>About This Lot</h2>
-    <p>This is a separate vacant parcel situated directly between two existing neighboring homes on Daniel Circle in Knightdale. The 2026 assessed land value for the parcel is $85,000.</p>
-    <p>The two neighboring homes on either side of this parcel sit on their own separate parcels and are existing residences — they are not part of this offering and are not included in the sale.</p>
-    <div class="callout-box">
-      Note for buyers: if an address lookup for this location pulls up one of the neighboring homes instead of the vacant lot, refer to the parcel map and aerial outline to confirm the correct vacant lot boundaries before making any offer decisions.
-    </div>
+    <h2 class="section-title">Here Is What We Have</h2>
+    <p>Opportunity to acquire approximately 0.59 acres / 25,700 SF of vacant land in an established Knightdale residential pocket.</p>
+    <p>The subject is a separate vacant parcel positioned between two existing homes on Daniel Cir. It is not either of the neighboring residences that may appear when searching for the property online — the street number for this parcel is available upon request.</p>
+    <p>The property has direct frontage along Daniel Cir and is surrounded by established residential development, making it an infill-style opportunity for a builder, land investor or cash buyer.</p>
+
+    <h2 class="section-title" style="margin-top:34px;">Location Clarification</h2>
+    <p>The subject is a separate vacant parcel located directly between two neighboring homes on Daniel Cir in Knightdale. Those two neighboring homes sit on their own separate parcels and are <strong>not</strong> part of this offering.</p>
+    <p>If an address search for this location pulls up either neighboring house, refer to the parcel map and aerial outline for the correct vacant lot location. Qualified buyers can request the parcel map, aerial boundary image, and property details confirming the subject parcel.</p>
   </div>
 </section>
 
-<section class="terms">
+<section>
   <div class="wrap">
-    <h2>Deal Terms</h2>
-    <table class="terms-table">
-      <tr>
-        <td class="label">Assignment Price</td>
-        <td class="value">$63,500</td>
-      </tr>
-      <tr>
-        <td class="label">2026 Assessed Land Value</td>
-        <td class="value">$85,000</td>
-      </tr>
-      <tr>
-        <td class="label">Deal Type</td>
-        <td class="value">Land</td>
-      </tr>
-      <tr>
-        <td class="label">City</td>
-        <td class="value">Knightdale, NC</td>
-      </tr>
-      <tr>
-        <td class="label">County</td>
-        <td class="value">Wake</td>
-      </tr>
+    <h2 class="section-title">Core Property Details</h2>
+    <table class="facts">
+      <tr><td class="k">Location</td><td>Knightdale, NC 27545</td></tr>
+      <tr><td class="k">County</td><td>Wake County</td></tr>
+      <tr><td class="k">Parcel ID</td><td>1744238408</td></tr>
+      <tr><td class="k">Lot Size</td><td>Approximately 0.59 acres / 25,700 SF</td></tr>
+      <tr><td class="k">Property Type</td><td>Vacant land</td></tr>
+      <tr><td class="k">Site</td><td>Wooded, irregular-shaped parcel</td></tr>
+      <tr><td class="k">Access</td><td>Direct frontage along Daniel Cir</td></tr>
+      <tr><td class="k">Setting</td><td>Established residential neighborhood with existing homes surrounding the parcel</td></tr>
+      <tr><td class="k">2026 Assessed Land Value</td><td>$85,000</td></tr>
+      <tr><td class="k">Asking Price</td><td>$63,500</td></tr>
     </table>
   </div>
 </section>
 
-<section class="assignment-note">
+<section class="alt">
   <div class="wrap">
-    <strong>Assignment of Contract:</strong> This offering is an assignment of a purchase and sale contract, not a direct sale of the property. JNA Dynamic Holdings LLC holds an equitable interest under contract with the underlying property owner and is marketing that contract position to a buyer. This is not an offer to sell real estate directly, and no direct contact with the underlying seller is implied or available through this listing.
+    <h2 class="section-title">Why Buyers Should Look at This</h2>
+    <p>The strongest feature is the setting. This is not isolated acreage — the parcel sits within an established Knightdale residential neighborhood with existing homes immediately surrounding it and direct road frontage along Daniel Cir.</p>
+    <p>At approximately 0.59 acres, the property provides more than half an acre in the Knightdale / Wake County market at a $63,500 asking price.</p>
+    <p>Wake County reports a 2026 assessed land value of $85,000. This assessment is provided as a supporting value indicator only and is not being represented as guaranteed market value or as a comparable sale.</p>
+    <p>For a builder, land investor or cash buyer, the opportunity is straightforward: evaluate a residential infill parcel in an already-developed Wake County neighborhood at a price below the current assessed land value.</p>
+
+    <h2 class="section-title" style="margin-top:34px;">Strongest Selling Points</h2>
+    <div class="points-grid">
+      <div>Knightdale / Wake County location</div>
+      <div>Established residential infill setting</div>
+      <div>0.59± acres / 25,700± SF</div>
+      <div>Direct Daniel Cir frontage</div>
+      <div>Vacant parcel between existing homes</div>
+      <div>Surrounding residential development already in place</div>
+      <div>$63,500 asking price</div>
+      <div>$85,000 2026 assessed land value</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Buyer Due Diligence</h2>
+    <p>Buyer should independently verify zoning, permitted use, exact parcel boundaries, survey, setbacks, building envelope, road access, utility availability, water and sewer availability, septic feasibility, flood conditions, wetlands, drainage, easements, title conditions, and all development costs.</p>
+    <p>No representation is being made that the property is currently permit-ready, buildable, utility-served, or septic-approved.</p>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <h2 class="section-title">Deal Terms</h2>
+    <table class="terms">
+      <tr><td class="k">Purchase Price</td><td>$63,500</td></tr>
+      <tr><td class="k">Funding</td><td>Cash or hard money</td></tr>
+      <tr><td class="k">Transaction Type</td><td>Assignment of contract</td></tr>
+      <tr><td class="k">Closing Costs</td><td>Paid by buyer</td></tr>
+      <tr><td class="k">Transaction Coordinator Fee</td><td>$425, paid by buyer as part of buyer's closing costs</td></tr>
+      <tr><td class="k">Condition</td><td>Property sold as-is</td></tr>
+      <tr><td class="k">Requirement</td><td>Proof of funds required</td></tr>
+    </table>
+
+    <div class="notice-box">
+      <strong>This is a wholesale assignment.</strong> JNA Dynamic Holdings LLC holds equitable interest in the subject transaction under a legally binding purchase contract with memorandum signed with the seller, giving this company exclusive rights to purchase the property. The end buyer will receive an assignment of contract. JNA Dynamic Holdings LLC does not represent the property owner, and this company is not a licensed broker and does not represent itself as one. Do not contact the owner/seller without explicit consent from JNA Dynamic Holdings LLC — any attempt to contact the owner or renegotiate directly may result in legal action.
+    </div>
+
+    <p class="disclaimer">All figures, measurements, and valuations above — including acreage, assessed value, and asking price — are provided as supporting information only and have not been independently verified by JNA Dynamic Holdings LLC. Buyers are responsible for performing their own due diligence prior to purchase.</p>
   </div>
 </section>
 
 <div class="cta-band">
   <div class="wrap">
-    <h2>Interested in This Lot?</h2>
-    <p>Contact us for the full parcel address, aerial outline, and parcel map, or to discuss terms on this assignment.</p>
+    <h2>0.59± Acres in Knightdale — Wake County Infill Setting</h2>
+    <p>Reach out for the parcel map, aerial boundary image, property information, and available due-diligence materials, including the exact property location.</p>
     <div class="cta-contacts">
-      <a href="tel:520-633-6437">520-633-6437</a>
+      <a href="tel:5206336437">520-633-6437</a>
       <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
     </div>
   </div>
 </div>
 
-<footer class="disclaimer">
-  <div class="wrap">
-    All figures, values, and details presented on this page have not been independently verified by JNA Dynamic Holdings LLC and should be confirmed independently by any prospective buyer prior to entering into an agreement.
-  </div>
+<footer>
+  JNA Dynamic Holdings LLC
 </footer>
 
 <script src="/rep-link.js" defer></script></body>
