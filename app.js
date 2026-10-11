@@ -3207,6 +3207,47 @@ document.getElementById("export-master-deals-btn").addEventListener("click", asy
   showToast("Exported " + active.length + " deals.");
 });
 
+
+document.getElementById("address-history-btn").addEventListener("click", async function () {
+  const btn = this;
+  const resultEl = document.getElementById("address-history-result");
+  const panel = document.getElementById("address-history-panel");
+  if (btn.disabled) return;
+  btn.disabled = true;
+  resultEl.textContent = " Loading…";
+  const res = await api("adminGetAddressRequestHistory", {});
+  btn.disabled = false;
+  if (!res.ok) { resultEl.textContent = " " + (res.error || "Could not load."); return; }
+  resultEl.textContent = "";
+  const s = res.summary;
+  const problems = s.emailsFailed + s.autoGrantsMissingGrantRow;
+  const sourceLabel = { public_page_button: "Public page button", deal_detail_button: "Deal detail" };
+  const outcomeLabel = { auto_granted: "Auto-granted", request_emailed: "Requested (emailed)", request_failed: "Requested (email FAILED)" };
+  function dt(iso) { return iso ? formatDate(iso) : ""; }
+  panel.innerHTML =
+    '<div class="banner ' + (problems > 0 ? "warn" : "info") + '">' +
+      '<strong>' + s.totalLogged + '</strong> request(s) logged &middot; <strong>' + s.autoGranted + '</strong> auto-granted &middot; ' +
+      '<strong>' + s.emailsSent + '</strong> admin email(s) sent &middot; <strong>' + s.emailsFailed + '</strong> failed' +
+      (s.autoGrantsMissingGrantRow > 0 ? ' &middot; <strong>' + s.autoGrantsMissingGrantRow + '</strong> auto-grant(s) with no grant row (revoked since, or a problem)' : "") +
+      (s.remainingEmailQuota !== null && s.remainingEmailQuota !== undefined ? '<br>Emails left in today\'s Google sending quota: <strong>' + s.remainingEmailQuota + '</strong>' : "") +
+      '<br>' + s.totalGrantRows + ' total grant(s) on file, ' + s.grantsWithoutLogCount + ' with no log entry (granted before logging started, or by hand in the admin panel).' +
+    '</div>' +
+    (res.rows.length ? '<div style="overflow-x:auto;"><table class="crm-table"><thead><tr><th>When</th><th>Who</th><th>Deal</th><th>How</th><th>Result</th><th>Admin email</th></tr></thead><tbody>' +
+      res.rows.map(function (r) {
+        const bad = r.emailStatus !== "sent";
+        return '<tr' + (bad ? ' style="background:#fdecea;"' : "") + '><td>' + esc(dt(r.at)) + '</td><td>' + esc(r.name || r.username) +
+          '<div class="small-muted">' + esc(r.role) + " &middot; " + esc(r.username) + '</div></td><td>' + esc(r.dealCode) + '</td><td>' + esc(sourceLabel[r.source] || r.source) +
+          '</td><td>' + esc(outcomeLabel[r.outcome] || r.outcome) + (r.outcome === "auto_granted" && !r.grantRowPresent ? '<div class="small-muted">grant row missing</div>' : "") +
+          '</td><td>' + esc(r.emailStatus || "—") + (r.emailError ? '<div class="small-muted">' + esc(r.emailError) + '</div>' : "") + '</td></tr>';
+      }).join("") + '</tbody></table></div>'
+      : '<p class="small-muted">No address requests have been logged yet. Logging started with this update, so earlier grants appear below instead.</p>') +
+    (res.grantsWithoutLog.length ? '<details style="margin-top:10px;"><summary style="cursor:pointer;font-weight:600;">' + res.grantsWithoutLog.length +
+      ' grant(s) with no log entry &mdash; check these against your inbox</summary><div style="overflow-x:auto;"><table class="crm-table"><thead><tr><th>Granted</th><th>Who</th><th>Deal</th></tr></thead><tbody>' +
+      res.grantsWithoutLog.map(function (g) {
+        return '<tr><td>' + esc(dt(g.grantedAt)) + '</td><td>' + esc(g.name || g.username) + '<div class="small-muted">' + esc(g.username) + '</div></td><td>' + esc(g.dealCode) + '</td></tr>';
+      }).join("") + '</tbody></table></div></details>' : "");
+});
+
 document.getElementById("regenerate-all-pages-btn").addEventListener("click", async function () {
   const btn = this;
   const resultEl = document.getElementById("regenerate-all-pages-result");

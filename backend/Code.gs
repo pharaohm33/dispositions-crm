@@ -61,7 +61,11 @@ const PITCHES_SHEET = 'Pitches';
 const REP_PAGES_SHEET = 'RepPages';
 const BUYER_LEAD_CONTACTS_SHEET = 'BuyerLeadContacts';
 const ADDRESS_GRANTS_SHEET = 'AddressGrants';
+const ADDRESS_LOG_SHEET = 'AddressRequestLog';
 const ADDRESS_GRANT_COLUMNS = ['DealID', 'Username', 'GrantedAt'];
+// One row per address request or auto-grant, with whether the admin email
+// actually went out -- lets admin reconcile AddressGrants against inbox.
+const ADDRESS_LOG_COLUMNS = ['LogID', 'At', 'Username', 'Name', 'Role', 'DealID', 'DealCode', 'Source', 'Outcome', 'EmailTo', 'EmailStatus', 'EmailError'];
 const ASSET_CATEGORIES_SHEET = 'AssetCategories';
 // This is an IDLE timeout, not a fixed session length -- withSession/
 // withAdminSession re-sign a fresh token (a new exp, SESSION_HOURS from
@@ -401,6 +405,8 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminGrantAddressAccess));
       case 'adminRevokeAddressAccess':
         return jsonOut(withAdminSession(body, adminRevokeAddressAccess));
+      case 'adminGetAddressRequestHistory':
+        return jsonOut(withAdminSession(body, adminGetAddressRequestHistory));
       case 'adminGetAddressGrants':
         return jsonOut(withAdminSession(body, adminGetAddressGrants));
       case 'adminGetFbRequests':
@@ -2874,105 +2880,125 @@ function buyerLeadContextEmailBlock(session) {
       : 'never yet contacted') + '.';
 }
 
-function requestAddressAccess(body, session) {
-  if (!body.dealId) return { ok: false, error: 'Missing dealId.' };
-  if (!canAccessDeal(session, body.dealId)) return { ok: false, error: 'You do not have access to this deal.' };
-  const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
-  const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === body.dealId; });
-  if (!deal) return { ok: false, error: 'Deal not found.' };
+// Sends one admin email and never throws -- returns how it went so the caller
+// can log it. A failed notification must not undo an address grant.
+function sendAddressAdminEmail(subject, bodyText) {
+  const to = getSupportEmail();
+  if (!to) return { to: '', status: 'no_recipient', error: 'No support email configured.' };
+  try {
+    MailApp.sendEmail({ to: to, subject: subject, body: bodyText });
+    return { to: to, status: 'sent', error: '' };
+  } catch (err) {
+    return { to: to, status: 'failed', error: String(err && err.message || err).slice(0, 300) };
+  }
+}
 
-  // A registered Buyer account (the actual end buyer, not a wholesaler/
-  // rep) auto-grants per BUYER_ADDRESS_AUTO_DISCLOSE_MODE (see
-  // buyerAddressAutoGrantAllowed) -- separate from and in addition to the
-  // site-wide "all_on_request" setting below, which covers everyone else.
-  // Admin still gets notified either way, with whatever Buyer Leads
-  // history overlaps this person (see buyerLeadContextEmailBlock) --
-  // auto-granting doesn't mean admin doesn't get told it happened.
+function logAddressRequest(session, rep, deal, source, outcome, mail) {
+  try {
+    appendRowByHeaders(getSheet(ADDRESS_LOG_SHEET, ADDRESS_LOG_COLUMNS), {
+      'LogID': Utilities.getUuid(), 'At': new Date().toISOString(), 'Username': session.u,
+      'Name': session.n || '', 'Role': session.a ? 'Admin' : ((rep && rep['PersonType']) || 'Rep'),
+      'DealID': deal['DealID'], 'DealCode': deal['DealCode'] || '', 'Source': source, 'Outcome': outcome,
+      'EmailTo': mail ? mail.to : '', 'EmailStatus': mail ? mail.status : '', 'EmailError': mail ? mail.error : ''
+    });
+  } catch (err) { /* logging must never break the request */ }
+}
+
+// Shared by requestAddressAccess (deal detail) and publicRequestAddressAccess
+// (public page button). Grants first, then emails admin, then logs both.
+function processAddressRequest(body, session, deal, source) {
   const rep = findRepByUsername(session.u);
   const isRegisteredBuyer = rep && rep['PersonType'] === 'Buyer';
-  const autoGrant = buyerAddressAutoGrantAllowed(rep) || adminGetAutoDiscloseAddressSettings({}).mode === 'all_on_request';
+  const dealLabel = (deal['DealCode'] || deal['DealID']) + ' (' + [deal['City'], deal['State']].filter(Boolean).join(', ') + ')';
+  const fromPublic = source === 'public_page_button';
+  // body.claim: the public page's "Request the Address" button auto-grants to
+  // any logged-in account.
+  const autoGrant = (fromPublic && body.claim === true) || buyerAddressAutoGrantAllowed(rep) || adminGetAutoDiscloseAddressSettings({}).mode === 'all_on_request';
 
   if (autoGrant) {
     adminGrantAddressAccess({ dealId: body.dealId, username: session.u });
-    const supportEmail = getSupportEmail();
-    if (supportEmail) {
-      MailApp.sendEmail({
-        to: supportEmail,
-        subject: 'SendMyBuyer — address auto-granted for ' + (deal['DealCode'] || deal['DealID']),
-        body: (session.n || session.u) + (isRegisteredBuyer ? ' (a registered Buyer account)' : '') +
-          ' was just auto-granted the full address for ' + (deal['DealCode'] || deal['DealID']) +
-          ' (' + [deal['City'], deal['State']].filter(Boolean).join(', ') + ').' +
-          buyerLeadContextEmailBlock(session)
-      });
-    }
-    return { ok: true, autoGranted: true };
+    const mail = sendAddressAdminEmail(
+      'SendMyBuyer -- address auto-granted' + (fromPublic ? ' from the public deal page' : '') + ' for ' + (deal['DealCode'] || deal['DealID']),
+      (session.n || session.u) + (isRegisteredBuyer ? ' (a registered Buyer account)' : '') + ' was just auto-granted the full address for ' + dealLabel +
+        (fromPublic ? ' from the public deal page.' : '.') + buyerLeadContextEmailBlock(session));
+    logAddressRequest(session, rep, deal, source, 'auto_granted', mail);
+    return { ok: true, autoGranted: true, emailStatus: mail.status };
   }
 
-  const supportEmail = getSupportEmail();
-  if (!supportEmail) return { ok: false, error: 'No support contact is set up yet — ask admin to set the "Need Help After Signing Up?" contact email in the Team tab.' };
-
-  MailApp.sendEmail({
-    to: supportEmail,
-    subject: 'SendMyBuyer — address requested for ' + (deal['DealCode'] || deal['DealID']),
-    body: (session.n || session.u) + ' is requesting the full address for ' + (deal['DealCode'] || deal['DealID']) +
-      ' (' + [deal['City'], deal['State']].filter(Boolean).join(', ') + ').\n\n' +
+  const mail = sendAddressAdminEmail(
+    'SendMyBuyer -- address requested' + (fromPublic ? ' from the public deal page' : '') + ' for ' + (deal['DealCode'] || deal['DealID']),
+    (session.n || session.u) + ' (' + session.u + ') is requesting the full address for ' + dealLabel + '.\n\n' +
       (body.note ? 'Note from rep: ' + body.note + '\n\n' : '') +
-      'Grant or deny from that deal\'s Address Access section in the admin panel.' +
-      buyerLeadContextEmailBlock(session)
-  });
+      'Grant or deny from that deal\'s Address Access section in the admin panel.' + buyerLeadContextEmailBlock(session));
+  logAddressRequest(session, rep, deal, source, mail.status === 'sent' ? 'request_emailed' : 'request_failed', mail);
+  if (mail.status === 'no_recipient') return { ok: false, error: 'No support contact is set up yet -- ask admin to set the "Need Help After Signing Up?" contact email in the Team tab.' };
+  if (mail.status === 'failed') return { ok: false, error: 'Your request could not be emailed to admin right now. Please try again shortly.' };
   return { ok: true };
 }
 
-// Same idea as requestAddressAccess, deliberately WITHOUT its
-// canAccessDeal gate -- this is reached from a public deal page's "Request
-// the Address" button (see requestAddressButtonHtml), so the person asking
-// very likely has no standing access to this specific deal yet (that's the
-// whole point: a wholesaler with an interested buyer, or a direct buyer,
-// who found this one listing and just signed up). Still requires being
-// logged in (withSession) -- an account is the minimum bar, but which
-// deals that account can already see is irrelevant here.
+function requestAddressAccess(body, session) {
+  if (!body.dealId) return { ok: false, error: 'Missing dealId.' };
+  if (!canAccessDeal(session, body.dealId)) return { ok: false, error: 'You do not have access to this deal.' };
+  const deal = sheetToObjects(getSheet(DEALS_SHEET, DEAL_COLUMNS)).find(function (d) { return d['DealID'] === body.dealId; });
+  if (!deal) return { ok: false, error: 'Deal not found.' };
+  return processAddressRequest(body, session, deal, 'deal_detail_button');
+}
+
+// Same as requestAddressAccess but WITHOUT the canAccessDeal gate -- reached
+// from a public deal page's "Request the Address" button, where the person
+// very likely has no standing access to this deal yet. Still requires login.
 function publicRequestAddressAccess(body, session) {
   if (!body.dealId) return { ok: false, error: 'Missing dealId.' };
   const deal = sheetToObjects(getSheet(DEALS_SHEET, DEAL_COLUMNS)).find(function (d) { return d['DealID'] === body.dealId; });
   if (!deal) return { ok: false, error: 'Deal not found.' };
+  return processAddressRequest(body, session, deal, 'public_page_button');
+}
 
-  // Same registered-Buyer auto-grant as requestAddressAccess above -- see
-  // its comment. A wholesaler/realtor/other account requesting from a
-  // public page still only auto-grants if the site-wide "all_on_request"
-  // setting is on.
-  const rep = findRepByUsername(session.u);
-  const isRegisteredBuyer = rep && rep['PersonType'] === 'Buyer';
-  // body.claim: the public page's "Request the Address" button auto-grants
-  // to any logged-in account (admin gets the notification email below).
-  const autoGrant = body.claim === true || buyerAddressAutoGrantAllowed(rep) || adminGetAutoDiscloseAddressSettings({}).mode === 'all_on_request';
+// Admin: every logged address request/auto-grant alongside the AddressGrants
+// sheet, so grants can be checked against emails. Grants with no log row were
+// made before logging existed or manually by admin.
+function adminGetAddressRequestHistory(body) {
+  const log = sheetToObjects(getSheet(ADDRESS_LOG_SHEET, ADDRESS_LOG_COLUMNS));
+  const grants = sheetToObjects(getSheet(ADDRESS_GRANTS_SHEET, ADDRESS_GRANT_COLUMNS));
+  const deals = {};
+  sheetToObjects(getSheet(DEALS_SHEET, DEAL_COLUMNS)).forEach(function (d) { deals[d['DealID']] = d; });
+  const reps = {};
+  sheetToObjects(getSheet(REPS_SHEET, REP_COLUMNS)).forEach(function (r) { reps[String(r['Username'] || '').toLowerCase()] = r; });
 
-  if (autoGrant) {
-    adminGrantAddressAccess({ dealId: body.dealId, username: session.u });
-    const supportEmail = getSupportEmail();
-    if (supportEmail) {
-      MailApp.sendEmail({
-        to: supportEmail,
-        subject: 'SendMyBuyer -- address auto-granted from the public deal page (' + (deal['DealCode'] || deal['DealID']) + ')',
-        body: (session.n || session.u) + (isRegisteredBuyer ? ' (a registered Buyer account)' : '') +
-          ' was just auto-granted the full address for ' + (deal['DealCode'] || deal['DealID']) +
-          ' (' + [deal['City'], deal['State']].filter(Boolean).join(', ') + ') after logging in from the public deal page.' +
-          buyerLeadContextEmailBlock(session)
-      });
+  const loggedGrantKeys = {};
+  log.forEach(function (l) { if (l['Outcome'] === 'auto_granted') loggedGrantKeys[l['DealID'] + '::' + String(l['Username']).toLowerCase()] = true; });
+  const grantKeys = {};
+  grants.forEach(function (g) { grantKeys[g['DealID'] + '::' + String(g['Username']).toLowerCase()] = true; });
+
+  const rows = log.map(function (l) {
+    const key = l['DealID'] + '::' + String(l['Username']).toLowerCase();
+    return {
+      at: l['At'], username: l['Username'], name: l['Name'], role: l['Role'], dealCode: l['DealCode'], source: l['Source'],
+      outcome: l['Outcome'], emailStatus: l['EmailStatus'], emailError: l['EmailError'],
+      grantRowPresent: !!grantKeys[key]
+    };
+  }).sort(function (a, b) { return String(b.at).localeCompare(String(a.at)); }).slice(0, 300);
+
+  const grantsWithoutLog = grants.filter(function (g) { return !loggedGrantKeys[g['DealID'] + '::' + String(g['Username']).toLowerCase()]; })
+    .map(function (g) {
+      const r = reps[String(g['Username']).toLowerCase()];
+      const d = deals[g['DealID']];
+      return { grantedAt: g['GrantedAt'], username: g['Username'], name: r ? r['Name'] : '', dealCode: d ? d['DealCode'] : g['DealID'] };
+    }).sort(function (a, b) { return String(b.grantedAt).localeCompare(String(a.grantedAt)); });
+
+  const autoRows = log.filter(function (l) { return l['Outcome'] === 'auto_granted'; });
+  let quota = null;
+  try { quota = MailApp.getRemainingDailyQuota(); } catch (e) {}
+  return {
+    ok: true, rows: rows, grantsWithoutLog: grantsWithoutLog,
+    summary: {
+      totalLogged: log.length, autoGranted: autoRows.length,
+      emailsSent: log.filter(function (l) { return l['EmailStatus'] === 'sent'; }).length,
+      emailsFailed: log.filter(function (l) { return l['EmailStatus'] === 'failed' || l['EmailStatus'] === 'no_recipient'; }).length,
+      autoGrantsMissingGrantRow: autoRows.filter(function (l) { return !grantKeys[l['DealID'] + '::' + String(l['Username']).toLowerCase()]; }).length,
+      totalGrantRows: grants.length, grantsWithoutLogCount: grantsWithoutLog.length, remainingEmailQuota: quota
     }
-    return { ok: true, autoGranted: true };
-  }
-
-  const supportEmail = getSupportEmail();
-  if (!supportEmail) return { ok: false, error: 'No support contact is set up yet -- ask admin to set the "Need Help After Signing Up?" contact email in the Team tab.' };
-  MailApp.sendEmail({
-    to: supportEmail,
-    subject: 'SendMyBuyer -- address requested from the public deal page (' + (deal['DealCode'] || deal['DealID']) + ')',
-    body: (session.n || session.u) + ' (' + session.u + ') just logged in from the public deal page and is requesting the full address for ' +
-      (deal['DealCode'] || deal['DealID']) + ' (' + [deal['City'], deal['State']].filter(Boolean).join(', ') + ').\n\n' +
-      'They may not have standing access to this specific deal yet -- grant or deny from that deal\'s Address Access section, assigning them to it first if appropriate.' +
-      buyerLeadContextEmailBlock(session)
-  });
-  return { ok: true };
+  };
 }
 
 // Used by the public deal page: tells a logged-in visitor whether they hold
