@@ -1346,7 +1346,7 @@ async function openRepDealDetail(dealId) {
     '<div id="selfmatch-result" class="small-muted"></div>' +
 
     '<div class="section-title">Match My Buyer Leads To This Deal</div>' +
-    '<p class="small-muted">Auto-matches buyer leads you can see (your own uploads, plus anything shared by the team) to this deal by state/city/asset category — same matching admin uses — and gives them to yourself, so they show up on your Buyer Leads tab to start calling.</p>' +
+    '<p class="small-muted">Matches the buyers you\'ve uploaded (build your list with the High-Intent Buyer Sourcing SOP at the top of the page) to this deal by state/city/asset category, and gives them to yourself so they show up on your Buyer Leads tab to start calling.</p>' +
     (visibleCities.length > 0
       ? '<p class="small-muted"><strong>Or pick specific cities to cold call instead</strong> — overrides the state/city/asset category matching above entirely, pulling from exactly the city(s) you check below (grouped by state). Leave nothing checked to use the normal matching instead.</p>' +
         '<div id="give-myself-cities" class="deal-checkbox-list" style="margin-bottom:10px;"></div>'
@@ -1376,7 +1376,7 @@ async function openRepDealDetail(dealId) {
     '<div id="buyer-list">' + renderBuyerMatchList(buyers) + '</div>' +
 
     '<div class="section-title">Optional &middot; Facebook Post (Not The Main Way We Work Deals)</div>' +
-    '<p class="small-muted">Calling buyers directly from the lead list above gets far more control than a public post, so please lead with that instead of this. Once a post is approved and shared to a bunch of groups, there\'s no way to pull it back or delete it if something turns out wrong (a bad price, the deal falling through, a typo) — so this is a secondary option for now, and every post still needs admin approval before it goes out. Want to cold email buyers instead? Talk to admin first — there\'s a specific approach we use so those emails don\'t land in spam.</p>' +
+    '<p class="small-muted">Calling buyers directly from your own buyer list gets far more control than a public post, so please lead with that instead of this. Once a post is approved and shared to a bunch of groups, there\'s no way to pull it back or delete it if something turns out wrong (a bad price, the deal falling through, a typo) — so this is a secondary option for now, and every post still needs admin approval before it goes out. Want to cold email buyers instead? Talk to admin first — there\'s a specific approach we use so those emails don\'t land in spam.</p>' +
     '<label class="field-label">Post text</label>' +
     '<textarea id="fb-post-text"></textarea>' +
     '<label class="field-label">Groups you intend to post it to</label>' +
