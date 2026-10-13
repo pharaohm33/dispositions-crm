@@ -600,17 +600,27 @@ backend (see [SETUP.md](SETUP.md)).
   remembers whether a rep left it open (per browser), and it's hidden for
   **Buyer** signups the same way the build-your-own-list card is.
 - **Buyer Leads** — a collapsible **"How to Build a Buyer List"** guide sits
-  above the importer for anyone new to this: find cash buyers on Propwire
-  (Cash Buyers filter, plus Fix &amp; Flip or switch Property Type to Land
-  depending on the deal, with Portfolio Value set to roughly 3x–20x the
-  subject property's price, aiming for a master list of 500+ if the filters
-  return that many), **split the export into batches of 100** (copy 100
-  rows at a time into new CSVs until a 500+ list becomes 5+ separate files
-  — work one deal's worth, 100 buyers, at a time rather than the whole
-  thing at once), skip-trace each batch of 100 (free/manual at
-  truepeoplesearch.com, a VA, Propwire's own paid skip trace, or a
-  third-party vendor — **quickly**, since skip tracing itself doesn't make
-  money, only calling buyers does), then come back and import the
+  above the importer for anyone new to this: find the exact property on
+  Google Maps, enter its zip on Propwire (the fastest way), zoom the map in as
+  close to the subject property as possible, and pick nearby cash buyers
+  (look for the **Cash Buyer** tag) with More Filters — Property Type
+  Single-Family Homes (or Land), Cash Buyer Yes, Years of Ownership 0–2,
+  Properties Owned by Owner >= 2, and Owner's Portfolio Value at least
+  **2–3x the deal's price** (a small price calculator shows the number to
+  enter). Then grab **10–40 buyer leads at a time**, paste each batch into
+  Google AI Mode with the prompt "use truepeoplesearch.com to skip trace
+  phone numbers of potential cash buyers and use opencorporates.com to find
+  the owners of the LLC's and then skip trace with truepeoplesearch for a
+  total list" (has a **Copy** button) — **quickly**, since skip tracing
+  itself doesn't make money, only calling buyers does. A collapsible
+  **Sniper approach** dropdown covers the older manual Zillow/Redfin method
+  for finding the ~10 nearest cash buyers (a supplement to Propwire, not a
+  replacement) (the 50+ target still applies there). A KPI callout at the top of
+  the guide applies to **both** methods: **contact 50+ cash buyers in the
+  same zip code and follow up with every one until each buyer says yes,
+  negotiates, or says no** (with the reason). A buyer who says they're
+  **not currently buying doesn't count** toward the 50 — replace them with
+  another buyer in the zip. Then come back and import the
   resulting CSV below. Closes with a volume target: **reach out to 50+
   buyers a day** to actually get a deal sold. It's a written walkthrough,
   not a live integration — Propwire and skip-trace steps happen on those

@@ -1732,6 +1732,32 @@ function switchRepTab(tab) {
   });
 })();
 
+/* Copy buttons on the "How to Build a Buyer List" guides (rep card + Buyer Leads tab) */
+Array.from(document.querySelectorAll(".bl-copy-btn")).forEach(function (btn) {
+  btn.addEventListener("click", async function () {
+    const target = document.getElementById(btn.getAttribute("data-copy-target"));
+    if (!target) return;
+    try {
+      await navigator.clipboard.writeText(target.textContent);
+      showToast("Prompt copied.");
+    } catch (e) {
+      showToast("Couldn't copy automatically -- select the text and copy it.", true);
+    }
+  });
+});
+
+/* "Your deal's price" calculator in the buyer-list guides: shows the 2x-3x Owner's Portfolio Value to filter on in Propwire */
+Array.from(document.querySelectorAll(".bl-price-input")).forEach(function (input) {
+  const out = document.getElementById(input.getAttribute("data-out"));
+  const fmt = function (n) { return "$" + Math.round(n).toLocaleString("en-US"); };
+  input.addEventListener("input", function () {
+    const price = Number(String(input.value).replace(/[^0-9.]/g, ""));
+    if (!out) return;
+    if (!price) { out.textContent = "Enter the price to see the Portfolio Value to filter on."; return; }
+    out.innerHTML = "In Propwire set <strong>Owner's Portfolio Value &gt;= " + fmt(price * 2) + "</strong> (2x) &mdash; or " + fmt(price * 3) + " (3x) for a stronger buyer pool.";
+  });
+});
+
 const LEAD_STATUS_PRIORITY = ["Follow-Up Due", "Follow-Up In Progress", "Awaiting Response", "Not Contacted", "Responded", "Fully Worked"];
 let myPitchesCurrentPage = 1;
 function myPitchesPageSize() {
