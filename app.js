@@ -1697,7 +1697,7 @@ function switchRepTab(tab) {
   });
   document.getElementById("rep-tab-deals").hidden = tab !== "deals";
   document.getElementById("rep-tab-buyerleads").hidden = tab !== "buyerleads";
-  if (tab === "buyerleads") loadMyPitches();
+  if (tab === "buyerleads") { loadMyPitches(); refreshRepDealsForBuyerList(); }
 }
 
 /* Copy buttons on the "How to Build a Buyer List" guides (rep card + Buyer Leads tab) */
@@ -2846,12 +2846,28 @@ function renderMyBuyerListDealSelect() {
   const select = document.getElementById("rep-mybuyerlist-give-deal-select");
   if (!select) return;
   const current = select.value;
+  // Active deals only (not Dead/Sold) -- the backend refuses to give leads to a
+  // closed deal anyway, so offering one here just sets up a dead-end error.
+  const activeRepDeals = repDeals.filter(function (d) { return d.Status !== "Dead" && d.Status !== "Sold"; });
   select.innerHTML = '<option value="">Select a deal…</option>' +
-    repDeals.map(function (d) {
+    activeRepDeals.map(function (d) {
       const label = (d.DealCode ? d.DealCode + " — " : "") + [d.City, d.State].filter(Boolean).join(", ") + (d.AssetType ? " (" + d.AssetType + ")" : "");
       return '<option value="' + esc(d.DealID) + '">' + esc(label) + '</option>';
     }).join("");
-  if (repDeals.some(function (d) { return d.DealID === current; })) select.value = current;
+  if (activeRepDeals.some(function (d) { return d.DealID === current; })) select.value = current;
+}
+
+// Re-pulls the deal list when a rep opens the Buyer Leads tab so the "give to
+// a deal" dropdown drops deals that went Dead/Sold (and picks up brand-new
+// ones) since the page loaded. Throttled -- each Apps Script call is slow.
+let repDealsRefreshedAt = 0;
+async function refreshRepDealsForBuyerList() {
+  if (Date.now() - repDealsRefreshedAt < 30000) return;
+  repDealsRefreshedAt = Date.now();
+  const res = await api("getDeals", {});
+  if (!res.ok) return;
+  repDeals = res.deals;
+  renderMyBuyerListDealSelect();
 }
 
 document.getElementById("rep-mybuyerlist-give-btn").addEventListener("click", async function () {
@@ -4579,6 +4595,15 @@ function renderMassEditCategories() {
   }).join("");
 }
 
+// Just re-pulls the active-deal list (no select re-render, so it can't reset
+// anything admin has already picked on the page) -- used when the buyer detail
+// panel opens so its "give to a deal" list never offers a deal that has since
+// gone Dead/Sold.
+async function refreshBuyerLeadsActiveDeals() {
+  const res = await api("getDeals", {});
+  if (res.ok) buyerLeadsActiveDeals = res.deals.filter(function (d) { return d.Status !== "Sold" && d.Status !== "Dead"; });
+}
+
 async function populateBulkGiveSelects() {
   const [repsRes, dealsRes] = await Promise.all([api("adminGetReps", {}), api("getDeals", {})]);
   if (repsRes.ok) {
@@ -5873,7 +5898,7 @@ async function openAdminBuyerLeadDetail(buyerLeadId) {
   const [pitchesRes, contactLogRes] = await Promise.all([
     api("adminGetPitchesForBuyerLead", { buyerLeadId: buyerLeadId }),
     api("adminGetBuyerLeadContactLog", { buyerLeadId: buyerLeadId }),
-    needsSelects ? populateBulkGiveSelects() : Promise.resolve()
+    needsSelects ? populateBulkGiveSelects() : refreshBuyerLeadsActiveDeals()
   ]);
   const pitches = pitchesRes.ok ? pitchesRes.pitches : [];
   const contactLog = contactLogRes.ok ? contactLogRes.contacts : [];

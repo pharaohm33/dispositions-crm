@@ -4711,6 +4711,11 @@ function adminGiveSelectedBuyerLeads(body) {
   body.buyerLeadIds.forEach(function (id) { wanted[id] = true; });
 
   return withLock(function () {
+    const dealsSheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+    const deal = sheetToObjects(dealsSheet).find(function (d) { return d['DealID'] === body.dealId; });
+    if (!deal) return { ok: false, error: 'Deal not found.' };
+    if (!dealIsActive(deal)) return { ok: false, error: 'This deal is no longer active.' };
+
     const pitchesSheet = getSheet(PITCHES_SHEET, PITCH_COLUMNS);
     const existingPitches = sheetToObjects(pitchesSheet);
     const alreadyPitchedByThisRepForThisDeal = {};
