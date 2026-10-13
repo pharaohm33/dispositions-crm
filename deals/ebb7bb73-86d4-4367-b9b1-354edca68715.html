@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NC-5 | Mount Airy, NC — Two-Property Portfolio Assignment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e9;
+    --ink:#241f1a;
+    --rule:#ddd3c2;
+    --accent:#8a5a35;
+    --card:#fffdf9;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    line-height:1.55;
+  }
+  h1,h2,h3,h4{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    margin:0;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding-left:24px;
+    padding-right:24px;
+  }
+  a{color:var(--accent);}
+
+  /* top bar */
+  .topbar{
+    border-bottom:1px solid var(--rule);
+    padding-top:18px;
+    padding-bottom:18px;
+  }
+  .topbar .wrap{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .brand{
+    font-family:'Fraunces',serif;
+    font-size:1.15rem;
+    letter-spacing:.02em;
+  }
+  .dealcode{
+    font-family:'Inter',sans-serif;
+    font-size:.75rem;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    background:var(--ink);
+    color:var(--paper);
+    padding:5px 11px;
+    border-radius:3px;
+  }
+
+  /* hero */
+  .hero{
+    padding-top:46px;
+    padding-bottom:30px;
+  }
+  .kicker{
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:.78rem;
+    color:var(--accent);
+    font-weight:600;
+    margin-bottom:14px;
+  }
+  .hero h1{
+    font-size:2.5rem;
+    line-height:1.12;
+    max-width:760px;
+  }
+  .hero .loc{
+    margin-top:14px;
+    font-size:1.05rem;
+    color:#4b443b;
+  }
+  .addr-note{
+    margin-top:10px;
+    font-size:.92rem;
+    font-style:italic;
+    color:var(--accent);
+    background:#fbeede;
+    display:inline-block;
+    padding:8px 14px;
+    border-radius:4px;
+    border:1px solid #e9d3b4;
+  }
+  .assignment-flag{
+    margin-top:18px;
+    font-size:.88rem;
+    color:#5a5248;
+    max-width:720px;
+  }
+
+  /* price block */
+  .priceblock{
+    padding-top:14px;
+    padding-bottom:30px;
+  }
+  .pricegrid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:1px;
+    background:var(--rule);
+    border:1px solid var(--rule);
+  }
+  .pricecell{
+    background:var(--card);
+    padding:22px 18px;
+  }
+  .pricecell .label{
+    font-size:.74rem;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:#8a8072;
+  }
+  .pricecell .value{
+    font-family:'Fraunces',serif;
+    font-size:1.65rem;
+    margin-top:6px;
+  }
+  .pricecell.highlight .value{color:var(--accent);}
+
+  /* gallery */
+  .gallery-section{padding-top:10px;padding-bottom:36px;}
+  .gallery-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .gallery-head h2{font-size:1.3rem;}
+  .more-photos{font-size:.88rem;}
+  .gallery{
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    padding-bottom:10px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .gallery img{
+    height:260px;
+    width:auto;
+    flex:0 0 auto;
+    border-radius:4px;
+    object-fit:cover;
+    border:1px solid var(--rule);
+  }
+
+  /* section generic */
+  section.block{
+    padding-top:34px;
+    padding-bottom:34px;
+    border-top:1px solid var(--rule);
+  }
+  section.block h2{
+    font-size:1.5rem;
+    margin-bottom:16px;
+  }
+  section.block p{margin-top:0;margin-bottom:12px;}
+
+  /* property cards */
+  .proplist{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+  }
+  @media (max-width:760px){
+    .proplist{grid-template-columns:1fr;}
+    .pricegrid{grid-template-columns:repeat(2,1fr);}
+  }
+  .propcard{
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:6px;
+    padding:20px;
+  }
+  .propcard h3{font-size:1.2rem;margin-bottom:4px;}
+  .propcard .sub{
+    font-size:.82rem;
+    color:#8a8072;
+    margin-bottom:14px;
+  }
+  .speclist{
+    list-style:none;
+    padding:0;
+    margin:0 0 14px 0;
+    font-size:.92rem;
+  }
+  .speclist li{
+    display:flex;
+    justify-content:space-between;
+    padding:5px 0;
+    border-bottom:1px dashed var(--rule);
+  }
+  .speclist li span:first-child{color:#6f675c;}
+  .arvbox{
+    background:#f2ebdf;
+    border-radius:4px;
+    padding:12px 14px;
+    font-size:.9rem;
+    margin-bottom:14px;
+  }
+  .arvbox .arvtitle{
+    font-weight:600;
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--accent);
+    margin-bottom:6px;
+  }
+  table.comps{
+    width:100%;
+    border-collapse:collapse;
+    font-size:.82rem;
+  }
+  table.comps th, table.comps td{
+    text-align:left;
+    padding:6px 4px;
+    border-bottom:1px solid var(--rule);
+    vertical-align:top;
+  }
+  table.comps th{
+    font-size:.7rem;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:#8a8072;
+  }
+  .compavg{
+    font-size:.82rem;
+    margin-top:8px;
+    color:#4b443b;
+  }
+
+  /* numbers table */
+  table.terms{
+    width:100%;
+    border-collapse:collapse;
+  }
+  table.terms td{
+    padding:10px 8px;
+    border-bottom:1px solid var(--rule);
+    font-size:.95rem;
+  }
+  table.terms td:first-child{
+    color:#6f675c;
+    width:45%;
+  }
+  table.terms td:last-child{
+    font-weight:600;
+  }
+
+  .exitlist{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  @media (max-width:760px){ .exitlist{grid-template-columns:1fr;} }
+  .exititem{
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:6px;
+    padding:16px 18px;
+  }
+  .exititem h4{font-size:1rem;margin-bottom:6px;color:var(--accent);}
+  .exititem p{font-size:.9rem;margin:0;}
+
+  .notice{
+    font-size:.84rem;
+    color:#6f675c;
+    background:#f2ebdf;
+    border-radius:4px;
+    padding:14px 16px;
+    margin-top:10px;
+  }
+
+  /* CTA band */
+  .cta{
+    background:var(--ink);
+    color:var(--paper);
+    padding-top:48px;
+    padding-bottom:48px;
+    margin-top:10px;
+  }
+  .cta h2{
+    font-size:2rem;
+    color:var(--paper);
+    margin-bottom:10px;
+  }
+  .cta p{
+    color:#d8d0c3;
+    max-width:600px;
+    margin-bottom:22px;
+  }
+  .cta-links{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+  }
+  .cta-links a{
+    display:inline-block;
+    background:var(--paper);
+    color:var(--ink);
+    text-decoration:none;
+    padding:12px 22px;
+    border-radius:4px;
+    font-weight:600;
+    font-size:.95rem;
+  }
+  .cta-links a.secondary{
+    background:transparent;
+    color:var(--paper);
+    border:1px solid #74695a;
+  }
+  footer{
+    padding-top:20px;
+    padding-bottom:30px;
+    font-size:.78rem;
+    color:#8a8072;
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=ebb7bb73-86d4-4367-b9b1-354edca68715&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2Febb7bb73-86d4-4367-b9b1-354edca68715.html">Request the Address</a></div></noscript>
+
+  <div class="topbar">
+    <div class="wrap">
+      <div class="brand">JNA Dynamic Holdings LLC</div>
+      <div class="dealcode">Deal NC-5</div>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="wrap">
+      <div class="kicker">Fix &amp; Flip / Buy &amp; Hold — Two-Property Portfolio</div>
+      <h1>Mount Airy, NC Two-Property Package — One Price, One Assignment</h1>
+      <div class="loc">Mount Airy, Surry County, NC 27030 — both properties located on the same street</div>
+      <div class="addr-note">Individual property addresses available upon request; contact us for the full address list.</div>
+      <div class="assignment-flag">This offering is an assignment of contract. JNA Dynamic Holdings LLC holds an equitable interest under contract with the property owner and is marketing that contract position — this is not a direct sale by the underlying seller, and buyers will not be contacting the owner directly.</div>
+    </div>
+  </div>
+
+  <div class="priceblock">
+    <div class="wrap">
+      <div class="pricegrid">
+        <div class="pricecell highlight">
+          <div class="label">Package Price</div>
+          <div class="value">$170,000</div>
+        </div>
+        <div class="pricecell">
+          <div class="label">Combined ARV</div>
+          <div class="value">$680,000</div>
+        </div>
+        <div class="pricecell">
+          <div class="label">Rehab Estimate</div>
+          <div class="value">$85,000</div>
+        </div>
+        <div class="pricecell">
+          <div class="label">EMD (Non-Refundable)</div>
+          <div class="value">$5,000</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gallery-section">
+    <div class="wrap">
+      <div class="gallery-head">
+        <h2>Photos</h2>
+        <a class="more-photos" href="https://drive.google.com/drive/folders/1TNzdfi7YJa_NvfM-ciNg9h4ZJ9NEmHiN?usp=sharing" target="_blank" rel="noopener">View full photo set</a>
+      </div>
+      <div class="gallery">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/1.jpg" alt="Mount Airy NC portfolio property photo 1">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/2.jpg" alt="Mount Airy NC portfolio property photo 2">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/3.jpg" alt="Mount Airy NC portfolio property photo 3">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/4.jpg" alt="Mount Airy NC portfolio property photo 4">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/5.jpg" alt="Mount Airy NC portfolio property photo 5">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/6.jpg" alt="Mount Airy NC portfolio property photo 6">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/7.jpg" alt="Mount Airy NC portfolio property photo 7">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/8.jpg" alt="Mount Airy NC portfolio property photo 8">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/9.jpg" alt="Mount Airy NC portfolio property photo 9">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/10.jpg" alt="Mount Airy NC portfolio property photo 10">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/11.jpg" alt="Mount Airy NC portfolio property photo 11">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/12.jpg" alt="Mount Airy NC portfolio property photo 12">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/13.jpg" alt="Mount Airy NC portfolio property photo 13">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/14.jpg" alt="Mount Airy NC portfolio property photo 14">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/15.jpg" alt="Mount Airy NC portfolio property photo 15">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/16.jpg" alt="Mount Airy NC portfolio property photo 16">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/17.jpg" alt="Mount Airy NC portfolio property photo 17">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/18.jpg" alt="Mount Airy NC portfolio property photo 18">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/19.jpg" alt="Mount Airy NC portfolio property photo 19">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/20.jpg" alt="Mount Airy NC portfolio property photo 20">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/21.jpg" alt="Mount Airy NC portfolio property photo 21">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/22.jpg" alt="Mount Airy NC portfolio property photo 22">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/23.jpg" alt="Mount Airy NC portfolio property photo 23">
+        <img src="/deals/ebb7bb73-86d4-4367-b9b1-354edca68715/photos/24.jpg" alt="Mount Airy NC portfolio property photo 24">
+      </div>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <h2>The Deal</h2>
+      <p><strong>Two properties. One price. One assignment.</strong> JNA Dynamic Holdings LLC is offering an exclusive two-property package in Mount Airy, NC for a single wholesale price of $170,000. This is a bundled portfolio opportunity with a combined adjusted ARV ranging from $665,000 to over $716,000 — giving a seasoned investor room to flip one property, hold the other, or build toward a rental portfolio in a growing Surry County market.</p>
+      <p>Both properties sit on the same street and must be purchased together. Both are in livable condition and need full cosmetic renovation — ideal for a buy-and-hold investor, fix-and-flip operator, or small portfolio builder looking for instant equity at acquisition.</p>
+      <p><strong>Properties will not be sold separately.</strong></p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <h2>Property Breakdown</h2>
+      <div class="proplist">
+
+        <div class="propcard">
+          <h3>Property 1</h3>
+          <div class="sub">Mount Airy, NC 27030 — address available upon request</div>
+          <ul class="speclist">
+            <li><span>Beds / Baths</span><span>2 BD / 1 BA</span></li>
+            <li><span>Living Area</span><span>1,257 sq ft</span></li>
+            <li><span>Lot Size</span><span>0.26 acres</span></li>
+            <li><span>Year Built</span><span>1949</span></li>
+            <li><span>Property Type</span><span>Single Family</span></li>
+            <li><span>Condition</span><span>Full cosmetics needed</span></li>
+          </ul>
+          <div class="arvbox">
+            <div class="arvtitle">Adjusted ARV</div>
+            Low: $246,453 &nbsp;|&nbsp; Midpoint: $250,999 &nbsp;|&nbsp; High: $259,868<br>
+            Avg Price / Sq Ft: $215
+          </div>
+          <table class="comps">
+            <thead>
+              <tr><th>Comp</th><th>Specs</th><th>Sold</th><th>Price</th><th>$/Sqft</th><th>Dist.</th><th>Adj. Value</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>344 Linville Rd</td><td>3BD/1BA, 1,051 sqft (renovated)</td><td>12/04/2025</td><td>$232,000</td><td>$235</td><td>1.00 mi</td><td>$246,677</td></tr>
+              <tr><td>313 Hunter Dr</td><td>3BD/2BA, 1,267 sqft (renovated)</td><td>06/11/2026</td><td>$260,000</td><td>$195</td><td>1.08 mi</td><td>$246,453</td></tr>
+              <tr><td>2136 Elizabeth Dr</td><td>3BD/2BA, 1,350 sqft</td><td>07/01/2026</td><td>$295,000</td><td>$192</td><td>1.46 mi</td><td>$259,868</td></tr>
+            </tbody>
+          </table>
+          <div class="compavg">Comp averages: $262,333 raw | $250,999 adjusted | $207/sqft avg</div>
+        </div>
+
+        <div class="propcard">
+          <h3>Property 2</h3>
+          <div class="sub">Mount Airy, NC 27030 — address available upon request</div>
+          <ul class="speclist">
+            <li><span>Beds / Baths</span><span>4 BD / 2.5 BA</span></li>
+            <li><span>Living Area</span><span>2,632 sq ft</span></li>
+            <li><span>Lot Size</span><span>0.44 acres</span></li>
+            <li><span>Year Built</span><span>1949</span></li>
+            <li><span>Property Type</span><span>Single Family</span></li>
+            <li><span>Condition</span><span>Full cosmetics needed</span></li>
+          </ul>
+          <div class="arvbox">
+            <div class="arvtitle">Adjusted ARV</div>
+            Low: $415,305 &nbsp;|&nbsp; Midpoint: $430,315 &nbsp;|&nbsp; High: $457,002<br>
+            Avg Price / Sq Ft: $181
+          </div>
+          <table class="comps">
+            <thead>
+              <tr><th>Comp</th><th>Specs</th><th>Sold</th><th>Price</th><th>$/Sqft</th><th>Dist.</th><th>Adj. Value</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>221 Wrenn Ave</td><td>3BD/2.5BA, 2,490 sqft (renovated)</td><td>06/01/2026</td><td>$449,000</td><td>$184</td><td>0.62 mi</td><td>$457,002</td></tr>
+              <tr><td>329 Laurel St</td><td>3BD/2BA, 2,205 sqft</td><td>07/01/2026</td><td>$400,000</td><td>$188</td><td>0.41 mi</td><td>$415,305</td></tr>
+              <tr><td>2057 Cynthia Dr</td><td>4BD/4BA, 2,244 sqft</td><td>06/05/2026</td><td>$405,000</td><td>$187</td><td>1.24 mi</td><td>$418,639</td></tr>
+            </tbody>
+          </table>
+          <div class="compavg">Comp averages: $418,000 raw | $430,315 adjusted | $186/sqft avg</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <h2>The Numbers</h2>
+      <table class="terms">
+        <tr><td>Package Asking Price</td><td>$170,000</td></tr>
+        <tr><td>Property 1 Adjusted ARV (Midpoint)</td><td>$250,999</td></tr>
+        <tr><td>Property 2 Adjusted ARV (Midpoint)</td><td>$430,315</td></tr>
+        <tr><td>Combined Adjusted ARV</td><td>$681,314</td></tr>
+        <tr><td>Combined ARV Range</td><td>$665,000 – $716,000+</td></tr>
+        <tr><td>Approx. Entry vs. Combined ARV</td><td>~25 cents on the dollar</td></tr>
+      </table>
+      <p class="notice">Acquiring both properties at $170,000 represents approximately 25 cents on the dollar against combined ARV — an exceptional entry point for the right buyer.</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <h2>Exit Strategies</h2>
+      <div class="exitlist">
+        <div class="exititem">
+          <h4>Fix &amp; Flip (Both)</h4>
+          <p>Renovate and sell both properties individually at or near ARV. Combined adjusted ARV of $681,000+ on a $170,000 acquisition creates substantial room for renovation budget and profit.</p>
+        </div>
+        <div class="exititem">
+          <h4>Buy &amp; Hold / Rental Portfolio</h4>
+          <p>Mount Airy's rental demand continues to grow. Two doors on one street acquired at this basis makes for a strong long-term hold with cash flow potential across both units.</p>
+        </div>
+        <div class="exititem">
+          <h4>Flip One / Hold One</h4>
+          <p>Flip the larger Property 2 to recoup acquisition and renovation capital — then hold Property 1 as a free-and-clear cash-flowing asset.</p>
+        </div>
+        <div class="exititem">
+          <h4>Land / Lot Value Play</h4>
+          <p>Combined lot size of 0.70 acres in a residential corridor. Explore subdivision or redevelopment options depending on local zoning.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <h2>Deal Terms</h2>
+      <table class="terms">
+        <tr><td>Asking Price</td><td>$170,000 (package — both properties)</td></tr>
+        <tr><td>Earnest Money Deposit</td><td>$5,000 — non-refundable, due at contract execution</td></tr>
+        <tr><td>Close of Escrow</td><td>October 30, 2026</td></tr>
+        <tr><td>Escrow Holder</td><td>Lowry Law</td></tr>
+        <tr><td>Occupancy</td><td>Currently occupied — vacant at closing</td></tr>
+        <tr><td>Access</td><td>By appointment only — call or text to schedule a walkthrough</td></tr>
+        <tr><td>Condition</td><td>Livable — full cosmetic renovation needed on both properties</td></tr>
+        <tr><td>Sale Structure</td><td>Properties will not be sold separately. No price reductions, no exceptions.</td></tr>
+      </table>
+      <p class="notice">This offering is an assignment of contract. JNA Dynamic Holdings LLC is marketing its equitable contract position with the underlying property owner; closing occurs through the assignment structure and escrow noted above. Figures above — including ARV, comps, and square footage — are derived from available records and have not been independently verified by JNA Dynamic Holdings LLC. Buyers should perform their own due diligence.</p>
+    </div>
+  </section>
+
+  <div class="cta">
+    <div class="wrap">
+      <h2>Schedule Your Walkthrough</h2>
+      <p>Two properties, one street, one price — available by appointment only. Contact JNA Dynamic Holdings LLC today to request the full address list and schedule a walkthrough before this package is gone.</p>
+      <div class="cta-links">
+        <a href="tel:520-633-6437">Call / Text 520-633-6437</a>
+        <a class="secondary" href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="wrap">
+      JNA Dynamic Holdings LLC — Deal NC-5 — Mount Airy, Surry County, NC. This is a marketing communication for an assignment of contract and is not an offer of real estate. All figures are believed accurate but not independently verified.
+    </div>
+  </footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
