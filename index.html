@@ -126,28 +126,6 @@
   }
   .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-  /* High-intent buyer sourcing SOP -- compact, collapsed-by-default bar at the very top of the rep view */
-  details.top-sop { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 12px; margin-bottom: 14px; box-shadow: 0 1px 2px rgba(30,25,15,0.04); }
-  details.top-sop[hidden] { display: none; }
-  details.top-sop > summary { list-style: none; cursor: pointer; padding: 12px 16px; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; color: var(--text); user-select: none; }
-  details.top-sop > summary::-webkit-details-marker { display: none; }
-  details.top-sop > summary::before { content: "\25B8"; color: var(--accent); font-size: 17px; line-height: 1; transition: transform 0.15s; flex: 0 0 auto; }
-  details.top-sop[open] > summary::before { transform: rotate(90deg); }
-  details.top-sop > summary:hover { background: var(--surface-muted); border-radius: 8px; }
-  details.top-sop .sop-hint { font-weight: 400; font-size: 12px; color: var(--muted); margin-left: auto; white-space: nowrap; }
-  details.top-sop[open] .sop-hint-closed { display: none; }
-  details.top-sop:not([open]) .sop-hint-open { display: none; }
-  details.top-sop .sop-body { padding: 4px 18px 18px; font-size: 13px; line-height: 1.55; }
-  details.top-sop .sop-body h4 { font-family: var(--serif); font-size: 15px; margin: 16px 0 4px; }
-  details.top-sop .sop-body p { margin: 4px 0 8px; }
-  details.top-sop .sop-body ul { margin: 4px 0 8px 20px; padding: 0; }
-  details.top-sop .sop-body li { margin: 3px 0; }
-  details.top-sop .sop-lead { background: var(--accent-light); border: 1px solid #cfe6d8; border-radius: 8px; padding: 10px 12px; color: #145039; margin: 10px 0 4px; }
-  details.top-sop .sop-prompt-wrap { position: relative; margin: 6px 0 10px; }
-  details.top-sop .sop-prompt { background: var(--surface-muted); border: 1px solid var(--border); border-radius: 8px; padding: 10px 76px 10px 12px; margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; white-space: pre-wrap; word-break: break-word; }
-  details.top-sop .sop-copy-btn { position: absolute; top: 8px; right: 8px; }
-  details.top-sop .sop-warn { background: var(--warn-light); border: 1px solid #f0d9a6; border-radius: 8px; padding: 10px 12px; color: #7a4d0a; margin: 10px 0 4px; }
-  @media (max-width: 480px) { details.top-sop .sop-hint { display: none; } }
   .bl-prompt-wrap { position: relative; margin: 6px 0 10px; }
   .bl-prompt { background: var(--surface-muted); border: 1px solid var(--border); border-radius: 8px; padding: 10px 76px 10px 12px; margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; white-space: pre-wrap; word-break: break-word; }
   .bl-copy-btn { position: absolute; top: 8px; right: 8px; }
@@ -405,135 +383,6 @@
   <div class="banner info" id="rep-loading-banner" hidden>
     Please wait for full page to load<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>
   </div>
-  <!-- High-intent buyer sourcing SOP: collapsed by default so it barely takes up space up top.
-       Shown to everyone except self-identified Buyers (see initRepView). -->
-  <details class="top-sop" id="rep-buyer-sourcing-sop" hidden>
-    <summary>
-      High-Intent Buyer Sourcing SOP
-      <span class="sop-hint"><span class="sop-hint-closed">Find buyers who are active right now &mdash; click to expand</span><span class="sop-hint-open">click to collapse</span></span>
-    </summary>
-    <div class="sop-body">
-      <div class="sop-lead">
-        <strong>The idea:</strong> the best buyer for a deal is an investor who is <strong>active right now</strong> and
-        <strong>local</strong> &mdash; someone who just sold or is selling an investment property near the deal. They have fresh
-        cash, they're in the market this month, and they're far more likely to say yes than a name pulled from a broad list.
-        This SOP builds that list in about an hour, then puts you on the phone with it.
-      </div>
-
-      <h4>Before you start</h4>
-      <p>Open the deal you're working and note its general info: <strong>City / State / Zip</strong>, <strong>price</strong> and
-        <strong>asset type</strong>.</p>
-      <ul>
-        <li><strong>If admin has granted you the deal's address,</strong> use it: it's the best way to source the buyers
-          <strong>closest to the subject property</strong> &mdash; start your listing search right around that exact address.</li>
-        <li><strong>If you haven't been given the address,</strong> hit <strong>Request Address Access</strong> on the deal (or ask admin)
-          and say you're using this SOP. Admin will disclose it as long as you're actually pulling the nearest comparable listings and sold comps to find
-          flippers, developers or retail buy-and-hold investors and <strong>you won't post the address online anywhere</strong>. Until it's granted, work from the deal's city / zip.</li>
-        <li>Either way, the address is for <strong>searching only</strong>. <strong>Never post it online anywhere</strong>. It's only ever disclosed to <strong>end buyers</strong>, and only to a buyer it has been granted for &mdash; never share it with anyone else unless it has been granted for that specific matched buyer &mdash; the address rules on the Deals tab still apply.</li>
-      </ul>
-
-      <h4>Step 1 &mdash; Pull the nearby listings</h4>
-      <ul>
-        <li>Search the deal's <strong>city / zip</strong> on <a href="https://www.zillow.com" target="_blank" rel="noopener">Zillow</a> and <a href="https://www.redfin.com" target="_blank" rel="noopener">Redfin</a>. Always start with the listings <strong>closest to the subject property</strong> (right around the exact address if you have it), then work outward.</li>
-        <li><strong>Zillow:</strong> click <strong>Filters</strong> &rarr; under <strong>Listing type</strong> tick <strong>New construction</strong> and/or <strong>Agent listed</strong>.</li>
-        <li><strong>Redfin:</strong> homes for sale listed by an agent (flippers rarely self-list), active listings only.</li>
-      </ul>
-
-      <h4>Step 2 &mdash; Spot the high-intent signal (about 10 seconds a listing)</h4>
-      <ul>
-        <li>Open a listing and press <strong>Ctrl + F</strong> (<strong>Cmd + F</strong> on Mac). Search <strong>"price history"</strong> on Zillow or <strong>"sale history"</strong> on Redfin &mdash; the page jumps straight to it.</li>
-        <li><strong>Fix &amp; flipper signal:</strong> the property <strong>sold within the past 6 months</strong> and is now <strong>listed for $40,000 or more above that sold price</strong>. That jump is a flip being sold.</li>
-        <li><strong>Developer / builder signal:</strong> a <strong>New construction</strong> listing from a small or mid-size builder. They're building and listing right now &mdash; and builders are the buyers for land and lots.</li>
-        <li>Skip listings with no recent sale and skip the huge national builders (they buy through corporate land teams). <strong>Save the address of every match</strong> in a doc or sheet and keep going.</li>
-      </ul>
-
-      <h4>Step 2b &mdash; Retail buy-and-hold investor signals (from sold comps)</h4>
-      <p>Not every active buyer is a flipper or builder. Some of the best buyers are <strong>retail buy-and-hold investors</strong> who recently paid top dollar for a rental near your deal and are still holding it. Find them from the <strong>sold comps</strong>:</p>
-      <ul>
-        <li><strong>1. Pull the sold comps nearest the subject property.</strong> On <a href="https://www.zillow.com" target="_blank" rel="noopener">Zillow</a> or <a href="https://www.redfin.com" target="_blank" rel="noopener">Redfin</a>, filter to <strong>Sold</strong> (last 6&ndash;12 months), the same property type, and work from the homes <strong>closest to the subject</strong> outward.</li>
-        <li><strong>2. Rank them by sale price.</strong> Start with the comps that sold at the <strong>highest prices</strong> &mdash; a buyer who paid top dollar in this area is a real, motivated buyer for it. Save each address.</li>
-        <li><strong>3. Keep only the ones who haven't sold yet.</strong> Search the address on <a href="https://propwire.com" target="_blank" rel="noopener">propwire.com</a>, open it, and check the sale history: if there's no later sale, the buyer still owns it. Skip anything that already resold (that's a flipper who's done, not a holder).</li>
-        <li><strong>4. Check they're an actual investor, not a one-time buyer.</strong> Still inside that property on Propwire, click the <strong>Owner</strong> tab and <strong>scroll down to the owner's portfolio</strong> (the other properties they own). <strong>2 or more properties</strong> = a real buyer worth calling. <strong>Only 1</strong> = someone who bought a single place; skip them.</li>
-        <li><strong>5. Skip trace and call.</strong> Run the owners who pass through Step 3, add them to your list, and call. They already know this market and have shown they pay up.</li>
-      </ul>
-
-      <h4>Step 3 &mdash; Skip trace the owners</h4>
-      <p>For every address you saved in Step 2, get the owner's phone and email. Start with the Propwire lookup, then pick the free or the paid skip trace.</p>
-
-      <p><strong>Step 3a &mdash; Find the owner on Propwire (every method starts here)</strong></p>
-      <ul>
-        <li>Go to <a href="https://propwire.com" target="_blank" rel="noopener">propwire.com</a> and <strong>search the property address</strong> you saved.</li>
-        <li><strong>Open the property</strong> from the search result.</li>
-        <li>Click the <strong>Owner</strong> tab. That's where the owner's full name (or the LLC / company behind it) lives, and it's where the skip trace button is.</li>
-      </ul>
-
-      <p><strong>Option A &mdash; Propwire skip trace (fast, paid)</strong></p>
-      <ul>
-        <li>On the <strong>Owner</strong> tab, press <strong>Skip Trace</strong>. At the time of writing it costs about <strong>10 cents per record</strong> (100 owners is roughly $10) &mdash; check the current price on the site before you run it.</li>
-        <li>The phone numbers and emails appear instantly. Copy them into your call list.</li>
-        <li><strong>Best for:</strong> a long list, when your time is worth more than 10 cents a record.</li>
-      </ul>
-
-      <p><strong>Option B &mdash; TruePeopleSearch (free, a little slower)</strong></p>
-      <ul>
-        <li>It takes longer because you look up one owner at a time, but it finds the same contact details. In testing it returned the same mobile number Propwire's paid skip trace found.</li>
-        <li><strong>1.</strong> Copy the owner's <strong>full name</strong> from the Propwire <strong>Owner</strong> tab, plus the <strong>city and state</strong> of the property.</li>
-        <li><strong>2.</strong> Go to <a href="https://www.truepeoplesearch.com" target="_blank" rel="noopener">truepeoplesearch.com</a>, stay on the <strong>Name</strong> tab, paste the name, add the city and state, and press search.</li>
-        <li><strong>3.</strong> Open the result that matches: <strong>same age range, same city, and a name that matches your owner</strong>. Click <strong>View Details</strong>.</li>
-        <li><strong>4.</strong> Copy the phone numbers and emails into your call list. The numbers listed first are usually the most current.</li>
-        <li><strong>Best for:</strong> when you're just starting out or only have a handful of owners to look up.</li>
-      </ul>
-
-      <p><strong>Option C &mdash; Just call the listing agent (fastest, with a cost)</strong></p>
-      <ul>
-        <li>Every Zillow / Redfin listing shows the <strong>listing agent's name and phone number</strong>. You can skip the skip trace and call the agent directly, then ask for the owner's interest in your deal.</li>
-        <li><strong>The tradeoff:</strong> if the deal comes together through the agent, the agent will expect a <strong>3% buyer-agent commission</strong>, and that comes out of our assignment fee.</li>
-        <li><strong>Speed beats saving every dollar.</strong> Use whichever method gets you on the phone with an active buyer fastest &mdash; just know that if you go the agent route, the 3% reduces what we make on the assignment.</li>
-      </ul>
-
-      <div class="sop-lead">
-        <strong>Check before you call.</strong> Whichever method you use, confirm the <strong>name, age and city</strong> match the owner before you dial, so you reach the right person. If the owner is an LLC, look up the person named on the Owner tab.
-      </div>
-
-      <details style="margin:8px 0;">
-        <summary class="small-muted" style="cursor:pointer;">Quick option: skip trace a batch with AI instead (less reliable)</summary>
-        <p style="margin-top:6px;">After every 5&ndash;10 saved addresses, paste them under this prompt into <a href="https://chat.deepseek.com" target="_blank" rel="noopener">DeepSeek</a> or Google AI Mode (try both and keep whichever gives you more complete results):</p>
-        <div class="sop-prompt-wrap">
-          <pre class="sop-prompt" id="sop-prompt-skip">Please give me a list of owners for each property in my list and skip trace the owners contact.
-
-Put it in a table with the property address, owner or company name, phone, email, mailing address and the property's price.</pre>
-          <button type="button" class="btn secondary small sop-copy-btn" data-copy-target="sop-prompt-skip">Copy</button>
-        </div>
-        <p class="small-muted">For new construction listings, add the listing photos or link and ask it to look for builder signs, logos and permit boards to identify the builder or LLC behind it. AI can guess or return old contact details &mdash; Propwire or TruePeopleSearch is more dependable.</p>
-      </details>
-
-      <h4>Step 4 &mdash; Organize your call list by price and distance</h4>
-      <p>Run a second prompt on the list it just gave you. <strong>If you've been granted the address,</strong> use this one so the list is sorted by distance to the exact subject property:</p>
-      <div class="sop-prompt-wrap">
-        <pre class="sop-prompt" id="sop-prompt-sort-address">My subject property is at [SUBJECT PROPERTY ADDRESS] and my deal is priced at [DEAL PRICE]. Take the list above and organize it by price (closest to my deal's price first) and by distance to that address (closest first), so I know who to call first to sell this deal. Add a column for the distance in miles.</pre>
-        <button type="button" class="btn secondary small sop-copy-btn" data-copy-target="sop-prompt-sort-address">Copy</button>
-      </div>
-      <p><strong>No address yet?</strong> Request it (see Before you start), and in the meantime use this version with the deal's <strong>city / state / zip</strong> and <strong>price</strong>:</p>
-      <div class="sop-prompt-wrap">
-        <pre class="sop-prompt" id="sop-prompt-sort">My deal is in [CITY, STATE ZIP] and is priced at [DEAL PRICE]. Take the list above and organize it by price (closest to my deal's price first) and by distance to that zip code (closest first), so I know who to call first to sell this deal. Add a column for the distance in miles.</pre>
-        <button type="button" class="btn secondary small sop-copy-btn" data-copy-target="sop-prompt-sort">Copy</button>
-      </div>
-
-      <h4>Step 5 &mdash; Import it, then call</h4>
-      <ul>
-        <li>Save the sorted list as a CSV (name, phone, city, state) and upload it on the <button type="button" class="link-btn" id="sop-go-buyerleads-btn">Buyer Leads tab</button> under <strong>Upload Your Buyer List</strong>. It stays private to you; give it to the deal when you're ready to pitch.</li>
-        <li><strong>Call first &mdash; never cold text.</strong> Leave a voicemail if there's no answer. Texting only opens up after someone has responded to a call. Best window is 8am&ndash;7pm in their time zone.</li>
-        <li>Start at the top of the sorted list. <strong>Goal: 20+ calls in your first hour</strong>, and 50+ buyers a day as you keep adding addresses.</li>
-        <li>Pitch from the general info only. <em>"Hi [name], this is [you]. I saw you recently [listed / sold] a property near [area]. I have a [asset type] deal in [city], priced at $[price]. Do you buy deals like that? What are you looking for?"</em></li>
-        <li>The moment someone is interested, log them under <strong>Interested Buyers</strong> on the deal. Follow up with anyone who asked for more info every 1&ndash;3 days. Never share an address you haven't been granted.</li>
-      </ul>
-
-      <div class="sop-warn">
-        <strong>Verify before you rely on it.</strong> AI tools can guess, mix up companies, or return old contact details &mdash; treat every result as a lead to confirm. Only paste public listing information (listing addresses, photos, listing details) into these tools, never private information about our buyers or sellers. A granted subject-property address is for searching and sorting only &mdash; it is only ever disclosed to end buyers, and only to a matched buyer it has been granted for.
-      </div>
-    </div>
-  </details>
-
   <div class="tabs">
     <button class="tab-btn active" data-rep-tab="deals">Deals</button>
     <button class="tab-btn" data-rep-tab="buyerleads">Buyer Leads</button>
@@ -550,9 +399,10 @@ Put it in a table with the property address, owner or company name, phone, email
         nothing to send when a buyer asks to see it.
       </div>
       <div style="margin-top:8px;">
-        <strong>Step 1.</strong> Build your own buyer list with the <strong>High-Intent Buyer Sourcing SOP</strong> at the top
-        of this page &mdash; find active local flippers, builders and retail buy-and-hold investors near the deal, skip trace them,
-        upload them on the Buyer Leads tab, then <strong>call them</strong>. That's the main way to work a deal. Match yourself to
+        <strong>Step 1.</strong> Build your own buyer list with the <strong>How to Build Your Own Buyer List</strong> guide on the
+        <strong>Buyer Leads tab</strong> &mdash; find cash buyers on Propwire right around the deal, skip trace them with AI,
+        upload them there, then <strong>call them</strong>. The target is <strong>50+ cash buyers in the same zip code per deal</strong>,
+        followed up until each one says yes, negotiates, or says no. That's the main way to work a deal. Match yourself to
         the buyers you've added (or cold-call specific cities from your own list) and start dialing. Cold emailing
         buyers is also allowed &mdash; but talk to admin first before you send any, since there's a specific outreach
         approach we use to keep those emails out of spam and avoid burning our sending reputation.
@@ -586,18 +436,17 @@ Put it in a table with the property address, owner or company name, phone, email
         see its Deal Code, City/State/Zip, County, price, and other general info until admin specifically grants you
         that one deal's address. There are two reasons to ask for it:
         <ul style="margin:6px 0 6px 20px; padding:0;">
-          <li style="margin:3px 0;"><strong>You're pitching buyers off the general info</strong> (not using the
-            High-Intent Buyer Sourcing SOP at the top of the page). Only once a buyer has actually responded to that
+          <li style="margin:3px 0;"><strong>You're pitching buyers off the general info</strong> (not building your list from the exact property location). Only once a buyer has actually responded to that
             pitch, is genuinely interested, and specifically asks you for the address — never before, and never just
             because a deal looks like a good fit to you — hit <strong>Request Address Access</strong> on that deal to
             ask admin for it.</li>
-          <li style="margin:3px 0;"><strong>You're using the High-Intent Buyer Sourcing SOP.</strong> If you're actually
-            going to pull the nearest comparable listings and sold comps around the subject property to find flippers, developers or retail buy-and-hold investors, and you
+          <li style="margin:3px 0;"><strong>You're building your buyer list from the exact property location.</strong> If you're actually
+            going to zoom in on the subject property (Google Maps / Propwire, or the nearest listings on Zillow/Redfin) to find cash buyers right around it, and you
             <strong>won't post the address online anywhere</strong>, admin will disclose the address to you — hit
             <strong>Request Address Access</strong> and say that's what you're using it for. It's for searching only.</li>
         </ul>
         Never share an address you haven't been granted. Never post a granted address online anywhere (Facebook, groups,
-        public docs, listings). <strong>A granted address is only ever disclosed to end buyers</strong> — never to anyone else. And outside of the SOP, never share a granted address with anyone besides that one
+        public docs, listings). <strong>A granted address is only ever disclosed to end buyers</strong> — never to anyone else. And outside of that, never share a granted address with anyone besides that one
         legitimate, matched buyer who asked for it. Sharing it early, posting it, or giving it to the wrong person
         risks losing us the deal entirely and getting removed as a team member.
       </div>
@@ -650,7 +499,7 @@ Put it in a table with the property address, owner or company name, phone, email
     <div class="banner info">
       <strong>How to work a buyer lead:</strong>
       <p class="small-muted" style="margin:6px 0 0;">These are the buyers you've brought in &mdash; build your list with the
-        <strong>High-Intent Buyer Sourcing SOP</strong> at the top of the page, upload it here, and give it to the deal you're pitching.</p>
+        <strong>How to Build Your Own Buyer List</strong> guide below, upload it here, and give it to the deal you're pitching.</p>
       <div style="margin-top:8px;">
         <strong>Step 1.</strong> Reach out about the deal shown on the card — <strong>always call first</strong>, never
         text as your opening move. High-volume texting to numbers with no reply history is what gets a phone number
@@ -670,8 +519,8 @@ Put it in a table with the property address, owner or company name, phone, email
     </div>
 
     <div class="card" id="rep-buyerlist-card" hidden>
-      <details>
-        <summary class="section-title" style="margin-top:0; cursor:pointer; display:inline-block;">How to Build Your Own Buyer List (click to expand)</summary>
+      <details open>
+        <summary class="section-title" style="margin-top:0; cursor:pointer; display:inline-block;">How to Build Your Own Buyer List (click to collapse)</summary>
         <p class="small-muted">A step-by-step guide, not an automated integration — the Propwire and AI skip-trace steps below all happen on those sites directly; come back here to import the CSV once you have it.</p>
 
         <div class="bl-kpi">
@@ -730,7 +579,6 @@ Put it in a table with the owner name, LLC name (if any), phone, email and maili
             <li>Search the deal's zip on <a href="https://www.zillow.com" target="_blank" rel="noopener">Zillow</a> / <a href="https://www.redfin.com" target="_blank" rel="noopener">Redfin</a> and start with the listings <strong>nearest the subject property</strong>, then work outward.</li>
             <li>Open each listing and check the price history: a property that <strong>sold in the last 6 months</strong> and is now listed <strong>$40,000+ above the sold price</strong> is a flip being sold — that owner is an active cash buyer.</li>
             <li>Save the address of each match; aim for about <strong>10 of the nearest cash buyers</strong>, then skip trace them with the AI prompt in Step 4.</li>
-            <li>Full walkthrough: the <strong>High-Intent Buyer Sourcing SOP</strong> bar at the top of the Deals page.</li>
           </ul>
         </details>
 
@@ -860,7 +708,7 @@ Put it in a table with the owner name, LLC name (if any), phone, email and maili
       <thead><tr><th>Buyer</th><th>Phone</th><th>Deal</th><th>Location</th><th>Portfolio Value</th><th>Status</th><th>Given</th></tr></thead>
       <tbody id="mypitches-tbody"></tbody>
     </table>
-    <div id="buyerleads-empty" class="small-muted" style="padding:20px;" hidden>No buyer leads yet — build your list with the High-Intent Buyer Sourcing SOP at the top of the page, upload it, and give it to a deal.</div>
+    <div id="buyerleads-empty" class="small-muted" style="padding:20px;" hidden>No buyer leads yet — build your list with the How to Build Your Own Buyer List guide above, upload it, and give it to a deal.</div>
     <div class="nav-row" style="justify-content:center; gap:16px; margin-top:12px;">
       <button class="btn secondary small" id="mypitches-prev-page-btn">&larr; Previous</button>
       <span class="small-muted" id="mypitches-page-indicator"></span>
@@ -1107,7 +955,6 @@ Put it in a table with the owner name, LLC name (if any), phone, email and maili
             <li>Search the deal's zip on <a href="https://www.zillow.com" target="_blank" rel="noopener">Zillow</a> / <a href="https://www.redfin.com" target="_blank" rel="noopener">Redfin</a> and start with the listings <strong>nearest the subject property</strong>, then work outward.</li>
             <li>Open each listing and check the price history: a property that <strong>sold in the last 6 months</strong> and is now listed <strong>$40,000+ above the sold price</strong> is a flip being sold — that owner is an active cash buyer.</li>
             <li>Save the address of each match; aim for about <strong>10 of the nearest cash buyers</strong>, then skip trace them with the AI prompt in Step 4.</li>
-            <li>Full walkthrough: the <strong>High-Intent Buyer Sourcing SOP</strong> bar at the top of the Deals page.</li>
           </ul>
         </details>
 

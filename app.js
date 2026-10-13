@@ -940,7 +940,6 @@ async function initRepView() {
 
     const buildsOwnList = !isBuyerSession;
     document.getElementById("rep-buyerlist-card").hidden = !buildsOwnList;
-    document.getElementById("rep-buyer-sourcing-sop").hidden = !buildsOwnList;
     document.getElementById("rep-mybuyerlist-card").hidden = !buildsOwnList;
     if (buildsOwnList) loadMyBuyerLeads();
     document.getElementById("rep-buybox-edit-row").hidden = !isBuyerSession;
@@ -1346,7 +1345,7 @@ async function openRepDealDetail(dealId) {
     '<div id="selfmatch-result" class="small-muted"></div>' +
 
     '<div class="section-title">Match My Buyer Leads To This Deal</div>' +
-    '<p class="small-muted">Matches the buyers you\'ve uploaded (build your list with the High-Intent Buyer Sourcing SOP at the top of the page) to this deal by state/city/asset category, and gives them to yourself so they show up on your Buyer Leads tab to start calling.</p>' +
+    '<p class="small-muted">Matches the buyers you\'ve uploaded (build your list with the guide on the Buyer Leads tab) to this deal by state/city/asset category, and gives them to yourself so they show up on your Buyer Leads tab to start calling.</p>' +
     (visibleCities.length > 0
       ? '<p class="small-muted"><strong>Or pick specific cities to cold call instead</strong> — overrides the state/city/asset category matching above entirely, pulling from exactly the city(s) you check below (grouped by state). Leave nothing checked to use the normal matching instead.</p>' +
         '<div id="give-myself-cities" class="deal-checkbox-list" style="margin-bottom:10px;"></div>'
@@ -1700,37 +1699,6 @@ function switchRepTab(tab) {
   document.getElementById("rep-tab-buyerleads").hidden = tab !== "buyerleads";
   if (tab === "buyerleads") loadMyPitches();
 }
-
-/* ------------------------------------------------------------
-   High-intent buyer sourcing SOP (top of the rep view)
-   Collapsed by default; remembers if the rep left it open.
-   ------------------------------------------------------------ */
-(function initBuyerSourcingSop() {
-  const sop = document.getElementById("rep-buyer-sourcing-sop");
-  if (!sop) return;
-  const KEY = "smb_buyer_sourcing_sop_open";
-  try { sop.open = localStorage.getItem(KEY) === "1"; } catch (e) { /* storage blocked -- stay collapsed */ }
-  sop.addEventListener("toggle", function () {
-    try { localStorage.setItem(KEY, sop.open ? "1" : "0"); } catch (e) { /* ignore */ }
-  });
-  Array.from(sop.querySelectorAll(".sop-copy-btn")).forEach(function (btn) {
-    btn.addEventListener("click", async function () {
-      const target = document.getElementById(btn.getAttribute("data-copy-target"));
-      if (!target) return;
-      try {
-        await navigator.clipboard.writeText(target.textContent);
-        showToast("Prompt copied.");
-      } catch (e) {
-        showToast("Couldn't copy automatically -- select the text and copy it.", true);
-      }
-    });
-  });
-  const goBtn = document.getElementById("sop-go-buyerleads-btn");
-  if (goBtn) goBtn.addEventListener("click", function () {
-    switchRepTab("buyerleads");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
-})();
 
 /* Copy buttons on the "How to Build a Buyer List" guides (rep card + Buyer Leads tab) */
 Array.from(document.querySelectorAll(".bl-copy-btn")).forEach(function (btn) {

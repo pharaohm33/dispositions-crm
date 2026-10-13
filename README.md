@@ -573,34 +573,8 @@ backend (see [SETUP.md](SETUP.md)).
   the conversation (rep's notes are visible to you the moment they're
   logged) to close the deal yourself, keeping the rep who brought the buyer
   updated as it moves.
-- **High-Intent Buyer Sourcing SOP** — a compact, collapsed-by-default bar
-  at the very top of the rep view (above the Deals / Buyer Leads tabs, so
-  it's one click away from either) that expands into a step-by-step SOP for
-  finding buyers who are active right now: pull the listings nearest the
-  deal's city/zip on Zillow (Listing type: New construction and/or Agent
-  listed) or Redfin (agent-listed, active), press Ctrl/Cmd+F for "price
-  history" / "sale history" and flag a sale within 6 months relisted
-  $40,000+ higher (fix &amp; flippers) or a small/mid-size builder's new
-  construction listing (developers), skip trace the saved addresses with
-  DeepSeek or Google AI Mode, run a second prompt that sorts the list by
-  price and by distance to the deal's zip, import it on the Buyer Leads
-  tab, and call (never cold text; 20+ calls the first hour, 50+ a day). It
-  deliberately says nothing about sourcing deals. Reps who've been granted a
-  deal's address use it to source the buyers closest to the exact subject
-  property (with a distance-sort prompt for the address); reps who haven't
-  are told to hit **Request Address Access** and say they're using the SOP
-  (admin discloses it when they'll actually pull the nearest comparable
-  listings to find flippers or developers and won't post the address online
-  anywhere), and meanwhile work
-  from the deal's general info (city/state/zip, price, asset type). The
-  Deals-tab **Address disclosure** paragraph spells out both reasons to ask
-  for an address (a buyer is interested vs. using the SOP). The address is
-  for searching only: never posted online, and only ever disclosed to end
-  buyers (and only a matched buyer it has been granted for). Both prompts have **Copy** buttons, the bar
-  remembers whether a rep left it open (per browser), and it's hidden for
-  **Buyer** signups the same way the build-your-own-list card is.
 - **Buyer Leads** — a collapsible **"How to Build a Buyer List"** guide sits
-  above the importer for anyone new to this: find the exact property on
+  above the importer (open by default; the old High-Intent Buyer Sourcing SOP bar at the top of the rep view was removed, and the Deals-tab "How to work a deal" text and Address disclosure now point reps here) for anyone new to this: find the exact property on
   Google Maps, enter its zip on Propwire (the fastest way), zoom the map in as
   close to the subject property as possible, and pick nearby cash buyers
   (look for the **Cash Buyer** tag) with More Filters — Property Type
