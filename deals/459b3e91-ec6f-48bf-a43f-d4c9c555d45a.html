@@ -1,329 +1,558 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sarasota, FL — Fix &amp; Flip / Buy &amp; Hold Opportunity | JNA Dynamic Holdings LLC</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FL-2 | Coral Cove Waterfront Assignment | Sarasota, FL</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+
   * { box-sizing: border-box; }
+
   body {
-    margin: 0;
     background-color: #f6f1e9;
-    color: #2b2621;
+    color: #2c2a26;
     font-family: 'Source Sans 3', sans-serif;
     font-size: 16px;
-    line-height: 1.6;
+    line-height: 1.55;
+    margin: 0;
+    padding: 0;
   }
+
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    color: #1f1d1a;
+    font-weight: 600;
+  }
+
   .wrap {
     max-width: 920px;
     margin: 0 auto;
     padding-left: 24px;
     padding-right: 24px;
   }
-  h1, h2, h3 {
-    font-family: 'Playfair Display', serif;
-    font-weight: 600;
-    color: #1f1b16;
-    letter-spacing: 0.3px;
-  }
+
+  a { color: #8a5a2b; }
+
   header.hero {
-    background-color: #efe7d8;
-    border-bottom: 1px solid #ddd2bc;
-    padding-top: 40px;
+    background-color: #ece3d3;
+    padding-top: 36px;
     padding-bottom: 32px;
-  }
-  .deal-code {
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-size: 13px;
-    color: #8a6d3b;
-    margin-bottom: 10px;
-  }
-  header.hero h1 {
-    font-size: 40px;
-    margin: 0 0 8px 0;
-  }
-  .location-line {
-    font-size: 19px;
-    color: #4a4136;
-    margin-bottom: 6px;
-  }
-  .address-note {
-    font-size: 15px;
-    font-style: italic;
-    color: #6b5f4d;
-    margin-bottom: 18px;
-  }
-  .assignment-note {
-    font-size: 14.5px;
-    color: #5a4f3f;
-    background: #fbf7ee;
-    border: 1px solid #e3d8c0;
-    padding: 10px 14px;
-    display: inline-block;
-    border-radius: 3px;
-  }
-  .price-block {
-    margin-top: 28px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 28px;
-  }
-  .price-item {
-    min-width: 150px;
-  }
-  .price-item .label {
-    font-size: 12.5px;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    color: #8a6d3b;
-    margin-bottom: 4px;
-  }
-  .price-item .value {
-    font-family: 'Playfair Display', serif;
-    font-size: 28px;
-    color: #1f1b16;
+    border-bottom: 1px solid #d9cdb6;
   }
 
-  section {
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 13px;
+    color: #8a5a2b;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+
+  h1.title {
+    font-size: 34px;
+    margin-top: 0;
+    margin-bottom: 8px;
+  }
+
+  .location-line {
+    font-size: 18px;
+    color: #4a463f;
+    margin-top: 0;
+    margin-bottom: 6px;
+  }
+
+  .address-note {
+    font-size: 14.5px;
+    color: #6b4a22;
+    font-style: italic;
+    background: #f9ecd8;
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 4px;
+    margin-top: 10px;
+    margin-bottom: 0;
+  }
+
+  .badges {
+    margin-top: 16px;
+    margin-bottom: 0;
+  }
+  .badge {
+    display: inline-block;
+    background: #2c2a26;
+    color: #f6f1e9;
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 3px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+  }
+
+  .comp-flag {
+    margin-top: 18px;
+    margin-bottom: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1f1d1a;
+    background: #fff;
+    border-left: 4px solid #8a5a2b;
+    padding: 10px 14px;
+  }
+
+  section.block {
     padding-top: 36px;
     padding-bottom: 36px;
-    border-bottom: 1px solid #e4dac3;
   }
-  section:last-of-type {
-    border-bottom: none;
+
+  section.block.alt {
+    background-color: #efe7d8;
   }
-  section h2 {
-    font-size: 25px;
+
+  h2.section-title {
+    font-size: 24px;
+    border-bottom: 2px solid #c9b98f;
+    padding-bottom: 8px;
     margin-top: 0;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
   }
+
+  .price-block {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .price-figure {
+    background: #fff;
+    border: 1px solid #ddd0b4;
+    border-radius: 6px;
+    padding: 16px 22px;
+    min-width: 170px;
+    flex: 1;
+  }
+
+  .price-figure .label {
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8a7d60;
+    margin-bottom: 4px;
+  }
+
+  .price-figure .value {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: #1f1d1a;
+  }
+
+  .price-figure.main .value { color: #8a5a2b; }
 
   .gallery {
     display: flex;
     overflow-x: auto;
     gap: 14px;
-    padding-bottom: 12px;
-    -webkit-overflow-scrolling: touch;
-  }
-  .gallery img {
-    height: 230px;
-    width: auto;
-    flex: 0 0 auto;
-    border-radius: 4px;
-    object-fit: cover;
-    border: 1px solid #ddd2bc;
-  }
-  .more-photos {
-    margin-top: 12px;
-    font-size: 14.5px;
-  }
-  .more-photos a {
-    color: #8a6d3b;
-    text-decoration: underline;
+    padding-bottom: 10px;
+    margin-top: 18px;
+    margin-bottom: 0;
   }
 
-  table.terms {
+  .gallery img {
+    height: 320px;
+    width: auto;
+    border-radius: 6px;
+    flex-shrink: 0;
+    border: 1px solid #d9cdb6;
+  }
+
+  .more-photos {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 0;
+    font-size: 14.5px;
+  }
+
+  dl.fact-list {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    row-gap: 10px;
+    column-gap: 16px;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  dl.fact-list dt {
+    font-weight: 600;
+    color: #4a463f;
+  }
+
+  dl.fact-list dd {
+    margin: 0;
+  }
+
+  ul.clean-list {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 20px;
+  }
+
+  ul.clean-list li {
+    margin-bottom: 8px;
+  }
+
+  table.terms-table, table.comp-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 15.5px;
-  }
-  table.terms tr {
-    border-bottom: 1px solid #e4dac3;
-  }
-  table.terms tr:last-child {
-    border-bottom: none;
-  }
-  table.terms td {
-    padding: 12px 6px;
-  }
-  table.terms td.label {
-    color: #6b5f4d;
-    width: 45%;
-  }
-  table.terms td.val {
-    font-weight: 600;
-    color: #1f1b16;
+    margin-top: 0;
+    margin-bottom: 0;
+    background: #fff;
   }
 
-  .notes {
-    font-size: 14.5px;
-    color: #5a4f3f;
-  }
-  .notes p {
-    margin: 0 0 12px 0;
+  table.terms-table td, table.terms-table th,
+  table.comp-table td, table.comp-table th {
+    border: 1px solid #ddd0b4;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+    font-size: 15px;
   }
 
-  .cta-band {
-    background-color: #2b2420;
-    color: #f3ecdf;
-    padding-top: 40px;
-    padding-bottom: 40px;
-    border-bottom: none;
+  table.terms-table th { background: #ece3d3; width: 230px; }
+  table.comp-table th { background: #ece3d3; }
+
+  .note-box {
+    background: #fff8ec;
+    border: 1px solid #e3cf9e;
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin-top: 18px;
+    margin-bottom: 0;
+    font-size: 15px;
   }
-  .cta-band h2 {
-    color: #f3ecdf;
+
+  .caveat-box {
+    background: #f3ece0;
+    border-left: 4px solid #8a5a2b;
+    padding: 14px 18px;
+    margin-top: 18px;
+    margin-bottom: 0;
+  }
+
+  .insurance-grid {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    margin-bottom: 0;
+  }
+
+  .insurance-grid div {
+    background: #fff;
+    border: 1px solid #ddd0b4;
+    border-radius: 6px;
+    padding: 12px 16px;
+    flex: 1;
+    min-width: 160px;
+  }
+
+  .insurance-grid .amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: #8a5a2b;
+  }
+
+  .disclosure-text {
+    font-size: 14px;
+    color: #4a463f;
+    background: #fff;
+    border: 1px solid #ddd0b4;
+    border-radius: 6px;
+    padding: 16px 18px;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  footer.cta {
+    background-color: #1f1d1a;
+    color: #f6f1e9;
+    padding-top: 42px;
+    padding-bottom: 42px;
+    text-align: center;
+  }
+
+  footer.cta h2 {
+    color: #f6f1e9;
+    font-size: 28px;
+    margin-top: 0;
     margin-bottom: 10px;
   }
-  .cta-band p {
-    color: #d9cdb6;
+
+  footer.cta p {
+    color: #d8d1c0;
     margin-top: 0;
     margin-bottom: 20px;
   }
-  .cta-contacts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 24px;
-  }
-  .cta-contacts a {
-    color: #f3ecdf;
-    font-size: 19px;
-    font-family: 'Playfair Display', serif;
-    text-decoration: none;
-    border-bottom: 1px solid #a8926a;
-    padding-bottom: 2px;
-  }
-  .cta-contacts a:hover {
-    color: #e8cf9f;
+
+  .contact-row {
+    margin-top: 0;
+    margin-bottom: 0;
   }
 
-  footer.disclaimer {
-    padding-top: 24px;
-    padding-bottom: 36px;
+  .contact-row a {
+    display: inline-block;
+    background: #c9a35a;
+    color: #1f1d1a;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 12px 22px;
+    border-radius: 4px;
+    margin: 6px;
   }
-  footer.disclaimer p {
-    font-size: 13px;
-    color: #887c68;
-    margin: 0 0 8px 0;
+
+  .small-print {
+    font-size: 12.5px;
+    color: #9c968a;
+    margin-top: 26px;
+    margin-bottom: 0;
   }
+
+  @media (max-width: 600px) {
+    dl.fact-list { grid-template-columns: 1fr; }
+    dl.fact-list dt { margin-bottom: -4px; }
+    table.terms-table th { width: auto; }
+  }
+
 </style>
 </head>
 <body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=459b3e91-ec6f-48bf-a43f-d4c9c555d45a&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F459b3e91-ec6f-48bf-a43f-d4c9c555d45a.html">Request the Address</a></div></noscript>
 
 <header class="hero">
   <div class="wrap">
-    <div class="deal-code">Deal Code: FL-2</div>
-    <h1>Sarasota, Florida</h1>
-    <div class="location-line">Sarasota County, FL</div>
-    <div class="address-note">Address available upon request — contact us for the full property address.</div>
-    <div class="assignment-note">This offering is an assignment of contract. JNA Dynamic Holdings LLC holds the underlying purchase contract with the property owner and is marketing its equitable interest in that contract; this is not a direct sale by the owner.</div>
+    <p class="eyebrow">Deal Code FL-2 &middot; Assignment of Contract</p>
+    <h1 class="title">Coral Cove Waterfront &mdash; Private Dock, No HOA</h1>
+    <p class="location-line">Sarasota, Sarasota County, FL 34231 &middot; Coral Cove</p>
+    <p class="address-note">Address available upon request &mdash; contact us for the full property address.</p>
+    <div class="badges">
+      <span class="badge">Fix and Flip</span>
+      <span class="badge">Buy and Hold</span>
+      <span class="badge">Waterfront</span>
+      <span class="badge">No HOA</span>
+    </div>
+    <p class="comp-flag">Two houses on this same street closed in September &mdash; $2,700,000 and $2,850,000, in 14 and 8 days on market.</p>
+  </div>
+</header>
 
+<section class="block">
+  <div class="wrap">
+    <h2 class="section-title">Photos</h2>
+    <div class="gallery">
+      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/1.jpg" alt="Coral Cove waterfront property, Sarasota, FL">
+    </div>
+  </div>
+</section>
+
+<section class="block alt">
+  <div class="wrap">
+    <h2 class="section-title">Price</h2>
     <div class="price-block">
-      <div class="price-item">
+      <div class="price-figure main">
         <div class="label">Assignment Price</div>
-        <div class="value">$1,850,000</div>
+        <div class="value">$1,785,000</div>
       </div>
-      <div class="price-item">
-        <div class="label">After Repair Value</div>
+      <div class="price-figure">
+        <div class="label">Published ARV</div>
         <div class="value">$2,800,000</div>
       </div>
-      <div class="price-item">
+      <div class="price-figure">
         <div class="label">Estimated Rehab</div>
         <div class="value">$10,000</div>
       </div>
     </div>
-  </div>
-</header>
-
-<section>
-  <div class="wrap">
-    <h2>Gallery</h2>
-    <div class="gallery">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/1.jpg" alt="Sarasota, FL property photo 1">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/2.jpg" alt="Sarasota, FL property photo 2">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/3.jpg" alt="Sarasota, FL property photo 3">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/4.jpg" alt="Sarasota, FL property photo 4">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/5.jpg" alt="Sarasota, FL property photo 5">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/6.jpg" alt="Sarasota, FL property photo 6">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/7.jpg" alt="Sarasota, FL property photo 7">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/8.jpg" alt="Sarasota, FL property photo 8">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/9.jpg" alt="Sarasota, FL property photo 9">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/10.jpg" alt="Sarasota, FL property photo 10">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/11.jpg" alt="Sarasota, FL property photo 11">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/12.jpg" alt="Sarasota, FL property photo 12">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/13.jpg" alt="Sarasota, FL property photo 13">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/14.jpg" alt="Sarasota, FL property photo 14">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/15.jpg" alt="Sarasota, FL property photo 15">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/16.jpg" alt="Sarasota, FL property photo 16">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/17.jpg" alt="Sarasota, FL property photo 17">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/18.jpg" alt="Sarasota, FL property photo 18">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/19.jpg" alt="Sarasota, FL property photo 19">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/20.jpg" alt="Sarasota, FL property photo 20">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/21.jpg" alt="Sarasota, FL property photo 21">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/22.jpg" alt="Sarasota, FL property photo 22">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/23.jpg" alt="Sarasota, FL property photo 23">
-      <img src="/deals/459b3e91-ec6f-48bf-a43f-d4c9c555d45a/photos/24.jpg" alt="Sarasota, FL property photo 24">
-    </div>
-    <div class="more-photos">
-      <a href="https://drive.google.com/drive/folders/17CzfiwTvsBNfupjzgy_w8rAxnaKKzAxA?usp=sharing" target="_blank" rel="noopener">View full photo set</a>
-    </div>
+    <p class="note-box">Entry at $1,785,000 sits $915,000 under the lower of the two same-street September closes referenced above.</p>
   </div>
 </section>
 
-<section>
+<section class="block">
   <div class="wrap">
-    <h2>Deal Terms</h2>
-    <table class="terms">
+    <h2 class="section-title">Property Overview</h2>
+    <dl class="fact-list">
+      <dt>Type</dt><dd>Single family, waterfront</dd>
+      <dt>Beds / Baths</dt><dd>3 bed / 3 bath per public records. Note: one secondary data source returns 3 bed / 3.5 bath for this property &mdash; we are printing both. Confirm the bath count against the Sarasota County record before you underwrite.</dd>
+      <dt>Square Feet</dt><dd>4,200 sq ft per our primary record; a secondary record shows 4,220 sq ft. The 20 sq ft is immaterial to value but we are not going to quietly pick one.</dd>
+      <dt>Lot Size</dt><dd>0.41 to 0.42 acres, approximately 17,900 sq ft</dd>
+      <dt>County / ZIP</dt><dd>Sarasota County, 34231</dd>
+      <dt>HOA</dt><dd>None</dd>
+      <dt>Water / Sewer</dt><dd>City water, septic. Well on site, redone 2024, for irrigation</dd>
+      <dt>Occupancy</dt><dd>Sold as-is &mdash; confirm occupancy and delivery status with us before you schedule</dd>
+      <dt>Structure</dt><dd>Assignment of an executed Florida Realtors / Florida Bar AS-IS Residential Contract</dd>
+    </dl>
+  </div>
+</section>
+
+<section class="block alt">
+  <div class="wrap">
+    <h2 class="section-title">Property Highlights</h2>
+    <ul class="clean-list">
+      <li>Coral Cove waterfront with a private dock &mdash; a boating-corridor address in one of the most consistently transacted waterfront pockets in south Sarasota.</li>
+      <li>No HOA. No board, no approval, no assessment exposure, no rental restriction to work around.</li>
+      <li>The comp evidence is on the subject's own street: two houses on that street closed this September at $2,700,000 and $2,850,000, in 14 and 8 days on market. No cross-neighborhood adjustment required.</li>
+      <li>The systems are documented with dates, not guessed at &mdash; see seller disclosure below.</li>
+      <li>Entry at $1,785,000 sits $915,000 under the lower of those two same-street September closes.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2 class="section-title">Condition &amp; Systems</h2>
+    <p>This is not a gut. Read this before you build a rehab budget off the price.</p>
+    <p><strong>What the seller has disclosed, with dates:</strong></p>
+    <ul class="clean-list">
+      <li>Roof: metal, 2006</li>
+      <li>Air handlers: replaced 2019, warranty through 2029</li>
+      <li>Heated spa: new covers 2024</li>
+      <li>Well, driveway, irrigation and low-voltage box: all redone 2024</li>
+      <li>Water / sewer: city water, septic</li>
+      <li>Dock: private dock, NO boat lift</li>
+    </ul>
+    <div class="caveat-box">
+      <p><strong>What has not been verified:</strong> we have not had a contractor through this house and we are not publishing a repair scope or a dollar figure. Nobody from JNA Dynamic Holdings LLC has produced a bid. Interior condition, cosmetic scope, septic condition and age, seawall condition, dock structural condition, and water depth at the dock are all yours to inspect.</p>
+      <p>On the roof specifically: a 2006 metal roof is 20 years old. Metal has the life for it, but 20 years is 20 years in a Florida coastal wind zone, and your insurer will have an opinion. Price your own inspection.</p>
+    </div>
+    <p><strong>Insurance, actual 2025 figures on this property:</strong></p>
+    <div class="insurance-grid">
+      <div>
+        <div class="label">Homeowners (incl. wind)</div>
+        <div class="amount">$11,239 / yr</div>
+      </div>
+      <div>
+        <div class="label">Flood</div>
+        <div class="amount">$1,081 / yr</div>
+      </div>
+      <div>
+        <div class="label">Combined carry</div>
+        <div class="amount">~$12,320 / yr</div>
+      </div>
+    </div>
+    <p class="note-box">We publish these because on Sarasota waterfront the insurance line is what kills deals in underwriting, and you should see it now rather than at binder.</p>
+  </div>
+</section>
+
+<section class="block alt">
+  <div class="wrap">
+    <h2 class="section-title">ARV Breakdown &amp; Comps</h2>
+    <p>Published ARV: <strong>$2,800,000</strong>. That figure is unchanged since we first brought this property to market, and we did not move it when we moved the price.</p>
+    <h3>Same-Street Comps &mdash; September 2026</h3>
+    <p>Condition is marked on both. Both closed within the last three weeks and are approximately 0.36 miles from the subject, on the subject's own street.</p>
+    <table class="comp-table">
       <tr>
-        <td class="label">Assignment Price</td>
-        <td class="val">$1,850,000</td>
+        <th>Comp</th>
+        <th>Beds/Baths</th>
+        <th>Sq Ft</th>
+        <th>Sold Price</th>
+        <th>Date</th>
+        <th>Days on Market</th>
+        <th>$/Sq Ft</th>
+        <th>Condition</th>
       </tr>
       <tr>
-        <td class="label">After Repair Value (ARV)</td>
-        <td class="val">$2,800,000</td>
+        <td>Cove Terrace Comp 1 (MLS #A4700159)</td>
+        <td>4 bed / 3 bath</td>
+        <td>3,496</td>
+        <td>$2,700,000</td>
+        <td>09/15/2026</td>
+        <td>14</td>
+        <td>$848</td>
+        <td>Renovated &mdash; Sub-Zero, Wolf and Miele appliances, travertine flooring, Calacatta marble, Campbell cabinetry; new Atkins seawall, 30-foot dock, 27,000 lb boat lift, 100+ ft of waterfront</td>
       </tr>
       <tr>
-        <td class="label">Estimated Rehab Budget</td>
-        <td class="val">$10,000</td>
+        <td>Cove Terrace Comp 2 (MLS #A4684647)</td>
+        <td>4 bed / 5 bath</td>
+        <td>3,799</td>
+        <td>$2,850,000 (listed at $3,295,000)</td>
+        <td>09/21/2026</td>
+        <td>8</td>
+        <td>$803</td>
+        <td>Renovated 2023, kitchen remodeled 2024 with Thermador appliances; sailboat-depth water, 100+ ft direct canal frontage, private dock with electric and water, two boat lifts (40,000 lb and 10,000 lb)</td>
       </tr>
-      <tr>
-        <td class="label">Strategy</td>
-        <td class="val">Fix and Flip, Buy and Hold</td>
-      </tr>
-      <tr>
-        <td class="label">County</td>
-        <td class="val">Sarasota County, FL</td>
-      </tr>
-      <tr>
-        <td class="label">Deal Code</td>
-        <td class="val">FL-2</td>
-      </tr>
-      <tr>
-        <td class="label">Contract Type</td>
-        <td class="val">Assignment of Contract</td>
-      </tr>
+    </table>
+    <p>Pull both yourself.</p>
+    <h3>Wider 2026 Comps in the Corridor</h3>
+    <ul class="clean-list">
+      <li>Solitude Ln comp &mdash; $2,850,000</li>
+      <li>Belgrave Dr comp &mdash; $2,800,000</li>
+      <li>Midnight Pass Rd comp &mdash; $2,400,000</li>
+    </ul>
+    <h3>How to Read This Honestly</h3>
+    <p>Three things cut against a straight read of the two same-street closes, and we would rather you hear them from us:</p>
+    <ul class="clean-list">
+      <li>Both comps are renovated. The subject is maintained, not renovated. That gap is your scope of work and it is the whole argument on this property.</li>
+      <li>Both comps carry boating infrastructure the subject does not have &mdash; a new seawall, 30-foot dock and 27,000 lb lift on one; sailboat depth and two lifts on the other. The subject has a private dock and no lift. On this street that is a real adjustment and you should make it.</li>
+      <li>Comp 2 listed at $3,295,000 and closed at $2,850,000. The street resisted above $2.85M. Treat $2.85M as evidence of the ceiling, not the floor.</li>
+    </ul>
+    <p>Cutting the other way: the subject is larger than both comps at 4,200 sq ft against 3,496 and 3,799, and sits on a bigger lot &mdash; roughly 17,900 sq ft against 15,078 and 14,650.</p>
+    <p>A third-party CMA on this property adjusts those two closes upward to $2,964,952 and $3,050,277 on that size difference and lands at a $3,007,614 midpoint. We are not publishing that as our ARV. The adjustment is driven by square footage while the subject has fewer bedrooms than both comps, and we are not going to raise our ARV in the same week we cut our price. The full CMA is available on request &mdash; read it and decide for yourself. We are staying at $2,800,000.</p>
+    <p>We are not publishing a projected profit figure. The gap between $1,785,000 and the comp evidence is visible above. Your scope, your carry, your insurance, your exit timeline. Build your own model.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2 class="section-title">Exit Strategies</h2>
+    <ul class="clean-list">
+      <li><strong>Renovate and resell.</strong> The primary play. Two renovated houses on this street cleared in 8 and 14 days in September &mdash; a fast market for finished waterfront product priced right.</li>
+      <li><strong>Add the boat lift.</strong> The two comps that set the ceiling both have lifts. The subject has a dock and no lift. That is a known, quotable scope item that moves the property toward the comps rather than away from them.</li>
+      <li><strong>Hold.</strong> No HOA, so short-term and annual rental are open to you subject to Sarasota County rules. Confirm those yourself &mdash; we have not.</li>
+    </ul>
+    <p class="note-box">We are not publishing a rent figure. We do not have verified rent comps on 4,200 sq ft waterfront in this pocket and we are not going to make one up.</p>
+  </div>
+</section>
+
+<section class="block alt">
+  <div class="wrap">
+    <h2 class="section-title">Deal Terms</h2>
+    <table class="terms-table">
+      <tr><th>Price</th><td>$1,785,000</td></tr>
+      <tr><th>EMD</th><td>$100,000, non-refundable at ratification</td></tr>
+      <tr><th>Closing</th><td>On or before November 25, 2026. Seller holds one 30-day extension option.</td></tr>
+      <tr><th>Due Diligence</th><td>No due diligence period. Diligence happens before you go under contract, not after.</td></tr>
+      <tr><th>Financing</th><td>Cash or hard money only</td></tr>
+      <tr><th>Condition of Sale</th><td>Sold strictly as-is</td></tr>
+      <tr><th>Title Company</th><td>Albatross Title (Florida)</td></tr>
+      <tr><th>Transaction Fee</th><td>$425 transaction coordination fee paid by buyer</td></tr>
+      <tr><th>Deal Structure</th><td>Direct deals only. No daisy chains.</td></tr>
+      <tr><th>Access</th><td>Walkthroughs by appointment, coordinated by JNA Dynamic Holdings LLC. No lockbox or access code is released.</td></tr>
     </table>
   </div>
 </section>
 
-<section>
+<section class="block">
   <div class="wrap">
-    <h2>Notes</h2>
-    <div class="notes">
-      <p>This property is located in Sarasota, Sarasota County, Florida and is being offered as an assignment of the existing purchase contract. The figures above reflect the current contract price, projected after-repair value, and the estimated rehab budget as provided in connection with this deal.</p>
-      <p>Individual property address will be provided directly to interested, qualified buyers upon contact.</p>
+    <h2 class="section-title">Wholesale Disclosure</h2>
+    <div class="disclosure-text">
+      <p>JNA Dynamic Holdings LLC holds equitable interest in this property under an executed purchase contract with the property owner and is marketing its interest in that contract, not the real property itself. This is an assignment of contract, not a direct sale, and not an offer to sell real property. JNA Dynamic Holdings LLC is not a licensed Florida real estate broker and is not acting as one.</p>
+      <p>Property is sold strictly as-is. Buyer is responsible for independent due diligence on all systems, condition, square footage, bed and bath count, occupancy, insurance, flood zone, and ARV prior to closing. Figures presented on this page have not been independently verified by JNA Dynamic Holdings LLC and should be confirmed by the buyer.</p>
     </div>
   </div>
 </section>
 
-<section class="cta-band">
+<footer class="cta">
   <div class="wrap">
-    <h2>Interested in This Assignment?</h2>
-    <p>Reach out today for the full address, underlying contract details, and any additional documentation on this Sarasota, FL opportunity.</p>
-    <div class="cta-contacts">
-      <a href="tel:520-633-6437">520-633-6437</a>
-      <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
+    <h2>Interested in FL-2?</h2>
+    <p>Contact us for the full street address, the complete photo set, the CMA, and to schedule a walkthrough.</p>
+    <div class="contact-row">
+      <a href="tel:520-633-6437">Call 520-633-6437</a>
+      <a href="mailto:montanoemmanuel@gmail.com">Email montanoemmanuel@gmail.com</a>
     </div>
-  </div>
-</section>
-
-<footer class="disclaimer">
-  <div class="wrap">
-    <p>JNA Dynamic Holdings LLC is marketing its equitable interest in the purchase contract for this property as an assignment of contract and is not the titled owner of the property. This offering is subject to the underlying contract with the property owner.</p>
-    <p>All figures, including price, ARV, and rehab estimates, are believed to be accurate but have not been independently verified by JNA Dynamic Holdings LLC. Buyers are encouraged to perform their own due diligence prior to entering any agreement.</p>
+    <p class="small-print">JNA Dynamic Holdings LLC &middot; Sarasota, FL &middot; Assignment of Contract</p>
   </div>
 </footer>
 
