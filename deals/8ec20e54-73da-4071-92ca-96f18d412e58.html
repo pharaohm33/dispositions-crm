@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OR-1 (Comm) — 9-Unit Motel/Multiplex, La Grande, OR | JNA Dynamic Holdings LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f7f3ec;
+    --paper-dark:#efe8db;
+    --ink:#2b2621;
+    --ink-soft:#5c5349;
+    --accent:#8a6a3c;
+    --accent-dark:#6b5029;
+    --line:#ddd3c0;
+    --card:#fffdf8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    font-size:16px;
+    line-height:1.6;
+  }
+  h1,h2,h3,.display{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    color:var(--ink);
+  }
+  .wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:12px;
+    font-weight:600;
+    color:var(--accent-dark);
+  }
+  header.top{
+    background:var(--paper-dark);
+    border-bottom:1px solid var(--line);
+    padding-top:36px;
+    padding-bottom:28px;
+  }
+  header.top .deal-code{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-top:0;
+    margin-bottom:6px;
+  }
+  header.top h1{
+    font-size:38px;
+    line-height:1.15;
+    margin-top:4px;
+    margin-bottom:10px;
+  }
+  .location-line{
+    font-size:17px;
+    color:var(--ink-soft);
+    margin-top:0;
+    margin-bottom:8px;
+  }
+  .addr-note{
+    display:inline-block;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:8px 14px;
+    font-size:14px;
+    color:var(--ink);
+    margin-top:6px;
+    margin-bottom:0;
+  }
+  .assignment-tag{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-top:14px;
+    margin-bottom:0;
+    font-style:italic;
+  }
+
+  .price-block{
+    padding-top:28px;
+    padding-bottom:28px;
+  }
+  .price-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    padding-top:22px;
+    padding-bottom:22px;
+  }
+  .price-cell{
+    flex:1 1 150px;
+  }
+  .price-cell .label{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .price-cell .value{
+    font-family:'Fraunces', serif;
+    font-size:26px;
+    color:var(--ink);
+  }
+  .price-cell.main .value{
+    font-size:34px;
+    color:var(--accent-dark);
+  }
+
+  .more-photos-link{
+    font-size:13px;
+    margin-top:10px;
+    margin-bottom:0;
+  }
+  .more-photos-link a{
+    color:var(--accent-dark);
+    text-decoration:underline;
+  }
+
+  .gallery-section{
+    padding-top:30px;
+    padding-bottom:10px;
+  }
+  .gallery{
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    padding-bottom:14px;
+    scroll-snap-type:x proximity;
+  }
+  .gallery img{
+    height:260px;
+    width:auto;
+    flex:0 0 auto;
+    border-radius:6px;
+    scroll-snap-align:start;
+    border:1px solid var(--line);
+    object-fit:cover;
+  }
+
+  section{
+    padding-top:34px;
+    padding-bottom:10px;
+  }
+  section h2{
+    font-size:24px;
+    border-bottom:2px solid var(--accent);
+    display:inline-block;
+    padding-bottom:4px;
+    margin-top:0;
+    margin-bottom:18px;
+  }
+  section p{
+    color:var(--ink-soft);
+    margin-top:0;
+    margin-bottom:14px;
+  }
+  .lede{
+    font-size:18px;
+    color:var(--ink);
+  }
+
+  .fact-table{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--card);
+    border:1px solid var(--line);
+  }
+  .fact-table tr{
+    border-bottom:1px solid var(--line);
+  }
+  .fact-table tr:last-child{
+    border-bottom:none;
+  }
+  .fact-table td{
+    padding:11px 16px;
+    vertical-align:top;
+  }
+  .fact-table td.k{
+    width:42%;
+    font-weight:600;
+    color:var(--ink-soft);
+    font-size:14px;
+  }
+  .fact-table td.v{
+    font-size:15px;
+  }
+
+  .note-list{
+    margin-top:0;
+    margin-bottom:0;
+    padding-left:20px;
+    color:var(--ink-soft);
+  }
+  .note-list li{
+    margin-bottom:8px;
+  }
+
+  .callout{
+    background:var(--paper-dark);
+    border-left:4px solid var(--accent);
+    padding:16px 20px;
+    margin-top:18px;
+    margin-bottom:18px;
+    font-size:15px;
+    color:var(--ink);
+  }
+
+  .disclosure-box{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:20px 22px;
+    font-size:13.5px;
+    color:var(--ink-soft);
+    margin-top:16px;
+    margin-bottom:16px;
+  }
+  .disclosure-box p{
+    color:var(--ink-soft);
+    font-size:13.5px;
+    margin-bottom:10px;
+  }
+  .disclosure-box p:last-child{
+    margin-bottom:0;
+  }
+
+  .cta-band{
+    background:var(--ink);
+    color:var(--paper);
+    margin-top:50px;
+    padding-top:44px;
+    padding-bottom:44px;
+  }
+  .cta-band h2{
+    color:var(--paper);
+    border-bottom:2px solid var(--accent);
+    font-size:28px;
+  }
+  .cta-band p{
+    color:#d8d0c3;
+    font-size:16px;
+  }
+  .cta-contacts{
+    display:flex;
+    flex-wrap:wrap;
+    gap:26px;
+    margin-top:20px;
+  }
+  .cta-contacts a{
+    color:var(--paper);
+    font-family:'Fraunces', serif;
+    font-size:20px;
+    text-decoration:none;
+    border-bottom:1px solid var(--accent);
+    padding-bottom:2px;
+  }
+  .cta-company{
+    margin-top:22px;
+    font-size:13px;
+    color:#a99f8e;
+    letter-spacing:.05em;
+  }
+
+  footer.foot{
+    padding-top:20px;
+    padding-bottom:40px;
+  }
+  footer.foot p{
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+
+  @media (max-width:640px){
+    header.top h1{font-size:28px;}
+    .price-cell.main .value{font-size:28px;}
+    .gallery img{height:190px;}
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=8ec20e54-73da-4071-92ca-96f18d412e58&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F8ec20e54-73da-4071-92ca-96f18d412e58.html">Request the Address</a></div></noscript>
+
+<header class="top">
+  <div class="wrap">
+    <p class="deal-code">Deal Code: OR-1 (Comm) &nbsp;|&nbsp; Commercial &nbsp;|&nbsp; Fix and Flip, Buy and Hold</p>
+    <h1>9-Unit Motel / Multiplex with Owner's House — General Commercial</h1>
+    <p class="location-line">La Grande, OR 97850 — Union County, Oregon</p>
+    <p class="addr-note">Address available upon request — contact us for the full property address.</p>
+    <p class="assignment-tag">This offering is an assignment of a purchase and sale agreement, not a direct sale of the property. JNA Dynamic Holdings LLC holds or is in the process of holding an equitable interest in the property under contract and is marketing that interest for assignment.</p>
+  </div>
+</header>
+
+<div class="price-block">
+  <div class="wrap">
+    <div class="price-grid">
+      <div class="price-cell main">
+        <div class="label">Assignment Price</div>
+        <div class="value">$375,000</div>
+      </div>
+      <div class="price-cell">
+        <div class="label">Est. ARV</div>
+        <div class="value">$1,200,000</div>
+      </div>
+      <div class="price-cell">
+        <div class="label">Est. Rehab</div>
+        <div class="value">$45,000</div>
+      </div>
+      <div class="price-cell">
+        <div class="label">Price Per Door</div>
+        <div class="value">~$41,667</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gallery-section">
+  <div class="wrap">
+    <div class="gallery">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/1.jpg" alt="Commercial motel/multiplex property exterior, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/2.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/3.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/4.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/5.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/6.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/7.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/8.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/9.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/10.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/11.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/12.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/13.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/14.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/15.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/16.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/17.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/18.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/19.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/20.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/21.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/22.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/23.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+      <img src="/deals/8ec20e54-73da-4071-92ca-96f18d412e58/photos/24.jpg" alt="Commercial motel/multiplex property, La Grande, OR">
+    </div>
+    <p class="more-photos-link"><a href="https://drive.google.com/drive/folders/1yrM4e-VIyxsUBQfKL7LbStYplDF_ma7s" target="_blank" rel="noopener">View all photos</a></p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <h2>The Opportunity</h2>
+    <p class="lede">Nine income units, five kitchens, and an owner's residence on a general commercial parcel in La Grande, Oregon, at $375,000 — approximately $41,667 per door. You would struggle to build a single unit for that number.</p>
+    <p>The five kitchens are the detail to stop on. Per the seller, they sit on the property but not inside the guest rooms, because La Grande code restricts cooking facilities in lodging units. That means the plumbing, gas, and electrical infrastructure for cooking already exists at five points on this property. If you have ever priced a kitchen rough-in, you know what that is worth.</p>
+    <p>It also means this property can serve the guest who actually pays well in a town like this: the traveling nurse on a thirteen-week contract at the hospital, the visiting faculty member, the contractor on a long job. Those guests book weeks, not nights, and the one thing they ask for is somewhere to cook.</p>
+    <p>The property is fully renovated per the seller and currently closed, because the owner shut it down for medical reasons. That is why it is priced at $375,000 — a restart, with no one bidding it up against you.</p>
+    <p>Across the street from Safeway. Minutes from Eastern Oregon University and Grande Ronde Hospital. Scheduled closing on or before November 30, 2026.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The Numbers</h2>
+    <table class="fact-table">
+      <tr><td class="k">Asking Price</td><td class="v">$375,000</td></tr>
+      <tr><td class="k">Units</td><td class="v">9, plus an owner's house with attached garage</td></tr>
+      <tr><td class="k">Kitchens</td><td class="v">5, located on the property but not within the guest rooms, per seller</td></tr>
+      <tr><td class="k">Price Per Door</td><td class="v">Approximately $41,667 across the 9 units</td></tr>
+      <tr><td class="k">Building Size</td><td class="v">Approximately 3,144 sq ft total, including the motel units, the owner's house, and the attached garage</td></tr>
+      <tr><td class="k">Price Per Sq Ft</td><td class="v">Approximately $119</td></tr>
+      <tr><td class="k">Lot Size</td><td class="v">0.29 acres (12,788 sq ft)</td></tr>
+      <tr><td class="k">Seller-Reported Revenue</td><td class="v">Approximately $11,000 per month when operating, roughly $132,000 annualized</td></tr>
+      <tr><td class="k">Est. ARV</td><td class="v">$1,200,000 (JNA Dynamic Holdings LLC estimate)</td></tr>
+      <tr><td class="k">Est. Rehab Budget</td><td class="v">$45,000 (JNA Dynamic Holdings LLC estimate)</td></tr>
+      <tr><td class="k">Financing</td><td class="v">Investment loan (e.g., hard money, bridge, DSCR, new construction loan)</td></tr>
+    </table>
+    <p style="margin-top:14px;">No operating statements, rent roll, tax returns, or expense data have been provided. No ARV or stabilized value was published by the seller — the ARV and rehab figures above reflect JNA Dynamic Holdings LLC's own estimates.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Property Snapshot</h2>
+    <table class="fact-table">
+      <tr><td class="k">Location</td><td class="v">La Grande, OR 97850 — Union County (full street address available on request)</td></tr>
+      <tr><td class="k">Property Type</td><td class="v">9-unit motel / multiplex plus owner's residence</td></tr>
+      <tr><td class="k">Year Built</td><td class="v">1950</td></tr>
+      <tr><td class="k">Zoning</td><td class="v">LG-GC, General Commercial</td></tr>
+      <tr><td class="k">Utilities</td><td class="v">City water and sewer, electric</td></tr>
+      <tr><td class="k">Condition</td><td class="v">Fully renovated, per seller</td></tr>
+      <tr><td class="k">Kitchens</td><td class="v">5 on the property, not in the guest rooms, per seller, attributed to city code</td></tr>
+      <tr><td class="k">Appliances</td><td class="v">In units; no stoves in the guest rooms</td></tr>
+      <tr><td class="k">Current Status</td><td class="v">Closed; shut down by the owner for medical reasons</td></tr>
+      <tr><td class="k">Access</td><td class="v">By appointment</td></tr>
+      <tr><td class="k">Sale Condition</td><td class="v">Sold as-is</td></tr>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The Five Kitchens — Why This Is the Headline</h2>
+    <p>Most small motels at this price have zero cooking infrastructure. Adding it is the single most expensive line item in converting lodging to anything else, because you are running supply, waste, venting, and electrical to points in a building never designed to receive them. This property already has five.</p>
+    <p>For an operator, that unlocks the extended-stay market. Nightly motel rates in a small Oregon town are a grind. Weekly and monthly stays to hospital travelers and university visitors are not, and cooking facilities are what makes those bookings happen. Grande Ronde Hospital staffs traveling clinicians, and those contracts run thirteen weeks at a time.</p>
+    <p>For a converter, it means five locations in this building already have the wet work done.</p>
+    <div class="callout">Now the honest flip side, which is the same fact seen from the other end. The seller's explanation for why the kitchens are not in the rooms is that city code does not permit it. That rule is common, and the reason behind it is that a unit with cooking facilities generally stops being a lodging room and becomes a dwelling unit, which triggers a different occupancy classification, different building code requirements, and sometimes different zoning and parking standards. So the same rule that put those kitchens where they are is the rule that governs your conversion. Get the specific La Grande code section in writing before you plan around it. Ask the building department directly what it would take to add cooking facilities to a guest room, and what classification the building lands in afterward. That one conversation decides whether the conversion exit is cheap or expensive.</div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>How to Read the $11,000 a Month</h2>
+    <p>Eleven thousand dollars a month is gross revenue, reported by the seller from a prior operating period. It is not net operating income.</p>
+    <p>A small motel carries real expenses against that line: utilities across nine units, housekeeping, linens and supplies, insurance, property taxes, maintenance, labor, and online travel agency commissions that commonly run fifteen percent of bookings or more. Operating expenses on a property like this frequently absorb a substantial share of gross. Do not divide $132,000 by $375,000 and call it a return.</p>
+    <p>The property is also closed, so there is no current trailing twelve, no occupancy report, and no recent deposits to verify against. You are underwriting a restart.</p>
+    <p>Ask for what does exist before you contract: prior-year tax returns or Schedule E, transient lodging tax filings, any bookkeeping or property management system records, utility history, and the date the property actually stopped operating. The gap between that date and today drives how much work the restart is.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Things to Verify Before You Write an Offer</h2>
+    <ul class="note-list">
+      <li>The exact La Grande code provision governing cooking facilities in lodging units, and what a change of use would require.</li>
+      <li>The configuration of the five kitchens: which are in shared or common areas, which serve specific units, and whether one of them is the owner's house.</li>
+      <li>How long the property has been closed, and whether lodging licenses, business registration, fire and health inspections, or Oregon transient lodging tax registration have lapsed.</li>
+      <li>Whether reopening triggers re-inspection or code upgrades with the City of La Grande or Union County.</li>
+      <li>The square footage split between the nine units, the owner's house, and the garage. At roughly 3,144 sq ft total, the individual units are small, which is normal for 1950 motel construction but matters to what you can do with them.</li>
+      <li>Current property tax assessment and insurance quotes, since insuring a closed lodging property differs from insuring an operating one.</li>
+      <li>Title, liens, and any existing franchise, management, or booking agreements.</li>
+    </ul>
+    <p style="margin-top:14px;">With a November 30 closing, start these calls the day you walk it. The City of La Grande will not move on your timeline.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Zoning and Conversion</h2>
+    <p>The parcel is zoned LG-GC, General Commercial — the flexible end of the zoning map, supporting continued lodging use along with a range of commercial uses. Confirm the current permitted use list with the City of La Grande.</p>
+    <p>Separately, Oregon has moved aggressively on motel conversion. Under ORS 197.748, from 2021 legislation, local governments are required to allow conversion of a lawful hotel or motel use to an emergency shelter, and from there to affordable housing, notwithstanding ordinary land use regulations, where the property sits inside an urban growth boundary and is not on heavy industrial land. A conversion under that statute is not treated as a land use decision. Local governments may still apply building code, occupancy, siting, and design standards. Oregon has separately moved to ease conversion of commercially zoned buildings to housing more broadly, without a zone change.</p>
+    <p>None of that is a promise about this parcel, and the affordability conditions attached to the shelter and affordable housing pathway are real. Whether any of it applies here is a question for the City of La Grande and your own land use counsel. But if your model is conversion rather than lodging operation, Oregon is an unusually favorable state to be doing it in, this is an unusually cheap building to be doing it with, and five existing kitchens is an unusually good head start.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Why La Grande and This Corner</h2>
+    <p>La Grande sits on Interstate 84 in the Grande Ronde Valley of Eastern Oregon, and is the commercial center of Union County.</p>
+    <p>The property is directly across the street from Safeway, which is the corner that matters in a town this size, and it is minutes from Eastern Oregon University and Grande Ronde Hospital.</p>
+    <p>Those two institutions are the demand story. A university generates student and visiting-family demand. A regional hospital generates travel nurse and traveling clinician demand, and that cohort books extended stays, which is the most profitable mix a small lodging property can run. Interstate 84 adds pass-through traffic on top of both.</p>
+    <p>Verify it yourself. Pull enrollment figures, ask the hospital's staffing office how they currently house travelers and what they pay, and check what competing La Grande lodging charges weekly.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Exit Strategies</h2>
+    <ul class="note-list">
+      <li><strong>Extended stay / travel nurse housing:</strong> Five kitchens plus proximity to Grande Ronde Hospital is the strongest version of this asset; weekly and monthly lets cut turnover cost and smooth occupancy.</li>
+      <li><strong>Reopen and operate:</strong> Restart the lodging business with an owner-operator in the on-site house.</li>
+      <li><strong>Residential conversion:</strong> Convert units to long-term rentals, subject to building code, change of occupancy, and the city's cooking facility rules; verify the applicable Oregon pathway with the City of La Grande.</li>
+      <li><strong>Owner-user:</strong> Live in the house, run the nine units, let the operation carry the property.</li>
+      <li><strong>Redevelopment:</strong> General commercial zoning on a 12,788 sq ft corner across from an anchor grocery.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Deal Terms</h2>
+    <table class="fact-table">
+      <tr><td class="k">Asking Price</td><td class="v">$375,000</td></tr>
+      <tr><td class="k">Earnest Money Deposit</td><td class="v">$10,000, non-refundable, due within 48 hours of executed contract</td></tr>
+      <tr><td class="k">Close of Escrow</td><td class="v">On or before November 30, 2026</td></tr>
+      <tr><td class="k">Access</td><td class="v">By appointment</td></tr>
+      <tr><td class="k">Condition</td><td class="v">Sold as-is</td></tr>
+      <tr><td class="k">Funding</td><td class="v">Cash or hard money only</td></tr>
+      <tr><td class="k">Closing Costs</td><td class="v">Buyer pays all closing costs, including escrow, title, and title insurance</td></tr>
+      <tr><td class="k">Transaction Coordination Fee</td><td class="v">$425, paid by buyer</td></tr>
+      <tr><td class="k">Terms</td><td class="v">First come, first served</td></tr>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Wholesale & Risk Disclosure</h2>
+    <div class="disclosure-box">
+      <p>JNA Dynamic Holdings LLC is not the record owner of this property. We hold, or are in the process of holding, an equitable interest in the property under a purchase and sale agreement, and we are marketing that equitable interest for assignment. We are not a licensed Oregon real estate broker and we are not acting as an agent for the seller or for any buyer. This is an assignment of an equitable interest in a real estate contract, not a listing of the real property itself. Earnest money on an assignment of contract is non-refundable.</p>
+      <p>Revenue figures are reported by the seller for a prior operating period, represent gross revenue rather than net operating income, and have not been verified against financial statements, tax returns, or bank records. The property is not currently operating. No operating statements, rent roll, or expense data have been provided. Condition, unit configuration, kitchen count, and the stated reason for kitchen placement are all seller-reported and have not been independently verified.</p>
+      <p>Statements regarding Oregon conversion statutes are general background, not legal advice, and not a representation that any pathway applies to this property.</p>
+      <p>Buyer to conduct their own due diligence, including independent inspection, verification of financial performance, square footage, unit count and configuration, kitchen locations, licensing and permit status, zoning and permitted uses, local code governing cooking facilities in lodging units, conversion eligibility and requirements, building code and occupancy classification, insurance cost, property taxes, title, and liens before executing any purchase agreement.</p>
+      <p>All figures on this page are believed accurate but have not been independently verified by JNA Dynamic Holdings LLC and are subject to change.</p>
+    </div>
+  </div>
+</section>
+
+<div class="cta-band">
+  <div class="wrap">
+    <h2>The Call</h2>
+    <p>Nine units, five kitchens, and an owner's house on general commercial zoning in La Grande. Across from Safeway, minutes from the university and the hospital. $375,000, or roughly $41,667 a door.</p>
+    <p>It is closed and it will need a restart. That is exactly why it is $375,000. EMD is $10,000 and closing is on or before November 30, 2026. If you run extended stay, or you have been hunting a conversion candidate in a state that makes conversion easy, reach out today.</p>
+    <div class="cta-contacts">
+      <a href="tel:5206336437">520-633-6437</a>
+      <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
+    </div>
+    <p class="cta-company">JNA Dynamic Holdings LLC</p>
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>This material is for informational purposes only and does not constitute an offer to sell real property. This is an assignment of an equitable interest in a purchase and sale agreement. Figures presented have not been independently verified by JNA Dynamic Holdings LLC. Buyers are encouraged to perform their own due diligence prior to entering any agreement.</p>
+  </div>
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
