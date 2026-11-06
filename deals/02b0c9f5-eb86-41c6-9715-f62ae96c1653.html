@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lakeland, FL — Gated Community Investment Opportunity | JNA Dynamic Holdings LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f6f1e9;
+    --ink: #2a241d;
+    --accent: #9c6b3f;
+    --line: #d9cdbb;
+    --card: #fffdf9;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .wrap {
+    max-width: 960px;
+    width: 92%;
+    margin: 0 auto;
+  }
+
+  header.hero {
+    background: linear-gradient(180deg, #efe6d6 0%, var(--paper) 100%);
+    padding-top: 50px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.75rem;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+
+  h1.title {
+    font-size: 2.6rem;
+    margin: 0 0 10px 0;
+    line-height: 1.15;
+  }
+
+  .location-line {
+    font-size: 1.1rem;
+    margin-bottom: 6px;
+  }
+
+  .address-note {
+    font-size: 0.95rem;
+    font-style: italic;
+    color: #5a4e3e;
+    margin-top: 10px;
+    margin-bottom: 18px;
+  }
+
+  .assignment-note {
+    font-size: 0.88rem;
+    color: #6b5f4d;
+    background: #efe3cf;
+    border: 1px solid var(--line);
+    padding: 10px 16px;
+    display: inline-block;
+    margin-top: 4px;
+  }
+
+  section {
+    margin-top: 48px;
+    margin-bottom: 48px;
+  }
+
+  .price-block {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    padding: 28px 32px;
+  }
+
+  .price-item {
+    min-width: 150px;
+  }
+
+  .price-item .label {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.72rem;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .price-item .value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    font-weight: 600;
+  }
+
+  .price-item .value.small {
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+
+  .gallery-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .more-photos-link {
+    font-size: 0.85rem;
+    color: var(--accent);
+  }
+
+  .gallery {
+    margin-top: 18px;
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+  }
+
+  .gallery img {
+    height: 260px;
+    width: auto;
+    flex: 0 0 auto;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    background: #e7ddc9;
+  }
+
+  h2.section-title {
+    font-size: 1.6rem;
+    border-bottom: 2px solid var(--accent);
+    display: inline-block;
+    padding-bottom: 6px;
+    margin-bottom: 20px;
+  }
+
+  table.terms {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border: 1px solid var(--line);
+  }
+
+  table.terms tr {
+    border-bottom: 1px solid var(--line);
+  }
+
+  table.terms tr:last-child {
+    border-bottom: none;
+  }
+
+  table.terms td {
+    padding: 12px 18px;
+    vertical-align: top;
+  }
+
+  table.terms td.label {
+    width: 42%;
+    font-weight: 500;
+    color: #5a4e3e;
+  }
+
+  ul.highlights {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 24px;
+  }
+
+  ul.highlights li {
+    padding-left: 18px;
+    position: relative;
+  }
+
+  ul.highlights li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+  }
+
+  .comps-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border: 1px solid var(--line);
+    font-size: 0.92rem;
+  }
+
+  .comps-table th, .comps-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+  }
+
+  .comps-table th {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.72rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .comps-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .scroll-x {
+    overflow-x: auto;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  .note-box {
+    background: #efe3cf;
+    border: 1px solid var(--line);
+    padding: 18px 22px;
+    font-size: 0.92rem;
+    margin-top: 16px;
+  }
+
+  .disclaimer {
+    font-size: 0.82rem;
+    color: #6b5f4d;
+    padding: 20px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  footer.cta {
+    background: var(--ink);
+    color: var(--paper);
+    padding-top: 50px;
+    padding-bottom: 50px;
+    margin-top: 60px;
+  }
+
+  footer.cta h2 {
+    color: var(--paper);
+    font-size: 1.9rem;
+    margin-bottom: 14px;
+  }
+
+  footer.cta p {
+    font-size: 1rem;
+    max-width: 560px;
+  }
+
+  .contact-line {
+    margin-top: 24px;
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+  }
+
+  .contact-line a {
+    color: var(--paper);
+    font-size: 1.15rem;
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent);
+    padding-bottom: 3px;
+  }
+
+  @media (max-width: 680px) {
+    .two-col { grid-template-columns: 1fr; }
+    ul.highlights { grid-template-columns: 1fr; }
+    h1.title { font-size: 2rem; }
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=02b0c9f5-eb86-41c6-9715-f62ae96c1653&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F02b0c9f5-eb86-41c6-9715-f62ae96c1653.html">Request the Address</a></div></noscript>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Off-Market Investor Opportunity &mdash; Deal FL-3 (SFH)</div>
+    <h1 class="title">Gated-Community Single-Family in TerraLargo</h1>
+    <div class="location-line">Lakeland, Polk County, FL 33810</div>
+    <div class="address-note">Address available upon request &mdash; contact us for the full property address.</div>
+    <div class="assignment-note">This offering is an assignment of contract. JNA Dynamic Holdings LLC holds an exclusive, legally binding purchase agreement with the property owner and does not represent the owner. Do not contact the owner/seller directly.</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="price-block">
+    <div class="price-item">
+      <div class="label">Asking Price</div>
+      <div class="value">$315,000 OBO</div>
+    </div>
+    <div class="price-item">
+      <div class="label">After-Repair Value (ARV)</div>
+      <div class="value">$474,000</div>
+    </div>
+    <div class="price-item">
+      <div class="label">Estimated Rehab</div>
+      <div class="value">$35,000</div>
+    </div>
+    <div class="price-item">
+      <div class="label">Asset Type</div>
+      <div class="value small">Single-Family Residence</div>
+    </div>
+    <div class="price-item">
+      <div class="label">Strategy</div>
+      <div class="value small">Fix &amp; Flip / Buy &amp; Hold</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="gallery-heading">
+      <h2 class="section-title">Property Photos</h2>
+      <a class="more-photos-link" href="https://drive.google.com/drive/folders/138vnLJnIXZdrmamNUvjruLwE1qd6n2Sm" target="_blank" rel="noopener">View all photos &rarr;</a>
+    </div>
+    <div class="gallery">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/1.jpg" alt="Lakeland FL property photo 1">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/2.jpg" alt="Lakeland FL property photo 2">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/3.jpg" alt="Lakeland FL property photo 3">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/4.jpg" alt="Lakeland FL property photo 4">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/5.jpg" alt="Lakeland FL property photo 5">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/6.jpg" alt="Lakeland FL property photo 6">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/7.jpg" alt="Lakeland FL property photo 7">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/8.jpg" alt="Lakeland FL property photo 8">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/9.jpg" alt="Lakeland FL property photo 9">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/10.jpg" alt="Lakeland FL property photo 10">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/11.jpg" alt="Lakeland FL property photo 11">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/12.jpg" alt="Lakeland FL property photo 12">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/13.jpg" alt="Lakeland FL property photo 13">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/14.jpg" alt="Lakeland FL property photo 14">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/15.jpg" alt="Lakeland FL property photo 15">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/16.jpg" alt="Lakeland FL property photo 16">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/17.jpg" alt="Lakeland FL property photo 17">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/18.jpg" alt="Lakeland FL property photo 18">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/19.jpg" alt="Lakeland FL property photo 19">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/20.jpg" alt="Lakeland FL property photo 20">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/21.jpg" alt="Lakeland FL property photo 21">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/22.jpg" alt="Lakeland FL property photo 22">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/23.jpg" alt="Lakeland FL property photo 23">
+      <img src="/deals/02b0c9f5-eb86-41c6-9715-f62ae96c1653/photos/24.jpg" alt="Lakeland FL property photo 24">
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">The Opportunity</h2>
+    <p>A spacious two-story residence located in TerraLargo, a gated residential community in Lakeland, Florida. Built in 2017, this property offers an opportunity for an experienced investor seeking a renovation and resale project in an established community.</p>
+    <ul class="highlights">
+      <li>Approximately 2,888 SF of living space</li>
+      <li>2017 construction</li>
+      <li>Spacious two-story layout</li>
+      <li>Attached two-car garage</li>
+      <li>Gated community with neighborhood amenities</li>
+      <li>Opportunity for interior cosmetic improvements and modernization</li>
+      <li>Four-point inspection report available</li>
+      <li>Comparable market analysis available</li>
+      <li>Expedited cash closing preferred</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="section-title">Property &amp; Deal Terms</h2>
+    <table class="terms">
+      <tr><td class="label">Asking Price</td><td>$315,000 OBO (also referenced as $319,000 OBO in purchase terms)</td></tr>
+      <tr><td class="label">After-Repair Value (ARV)</td><td>$474,000</td></tr>
+      <tr><td class="label">Estimated Rehab Budget</td><td>$35,000 (preliminary contractor range cited at $40,000&ndash;$50,000, including contingency)</td></tr>
+      <tr><td class="label">Preliminary Renovated Resale Range</td><td>$410,000 &ndash; $547,000 (underwriting estimate only, not a certified appraisal or guaranteed resale value)</td></tr>
+      <tr><td class="label">Asset Type</td><td>Single-Family Residence</td></tr>
+      <tr><td class="label">Deal Strategy</td><td>Fix and Flip, Buy and Hold</td></tr>
+      <tr><td class="label">Financing Type</td><td>Investment Loan (e.g. Hard Money, Bridge, DSCR, New Construction Loan)</td></tr>
+      <tr><td class="label">County</td><td>Polk County</td></tr>
+      <tr><td class="label">Community</td><td>Terra Largo (gated)</td></tr>
+      <tr><td class="label">Year Built</td><td>2017</td></tr>
+      <tr><td class="label">Living Area</td><td>Approximately 2,888 SF</td></tr>
+      <tr><td class="label">Bedrooms</td><td>5 reported &mdash; buyer to verify</td></tr>
+      <tr><td class="label">Bathrooms</td><td>2.5</td></tr>
+      <tr><td class="label">Garage</td><td>Attached 2-car</td></tr>
+      <tr><td class="label">HOA</td><td>Approximately $344/month</td></tr>
+      <tr><td class="label">Acquisition Terms</td><td>Cash only</td></tr>
+      <tr><td class="label">Earnest Money Deposit</td><td>$7,500</td></tr>
+      <tr><td class="label">Condition</td><td>Property sold AS IS</td></tr>
+      <tr><td class="label">Closing Costs</td><td>Buyer pays agreed closing costs</td></tr>
+      <tr><td class="label">Closing Timeline</td><td>Expedited closing preferred</td></tr>
+      <tr><td class="label">Buyer Requirements</td><td>Verified proof of funds required; end buyers only, no daisy chains</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2 class="section-title">Renovation Overview</h2>
+    <p>Preliminary rehab estimate: $40,000&ndash;$50,000, including contingency. Potential renovation items include flooring, kitchen and bathroom updates, painting, appliances, drywall repairs, HVAC servicing, and plumbing evaluation.</p>
+    <div class="note-box">Resale potential: preliminary renovated resale range of $410,000&ndash;$547,000. This range is an underwriting estimate, not a certified appraisal or guaranteed resale value. Buyers should independently verify comparable sales, renovation scope, and projected returns.</div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Comparable Sales</h2>
+    <div class="scroll-x">
+      <table class="comps-table">
+        <tr>
+          <th>Location</th>
+          <th>Status / Type</th>
+          <th>Beds / Baths</th>
+          <th>Sq. Ft.</th>
+          <th>Lot</th>
+          <th>Year Built</th>
+          <th>Last Sold Price</th>
+        </tr>
+        <tr>
+          <td>3987 Sunset Lake Dr, Lakeland, FL 33810 (MLS J1004589)</td>
+          <td>Closed / Single Family</td>
+          <td>5 bed / 3 bath</td>
+          <td>2,223 SF</td>
+          <td>10,851 SF</td>
+          <td>2015</td>
+          <td>$449,900</td>
+        </tr>
+        <tr>
+          <td>1950 Via Lago Dr, Lakeland, FL 33810</td>
+          <td>Closed / Single Family</td>
+          <td>4 bed / 3 bath</td>
+          <td>2,769 SF</td>
+          <td>0.38 acres</td>
+          <td>2015</td>
+          <td>$490,000</td>
+        </tr>
+        <tr>
+          <td>2250 Bella Luna Cir, Lakeland, FL 33810 (Polk County)</td>
+          <td>Single Family</td>
+          <td>4 bed / 2 bath</td>
+          <td>2,888 SF</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>$410,000</td>
+        </tr>
+        <tr>
+          <td>1844 Via Lago Dr, Lakeland, FL 33810</td>
+          <td>Closed / Single Family</td>
+          <td>5 bed / 4 bath</td>
+          <td>3,259 SF</td>
+          <td>0.28 acres</td>
+          <td>2016</td>
+          <td>$635,000</td>
+        </tr>
+        <tr>
+          <td>4169 Prima Lago Cir, Lakeland, FL 33810</td>
+          <td>Closed / Single Family</td>
+          <td>4 bed / 3 bath</td>
+          <td>2,110 SF</td>
+          <td>9,200 SF</td>
+          <td>2019</td>
+          <td>$389,000</td>
+        </tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Due Diligence</h2>
+    <div class="two-col">
+      <div>
+        <p>A due-diligence package is available to qualified buyers, including:</p>
+        <ul class="highlights" style="grid-template-columns: 1fr;">
+          <li>Seller purchase agreement documentation</li>
+          <li>Four-point inspection report</li>
+          <li>Comparative market analysis</li>
+          <li>Relevant title information</li>
+        </ul>
+      </div>
+      <div>
+        <p>These documents are made available through the appropriate transaction process once a buyer has been qualified and proof of funds has been verified.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="disclaimer">
+    This is an assignment of contract. JNA Dynamic Holdings LLC holds a legally binding purchase agreement with memorandum, granting it exclusive rights to purchase this property. JNA Dynamic Holdings LLC does not represent the property owner and is not a licensed broker. Figures presented, including bedroom count, square footage, HOA dues, rehab estimates, ARV, and comparable sales, have not been independently verified by JNA Dynamic Holdings LLC and should be confirmed by the buyer during due diligence. Do not contact the owner/seller without explicit consent; any attempt to contact the owner or renegotiate outside of this process may result in legal action.
+  </div>
+
+</div>
+
+<footer class="cta">
+  <div class="wrap">
+    <h2>Interested in this Lakeland assignment?</h2>
+    <p>Proof of funds required. End buyers only &mdash; no daisy chains. Reach out today for the full property address, the due-diligence package, and current availability.</p>
+    <div class="contact-line">
+      <a href="tel:520-633-6437">520-633-6437</a>
+      <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
+    </div>
+    <p style="margin-top:24px; font-size:0.85rem; color:#c9bfa9;">JNA Dynamic Holdings LLC</p>
+  </div>
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
