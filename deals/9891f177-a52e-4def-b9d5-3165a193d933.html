@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TX-5 (SFH) — Lockhart, TX | JNA Dynamic Holdings LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e9;
+    --ink:#262220;
+    --muted:#6b6056;
+    --line:#ddd3c4;
+    --accent:#7a3b2e;
+    --card:#fffdf9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Source Sans 3', sans-serif;
+    font-size:17px;
+    line-height:1.6;
+  }
+  h1,h2,h3{
+    font-family:'Playfair Display', serif;
+    font-weight:600;
+    color:var(--ink);
+  }
+  .wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:12.5px;
+    color:var(--accent);
+    font-weight:600;
+    margin-top:0;
+    margin-bottom:6px;
+  }
+  header.top{
+    padding-top:48px;
+    padding-bottom:18px;
+    border-bottom:1px solid var(--line);
+  }
+  header.top h1{
+    font-size:38px;
+    margin-top:0;
+    margin-bottom:10px;
+    line-height:1.15;
+  }
+  .location-line{
+    font-size:18px;
+    color:var(--muted);
+    margin-top:0;
+    margin-bottom:6px;
+  }
+  .notice{
+    display:inline-block;
+    background:#efe3d0;
+    border:1px solid var(--line);
+    color:var(--ink);
+    font-size:14px;
+    padding:8px 14px;
+    border-radius:4px;
+    margin-top:10px;
+    margin-bottom:6px;
+  }
+  .tags{
+    margin-top:14px;
+    margin-bottom:0;
+  }
+  .tag{
+    display:inline-block;
+    font-size:12.5px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    border:1px solid var(--accent);
+    color:var(--accent);
+    padding:4px 10px;
+    border-radius:20px;
+    margin-right:8px;
+    margin-bottom:8px;
+  }
+
+  .price-block{
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:28px 28px;
+    margin-top:28px;
+    margin-bottom:28px;
+  }
+  .price-item .label{
+    font-size:12.5px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--muted);
+    margin-bottom:4px;
+  }
+  .price-item .value{
+    font-family:'Playfair Display', serif;
+    font-size:30px;
+    font-weight:700;
+    color:var(--ink);
+  }
+  .price-item .value.accent{color:var(--accent);}
+
+  .gallery-wrap{
+    margin-top:0;
+    margin-bottom:10px;
+  }
+  .gallery{
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    padding-bottom:10px;
+    scrollbar-width:thin;
+  }
+  .gallery img{
+    height:230px;
+    width:auto;
+    border-radius:6px;
+    flex-shrink:0;
+    border:1px solid var(--line);
+    object-fit:cover;
+  }
+  .more-photos{
+    display:inline-block;
+    font-size:14px;
+    color:var(--accent);
+    text-decoration:underline;
+    margin-top:4px;
+    margin-bottom:28px;
+  }
+
+  section.block{
+    margin-top:38px;
+    margin-bottom:38px;
+  }
+  section.block h2{
+    font-size:24px;
+    border-bottom:2px solid var(--accent);
+    display:inline-block;
+    padding-bottom:4px;
+    margin-top:0;
+    margin-bottom:18px;
+  }
+  p{margin-top:0;margin-bottom:14px;}
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--card);
+    border:1px solid var(--line);
+  }
+  table caption{
+    text-align:left;
+    font-size:13px;
+    color:var(--muted);
+    margin-bottom:8px;
+  }
+  th,td{
+    text-align:left;
+    padding:10px 14px;
+    border-bottom:1px solid var(--line);
+    font-size:15.5px;
+    vertical-align:top;
+  }
+  th{
+    width:40%;
+    color:var(--muted);
+    font-weight:600;
+    background:#efe8db;
+  }
+  tr:last-child th, tr:last-child td{border-bottom:none;}
+
+  .comp-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:16px 18px;
+    margin-top:0;
+    margin-bottom:16px;
+  }
+  .comp-card h3{
+    font-size:18px;
+    margin-top:0;
+    margin-bottom:8px;
+  }
+  .comp-card .tagline{
+    display:inline-block;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--accent);
+    margin-top:6px;
+  }
+
+  ul.exits{
+    padding-left:20px;
+    margin-top:0;
+    margin-bottom:0;
+  }
+  ul.exits li{
+    margin-bottom:10px;
+  }
+
+  .disclosure-box{
+    background:#efe8db;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:20px 22px;
+    font-size:14.5px;
+    color:var(--muted);
+    margin-top:0;
+    margin-bottom:0;
+  }
+  .disclosure-box p{margin-bottom:10px;}
+  .disclosure-box p:last-child{margin-bottom:0;}
+
+  .cta-band{
+    background:var(--accent);
+    color:#fdf6ee;
+    text-align:center;
+    padding:48px 24px;
+    margin-top:50px;
+  }
+  .cta-band h2{
+    color:#fdf6ee;
+    font-size:28px;
+    margin-top:0;
+    margin-bottom:12px;
+  }
+  .cta-band p{
+    color:#f2e3d6;
+    margin-bottom:22px;
+    font-size:16px;
+  }
+  .cta-contacts{
+    display:flex;
+    justify-content:center;
+    gap:24px;
+    flex-wrap:wrap;
+  }
+  .cta-contacts a{
+    display:inline-block;
+    background:#fdf6ee;
+    color:var(--accent);
+    font-weight:600;
+    padding:12px 22px;
+    border-radius:4px;
+    text-decoration:none;
+    font-size:16px;
+  }
+  footer.foot{
+    text-align:center;
+    padding:24px;
+    font-size:12.5px;
+    color:var(--muted);
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=9891f177-a52e-4def-b9d5-3165a193d933&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F9891f177-a52e-4def-b9d5-3165a193d933.html">Request the Address</a></div></noscript>
+
+<div class="wrap">
+  <header class="top">
+    <p class="eyebrow">Deal Code: TX-5 (SFH) &nbsp;|&nbsp; Single-Family &nbsp;|&nbsp; Assignment of Contract</p>
+    <h1>Lockhart Three Bedroom — Same-Street Comp Closed at $364,420</h1>
+    <p class="location-line">Lockhart, TX 78644 &middot; Caldwell County, Texas</p>
+    <div class="notice">Address available upon request — contact us for the full property address.</div>
+    <div class="tags">
+      <span class="tag">Fix and Flip</span>
+      <span class="tag">Buy and Hold</span>
+      <span class="tag">3 Bed / 2 Bath</span>
+      <span class="tag">1,978 Sqft</span>
+    </div>
+  </header>
+
+  <div class="price-block">
+    <div class="price-item">
+      <div class="label">Asking Price</div>
+      <div class="value">$195,000</div>
+    </div>
+    <div class="price-item">
+      <div class="label">ARV</div>
+      <div class="value accent">$360,000</div>
+    </div>
+    <div class="price-item">
+      <div class="label">Gross Spread at Asking</div>
+      <div class="value">$165,000</div>
+    </div>
+    <div class="price-item">
+      <div class="label">Est. Market Rent</div>
+      <div class="value">$3,137/mo</div>
+    </div>
+  </div>
+
+  <div class="gallery-wrap">
+    <div class="gallery">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/1.jpg" alt="Lockhart, TX single-family property photo 1">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/2.jpg" alt="Lockhart, TX single-family property photo 2">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/3.jpg" alt="Lockhart, TX single-family property photo 3">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/4.jpg" alt="Lockhart, TX single-family property photo 4">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/5.jpg" alt="Lockhart, TX single-family property photo 5">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/6.jpg" alt="Lockhart, TX single-family property photo 6">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/7.jpg" alt="Lockhart, TX single-family property photo 7">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/8.jpg" alt="Lockhart, TX single-family property photo 8">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/9.jpg" alt="Lockhart, TX single-family property photo 9">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/10.jpg" alt="Lockhart, TX single-family property photo 10">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/11.jpg" alt="Lockhart, TX single-family property photo 11">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/12.jpg" alt="Lockhart, TX single-family property photo 12">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/13.jpg" alt="Lockhart, TX single-family property photo 13">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/14.jpg" alt="Lockhart, TX single-family property photo 14">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/15.jpg" alt="Lockhart, TX single-family property photo 15">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/16.jpg" alt="Lockhart, TX single-family property photo 16">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/17.jpg" alt="Lockhart, TX single-family property photo 17">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/18.jpg" alt="Lockhart, TX single-family property photo 18">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/19.jpg" alt="Lockhart, TX single-family property photo 19">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/20.jpg" alt="Lockhart, TX single-family property photo 20">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/21.jpg" alt="Lockhart, TX single-family property photo 21">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/22.jpg" alt="Lockhart, TX single-family property photo 22">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/23.jpg" alt="Lockhart, TX single-family property photo 23">
+      <img src="/deals/9891f177-a52e-4def-b9d5-3165a193d933/photos/24.jpg" alt="Lockhart, TX single-family property photo 24">
+    </div>
+    <a class="more-photos" href="https://drive.google.com/drive/folders/17k-M1siKqjhAaYeGmTVXQMFHa28smMCC" target="_blank" rel="noopener">View all photos &rarr;</a>
+  </div>
+
+  <section class="block">
+    <h2>The Opportunity</h2>
+    <p>The house across the street is identical in layout and it sold for $364,420. The subject is a three bedroom, two bath, single-story home at 1,978 square feet, built 2005 per tax records (2002 per the seller). That across-the-street comp is also three bedroom, two bath, single story, 1,978 square feet — not approximately, the same number — and it closed on June 1, 2026 at $364,420.</p>
+    <p>This property is being offered at $195,000. That is approximately $99 a square foot going in against a street that is pricing at roughly $184 a square foot — a gross spread of about $165,000 on a house with a 2021 roof and 2018 HVAC.</p>
+    <p>The seller discloses very minor foundation cracks. In Central Texas that is close to universal on slab construction and is usually cosmetic, but it is the one item that should not be taken on faith — a structural engineer, not a general inspector, should evaluate it. If the condition is as represented, this is a roughly twenty-year-old house with a newer roof, newer HVAC, and nothing major standing between the buyer and the comp across the street.</p>
+    <p><strong>Targeted closing: on or before November 18, 2026.</strong></p>
+  </section>
+
+  <section class="block">
+    <h2>The Numbers</h2>
+    <table>
+      <tr><th>Asking Price</th><td>$195,000</td></tr>
+      <tr><th>ARV</th><td>$360,000</td></tr>
+      <tr><th>Gross Spread at Asking</th><td>$165,000</td></tr>
+      <tr><th>Price per Sqft at Asking</th><td>Approximately $99</td></tr>
+      <tr><th>ARV per Sqft</th><td>Approximately $182</td></tr>
+      <tr><th>Comp Average Price per Sqft</th><td>$183</td></tr>
+      <tr><th>Comp Average Sale Price</th><td>$368,410</td></tr>
+      <tr><th>Comp-Adjusted Estimated Value</th><td>$361,974</td></tr>
+      <tr><th>AVM</th><td>$346,952</td></tr>
+      <tr><th>Estimated Market Rent</th><td>$3,137 per month</td></tr>
+      <tr><th>Living Area</th><td>1,978 sqft</td></tr>
+      <tr><th>Lot Size</th><td>9,805 sqft</td></tr>
+      <tr><th>Rehab Budget (per deal facts)</th><td>$35,000 estimated — note: no formal contractor rehab estimate has been produced; buyer should bring their own contractor to scope and confirm</td></tr>
+      <tr><th>Recommended Financing</th><td>Investment loan (example: hard money, bridge, DSCR, or new construction loan)</td></tr>
+      <tr><th>Target Strategies</th><td>Fix and Flip, Buy and Hold</td></tr>
+    </table>
+  </section>
+
+  <section class="block">
+    <h2>Property Snapshot</h2>
+    <table>
+      <tr><th>Location</th><td>Lockhart, TX 78644 — address available upon request</td></tr>
+      <tr><th>County</th><td>Caldwell County</td></tr>
+      <tr><th>Beds / Baths</th><td>3 Bed / 2 Bath</td></tr>
+      <tr><th>Living Area</th><td>1,978 sqft</td></tr>
+      <tr><th>Lot Size</th><td>9,805 sqft</td></tr>
+      <tr><th>Stories</th><td>1</td></tr>
+      <tr><th>Year Built</th><td>2002 per seller, 2005 per tax records — buyer to verify</td></tr>
+      <tr><th>Reported Features</th><td>Fireplace, garage, patio</td></tr>
+      <tr><th>Condition</th><td>Sold as-is</td></tr>
+    </table>
+  </section>
+
+  <section class="block">
+    <h2>Condition — Seller Disclosed</h2>
+    <table>
+      <tr><th>Roof</th><td>2021, per seller's disclosure</td></tr>
+      <tr><th>HVAC</th><td>2018, reported in good shape</td></tr>
+      <tr><th>Foundation</th><td>Very minor cracks disclosed by seller</td></tr>
+    </table>
+    <p style="margin-top:16px;">A seller who discloses foundation cracking before being asked is a seller whose other statements carry more weight. That said, foundation condition is the one item here that should never be priced from a disclosure alone. Central Texas clay moves, slab cracking is common, and the gap between hairline settlement and a real structural problem is the difference between a few thousand dollars and thirty — a structural engineer's letter is strongly advised.</p>
+    <p>No report has been provided on electrical, plumbing, interior condition, or appliances.</p>
+  </section>
+
+  <section class="block">
+    <h2>Closed Comparables — Lockhart, TX 78644</h2>
+
+    <div class="comp-card">
+      <h3>513 Mockingbird Ln, Lockhart, TX 78644</h3>
+      <p>3 Bed / 2 Bath, 1,978 sqft, single story, built 2005, 10,755 sqft lot. Features: fireplace, garage, patio, pool, porch.</p>
+      <p><strong>Sold $364,420</strong> on 06/01/2026 — approximately $184 per sqft.</p>
+      <span class="tagline">Same street as subject &middot; identical square footage</span>
+    </div>
+
+    <div class="comp-card">
+      <h3>1215 W Live Oak St, Lockhart, TX 78644</h3>
+      <p>3 Bed / 2 Bath, 2,031 sqft, single story, built 2003, 0.57 acre lot. Features: fireplace, garage, patio, porch.</p>
+      <p><strong>Sold $372,400</strong> on 08/17/2026 — approximately $183 per sqft.</p>
+    </div>
+
+    <h3 style="font-size:18px;margin-top:24px;">How to Read This Comp Set</h3>
+    <p>It is a small set — two sales — and that should be said plainly. But it is an unusually clean set. 513 Mockingbird is across the street from the subject, with the same bed and bath count, the same single-story configuration, the same vintage, and the same 1,978 square feet. There is no size adjustment to argue because there is no size difference; it closed at $364,420.</p>
+    <p>1215 W Live Oak is fifty-three square feet larger, two years older, and closed at $372,400. Two independent sales landing at $184 and $183 a square foot is a tight read on what this product does in Lockhart.</p>
+    <p>The adjustments both run against the subject: 513 Mockingbird has a pool and the subject does not; 1215 W Live Oak sits on 0.57 acres against the subject's 9,805 square feet, and the comp average lot size is 0.41 acres, putting the subject on the smaller side of the set. That is why the ARV used here is $360,000 rather than $368,000 — it sits below the comp average, below the $361,974 comp-adjusted estimate, and above the $346,952 AVM.</p>
+    <p>Lockhart is an appreciating market, not a fast one — whatever the exit strategy, carrying costs should be underwritten honestly.</p>
+  </section>
+
+  <section class="block">
+    <h2>Why Lockhart</h2>
+    <p>Lockhart is the Caldwell County seat, roughly thirty miles southeast of downtown Austin on the US 183 corridor, and is known nationally as the Barbecue Capital of Texas.</p>
+    <p>The investment case is proximity. Austin's housing costs have pushed working households outward for years, and the towns along 183 and SH 130 have absorbed that demand. Lockhart has a historic courthouse square, a real small-town identity, and commuting distance to both Austin and San Marcos, with the SH 130 industrial corridor in between.</p>
+    <p>The rental number tells the same story: estimated market rent on this property is $3,137 a month against a $195,000 acquisition — a ratio not found inside Travis County.</p>
+  </section>
+
+  <section class="block">
+    <h2>Exit Strategies</h2>
+    <ul class="exits">
+      <li><strong>Fix and Flip:</strong> $195,000 entry against a street that closed at $364,420 this year, with roof and HVAC already handled so the rehab budget can go to cosmetics.</li>
+      <li><strong>Buy and Hold:</strong> Estimated rent of $3,137 per month against a $195,000 basis in an Austin commuter market.</li>
+      <li><strong>BRRRR:</strong> Acquire, update, stabilize at market rent, and refinance against a comp-supported value.</li>
+      <li><strong>Workforce Rental:</strong> Three bedroom, single-story product near the US 183 and SH 130 corridors serving commuters priced out of Travis and Hays counties.</li>
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2>Deal Terms</h2>
+    <table>
+      <tr><th>Purchase Price</th><td>$195,000</td></tr>
+      <tr><th>Close of Escrow</th><td>On or before November 18, 2026</td></tr>
+      <tr><th>Title Company</th><td>Nu World Title — Sally Schopp (sally@nuworldtitle.com)</td></tr>
+      <tr><th>Condition</th><td>Sold as-is</td></tr>
+      <tr><th>Funding</th><td>Cash or hard money only</td></tr>
+      <tr><th>Closing Costs</th><td>Buyer pays all closing costs, including escrow, title, and title insurance</td></tr>
+      <tr><th>Transaction Coordination Fee</th><td>$425, paid by buyer</td></tr>
+      <tr><th>Terms</th><td>First come, first served</td></tr>
+    </table>
+  </section>
+
+  <section class="block">
+    <h2>Wholesale &amp; Disclosure Notice</h2>
+    <div class="disclosure-box">
+      <p>This is an assignment of contract, not a direct sale of real property. JNA Dynamic Holdings LLC is not the record owner of this property. We hold, or are in the process of acquiring, an equitable interest in the property under a purchase and sale agreement, and we are marketing that equitable interest for assignment. JNA Dynamic Holdings LLC is not a licensed Texas real estate broker and is not acting as an agent for the seller or for any buyer. Earnest money on an assignment of contract is non-refundable.</p>
+      <p>Condition information is taken from the seller's disclosure and has not been independently inspected or verified by JNA Dynamic Holdings LLC. The seller has disclosed minor foundation cracking, and buyers are strongly advised to obtain an independent structural evaluation. Year built is reported as 2002 by the seller and 2005 by tax records and should be verified. ARV, AVM, estimated values, comparable sales data, and rent estimates are model-generated outputs from third-party platforms, not appraisals, and are not guaranteed.</p>
+      <p>Buyers are responsible for their own due diligence, including independent inspection, independent ARV verification, and confirmation of square footage, bed and bath count, permit history, HOA status and dues, flood zone, property taxes, title, and liens before executing any purchase agreement.</p>
+    </div>
+  </section>
+</div>
+
+<div class="cta-band">
+  <h2>Lockhart, Caldwell County — Identical Comp Across the Street Closed at $364,420</h2>
+  <p>Three bedroom, two bath, 1,978 square feet, single story. 2021 roof, 2018 HVAC. Closing on or before November 18, 2026. Call or text, and bring a structural engineer along with your contractor.</p>
+  <div class="cta-contacts">
+    <a href="tel:520-633-6437">Call / Text 520-633-6437</a>
+    <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
+  </div>
+</div>
+
+<footer class="foot">
+  JNA Dynamic Holdings LLC &middot; Deal Code TX-5 (SFH) &middot; Lockhart, Caldwell County, Texas
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
