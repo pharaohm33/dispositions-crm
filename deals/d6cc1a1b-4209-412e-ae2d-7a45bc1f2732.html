@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Cliffs on Lake Granbury | 2.25-Acre Homesite + Shoreline Parcel | Hood County, TX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: #f6f1e9;
+    color: #2b2621;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+  }
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    color: #1f1b17;
+  }
+  a { color: inherit; }
+
+  .top-strip {
+    background-color: #2b2621;
+    color: #f6f1e9;
+    padding: 10px 0;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  header.hero {
+    padding-top: 48px;
+    padding-bottom: 20px;
+  }
+  .deal-code {
+    display: inline-block;
+    background: #e3d9c6;
+    color: #4a3f31;
+    padding: 4px 12px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 2px;
+    margin-bottom: 14px;
+  }
+  h1.title {
+    font-size: 38px;
+    line-height: 1.2;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  .subtitle {
+    font-size: 17px;
+    color: #5a5047;
+    margin-top: 0;
+    margin-bottom: 18px;
+  }
+  .location-line {
+    font-size: 16px;
+    margin-top: 0;
+    margin-bottom: 6px;
+  }
+  .address-note {
+    font-size: 14.5px;
+    font-style: italic;
+    color: #6b5f50;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .price-block {
+    background-color: #fffdf8;
+    border: 1px solid #e3d9c6;
+    border-radius: 6px;
+    padding: 26px 28px;
+    margin-top: 28px;
+    margin-bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .price-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 44px;
+    font-weight: 700;
+    color: #1f1b17;
+  }
+  .price-sub {
+    font-size: 14px;
+    color: #6b5f50;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .price-meta {
+    font-size: 14.5px;
+    color: #4a3f31;
+  }
+
+  .gallery {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding-bottom: 10px;
+    margin-top: 12px;
+    margin-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .gallery img {
+    height: 230px;
+    width: auto;
+    flex: 0 0 auto;
+    border-radius: 5px;
+    object-fit: cover;
+    border: 1px solid #e3d9c6;
+  }
+  .more-photos {
+    font-size: 14px;
+    margin-top: 0;
+    margin-bottom: 30px;
+  }
+
+  section {
+    margin-top: 38px;
+    margin-bottom: 38px;
+  }
+
+  h2.section-title {
+    font-size: 24px;
+    border-bottom: 2px solid #d8cdb6;
+    padding-bottom: 10px;
+    margin-bottom: 18px;
+    margin-top: 0;
+  }
+
+  .lede {
+    font-size: 17px;
+    color: #332b22;
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+  p {
+    margin-top: 0;
+    margin-bottom: 14px;
+    font-size: 15.5px;
+    color: #3a332a;
+  }
+
+  h3.sub-title {
+    font-size: 19px;
+    margin-top: 24px;
+    margin-bottom: 10px;
+  }
+
+  table.facts-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fffdf8;
+    border: 1px solid #e3d9c6;
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+  table.facts-table th, table.facts-table td {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 15px;
+    border-bottom: 1px solid #ece3d1;
+  }
+  table.facts-table th {
+    width: 42%;
+    color: #6b5f50;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+  }
+  table.facts-table tr:last-child th,
+  table.facts-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  ul.plain-list {
+    margin-top: 0;
+    margin-bottom: 16px;
+    padding-left: 20px;
+  }
+  ul.plain-list li {
+    margin-bottom: 8px;
+    font-size: 15.5px;
+    color: #3a332a;
+  }
+
+  .callout-box {
+    background: #efe6d4;
+    border-left: 4px solid #b89b6b;
+    padding: 16px 20px;
+    font-size: 14.5px;
+    color: #4a3f31;
+    margin-top: 16px;
+    margin-bottom: 16px;
+  }
+
+  .disclosure {
+    background: #fffdf8;
+    border: 1px dashed #c8bba0;
+    padding: 18px 20px;
+    font-size: 13.5px;
+    color: #6b5f50;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .cta-band {
+    background-color: #1f1b17;
+    color: #f6f1e9;
+    padding-top: 48px;
+    padding-bottom: 48px;
+    margin-top: 50px;
+    margin-bottom: 0;
+  }
+  .cta-band h2 {
+    color: #f6f1e9;
+    font-size: 28px;
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+  .cta-band p {
+    color: #d9cfbd;
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+  .cta-contacts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    font-size: 17px;
+  }
+  .cta-contacts a {
+    color: #f6f1e9;
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px solid #b89b6b;
+    padding-bottom: 2px;
+  }
+  .cta-company {
+    margin-top: 18px;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #a89a84;
+  }
+
+  footer.foot {
+    padding-top: 20px;
+    padding-bottom: 36px;
+    font-size: 12.5px;
+    color: #8a7d6a;
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=d6cc1a1b-4209-412e-ae2d-7a45bc1f2732&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2Fd6cc1a1b-4209-412e-ae2d-7a45bc1f2732.html">Request the Address</a></div></noscript>
+
+<div class="top-strip">Wholesale Assignment Opportunity &mdash; JNA Dynamic Holdings LLC</div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="deal-code">Deal TX-4 (Land)</span>
+    <h1 class="title">2.25-Acre Custom Homesite + Bonus Shoreline Parcel</h1>
+    <p class="subtitle">The Cliffs on Lake Granbury &mdash; A two-parcel land package near Lake Granbury</p>
+    <p class="location-line">Granbury, Hood County, Texas</p>
+    <p class="address-note">Address available upon request &mdash; contact us for the full parcel address details.</p>
+  </header>
+
+  <div class="price-block">
+    <div>
+      <div class="price-sub">Package Asking Price</div>
+      <div class="price-amount">$123,000</div>
+    </div>
+    <div class="price-meta">
+      Two-parcel package &middot; Approximately 2.25 acres primary tract + 0.15-acre bonus shoreline parcel<br>
+      Asset Type: Land &middot; Financing: Investment Loan (e.g., Hard Money, Bridge, DSCR, New Construction Loan)
+    </div>
+  </div>
+
+  <section class="gallery-section">
+    <div class="gallery">
+      <img src="/deals/d6cc1a1b-4209-412e-ae2d-7a45bc1f2732/photos/1.jpg" alt="The Cliffs on Lake Granbury land parcel view 1">
+      <img src="/deals/d6cc1a1b-4209-412e-ae2d-7a45bc1f2732/photos/2.jpg" alt="The Cliffs on Lake Granbury land parcel view 2">
+      <img src="/deals/d6cc1a1b-4209-412e-ae2d-7a45bc1f2732/photos/3.jpg" alt="The Cliffs on Lake Granbury land parcel view 3">
+      <img src="/deals/d6cc1a1b-4209-412e-ae2d-7a45bc1f2732/photos/4.jpg" alt="The Cliffs on Lake Granbury land parcel view 4">
+      <img src="/deals/d6cc1a1b-4209-412e-ae2d-7a45bc1f2732/photos/5.jpg" alt="The Cliffs on Lake Granbury land parcel view 5">
+      <img src="/deals/d6cc1a1b-4209-412e-ae2d-7a45bc1f2732/photos/6.jpg" alt="The Cliffs on Lake Granbury land parcel view 6">
+      <img src="/deals/d6cc1a1b-4209-412e-ae2d-7a45bc1f2732/photos/7.jpg" alt="The Cliffs on Lake Granbury land parcel view 7">
+      <img src="/deals/d6cc1a1b-4209-412e-ae2d-7a45bc1f2732/photos/8.jpg" alt="The Cliffs on Lake Granbury land parcel view 8">
+      <img src="/deals/d6cc1a1b-4209-412e-ae2d-7a45bc1f2732/photos/9.jpg" alt="The Cliffs on Lake Granbury land parcel view 9">
+      <img src="/deals/d6cc1a1b-4209-412e-ae2d-7a45bc1f2732/photos/10.jpg" alt="The Cliffs on Lake Granbury land parcel view 10">
+      <img src="/deals/d6cc1a1b-4209-412e-ae2d-7a45bc1f2732/photos/11.jpg" alt="The Cliffs on Lake Granbury land parcel view 11">
+    </div>
+  </section>
+
+  <section class="opportunity">
+    <h2 class="section-title">The Opportunity</h2>
+    <p class="lede">2.25 acres to build a custom home near Lake Granbury, with a separate shoreline parcel included at no additional asking price.</p>
+    <p>Located in The Cliffs on Lake Granbury, this offering is centered around an approximately 2.25-acre residential tract with the potential to become an impressive custom homesite.</p>
+    <p>For buyers looking beyond conventional subdivision lots, this property offers the opportunity to explore a larger residence, expansive outdoor living areas, and a custom layout designed around the land.</p>
+    <p>With approximately 98,010 square feet on the primary tract alone, the property provides room to consider a substantial residential project while remaining within an established community near Lake Granbury.</p>
+    <p>The purchase also includes a separate approximately 0.15-acre shoreline parcel on Cliffview Ct. This additional tract is included in the $123,000 asking price without an additional purchase charge.</p>
+    <p>The primary value is the 2.25-acre homesite. The shoreline parcel is an additional component of the package.</p>
+  </section>
+
+  <section class="homesite">
+    <h2 class="section-title">2.25 Acres of Custom-Home Potential</h2>
+    <p>The defining feature of this offering is the size of the main residential tract. At approximately 2.25 acres, the property provides an opportunity to explore home designs and outdoor configurations that may not be practical on smaller residential lots.</p>
+    <p>A buyer could evaluate plans for a spacious custom residence with an attached garage, covered patios, outdoor entertaining areas, landscaped grounds, and other residential improvements suited to the property's verified building envelope.</p>
+    <p>For those interested in a more distinctive home, the acreage allows room to explore architectural concepts that prioritize the relationship between the residence and its surrounding land.</p>
+    <p>A custom builder may also evaluate the site for a new-construction project, with the potential to develop a home tailored to local buyer preferences and the broader Granbury residential market.</p>
+    <p>All development concepts remain subject to applicable restrictions, setbacks, terrain, utilities, permitting, and independent confirmation of buildability.</p>
+    <p>This is an opportunity to purchase a substantial acreage homesite and explore a custom residential project based on the property's actual characteristics.</p>
+  </section>
+
+  <section class="shoreline">
+    <h2 class="section-title">Bonus Shoreline Parcel Included</h2>
+    <p>Located on the same Cliff View Ct. road &mdash; approximately 0.15 acre, included with purchase.</p>
+    <p>In addition to the primary homesite, the package includes a separate approximately 0.15-acre shoreline parcel in the Lake Granbury area. The smaller tract is being conveyed as part of the same $123,000 offering, with no additional asking price allocated to its inclusion.</p>
+    <p>This provides buyers with an additional property interest to evaluate alongside the larger residential tract.</p>
+    <p>Available historical survey documentation identifies access easements and references a recorded conveyance restriction. The seller reports challenging terrain, and practical access, shoreline usability, and dock eligibility have not been verified.</p>
+    <p>The shoreline parcel is not represented as an approved building lot, recreational access point, or permitted dock location.</p>
+    <p>The two properties are separate and noncontiguous. The approximately 0.15-acre shoreline tract should not be combined with the primary 2.25-acre parcel when determining the main homesite's usable acreage.</p>
+  </section>
+
+  <section class="location">
+    <h2 class="section-title">The Cliffs on Lake Granbury &mdash; Location &amp; Lifestyle</h2>
+    <p>Situated in Hood County, Texas, the property offers a residential acreage opportunity within an established community near Lake Granbury.</p>
+    <p>Granbury's combination of lake-oriented recreation, established neighborhoods, and custom residential development makes the area worth exploring for buyers seeking a home outside a conventional high-density subdivision setting.</p>
+    <p>The primary tract offers an opportunity to design a residence around a larger property footprint, with potential space for outdoor living, landscaping, and additional residential features where permitted.</p>
+    <p>For an owner-builder, the appeal is the ability to pursue a custom home designed around personal preferences. For a professional builder, the opportunity is to evaluate a larger homesite for a finished residential product, taking into consideration the local market, construction costs, and comparable new-home sales.</p>
+    <p>Cliffview Ct is offered at $123,000 for approximately 2.25 acres, with the separate shoreline tract included at no additional asking price.</p>
+    <p>The comparable sale is provided for market context rather than as a direct valuation or representation of the subject property's market value.</p>
+  </section>
+
+  <section class="property-details">
+    <h2 class="section-title">Property Details</h2>
+    <table class="facts-table">
+      <tr><th>Location</th><td>The Cliffs on Lake Granbury, Hood County, Texas</td></tr>
+      <tr><th>Parcel Size</th><td>Approximately 2.25 acres</td></tr>
+      <tr><th>Land Area</th><td>Approximately 98,010 square feet</td></tr>
+      <tr><th>Opportunity</th><td>Custom residential homesite, subject to due diligence and applicable approvals</td></tr>
+      <tr><th>Documentation</th><td>Available survey information, aerial imagery, and parcel materials upon request</td></tr>
+    </table>
+
+    <h3 class="sub-title">Additional Included Parcel</h3>
+    <table class="facts-table">
+      <tr><th>Parcel Size</th><td>Approximately 0.15 acre</td></tr>
+      <tr><th>Property Description</th><td>Separate shoreline tract</td></tr>
+      <tr><th>Purchase Price</th><td>Included in the $123,000 package at no additional asking price</td></tr>
+      <tr><th>Access &amp; Restrictions</th><td>Historical survey references access easements and a recorded conveyance restriction</td></tr>
+      <tr><th>Current Status</th><td>Practical access, shoreline usability, and dock eligibility remain unverified</td></tr>
+    </table>
+  </section>
+
+  <section class="development">
+    <h2 class="section-title">Development Considerations</h2>
+    <ul class="plain-list">
+      <li>Prospective buyers should independently evaluate the primary parcel's topography, usable building area, setbacks, legal access, utility availability, septic feasibility, flood designation, HOA requirements, deed restrictions, and anticipated site preparation costs.</li>
+      <li>The smaller shoreline parcel requires separate investigation regarding recorded restrictions, easements, terrain, accessibility, permissible uses, and any applicable shoreline or dock regulations.</li>
+      <li>No representation is made regarding approved building plans, installed utilities, septic approval, guaranteed buildability, dock rights, or existing development permits.</li>
+      <li>Available documentation can be provided to qualified buyers for review.</li>
+    </ul>
+  </section>
+
+  <section class="terms">
+    <h2 class="section-title">Deal Terms</h2>
+    <table class="facts-table">
+      <tr><th>Package Asking Price</th><td>$123,000</td></tr>
+      <tr><th>Transaction Structure</th><td>Wholesale assignment of contract</td></tr>
+      <tr><th>Condition</th><td>As-is</td></tr>
+      <tr><th>Financing</th><td>Cash or approved funds (Investment loan options such as hard money, bridge, DSCR, or new-construction financing may apply)</td></tr>
+      <tr><th>Closing Costs</th><td>Buyer responsibility</td></tr>
+      <tr><th>Transaction Coordinator Fee</th><td>$425, paid by buyer at closing</td></tr>
+      <tr><th>Offer Requirements</th><td>Proof of funds required</td></tr>
+    </table>
+    <div class="callout-box">
+      This is an assignment of contract. JNA Dynamic Holdings LLC holds equitable interest in the subject transaction under its agreement with the underlying property owner. The end buyer will receive an assignment of that contract, not a direct conveyance from the underlying owner.
+    </div>
+    <div class="disclosure">
+      All figures, measurements, and descriptions above are believed to be accurate but have not been independently verified by JNA Dynamic Holdings LLC. Buyers are encouraged to perform their own due diligence, including independent verification of acreage, boundaries, access, easements, restrictions, utilities, and buildability prior to entering into any agreement.
+    </div>
+  </section>
+</div>
+
+<div class="cta-band">
+  <div class="wrap">
+    <h2>Request the Full Property Package</h2>
+    <p>2.25 acres of custom-home potential near Lake Granbury, plus a separate shoreline parcel included in the purchase. For builders, investors, and buyers considering a custom residential project, this offering provides an opportunity to evaluate a larger homesite at a $123,000 package asking price. Available survey documentation, aerial photographs, parcel information, and additional due diligence materials can be provided upon request.</p>
+    <div class="cta-contacts">
+      <a href="tel:520-633-6437">520-633-6437</a>
+      <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
+    </div>
+    <div class="cta-company">JNA Dynamic Holdings LLC</div>
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>Individual property addresses available upon request; contact us for the full address details. This offering is subject to prior sale, price change, or withdrawal without notice. JNA Dynamic Holdings LLC holds equitable interest in the subject transaction via contract with the underlying property owner and is marketing its assignable interest; this is not a direct sale by the underlying seller.</p>
+  </div>
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
