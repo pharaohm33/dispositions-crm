@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Port LaBelle Land Opportunity | 0.31 Acre | LaBelle, FL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #f6f1e9;
+    color: #2b2621;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+  }
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    color: #1f1b17;
+  }
+  header.top {
+    background: #2b2621;
+    color: #f6f1e9;
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+  header.top .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.03em;
+  }
+  .tagline {
+    font-size: 0.78rem;
+    opacity: 0.75;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .hero {
+    margin-top: 42px;
+    margin-bottom: 10px;
+  }
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.78rem;
+    color: #8a6b3f;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  h1.title {
+    font-size: 2.3rem;
+    margin: 0 0 10px 0;
+    line-height: 1.2;
+  }
+  .location-line {
+    font-size: 1.05rem;
+    color: #4a433b;
+    margin-bottom: 4px;
+  }
+  .address-note {
+    font-size: 0.92rem;
+    color: #6b5c45;
+    font-style: italic;
+    margin-top: 6px;
+    margin-bottom: 20px;
+  }
+  .photos-link {
+    display: inline-block;
+    margin-top: 8px;
+    margin-bottom: 10px;
+    font-size: 0.88rem;
+    color: #8a6b3f;
+    text-decoration: underline;
+  }
+  .price-block {
+    background: #fff;
+    border: 1px solid #e4dbc9;
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-top: 22px;
+    margin-bottom: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    align-items: center;
+  }
+  .price-main .label {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: #8a7c63;
+    margin-bottom: 4px;
+  }
+  .price-main .value {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    color: #1f1b17;
+    font-weight: 700;
+  }
+  .price-sub {
+    font-size: 0.92rem;
+    color: #4a433b;
+  }
+  .gallery {
+    margin-top: 10px;
+    margin-bottom: 36px;
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .gallery img {
+    height: 240px;
+    width: auto;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid #e4dbc9;
+  }
+  section.block {
+    margin-top: 34px;
+    margin-bottom: 34px;
+  }
+  section.block h2 {
+    font-size: 1.4rem;
+    margin-bottom: 14px;
+    border-bottom: 2px solid #d9cba6;
+    padding-bottom: 8px;
+  }
+  p { color: #3a342c; }
+  table.terms {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid #e4dbc9;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  table.terms tr {
+    border-bottom: 1px solid #ece4d3;
+  }
+  table.terms tr:last-child { border-bottom: none; }
+  table.terms td {
+    padding: 12px 18px;
+    font-size: 0.95rem;
+    vertical-align: top;
+  }
+  table.terms td.k {
+    width: 42%;
+    color: #7a6c53;
+    font-weight: 600;
+  }
+  ul.plain {
+    padding-left: 20px;
+    margin: 0;
+  }
+  ul.plain li { margin-bottom: 8px; color: #3a342c; }
+  .notice-box {
+    background: #efe6d3;
+    border: 1px solid #d9cba6;
+    border-radius: 8px;
+    padding: 18px 20px;
+    font-size: 0.88rem;
+    color: #4a3f2e;
+  }
+  .disclaimer {
+    font-size: 0.82rem;
+    color: #6b5c45;
+    margin-top: 10px;
+  }
+  .cta-band {
+    background: #1f1b17;
+    color: #f6f1e9;
+    margin-top: 50px;
+    padding-top: 42px;
+    padding-bottom: 42px;
+  }
+  .cta-band h2 {
+    color: #f6f1e9;
+    border: none;
+    font-size: 1.7rem;
+    margin-bottom: 10px;
+  }
+  .cta-band p {
+    color: #cfc6b4;
+    margin-bottom: 20px;
+  }
+  .cta-links {
+    display: flex;
+    gap: 22px;
+    flex-wrap: wrap;
+  }
+  .cta-links a {
+    color: #f6f1e9;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 2px solid #8a6b3f;
+    padding-bottom: 2px;
+  }
+  footer.foot {
+    padding-top: 24px;
+    padding-bottom: 36px;
+  }
+  footer.foot p {
+    font-size: 0.78rem;
+    color: #8a7c63;
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=1c4bcd22-5eb8-4d2b-8065-59bbeafd7b25&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F1c4bcd22-5eb8-4d2b-8065-59bbeafd7b25.html">Request the Address</a></div></noscript>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">JNA Dynamic Holdings LLC</div>
+    <div class="tagline">Assignment of Contract Opportunities</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Deal Code: FL-5 (Land)</div>
+    <h1 class="title">Port LaBelle Land Opportunity — 0.31 Acre, ±208 Ft of Road Frontage</h1>
+    <div class="location-line">LaBelle, Hendry County, FL 33935</div>
+    <div class="address-note">Address available upon request — contact us for the full parcel address.</div>
+  </div>
+
+  <div class="gallery">
+    <img src="/deals/1c4bcd22-5eb8-4d2b-8065-59bbeafd7b25/photos/1.jpg" alt="Port LaBelle Unit 13 vacant residential lot view 1">
+    <img src="/deals/1c4bcd22-5eb8-4d2b-8065-59bbeafd7b25/photos/2.jpg" alt="Port LaBelle Unit 13 vacant residential lot view 2">
+    <img src="/deals/1c4bcd22-5eb8-4d2b-8065-59bbeafd7b25/photos/3.jpg" alt="Port LaBelle Unit 13 vacant residential lot view 3">
+    <img src="/deals/1c4bcd22-5eb8-4d2b-8065-59bbeafd7b25/photos/4.jpg" alt="Port LaBelle Unit 13 vacant residential lot view 4">
+    <img src="/deals/1c4bcd22-5eb8-4d2b-8065-59bbeafd7b25/photos/5.jpg" alt="Port LaBelle Unit 13 vacant residential lot view 5">
+  </div>
+
+  <div class="price-block">
+    <div class="price-main">
+      <div class="label">Assignment Price</div>
+      <div class="value">$23,000</div>
+    </div>
+    <div class="price-sub">
+      0.31-acre residential lot &nbsp;·&nbsp; ±13,503 SF &nbsp;·&nbsp; Port LaBelle Unit 13, Hendry County, FL
+    </div>
+  </div>
+
+  <section class="block">
+    <h2>Opportunity Overview</h2>
+    <p>Builders, developers, and land investors: evaluate this 0.31-acre residential lot in Port LaBelle Unit 13 for your next single-family home project, subject to zoning and site approvals.</p>
+    <p>Address available on request — this parcel is located in LaBelle, FL 33935, and offers approximately 13,503 square feet of land and 208.5 feet of reported road frontage. Buyers considering a spec build, custom home, or land investment can assess the property against nearby lot sales and their own development budget.</p>
+  </section>
+
+  <section class="block">
+    <h2>Property Details</h2>
+    <table class="terms">
+      <tr><td class="k">Asset Type</td><td>Land</td></tr>
+      <tr><td class="k">County</td><td>Hendry County</td></tr>
+      <tr><td class="k">Subdivision</td><td>Port LaBelle Unit 13</td></tr>
+      <tr><td class="k">Legal Description</td><td>Block 2525, Lot 22</td></tr>
+      <tr><td class="k">Lot Size</td><td>Approximately 0.31 acre / 13,503 SF</td></tr>
+      <tr><td class="k">Road Frontage</td><td>Approximately 208.5 feet, reported</td></tr>
+      <tr><td class="k">Current Land Use</td><td>Residential vacant land</td></tr>
+      <tr><td class="k">City / State / ZIP</td><td>LaBelle, FL 33935</td></tr>
+    </table>
+  </section>
+
+  <section class="block">
+    <h2>Deal Terms</h2>
+    <table class="terms">
+      <tr><td class="k">Deal Code</td><td>FL-5 (Land)</td></tr>
+      <tr><td class="k">Assignment Price</td><td>$23,000</td></tr>
+      <tr><td class="k">Deal Type</td><td>Land — Assignment of Contract</td></tr>
+      <tr><td class="k">Suggested Financing</td><td>Investment Loan (e.g., Hard Money, Bridge, DSCR, New Construction Loan)</td></tr>
+    </table>
+  </section>
+
+  <section class="block">
+    <h2>Nearby Land Sales</h2>
+    <p>Supplied property research identifies six nearby sold lots ranging from $29,900 to $35,000, approximately 0.1–0.5 mile away, with lot sizes ranging from 0.23–0.32 acre. Sale dates were not included in the available research; buyers should independently verify these transactions and evaluate differences in utilities, site conditions, and location.</p>
+  </section>
+
+  <section class="block">
+    <h2>Site &amp; Development Considerations</h2>
+    <ul class="plain">
+      <li>Preliminary mapping reported no wetland overlap or FEMA flood overlap. These screening results require verification and do not establish drainage conditions, required finished-floor elevation, or construction readiness.</li>
+      <li>Parcel-specific zoning and permitted uses remain unconfirmed. Buyers should verify setbacks, utility connections and costs, septic or sewer availability, soils, drainage, legal access, and permitting requirements with Hendry County and the applicable service providers.</li>
+      <li>Contact us for pricing, parcel information, and available property research.</li>
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2>Disclosures</h2>
+    <div class="notice-box">
+      <p style="margin-top:0;">This is an assignment of contract. A legally binding purchase contract with memorandum has been signed with the seller, giving JNA Dynamic Holdings LLC exclusive rights to purchase this property. JNA Dynamic Holdings LLC does not represent the owner and is not a licensed broker. Do not contact the owner/seller without our explicit consent — any attempt to renegotiate or contact the owner directly will result in legal action.</p>
+      <p class="disclaimer" style="margin-bottom:0;">Figures, measurements, and details above have not been independently verified by JNA Dynamic Holdings LLC. Buyers should conduct their own due diligence, including zoning, utilities, surveys, and title review, prior to purchase.</p>
+    </div>
+  </section>
+</div>
+
+<div class="cta-band">
+  <div class="wrap">
+    <h2>Interested in This Lot?</h2>
+    <p>Reach out for the full parcel address, available property research, and assignment terms.</p>
+    <div class="cta-links">
+      <a href="tel:520-633-6437">520-633-6437</a>
+      <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
+    </div>
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>JNA Dynamic Holdings LLC &nbsp;|&nbsp; Deal Code FL-5 (Land) &nbsp;|&nbsp; LaBelle, Hendry County, FL</p>
+  </div>
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
