@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>San Antonio 8-Plex | TX-3 (MF) | JNA Dynamic Holdings LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: #f6f1e9;
+    color: #2b2621;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.55;
+  }
+  h1, h2, h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    color: #211c17;
+  }
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  a { color: #8a5a2b; }
+
+  /* ---------- Header ---------- */
+  .header-band {
+    background-color: #efe6d6;
+    border-bottom: 1px solid #ddd0b8;
+    padding-top: 36px;
+    padding-bottom: 28px;
+  }
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.75rem;
+    color: #8a5a2b;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  .header-band h1 {
+    font-size: 2.1rem;
+    margin-top: 0;
+    margin-bottom: 8px;
+  }
+  .loc-line {
+    font-size: 1.05rem;
+    margin-top: 0;
+    margin-bottom: 6px;
+    color: #4a4136;
+  }
+  .addr-note {
+    font-size: 0.92rem;
+    font-style: italic;
+    color: #6b4a22;
+    background-color: #fbf6ea;
+    border: 1px dashed #c9a86a;
+    padding: 8px 12px;
+    display: inline-block;
+    margin-top: 10px;
+    margin-bottom: 0;
+    border-radius: 4px;
+  }
+
+  /* ---------- Price Block ---------- */
+  .price-block {
+    margin-top: 28px;
+    margin-bottom: 28px;
+  }
+  .price-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .price-card {
+    background-color: #ffffff;
+    border: 1px solid #e3d8c0;
+    border-radius: 8px;
+    padding: 18px 22px;
+    flex: 1 1 200px;
+  }
+  .price-card .label {
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    color: #8a7a5c;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .price-card .value {
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem;
+    color: #211c17;
+    font-weight: 600;
+  }
+  .price-card .sub {
+    font-size: 0.85rem;
+    color: #6b6050;
+    margin-top: 4px;
+  }
+
+  /* ---------- Gallery ---------- */
+  .gallery-section {
+    margin-top: 10px;
+    margin-bottom: 30px;
+  }
+  .gallery-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-snap-type: x mandatory;
+  }
+  .gallery-scroll img {
+    height: 260px;
+    width: auto;
+    flex: 0 0 auto;
+    border-radius: 6px;
+    scroll-snap-align: start;
+    border: 1px solid #ddd0b8;
+    object-fit: cover;
+  }
+  .more-photos {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  /* ---------- Section generic ---------- */
+  section.content {
+    margin-top: 10px;
+    margin-bottom: 40px;
+  }
+  section.content h2 {
+    font-size: 1.5rem;
+    border-bottom: 2px solid #dccfa9;
+    padding-bottom: 8px;
+    margin-top: 0;
+    margin-bottom: 18px;
+  }
+  section.content p {
+    color: #342e26;
+    font-size: 1rem;
+  }
+  .lede {
+    font-size: 1.05rem;
+    color: #342e26;
+  }
+
+  table.facts-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fffefb;
+    border: 1px solid #e3d8c0;
+  }
+  table.facts-table th, table.facts-table td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid #ece2cb;
+    font-size: 0.95rem;
+  }
+  table.facts-table th {
+    background-color: #efe6d6;
+    width: 42%;
+    font-weight: 600;
+    color: #4a4136;
+  }
+  table.facts-table tr:last-child th,
+  table.facts-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  ul.clean-list {
+    padding-left: 20px;
+    margin-top: 0;
+  }
+  ul.clean-list li {
+    margin-bottom: 8px;
+  }
+
+  .comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background-color: #fffefb;
+    border: 1px solid #e3d8c0;
+  }
+  .comp-table th, .comp-table td {
+    text-align: left;
+    padding: 9px 12px;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #ece2cb;
+  }
+  .comp-table th {
+    background-color: #efe6d6;
+    color: #4a4136;
+  }
+
+  .note-box {
+    background-color: #fbf6ea;
+    border-left: 4px solid #c9a86a;
+    padding: 14px 18px;
+    font-size: 0.92rem;
+    color: #4a4136;
+    margin-top: 16px;
+    margin-bottom: 0;
+  }
+
+  .disclosure-box {
+    background-color: #efe6d6;
+    border: 1px solid #ddd0b8;
+    border-radius: 8px;
+    padding: 20px 22px;
+    font-size: 0.9rem;
+    color: #4a4136;
+  }
+  .disclosure-box p {
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+  .disclosure-box p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ---------- CTA band ---------- */
+  .cta-band {
+    background-color: #211c17;
+    color: #f6f1e9;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    margin-top: 0;
+  }
+  .cta-band h2 {
+    color: #f6f1e9;
+    font-size: 1.8rem;
+    margin-top: 0;
+    margin-bottom: 14px;
+    border: none;
+    padding-bottom: 0;
+  }
+  .cta-band p {
+    color: #d8cdb8;
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+  .cta-contacts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+  .cta-contacts a {
+    color: #f6f1e9;
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 2px solid #c9a86a;
+    padding-bottom: 2px;
+  }
+  .company-name {
+    font-size: 0.85rem;
+    color: #a89a7c;
+    margin-top: 24px;
+  }
+
+  @media (max-width: 600px) {
+    .header-band h1 { font-size: 1.6rem; }
+    .gallery-scroll img { height: 190px; }
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=b87ec16d-d54f-43b0-b431-6c90ad4801e9&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2Fb87ec16d-d54f-43b0-b431-6c90ad4801e9.html">Request the Address</a></div></noscript>
+
+  <div class="header-band">
+    <div class="wrap">
+      <p class="eyebrow">Deal Code: TX-3 (MF) &nbsp;|&nbsp; Multifamily &nbsp;|&nbsp; Fix and Flip / Buy and Hold</p>
+      <h1>San Antonio 8-Plex &mdash; Value-Add to a 10% Cap</h1>
+      <p class="loc-line">San Antonio, TX 78211 &nbsp;&middot;&nbsp; Bexar County</p>
+      <p class="addr-note">Address available upon request &mdash; contact us for the full property address.</p>
+    </div>
+  </div>
+
+  <section class="wrap price-block">
+    <div class="price-grid">
+      <div class="price-card">
+        <div class="label">Asking Price</div>
+        <div class="value">$450,000</div>
+        <div class="sub">$56,250 per door</div>
+      </div>
+      <div class="price-card">
+        <div class="label">ARV</div>
+        <div class="value">$625,000</div>
+      </div>
+      <div class="price-card">
+        <div class="label">Price per Sq. Ft.</div>
+        <div class="value">~$108</div>
+      </div>
+      <div class="price-card">
+        <div class="label">Cap Rate at Market Rent</div>
+        <div class="value">~10&ndash;11%</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap gallery-section">
+    <div class="gallery-scroll">
+      <img src="/deals/b87ec16d-d54f-43b0-b431-6c90ad4801e9/photos/1.jpg" alt="San Antonio 8-plex exterior view">
+      <img src="/deals/b87ec16d-d54f-43b0-b431-6c90ad4801e9/photos/2.jpg" alt="San Antonio 8-plex exterior view">
+      <img src="/deals/b87ec16d-d54f-43b0-b431-6c90ad4801e9/photos/3.jpg" alt="San Antonio 8-plex unit interior">
+      <img src="/deals/b87ec16d-d54f-43b0-b431-6c90ad4801e9/photos/4.jpg" alt="San Antonio 8-plex unit interior">
+      <img src="/deals/b87ec16d-d54f-43b0-b431-6c90ad4801e9/photos/5.jpg" alt="San Antonio 8-plex unit interior">
+      <img src="/deals/b87ec16d-d54f-43b0-b431-6c90ad4801e9/photos/6.jpg" alt="San Antonio 8-plex unit interior">
+      <img src="/deals/b87ec16d-d54f-43b0-b431-6c90ad4801e9/photos/7.jpg" alt="San Antonio 8-plex unit interior">
+      <img src="/deals/b87ec16d-d54f-43b0-b431-6c90ad4801e9/photos/8.jpg" alt="San Antonio 8-plex kitchen">
+      <img src="/deals/b87ec16d-d54f-43b0-b431-6c90ad4801e9/photos/9.jpg" alt="San Antonio 8-plex bathroom">
+      <img src="/deals/b87ec16d-d54f-43b0-b431-6c90ad4801e9/photos/10.jpg" alt="San Antonio 8-plex exterior view">
+    </div>
+  </section>
+
+  <section class="wrap content">
+    <h2>Overview</h2>
+    <p class="lede">A completely renovated 8-plex on the south side of San Antonio at $450,000, which works out to $56,250 per door. The renovation is already done, so the upside here is the rent. Comparable 1/1 and 2/1 units in 78211 rent for $800 to $925 a month &mdash; bringing the units up to market would put the building's gross income around $82,800 a year.</p>
+    <p>At $56K a door, this property is priced below every 6-to-8-unit sale in the comp set. Sold as-is, first come first served.</p>
+  </section>
+
+  <section class="wrap content">
+    <h2>The Numbers</h2>
+    <table class="facts-table">
+      <tr><th>Asking Price</th><td>$450,000</td></tr>
+      <tr><th>Price per Door</th><td>$56,250</td></tr>
+      <tr><th>Price per Sq. Ft.</th><td>Approximately $108</td></tr>
+      <tr><th>Market Rent</th><td>Approximately $800 per 1/1 and $925 per 2/1</td></tr>
+      <tr><th>Gross Income at Market Rent</th><td>Approximately $82,800 per year ($6,900 per month)</td></tr>
+      <tr><th>Cap Rate at Market Rent</th><td>Approximately 10 to 11 percent</td></tr>
+      <tr><th>HUD FY2026 Small Area Fair Market Rent, 78211</th><td>$950 for a 1BR and $1,150 for a 2BR (Section 8 upside)</td></tr>
+    </table>
+  </section>
+
+  <section class="wrap content">
+    <h2>Property Snapshot</h2>
+    <table class="facts-table">
+      <tr><th>Location</th><td>San Antonio, TX 78211 (address available upon request)</td></tr>
+      <tr><th>County</th><td>Bexar County</td></tr>
+      <tr><th>Units</th><td>8 total &mdash; four 2 bed / 1 bath units at approximately 572 sq. ft. each, four 1 bed / 1 bath units at approximately 466 sq. ft. each</td></tr>
+      <tr><th>Total Beds / Baths</th><td>12 bed / 8 bath</td></tr>
+      <tr><th>Building Area</th><td>4,152 sq. ft.</td></tr>
+      <tr><th>Lot Size</th><td>7,013 sq. ft.</td></tr>
+      <tr><th>Year Built</th><td>1974</td></tr>
+      <tr><th>Condition</th><td>Completely renovated (seller reported)</td></tr>
+      <tr><th>Air Conditioning</th><td>Mini splits</td></tr>
+      <tr><th>Parking</th><td>Unassigned</td></tr>
+      <tr><th>Sale Condition</th><td>Sold as-is, first come first served</td></tr>
+    </table>
+  </section>
+
+  <section class="wrap content">
+    <h2>Rent Comps &mdash; 78211</h2>
+    <table class="comp-table">
+      <tr><th>Address</th><th>Unit Type</th><th>Sq. Ft.</th><th>Rent</th></tr>
+      <tr><td>703 Milvid Ave #B</td><td>1/1</td><td>408</td><td>$900</td></tr>
+      <tr><td>779 W Mayfield Blvd</td><td>1/1</td><td></td><td>$919</td></tr>
+      <tr><td>823 Bynum Ave #201</td><td>1/1</td><td></td><td>$795</td></tr>
+      <tr><td>750 Bynum Ave #21</td><td>2/1</td><td></td><td>$825</td></tr>
+      <tr><td>1327 Quintana Rd</td><td>2/1</td><td></td><td>$800 to $900</td></tr>
+      <tr><td>146 Caddo #A</td><td>2/1</td><td></td><td>$950</td></tr>
+    </table>
+  </section>
+
+  <section class="wrap content">
+    <h2>Closed Comps &mdash; San Antonio 6&ndash;8 Unit Multifamily</h2>
+    <table class="comp-table">
+      <tr><th>Address</th><th>Units</th><th>Sq. Ft.</th><th>Built</th><th>Price / Status</th><th>Per Door</th></tr>
+      <tr><td>2503 Suzette Ave, 78227</td><td>8</td><td>3,600</td><td>1980</td><td>Last listed $490,000, sold 11/21/2025 (six of eight units needed repairs)</td><td>~$61,250</td></tr>
+      <tr><td>1118 W French Pl, 78201</td><td>6</td><td>7,483</td><td>1910</td><td>Sold $465,000 on 04/25/2025</td><td>$77,500</td></tr>
+      <tr><td>1409 W Woodlawn Ave, 78201</td><td>8</td><td>10,851</td><td>1940</td><td>Last listed $580,000, sold 08/24/2026</td><td>~$72,500</td></tr>
+      <tr><td>1635 W Mulberry Ave, 78201</td><td>8</td><td>6,132</td><td>1955</td><td>Last listed $795,000, sold 06/2025</td><td>~$99,375</td></tr>
+    </table>
+    <div class="note-box">
+      Texas is a non-disclosure state. The French Place sale is the only confirmed closing price in this set &mdash; the other comps show the last list price before closing, and the actual sale price may have been lower. The Suzette Avenue comp is the closest match: a south-west side 8-unit that sold for about $61K a door with most units needing work. This property is fully renovated and priced at $56K a door.
+    </div>
+  </section>
+
+  <section class="wrap content">
+    <h2>Exit Strategies</h2>
+    <ul class="clean-list">
+      <li><strong>Value-add hold:</strong> Raise rents to market as leases turn over, for roughly a 10 percent or better cap stabilized</li>
+      <li><strong>Section 8:</strong> HUD rents for 78211 are above market</li>
+      <li><strong>Refinance:</strong> Stabilize, document the income, and refinance on a commercial valuation</li>
+      <li><strong>1031 exchange:</strong> A renovated 8-unit replacement property under $500K</li>
+    </ul>
+  </section>
+
+  <section class="wrap content">
+    <h2>Deal Terms</h2>
+    <table class="facts-table">
+      <tr><th>Asking Price</th><td>$450,000</td></tr>
+      <tr><th>Access</th><td>By appointment, with tenant notice. Call or text to schedule.</td></tr>
+      <tr><th>Condition</th><td>Sold as-is</td></tr>
+      <tr><th>Financing</th><td>Cash or hard money only &mdash; Investment loan (e.g. hard money, bridge, DSCR, new construction loan)</td></tr>
+      <tr><th>Closing Costs</th><td>Buyer pays all closing costs, including escrow, title and title insurance</td></tr>
+      <tr><th>Transaction Coordination Fee</th><td>$425, paid by buyer</td></tr>
+      <tr><th>EMD</th><td>$10,000 minimum, non-refundable on assignment of contract</td></tr>
+      <tr><th>COE</th><td>Contact for terms</td></tr>
+      <tr><th>Title</th><td>Contact for details</td></tr>
+      <tr><th>Terms</th><td>First come, first served</td></tr>
+    </table>
+  </section>
+
+  <section class="wrap content">
+    <h2>Wholesale &amp; Assignment Disclosure</h2>
+    <div class="disclosure-box">
+      <p>This is an assignment of contract, not a direct sale. JNA Dynamic Holdings LLC is not the record owner of this property. We hold, or are in the process of holding, an equitable interest in the property under a purchase and sale agreement with the underlying property owner, and we are marketing that equitable interest for assignment. We are not acting as an agent for the seller or for any buyer, and this page does not offer direct contact with the underlying seller or owner. This is an assignment of an equitable interest in a real estate contract, not a listing of the real property itself. Earnest money on an assignment of contract is non-refundable.</p>
+      <p>Condition and income information is seller reported and has not been independently verified by JNA Dynamic Holdings LLC. Rent and sales comparables come from public sources, and some reflect list prices rather than confirmed sale prices. They are not an appraisal and are not guaranteed. Buyer is responsible for their own due diligence before executing any purchase agreement, including independent inspection, a rent roll and lease review, income and expense verification, and confirmation of square footage, unit count, zoning, permits, taxes, title, and liens.</p>
+    </div>
+  </section>
+
+  <div class="cta-band">
+    <div class="wrap">
+      <h2>A Renovated 8-Plex at $56K a Door</h2>
+      <p>Market rents support approximately $82,800 a year in gross income &mdash; roughly a 10 percent cap stabilized at $450,000. First come, first served. Call or text to set up your walkthrough this week.</p>
+      <div class="cta-contacts">
+        <a href="tel:520-633-6437">520-633-6437</a>
+        <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
+      </div>
+      <p class="company-name">JNA Dynamic Holdings LLC</p>
+    </div>
+  </div>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
