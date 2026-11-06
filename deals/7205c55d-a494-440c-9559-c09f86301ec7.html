@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NC-8 (SFH) — Bessemer City, NC | Gaston County Fix &amp; Flip Opportunity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f6f1e9;
+    --ink: #2b2521;
+    --rule: #d8cdbc;
+    --accent: #8a5a36;
+    --card: #fffdf9;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  a { color: var(--accent); }
+
+  .topbar {
+    background: var(--ink);
+    color: #f1e9db;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .topbar .wrap {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  header.hero {
+    padding-top: 48px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  h1.title {
+    font-size: 40px;
+    line-height: 1.15;
+    margin-bottom: 14px;
+  }
+
+  .location-line {
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+
+  .address-note {
+    font-size: 15px;
+    font-style: italic;
+    color: #5a4f44;
+    margin-bottom: 18px;
+  }
+
+  .assignment-note {
+    font-size: 14px;
+    background: #efe4d3;
+    border-left: 3px solid var(--accent);
+    padding: 10px 14px;
+    margin-top: 18px;
+    margin-bottom: 4px;
+  }
+
+  .price-block {
+    margin-top: 28px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+  }
+
+  .price-box {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 18px 24px;
+    min-width: 180px;
+    flex: 1 1 180px;
+  }
+
+  .price-box .label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8a7c6a;
+    margin-bottom: 6px;
+  }
+
+  .price-box .value {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .price-box .sub {
+    font-size: 13px;
+    color: #6a5f52;
+    margin-top: 4px;
+  }
+
+  section {
+    padding-top: 36px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  section:last-of-type { border-bottom: none; }
+
+  section h2 {
+    font-size: 26px;
+    margin-bottom: 18px;
+  }
+
+  .gallery-wrap {
+    margin-top: 20px;
+  }
+
+  .gallery {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+
+  .gallery img {
+    height: 260px;
+    width: auto;
+    border-radius: 6px;
+    flex: 0 0 auto;
+    border: 1px solid var(--rule);
+  }
+
+  .more-photos {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: underline;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border: 1px solid var(--rule);
+  }
+
+  table caption {
+    text-align: left;
+    font-weight: 600;
+    padding-bottom: 8px;
+    font-size: 15px;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--rule);
+    font-size: 15px;
+    vertical-align: top;
+  }
+
+  tr:last-child th, tr:last-child td { border-bottom: none; }
+
+  th {
+    width: 42%;
+    color: #5a4f44;
+    font-weight: 600;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  @media (max-width: 720px) {
+    .two-col { grid-template-columns: 1fr; }
+  }
+
+  p { margin-top: 0; margin-bottom: 14px; }
+
+  ul {
+    margin-top: 0;
+    margin-bottom: 14px;
+    padding-left: 20px;
+  }
+
+  li { margin-bottom: 6px; }
+
+  .note-box {
+    background: #efe4d3;
+    border-left: 3px solid var(--accent);
+    padding: 14px 18px;
+    font-size: 15px;
+    margin-top: 16px;
+    margin-bottom: 0;
+  }
+
+  .comp-table th { width: auto; }
+
+  footer.cta {
+    background: var(--ink);
+    color: #f6f1e9;
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+
+  footer.cta h2 {
+    color: #f6f1e9;
+    margin-bottom: 14px;
+  }
+
+  footer.cta p { color: #d9cfc0; }
+
+  .contact-row {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+
+  .contact-btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    text-decoration: none;
+    padding: 12px 22px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  .contact-btn.secondary {
+    background: transparent;
+    border: 1px solid #a89073;
+    color: #f6f1e9;
+  }
+
+  .disclaimer {
+    font-size: 12px;
+    color: #a89073;
+    margin-top: 32px;
+    line-height: 1.5;
+  }
+
+  .tag-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    margin-bottom: 14px;
+  }
+
+  .tag {
+    background: #efe4d3;
+    border: 1px solid var(--rule);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 13px;
+    color: #5a4f44;
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=7205c55d-a494-440c-9559-c09f86301ec7&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F7205c55d-a494-440c-9559-c09f86301ec7.html">Request the Address</a></div></noscript>
+
+<div class="topbar">
+  <div class="wrap">
+    <span>Deal Code: NC-8 (SFH)</span>
+    <span>Gaston County, North Carolina</span>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Fix &amp; Flip / Buy &amp; Hold Opportunity</div>
+    <h1 class="title">Three-Bedroom on Two-Thirds of an Acre<br>Bessemer City, NC</h1>
+    <div class="location-line">Bessemer City, NC 28016 &middot; Gaston County</div>
+    <div class="address-note">Address available upon request — contact us and we'll send the full property address.</div>
+
+    <div class="tag-row">
+      <span class="tag">Single-Family</span>
+      <span class="tag">Fix and Flip</span>
+      <span class="tag">Buy and Hold</span>
+      <span class="tag">0.69 Acre Lot</span>
+      <span class="tag">Vacant at Closing</span>
+    </div>
+
+    <div class="price-block">
+      <div class="price-box">
+        <div class="label">Asking Price</div>
+        <div class="value">$148,000</div>
+      </div>
+      <div class="price-box">
+        <div class="label">After Repair Value (ARV)</div>
+        <div class="value">$250,000</div>
+        <div class="sub">Detailed comp analysis adjusts to $243,166 (range $231,008–$255,324)</div>
+      </div>
+      <div class="price-box">
+        <div class="label">Estimated Rehab</div>
+        <div class="value">$25,000</div>
+        <div class="sub">Cosmetic-scope estimate — see Condition section</div>
+      </div>
+      <div class="price-box">
+        <div class="label">Gross Spread at Asking</div>
+        <div class="value">$95,166</div>
+      </div>
+    </div>
+
+    <div class="assignment-note">
+      This offering is an assignment of contract. JNA Dynamic Holdings LLC holds an equitable interest under contract with the property owner and is marketing that contract position — this is not a direct sale by the underlying seller, and buyers will be contracting with JNA Dynamic Holdings LLC to take assignment.
+    </div>
+  </div>
+</header>
+
+<section class="gallery-wrap">
+  <div class="wrap">
+    <h2>Photos</h2>
+    <div class="gallery">
+      <img src="/deals/7205c55d-a494-440c-9559-c09f86301ec7/photos/1.jpg" alt="Property exterior view 1">
+      <img src="/deals/7205c55d-a494-440c-9559-c09f86301ec7/photos/2.jpg" alt="Property exterior view 2">
+      <img src="/deals/7205c55d-a494-440c-9559-c09f86301ec7/photos/3.jpg" alt="Property exterior view 3">
+      <img src="/deals/7205c55d-a494-440c-9559-c09f86301ec7/photos/4.jpg" alt="Property interior view 4">
+      <img src="/deals/7205c55d-a494-440c-9559-c09f86301ec7/photos/5.jpg" alt="Property interior view 5">
+      <img src="/deals/7205c55d-a494-440c-9559-c09f86301ec7/photos/6.jpg" alt="Property interior view 6">
+      <img src="/deals/7205c55d-a494-440c-9559-c09f86301ec7/photos/7.jpg" alt="Property interior view 7">
+      <img src="/deals/7205c55d-a494-440c-9559-c09f86301ec7/photos/8.jpg" alt="Property interior view 8">
+      <img src="/deals/7205c55d-a494-440c-9559-c09f86301ec7/photos/9.jpg" alt="Property exterior or lot view 9">
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The Story</h2>
+    <p>A 1998-built, three-bedroom, two-bath home on more than two-thirds of an acre in Bessemer City, priced at $148,000 against an after-repair value in the $243,000–$250,000 range.</p>
+    <p>The thing that makes this one work is what you do not have to do. Roof and HVAC are both under five years old. On a flip, those two line items are usually the first thing that eats your budget, and here they are already handled.</p>
+    <p>What is left is cosmetic: flooring throughout, interior paint, kitchen countertops and cabinet refinishing, a tub and vanity in the primary bath, lighting, and exterior pressure washing and cleanup. That is a scope you can run in weeks, not months.</p>
+    <p>The property is on well and septic, which on a 0.69-acre Gaston County parcel is normal and which should be inspected before closing.</p>
+    <p>The home is vacant at closing, available for showing by appointment, and this opportunity is first come, first served.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The Numbers</h2>
+    <div class="two-col">
+      <table>
+        <tbody>
+          <tr><th>Asking Price</th><td>$148,000</td></tr>
+          <tr><th>ARV (adjusted)</th><td>$243,166, estimated range $231,008–$255,324</td></tr>
+          <tr><th>Gross Spread at Asking</th><td>$95,166</td></tr>
+          <tr><th>Price per Sq. Ft. (Asking)</th><td>Approximately $86</td></tr>
+        </tbody>
+      </table>
+      <table>
+        <tbody>
+          <tr><th>ARV per Sq. Ft.</th><td>Approximately $141</td></tr>
+          <tr><th>Comparable Avg. Price/Sq. Ft.</th><td>$137</td></tr>
+          <tr><th>Living Area</th><td>1,728 sq. ft.</td></tr>
+          <tr><th>Lot Size</th><td>30,229 sq. ft., approximately 0.69 acres</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note-box">No itemized rehab estimate was published for this scope — bring your contractor and build your own number. JNA Dynamic Holdings LLC's working estimate above ($25,000) is based on the cosmetic punch list described in this packet and should be independently verified.</div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Property Snapshot</h2>
+    <table>
+      <tbody>
+        <tr><th>City / State</th><td>Bessemer City, NC 28016</td></tr>
+        <tr><th>County</th><td>Gaston County</td></tr>
+        <tr><th>Beds / Baths</th><td>3 Bed / 2 Bath</td></tr>
+        <tr><th>Living Area</th><td>1,728 sq. ft.</td></tr>
+        <tr><th>Lot Size</th><td>30,229 sq. ft., approximately 0.69 acres</td></tr>
+        <tr><th>Year Built</th><td>1998</td></tr>
+        <tr><th>Water</th><td>Private well</td></tr>
+        <tr><th>Sewer</th><td>Private septic</td></tr>
+        <tr><th>Garage</th><td>None</td></tr>
+        <tr><th>Pool</th><td>None</td></tr>
+        <tr><th>Occupancy</th><td>Vacant at closing</td></tr>
+        <tr><th>Access</th><td>By appointment</td></tr>
+        <tr><th>Condition of Sale</th><td>Sold as-is, first come first served</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Condition — Seller Reported</h2>
+    <table>
+      <tbody>
+        <tr><th>Roof</th><td>Less than 5 years old</td></tr>
+        <tr><th>HVAC</th><td>Less than 5 years old</td></tr>
+        <tr><th>Water</th><td>Private well</td></tr>
+        <tr><th>Sewer</th><td>Private septic</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:18px;">The roof and HVAC are the headline and they are worth sitting with. A buyer looking at comparable 1998 inventory in this market is usually budgeting both — here, that budget is not needed.</p>
+    <p>Two items belong at the top of any diligence list anyway: get the well tested for flow rate and water quality, and get the septic inspected and the tank pumped so the field can be seen. On rural Gaston County acreage, these two systems are the difference between a clean flip and a five-figure surprise, and no report on either has been provided.</p>
+    <p>Electrical, plumbing, and structural condition have also not been reported on. Walk the property with your contractor before finalizing your offer.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Closed Comps — Gaston &amp; Lincoln County</h2>
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Comp</th>
+          <th>Beds/Baths</th>
+          <th>Sq. Ft.</th>
+          <th>Built</th>
+          <th>Sold Price</th>
+          <th>Sold Date</th>
+          <th>$/Sq. Ft.</th>
+          <th>Adjusted</th>
+          <th>Distance</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Hephzibah Church Rd, Bessemer City, NC</td>
+          <td>3 / 2</td>
+          <td>1,685</td>
+          <td>1998</td>
+          <td>$245,000</td>
+          <td>12/04/2025</td>
+          <td>$145</td>
+          <td>$240,659</td>
+          <td>0.5 mi</td>
+        </tr>
+        <tr>
+          <td>Lansdale Ave, Lincolnton, NC</td>
+          <td>3 / 3</td>
+          <td>1,991</td>
+          <td>1995</td>
+          <td>$259,000</td>
+          <td>04/10/2026</td>
+          <td>$130</td>
+          <td>$245,672</td>
+          <td>1.7 mi</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="margin-top:18px;">Comparable averages: 1,838 sq. ft., $137 per square foot, 0.70-acre lot, 1997 build year, 1.1 miles average distance, 9 months since sale. Adjusted ARV: $243,166.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>How to Read This Comp Set</h2>
+    <p>Two comps, and here is what is strong about them and what is not.</p>
+    <p><strong>What is strong:</strong> the Hephzibah Church Road comp is half a mile away, built the same year as the subject, three bed / two bath, no garage, no pool, and it closed at $245,000. On size, vintage, configuration, and distance, that is about as close a match as this market produces — it is the comp this exit rests on.</p>
+    <p><strong>What to weigh:</strong> it is two comps, not five. The Lansdale Avenue comp is in Lincolnton, a different town 1.7 miles out, and it carries a third bathroom the subject does not have, which is part of why the model adjusted it down by $13,328. Both sales average nine months old, with Hephzibah closing in December 2025.</p>
+    <p>The subject's 0.69-acre lot matches the 0.70-acre comp average almost exactly, which is one fewer adjustment to argue about.</p>
+    <p>Pull your own Gaston County comps before setting your exit. Confirm construction type on the subject and on your comps while you are at it, and make sure you are comparing like to like.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Exit Strategies</h2>
+    <ul>
+      <li><strong>Cosmetic flip:</strong> Roof and HVAC are already handled; remaining scope is flooring, paint, kitchen and bath cosmetics, lighting, and exterior cleanup — a short, predictable project with the two biggest line items already off the table.</li>
+      <li><strong>Buy and hold:</strong> Rural, well-and-septic acreage with recent roof and mechanicals supports a lower-maintenance rental hold once cosmetic items are addressed.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Deal Terms</h2>
+    <table>
+      <tbody>
+        <tr><th>Deal Code</th><td>NC-8 (SFH)</td></tr>
+        <tr><th>Asset Type</th><td>Single-Family</td></tr>
+        <tr><th>Deal Types</th><td>Fix and Flip, Buy and Hold</td></tr>
+        <tr><th>City / State</th><td>Bessemer City, NC</td></tr>
+        <tr><th>County</th><td>Gaston County</td></tr>
+        <tr><th>Asking Price</th><td>$148,000</td></tr>
+        <tr><th>ARV</th><td>$250,000 (adjusted comp estimate $243,166)</td></tr>
+        <tr><th>Estimated Rehab</th><td>$25,000</td></tr>
+        <tr><th>Suggested Financing</th><td>Investment Loan (e.g., Hard Money, Bridge, DSCR, New Construction Loan)</td></tr>
+        <tr><th>Occupancy</th><td>Vacant at closing</td></tr>
+        <tr><th>Transaction Type</th><td>Assignment of Contract</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer class="cta">
+  <div class="wrap">
+    <h2>Interested? Let's Talk.</h2>
+    <p>This is a first-come, first-served assignment opportunity in Gaston County, NC. Reach out for the full property address, additional documentation, and to discuss next steps on assigning this contract.</p>
+    <div class="contact-row">
+      <a class="contact-btn" href="tel:520-633-6437">Call 520-633-6437</a>
+      <a class="contact-btn secondary" href="mailto:montanoemmanuel@gmail.com">Email montanoemmanuel@gmail.com</a>
+    </div>
+    <p class="disclaimer">This is an assignment of contract. JNA Dynamic Holdings LLC holds an equitable interest in this property under contract with the property owner and is marketing that contract for assignment; this is not a direct offer of sale by the underlying property owner. All figures, measurements, condition statements, and comparable sales presented here are believed reliable but have not been independently verified by JNA Dynamic Holdings LLC. Buyers are responsible for performing their own due diligence, including inspections of the roof, HVAC, well, septic, electrical, plumbing, and structural systems, and for independently verifying all values prior to entering into any agreement.</p>
+  </div>
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
