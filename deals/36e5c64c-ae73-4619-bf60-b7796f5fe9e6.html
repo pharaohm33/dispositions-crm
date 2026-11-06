@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NC-11 (Land) | 1.94-AC Luxury Homesite | Fletcher, NC | JNA Dynamic Holdings LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e9;
+    --ink:#2a2521;
+    --ink-soft:#5c544c;
+    --rule:#ddd2bf;
+    --accent:#6b5a3e;
+    --accent-dark:#3e3424;
+    --card:#fffdf9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Source Sans 3', sans-serif;
+    font-size:17px;
+    line-height:1.6;
+  }
+  h1,h2,h3{
+    font-family:'Playfair Display', serif;
+    color:var(--ink);
+    font-weight:600;
+  }
+  .wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding:0 28px;
+  }
+  a{color:var(--accent-dark);}
+
+  header.top{
+    border-bottom:1px solid var(--rule);
+    padding-top:36px;
+    padding-bottom:28px;
+  }
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:10px;
+  }
+  h1.title{
+    font-size:38px;
+    line-height:1.2;
+    margin:0 0 14px 0;
+  }
+  .location-line{
+    font-size:18px;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .address-note{
+    display:inline-block;
+    font-size:14px;
+    font-style:italic;
+    color:var(--accent-dark);
+    background:#efe6d2;
+    border:1px solid var(--rule);
+    padding:6px 12px;
+    border-radius:4px;
+    margin-top:10px;
+  }
+
+  .price-block{
+    margin-top:26px;
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:6px;
+    padding:22px 26px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:24px;
+    align-items:baseline;
+  }
+  .price-block .price{
+    font-family:'Playfair Display', serif;
+    font-size:42px;
+    font-weight:700;
+    color:var(--accent-dark);
+  }
+  .price-block .price-label{
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--ink-soft);
+    display:block;
+    margin-bottom:4px;
+  }
+  .price-meta{
+    font-size:15px;
+    color:var(--ink-soft);
+  }
+  .price-meta strong{color:var(--ink);}
+
+  .gallery-section{
+    margin-top:34px;
+  }
+  .gallery{
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    padding-bottom:12px;
+    scrollbar-width:thin;
+  }
+  .gallery img{
+    height:260px;
+    width:auto;
+    border-radius:6px;
+    flex:0 0 auto;
+    border:1px solid var(--rule);
+    object-fit:cover;
+  }
+  .gallery-note{
+    font-size:14px;
+    margin-top:8px;
+    color:var(--ink-soft);
+  }
+
+  section.block{
+    margin-top:44px;
+  }
+  section.block h2{
+    font-size:24px;
+    border-bottom:2px solid var(--accent);
+    padding-bottom:8px;
+    margin-bottom:16px;
+  }
+  section.block h3{
+    font-size:18px;
+    margin-bottom:8px;
+    margin-top:22px;
+    color:var(--accent-dark);
+  }
+  ul.plain{
+    margin:0;
+    padding-left:20px;
+  }
+  ul.plain li{
+    margin-bottom:6px;
+  }
+  .two-col{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:28px;
+  }
+  @media (max-width:640px){
+    .two-col{grid-template-columns:1fr;}
+    .gallery img{height:200px;}
+    h1.title{font-size:28px;}
+  }
+
+  table.terms{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--card);
+    border:1px solid var(--rule);
+  }
+  table.terms tr{
+    border-bottom:1px solid var(--rule);
+  }
+  table.terms tr:last-child{border-bottom:none;}
+  table.terms td{
+    padding:12px 16px;
+    vertical-align:top;
+  }
+  table.terms td.label{
+    width:38%;
+    font-weight:600;
+    color:var(--ink-soft);
+  }
+
+  .disclosure{
+    margin-top:28px;
+    background:#efe6d2;
+    border:1px solid var(--rule);
+    border-radius:6px;
+    padding:18px 20px;
+    font-size:15px;
+  }
+
+  .diligence{
+    font-size:15.5px;
+    color:var(--ink-soft);
+  }
+
+  .cta-band{
+    margin-top:56px;
+    background:var(--accent-dark);
+    color:#f6f1e9;
+    padding:44px 0 50px 0;
+  }
+  .cta-band h2{
+    color:#f6f1e9;
+    border-bottom:none;
+    font-size:28px;
+    margin-bottom:10px;
+  }
+  .cta-band p{
+    color:#e7dfd0;
+    font-size:16px;
+    margin-bottom:22px;
+  }
+  .cta-contacts{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+  }
+  .cta-contacts a{
+    display:inline-block;
+    background:#f6f1e9;
+    color:var(--accent-dark);
+    text-decoration:none;
+    font-weight:600;
+    padding:12px 22px;
+    border-radius:4px;
+    font-size:15.5px;
+  }
+  .cta-company{
+    margin-top:22px;
+    font-size:13px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#cfc4ab;
+  }
+
+  footer.fineprint{
+    padding:28px 0 50px 0;
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=36e5c64c-ae73-4619-bf60-b7796f5fe9e6&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F36e5c64c-ae73-4619-bf60-b7796f5fe9e6.html">Request the Address</a></div></noscript>
+
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">Deal Code: NC-11 (Land) &middot; Wholesale Assignment of Contract</div>
+    <h1 class="title">1.94-Acre Luxury Homesite &mdash; Survey &amp; 4-Bedroom Septic Authorization in Hand</h1>
+    <div class="location-line">Rilandwell Estates &middot; Fletcher, Buncombe County, North Carolina</div>
+    <span class="address-note">Address available upon request &mdash; exact property location provided to qualified buyers who contact us.</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="price-block">
+    <div>
+      <span class="price-label">Asking Price</span>
+      <span class="price">$240,000</span>
+    </div>
+    <div class="price-meta">
+      <strong>Approximately 1.94 acres</strong> / 84,500 SF &middot; Rilandwell Estates, Lot 15 &middot; Reported OU (Open Use) zoning &middot; Financing: Investment Loan (e.g., Hard Money, Bridge, DSCR, New Construction Loan)
+    </div>
+  </div>
+
+  <div class="gallery-section">
+    <div class="gallery">
+      <img src="/deals/36e5c64c-ae73-4619-bf60-b7796f5fe9e6/photos/1.jpg" alt="Wooded homesite parcel in Rilandwell Estates, Fletcher NC">
+      <img src="/deals/36e5c64c-ae73-4619-bf60-b7796f5fe9e6/photos/2.jpg" alt="Wooded homesite parcel in Rilandwell Estates, Fletcher NC">
+      <img src="/deals/36e5c64c-ae73-4619-bf60-b7796f5fe9e6/photos/3.jpg" alt="Wooded homesite parcel in Rilandwell Estates, Fletcher NC">
+      <img src="/deals/36e5c64c-ae73-4619-bf60-b7796f5fe9e6/photos/4.jpg" alt="Wooded homesite parcel in Rilandwell Estates, Fletcher NC">
+      <img src="/deals/36e5c64c-ae73-4619-bf60-b7796f5fe9e6/photos/5.jpg" alt="Wooded homesite parcel in Rilandwell Estates, Fletcher NC">
+      <img src="/deals/36e5c64c-ae73-4619-bf60-b7796f5fe9e6/photos/6.jpg" alt="Wooded homesite parcel in Rilandwell Estates, Fletcher NC">
+      <img src="/deals/36e5c64c-ae73-4619-bf60-b7796f5fe9e6/photos/7.jpg" alt="Wooded homesite parcel in Rilandwell Estates, Fletcher NC">
+      <img src="/deals/36e5c64c-ae73-4619-bf60-b7796f5fe9e6/photos/8.jpg" alt="Wooded homesite parcel in Rilandwell Estates, Fletcher NC">
+      <img src="/deals/36e5c64c-ae73-4619-bf60-b7796f5fe9e6/photos/9.jpg" alt="Wooded homesite parcel in Rilandwell Estates, Fletcher NC">
+      <img src="/deals/36e5c64c-ae73-4619-bf60-b7796f5fe9e6/photos/10.jpg" alt="Wooded homesite parcel in Rilandwell Estates, Fletcher NC">
+      <img src="/deals/36e5c64c-ae73-4619-bf60-b7796f5fe9e6/photos/11.jpg" alt="Wooded homesite parcel in Rilandwell Estates, Fletcher NC">
+      <img src="/deals/36e5c64c-ae73-4619-bf60-b7796f5fe9e6/photos/12.jpg" alt="Wooded homesite parcel in Rilandwell Estates, Fletcher NC">
+      <img src="/deals/36e5c64c-ae73-4619-bf60-b7796f5fe9e6/photos/13.jpg" alt="Wooded homesite parcel in Rilandwell Estates, Fletcher NC">
+    </div>
+    <div class="gallery-note">Site, survey, and documentation photos for the subject parcel.</div>
+  </div>
+
+  <section class="block">
+    <h2>Here Is What We Have</h2>
+    <p>Off-market opportunity to acquire approximately 1.94 acres inside Rilandwell Estates, an established custom-home community in Fletcher, North Carolina.</p>
+    <p>The wooded parcel is surrounded by higher-end custom residences and includes valuable existing due-diligence documentation for a prospective builder or future homeowner.</p>
+  </section>
+
+  <section class="block">
+    <h2>Property Highlights</h2>
+    <ul class="plain">
+      <li>Approximately 1.94 acres / 84,500 SF</li>
+      <li>Rilandwell Estates &mdash; Lot 15</li>
+      <li>Buncombe County</li>
+      <li>Reported OU &mdash; Open Use zoning</li>
+      <li>Established luxury / custom-home community</li>
+      <li>Wooded residential homesite</li>
+      <li>Paved subdivision road access</li>
+      <li>Boundary and topographic survey available</li>
+      <li>Survey dated March 14, 2023</li>
+      <li>Four-bedroom septic construction authorization available</li>
+      <li>Wastewater authorization issued April 28, 2022</li>
+      <li>Proposed building envelope shown in available documentation</li>
+      <li>Septic layout included in available documentation</li>
+      <li>Public / community water source indicated</li>
+      <li>Mandatory HOA</li>
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2>Why Builders Should Look at This</h2>
+    <p>The strongest advantage here is the amount of site documentation already available.</p>
+    <p>Rather than evaluating completely raw land with no prior planning work, buyers can review an existing boundary and topographic survey along with a Buncombe County wastewater construction authorization for a four-bedroom residential septic system.</p>
+    <p>The documentation also includes a proposed building envelope and septic layout, giving a builder a stronger starting point for evaluating a future custom-home project.</p>
+
+    <h3>Custom-Home Angle</h3>
+    <p>At approximately 1.94 acres, the property offers room for a substantial custom residence while maintaining the privacy and wooded setting buyers expect from this type of community.</p>
+    <p>Rilandwell Estates is characterized by custom residential construction, making the property particularly relevant for:</p>
+    <ul class="plain">
+      <li>Custom-home builders</li>
+      <li>Spec-home builders</li>
+      <li>Future owner-builders</li>
+      <li>Luxury residential buyers</li>
+      <li>Land investors targeting the Fletcher / South Asheville market</li>
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2>Site Documentation</h2>
+    <p>Available documentation includes:</p>
+    <div class="two-col">
+      <ul class="plain">
+        <li>Boundary survey</li>
+        <li>Topographic survey</li>
+        <li>Survey dated March 14, 2023</li>
+      </ul>
+      <ul class="plain">
+        <li>Buncombe County wastewater construction authorization</li>
+        <li>Four-bedroom septic design</li>
+        <li>Proposed septic layout</li>
+        <li>Proposed residential building envelope</li>
+        <li>Wastewater authorization dated April 28, 2022</li>
+      </ul>
+    </div>
+    <p class="diligence">Buyer should independently confirm the present status and continued validity of all permits, authorizations, plans and approvals before relying upon them for construction.</p>
+  </section>
+
+  <section class="block">
+    <h2>Utilities</h2>
+    <ul class="plain">
+      <li><strong>Water:</strong> Public / community source indicated; buyer to verify provider, tap availability, connection requirements and fees.</li>
+      <li><strong>Wastewater:</strong> Private septic required. A four-bedroom residential septic construction authorization was previously issued. Buyer should independently verify whether the authorization remains valid and whether any renewal, redesign or additional county approval is required.</li>
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2>Road / Community</h2>
+    <ul class="plain">
+      <li>Paved subdivision roads</li>
+      <li>Roads reported as privately maintained</li>
+      <li>Mandatory HOA</li>
+      <li>HOA dues previously reported at approximately $600 annually; buyer to verify current dues, assessments, architectural requirements and restrictions directly with the association.</li>
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2>Buyer Due Diligence</h2>
+    <p class="diligence">Buyer to independently verify zoning, permitted use, acreage, property boundaries, setbacks, building envelope, survey, topography, grading requirements, driveway feasibility, water connection, septic authorization status, soils, drainage, flood conditions, wetlands, HOA dues, architectural restrictions, private-road obligations, utilities, title, easements, construction costs and all current Buncombe County requirements.</p>
+    <p class="diligence">Existing survey and septic documentation are provided for informational review. No representation is being made that the property is permit-ready or that previously issued approvals remain valid for a buyer's proposed construction.</p>
+  </section>
+
+  <section class="block">
+    <h2>Deal Terms</h2>
+    <table class="terms">
+      <tr><td class="label">Purchase Price</td><td>$240,000</td></tr>
+      <tr><td class="label">Payment</td><td>Cash or approved funds</td></tr>
+      <tr><td class="label">Transaction Type</td><td>Assignment of contract</td></tr>
+      <tr><td class="label">Closing Costs</td><td>Buyer pays closing costs</td></tr>
+      <tr><td class="label">Transaction Coordinator Fee</td><td>Buyer to pay a $425 Transaction Coordinator fee as part of buyer's closing costs</td></tr>
+      <tr><td class="label">Condition</td><td>Property sold as-is</td></tr>
+      <tr><td class="label">Offer Requirement</td><td>Proof of funds required with offers</td></tr>
+      <tr><td class="label">Financing Type</td><td>Investment Loan (Ex: Hard Money, Bridge, DSCR, New Construction Loan)</td></tr>
+    </table>
+
+    <div class="disclosure">
+      This is a wholesale assignment of contract. JNA Dynamic Holdings LLC holds equitable interest in the subject transaction under contract with the property owner and is not the record title holder. The end buyer will receive an assignment of contract, not a direct purchase from the underlying seller. Figures, acreage, survey, and permit information presented here are provided by available documentation and have not been independently verified by JNA Dynamic Holdings LLC; buyer is responsible for independent verification of all facts prior to closing.
+    </div>
+  </section>
+
+</div>
+
+<div class="cta-band">
+  <div class="wrap">
+    <h2>1.94 Acres. Rilandwell Estates. Survey &amp; Septic Authorization in Hand.</h2>
+    <p>Contact JNA Dynamic Holdings LLC for the survey, septic documentation, parcel information, aerials, and the complete property package &mdash; including the exact property address.</p>
+    <div class="cta-contacts">
+      <a href="tel:5206336437">Call: 520-633-6437</a>
+      <a href="mailto:montanoemmanuel@gmail.com">Email: montanoemmanuel@gmail.com</a>
+    </div>
+    <div class="cta-company">JNA Dynamic Holdings LLC</div>
+  </div>
+</div>
+
+<footer class="fineprint">
+  <div class="wrap">
+    This material is for informational purposes only and does not constitute an offer to sell real property. This transaction is a wholesale assignment of contract; JNA Dynamic Holdings LLC holds an equitable interest and is assigning its contractual rights, not conveying title directly as owner. All acreage, zoning, survey, permit, utility, and HOA figures are as reported and have not been independently verified by JNA Dynamic Holdings LLC. Buyer is solely responsible for independent due diligence and verification of all facts prior to any purchase decision.
+  </div>
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
