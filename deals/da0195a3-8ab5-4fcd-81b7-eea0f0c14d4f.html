@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NC-9 (SFH) — Fayetteville, NC | Haymount West Assignment Opportunity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    background-color: #f7f3ec;
+    color: #2b2620;
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+  }
+  h1, h2, h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 600;
+    color: #211d18;
+  }
+  .wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  a { color: #7a3b1f; }
+
+  .topbar {
+    background: #211d18;
+    color: #efe7d8;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    letter-spacing: 0.08em;
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+  .topbar span.code {
+    color: #d9b98a;
+    font-weight: 600;
+  }
+
+  .hero {
+    padding-top: 42px;
+    padding-bottom: 10px;
+  }
+  .hero .kicker {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 13px;
+    color: #8a6d3f;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .hero h1 {
+    font-size: 40px;
+    margin-top: 0;
+    margin-bottom: 10px;
+    line-height: 1.15;
+  }
+  .hero .loc {
+    font-size: 18px;
+    color: #4a3f31;
+    margin-bottom: 6px;
+  }
+  .hero .addr-note {
+    font-size: 14.5px;
+    font-style: italic;
+    color: #6b5d47;
+    background: #efe6d2;
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 4px;
+    margin-top: 6px;
+    margin-bottom: 4px;
+  }
+
+  .pricebar {
+    background: #2b2317;
+    color: #f5ecdc;
+    padding-top: 26px;
+    padding-bottom: 26px;
+    margin-top: 26px;
+  }
+  .pricebar .grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+  }
+  .pricebar .item {
+    min-width: 150px;
+  }
+  .pricebar .item .label {
+    text-transform: uppercase;
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    color: #c9b58a;
+    margin-bottom: 4px;
+  }
+  .pricebar .item .value {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 600;
+  }
+
+  .gallery-section {
+    margin-top: 30px;
+    margin-bottom: 10px;
+  }
+  .gallery {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding-bottom: 10px;
+    scroll-snap-type: x mandatory;
+  }
+  .gallery img {
+    height: 260px;
+    width: auto;
+    border-radius: 6px;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+    object-fit: cover;
+    border: 1px solid #ddd2b8;
+  }
+  .more-photos {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid #7a3b1f;
+  }
+
+  .section {
+    margin-top: 44px;
+    margin-bottom: 10px;
+  }
+  .section h2 {
+    font-size: 26px;
+    border-bottom: 2px solid #d9b98a;
+    padding-bottom: 8px;
+    margin-bottom: 18px;
+  }
+  .section p {
+    margin-top: 0;
+    margin-bottom: 14px;
+    color: #3a332a;
+  }
+
+  table.facts {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 6px;
+    margin-bottom: 6px;
+  }
+  table.facts tr {
+    border-bottom: 1px solid #e3d9c2;
+  }
+  table.facts td {
+    padding: 10px 6px;
+    vertical-align: top;
+  }
+  table.facts td.k {
+    width: 38%;
+    color: #6b5d47;
+    font-weight: 600;
+  }
+
+  ul.clean {
+    margin-top: 0;
+    margin-bottom: 14px;
+    padding-left: 20px;
+  }
+  ul.clean li { margin-bottom: 6px; }
+
+  .comp-card {
+    background: #fff;
+    border: 1px solid #e6dcc4;
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin-top: 0;
+    margin-bottom: 14px;
+  }
+  .comp-card .addr {
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .comp-avg {
+    font-style: italic;
+    color: #5c5140;
+  }
+
+  .callout {
+    background: #efe6d2;
+    border-left: 4px solid #8a6d3f;
+    padding: 14px 18px;
+    margin-top: 10px;
+    margin-bottom: 14px;
+    font-size: 15px;
+  }
+
+  .disclosure {
+    background: #f1ece0;
+    border: 1px solid #ddd2b8;
+    border-radius: 6px;
+    padding: 18px 20px;
+    font-size: 13.5px;
+    color: #5a5042;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  .disclosure p { margin-bottom: 10px; color: #5a5042; }
+
+  .cta-band {
+    background: #211d18;
+    color: #f5ecdc;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    margin-top: 50px;
+  }
+  .cta-band h2 {
+    color: #f5ecdc;
+    border-bottom: none;
+    font-size: 30px;
+    margin-bottom: 10px;
+  }
+  .cta-band p {
+    color: #d8cdb6;
+    font-size: 16px;
+  }
+  .cta-contacts {
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+  .cta-contacts a {
+    color: #f5ecdc;
+    font-size: 18px;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid #d9b98a;
+  }
+  .foot-note {
+    padding-top: 18px;
+    padding-bottom: 28px;
+    font-size: 12.5px;
+    color: #9c8f78;
+    text-align: center;
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2Fda0195a3-8ab5-4fcd-81b7-eea0f0c14d4f.html">Request the Address</a></div></noscript>
+
+  <div class="topbar">
+    <div class="wrap"><span class="code">NC-9 (SFH)</span> &nbsp;|&nbsp; Fix &amp; Flip Assignment &nbsp;|&nbsp; Fayetteville, NC</div>
+  </div>
+
+  <div class="hero wrap">
+    <div class="kicker">Single-Family · Fix &amp; Flip Opportunity</div>
+    <h1>Haymount West — Half-Acre Lot Backing a Million-Dollar Estate Pocket</h1>
+    <div class="loc">Fayetteville, NC 28303 &nbsp;·&nbsp; Cumberland County &nbsp;·&nbsp; Haymount West</div>
+    <div class="addr-note">Address available upon request — contact us for the full property address.</div>
+  </div>
+
+  <div class="pricebar">
+    <div class="wrap grid">
+      <div class="item">
+        <div class="label">Assignment Price</div>
+        <div class="value">$65,000</div>
+      </div>
+      <div class="item">
+        <div class="label">After Repair Value</div>
+        <div class="value">$251,029</div>
+      </div>
+      <div class="item">
+        <div class="label">Rehab Estimate</div>
+        <div class="value">$55,000</div>
+      </div>
+      <div class="item">
+        <div class="label">Gross Spread at Asking</div>
+        <div class="value">$186,029</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap gallery-section">
+    <div class="gallery">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/1.jpg" alt="Haymount West fix and flip property photo 1">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/2.jpg" alt="Haymount West fix and flip property photo 2">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/3.jpg" alt="Haymount West fix and flip property photo 3">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/4.jpg" alt="Haymount West fix and flip property photo 4">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/5.jpg" alt="Haymount West fix and flip property photo 5">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/6.jpg" alt="Haymount West fix and flip property photo 6">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/7.jpg" alt="Haymount West fix and flip property photo 7">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/8.jpg" alt="Haymount West fix and flip property photo 8">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/9.jpg" alt="Haymount West fix and flip property photo 9">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/10.jpg" alt="Haymount West fix and flip property photo 10">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/11.jpg" alt="Haymount West fix and flip property photo 11">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/12.jpg" alt="Haymount West fix and flip property photo 12">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/13.jpg" alt="Haymount West fix and flip property photo 13">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/14.jpg" alt="Haymount West fix and flip property photo 14">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/15.jpg" alt="Haymount West fix and flip property photo 15">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/16.jpg" alt="Haymount West fix and flip property photo 16">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/17.jpg" alt="Haymount West fix and flip property photo 17">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/18.jpg" alt="Haymount West fix and flip property photo 18">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/19.jpg" alt="Haymount West fix and flip property photo 19">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/20.jpg" alt="Haymount West fix and flip property photo 20">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/21.jpg" alt="Haymount West fix and flip property photo 21">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/22.jpg" alt="Haymount West fix and flip property photo 22">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/23.jpg" alt="Haymount West fix and flip property photo 23">
+      <img src="/deals/da0195a3-8ab5-4fcd-81b7-eea0f0c14d4f/photos/24.jpg" alt="Haymount West fix and flip property photo 24">
+    </div>
+    <a class="more-photos" href="https://drive.google.com/drive/folders/1ncnTe1VYI8kr2hKdcAnt6TMl3wxBOkBO" target="_blank" rel="noopener">View full photo set &rarr;</a>
+  </div>
+
+  <div class="wrap section">
+    <h2>The Opportunity</h2>
+    <p>Pull up the lot lines on this parcel before you do anything else.</p>
+    <p>The property immediately behind this one assesses at approximately $1.3 million. The one beside it, approximately $1.5 million. Then approximately $1.4 million, another approximately $1.5 million, and approximately $1.9 million. Those are the Hybarts Branch and Willow Bend estate homes, and this half-acre lot shares a rear boundary with them.</p>
+    <p>The subject's own parcel assesses around $136,000.</p>
+    <p>That is the deal. This is a 1942 frame house that needs everything, priced at $65,000, on a half acre that backs directly onto the most expensive residential pocket in Fayetteville.</p>
+    <p>ARV is $251,029. Entry is at approximately twenty-six cents on the dollar, with a $186,029 gross spread before any renovation spend.</p>
+    <p>Now the honest part: this house needs a roof, HVAC, kitchen, both bathrooms, windows, and a complete interior. The market analysis on file calls for a full interior renovation, new major systems, and a new roof. This is a gut. If cosmetics-only is the goal, this is not that deal.</p>
+    <p>Vacant at closing, available by appointment, first come first served.</p>
+  </div>
+
+  <div class="wrap section">
+    <h2>The Numbers</h2>
+    <table class="facts">
+      <tr><td class="k">Asking Price</td><td>$65,000</td></tr>
+      <tr><td class="k">ARV</td><td>$251,029</td></tr>
+      <tr><td class="k">Gross Spread at Asking</td><td>$186,029</td></tr>
+      <tr><td class="k">Price per Sq. Ft. at Asking</td><td>Approximately $56</td></tr>
+      <tr><td class="k">ARV per Sq. Ft.</td><td>Approximately $215</td></tr>
+      <tr><td class="k">Asking Price as % of ARV</td><td>Approximately 26%</td></tr>
+      <tr><td class="k">Living Area</td><td>1,169 sq. ft.</td></tr>
+      <tr><td class="k">Lot Size</td><td>20,909 sq. ft. (approximately 0.48 acres)</td></tr>
+      <tr><td class="k">As-Is Value per CMA</td><td>$133,795 low / $149,841 midpoint / $172,342 high</td></tr>
+      <tr><td class="k">As-Is Comparable Avg. Price/Sq. Ft.</td><td>$124</td></tr>
+      <tr><td class="k">JNA Estimated Rehab Budget</td><td>$55,000 — build your own scope with your contractor; no third-party rehab estimate was published for this house</td></tr>
+    </table>
+  </div>
+
+  <div class="wrap section">
+    <h2>Property Snapshot</h2>
+    <table class="facts">
+      <tr><td class="k">Location</td><td>Fayetteville, NC 28303 — address available upon request</td></tr>
+      <tr><td class="k">County</td><td>Cumberland</td></tr>
+      <tr><td class="k">Subdivision</td><td>Haymount West</td></tr>
+      <tr><td class="k">Beds / Baths</td><td>3 Bed / 2 Bath</td></tr>
+      <tr><td class="k">Living Area</td><td>1,169 sq. ft.</td></tr>
+      <tr><td class="k">Lot Size</td><td>20,909 sq. ft. (approximately 0.48 acres)</td></tr>
+      <tr><td class="k">Year Built</td><td>1942</td></tr>
+      <tr><td class="k">Construction</td><td>Frame, single story</td></tr>
+      <tr><td class="k">Floodplain</td><td>Outside the floodplain, per the comparative market analysis on file</td></tr>
+      <tr><td class="k">Occupancy</td><td>Vacant at closing</td></tr>
+      <tr><td class="k">Access</td><td>By appointment — call or text for access information</td></tr>
+      <tr><td class="k">Sale Condition</td><td>Sold as-is, first come, first served</td></tr>
+    </table>
+  </div>
+
+  <div class="wrap section">
+    <h2>The Location — This Is the Whole Argument</h2>
+    <p>Haymount is Fayetteville's premier residential address, and this parcel sits on its edge.</p>
+    <p>County parcel data shows the properties adjoining and immediately behind this lot assessed at approximately $1.3 million, $1.4 million, $1.5 million, $1.5 million, and $1.9 million. That is the Hybarts Branch and Willow Bend Lane estate section, and the rear property line of this parcel touches it.</p>
+    <p>Be clear-eyed about what that does and does not mean. It does not mean this house becomes a million-dollar house — it is 1,169 square feet of 1942 frame construction, and it will be worth what renovated 1,169-square-foot houses in this pocket are worth.</p>
+    <p>What it does mean is that the land under it sits in a location that does not exist elsewhere at this price, that the neighborhood behind it is not going anywhere, and that a finished product here competes at the top of its size class rather than the middle.</p>
+    <p>One more detail worth attention: the market analysis notes that several of the closest as-is comparable sales sit across Bragg Boulevard. In Fayetteville, Bragg Boulevard is a real dividing line. Those comps match the subject on size and layout, but they are not on the Haymount side. The subject is.</p>
+    <p>That is a meaningful reason the $124-per-square-foot as-is figure may understate this specific lot, and a meaningful reason the $215-per-square-foot after-repair figure is reachable rather than optimistic. Verify independently against renovated Haymount-side closings.</p>
+  </div>
+
+  <div class="wrap section">
+    <h2>Condition — Seller Reported</h2>
+    <table class="facts">
+      <tr><td class="k">Roof</td><td>Needs replacement</td></tr>
+      <tr><td class="k">HVAC</td><td>Needs replacement</td></tr>
+      <tr><td class="k">Kitchen</td><td>Needs full remodel</td></tr>
+      <tr><td class="k">Bathrooms</td><td>Both need remodeling</td></tr>
+      <tr><td class="k">Windows</td><td>Need replacement</td></tr>
+      <tr><td class="k">Interior</td><td>Full cosmetic scope</td></tr>
+    </table>
+    <p>Price this as a full gut. On a 1942 frame house taken to the studs, look hard at the items nobody has reported on: electrical service and wiring, supply and waste plumbing, subfloor and framing condition, and the crawlspace. That is where a renovation budget moves on a house this age. Walk it with your contractor and build your own number.</p>
+  </div>
+
+  <div class="wrap section">
+    <h2>The Two Valuation Figures — and What Each One Means</h2>
+    <p>Two numbers exist on this property. They answer different questions and are not interchangeable.</p>
+    <p>The $251,029 figure is the after-repair value, drawn from renovated comparable sales. That is the exit.</p>
+    <p>The $149,841 figure is an estimated as-is value, drawn from a separate set of non-renovated comparables. Here is the caution worth giving now rather than discovering later: the homes in that as-is set were dated but functional, not full-gut condition. One of them was described in its own listing as having modern updates throughout, updated bath fixtures, and new flooring. The subject here is in materially rougher shape than that.</p>
+    <div class="callout">Do not treat $149,841 as a floor. Underwriting should run off the $251,029 exit and your own renovation scope.</div>
+  </div>
+
+  <div class="wrap section">
+    <h2>As-Is Comparable Sales — Fayetteville, NC 28303</h2>
+    <p>For context on the as-is figure above:</p>
+
+    <div class="comp-card">
+      <div class="addr">1929 Mcgougan Rd</div>
+      <div>3 Bed / 2 Bath, 1,215 sq. ft., built 1955, 0.48 acre lot</div>
+      <div>Sold $145,200 on 06/26/2026, 130 days on market — $118/sq. ft. — adjusted $143,386 — 0.80 mi from subject</div>
+    </div>
+
+    <div class="comp-card">
+      <div class="addr">3118 Imperial Dr</div>
+      <div>3 Bed / 2 Bath, 1,341 sq. ft., built 1958, 9,583 sq. ft. lot</div>
+      <div>Sold $169,500 on 03/20/2026, 228 days on market, listed at $174,000 — $129/sq. ft. — adjusted $172,342 — 0.30 mi from subject</div>
+    </div>
+
+    <div class="comp-card">
+      <div class="addr">1227 Stansfield Dr</div>
+      <div>3 Bed / 2 Bath, 1,074 sq. ft., built 1958</div>
+      <div>Sold $130,000 on 10/09/2026, 25 days on market, listed at $130,000, appraised $23,000 over list — $125/sq. ft. — adjusted $133,795 — 1.42 mi from subject</div>
+    </div>
+
+    <p class="comp-avg">Averages across the set: 1,210 sq. ft., $148,233 sale price, $124 per adjusted square foot, 128 days on market.</p>
+    <p>Note the Stansfield sale in particular — it appraised $23,000 above its list price and closed in 25 days. That points to appraisals coming in strong in this zip code.</p>
+    <p>The $251,029 after-repair value is supported by a separate set of renovated comparable sales; that report is available on request and should be verified independently before setting an exit number.</p>
+  </div>
+
+  <div class="wrap section">
+    <h2>Exit Strategies</h2>
+    <ul class="clean">
+      <li><strong>Full gut renovation and resale:</strong> $65,000 entry against a $251,029 ARV, on a lot backing the Haymount estate section.</li>
+      <li><strong>Buy and hold:</strong> Fort Bragg corridor rental demand at a $65,000 basis, in a location that supports premium rent for its size class.</li>
+      <li><strong>BRRRR:</strong> Acquire, renovate completely, stabilize, and refinance against a comp-supported after-repair value.</li>
+      <li><strong>Owner-occupant renovation:</strong> Half an acre adjoining Haymount, outside the floodplain, at a fraction of what the street behind it commands.</li>
+      <li><strong>Land-forward play:</strong> Half an acre on the Haymount side of Bragg Boulevard is worth underwriting on its own terms.</li>
+    </ul>
+  </div>
+
+  <div class="wrap section">
+    <h2>Deal Terms</h2>
+    <table class="facts">
+      <tr><td class="k">Asking Price</td><td>$65,000</td></tr>
+      <tr><td class="k">Occupancy</td><td>Vacant at closing</td></tr>
+      <tr><td class="k">Access</td><td>By appointment — call or text for access information</td></tr>
+      <tr><td class="k">Condition of Sale</td><td>Sold as-is</td></tr>
+      <tr><td class="k">Financing</td><td>Cash or hard money only</td></tr>
+      <tr><td class="k">Closing Costs</td><td>Buyer pays all closing costs, including escrow, title, and title insurance</td></tr>
+      <tr><td class="k">Transaction Coordination Fee</td><td>$425, paid by buyer</td></tr>
+      <tr><td class="k">EMD</td><td>Contact for terms; non-refundable on assignment of contract</td></tr>
+      <tr><td class="k">COE</td><td>Contact for terms</td></tr>
+      <tr><td class="k">Title</td><td>Contact for details</td></tr>
+      <tr><td class="k">Priority</td><td>First come, first served</td></tr>
+    </table>
+  </div>
+
+  <div class="wrap section">
+    <h2>Wholesale Disclosure</h2>
+    <div class="disclosure">
+      <p>This offering is an assignment of contract. JNA Dynamic Holdings LLC is not the record owner of this property. We hold, or are in the process of holding, an equitable interest in the property under a purchase and sale agreement with the underlying contract holder, and we are marketing that equitable interest for assignment. We are not a licensed North Carolina real estate broker and are not acting as an agent for the seller or for any buyer. This is an assignment of an equitable interest in a real estate contract, not a listing of the real property itself. Earnest money on an assignment of contract is non-refundable.</p>
+      <p>Condition information is seller-reported and has not been independently inspected or verified by JNA Dynamic Holdings LLC. The after-repair value, as-is value, and comparable sales figures above are model-generated outputs from a third-party platform, not appraisals, and are not guaranteed. The after-repair value and the as-is value derive from two different comparable sets and are not interchangeable. Neighboring parcel values are drawn from public assessment data, refer to other properties, and are not a representation of this property's value or of any value it may reach after renovation.</p>
+      <p>Buyer is responsible for their own due diligence, including independent inspection, independent after-repair value verification, and confirmation of square footage, lot size, lot lines, bed and bath count, permit history, flood zone, zoning, property taxes, title, and liens before executing any purchase agreement.</p>
+    </div>
+  </div>
+
+  <div class="cta-band">
+    <div class="wrap">
+      <h2>The Call</h2>
+      <p>Half an acre on the Haymount side of Bragg Boulevard, sharing a rear line with homes assessed between $1.3 and $1.9 million, outside the floodplain, vacant at closing.</p>
+      <p>$65,000 against a $251,029 after-repair value. It needs everything, and that is the only reason the number reads like this.</p>
+      <p>Call or text for access information. Address available upon request. Bring your contractor and pull the lot lines on your way over.</p>
+      <div class="cta-contacts">
+        <a href="tel:520-633-6437">520-633-6437</a>
+        <a href="mailto:montanoemmanuel@gmail.com">montanoemmanuel@gmail.com</a>
+      </div>
+      <p style="margin-top:18px; font-size:14px;">JNA Dynamic Holdings LLC</p>
+    </div>
+  </div>
+
+  <div class="foot-note">
+    Figures above have not been independently verified by JNA Dynamic Holdings LLC. This is an assignment of contract, not a direct sale of the property.
+  </div>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
