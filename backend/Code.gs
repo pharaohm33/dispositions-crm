@@ -377,6 +377,8 @@ function doPost(e) {
         return jsonOut(withAdminSession(body, adminSyncDealPricingBatch));
       case 'adminGetAllActiveDealIdsWithSourceLink':
         return jsonOut(withAdminSession(body, adminGetAllActiveDealIdsWithSourceLink));
+      case 'adminCheckPageLive':
+        return jsonOut(withAdminSession(body, adminCheckPageLive));
       case 'adminCreateDealArtifactPage':
         return jsonOut(withAdminSession(body, adminCreateDealArtifactPage));
       case 'adminGetReps':
@@ -1307,9 +1309,13 @@ function adminAddDeal(body) {
     try {
       const newMatch = sheetToObjects(sheet).find(function (r) { return r['DealID'] === dealId; });
       if (newMatch) {
+        let photoFiles = [];
         if (d.picturesLink) {
           sheet.getRange(newMatch._row, getColumnIndex(sheet, 'ArtifactPicturesLink')).setValue(d.picturesLink);
-          const photoResult = publishDealPhotosFromDrive(dealId, d.picturesLink);
+          // Read the photos from Drive now but commit them WITH the page (one
+          // commit, one GitHub Pages build) -- see publishDealPageToGithub.
+          const photoResult = collectDealPhotosFromDrive(dealId, d.picturesLink);
+          photoFiles = photoResult.files;
           sheet.getRange(newMatch._row, getColumnIndex(sheet, 'ArtifactPhotoPaths')).setValue(photoResult.paths.join(','));
           sheet.getRange(newMatch._row, getColumnIndex(sheet, 'ArtifactPhotoTotalFound')).setValue(photoResult.totalFound);
           newMatch['ArtifactPicturesLink'] = d.picturesLink;
@@ -1317,7 +1323,16 @@ function adminAddDeal(body) {
           newMatch['ArtifactPhotoTotalFound'] = photoResult.totalFound;
           photoCount = photoResult.paths.length;
         }
-        publicPageUrl = regenerateAndPublishDealPage(newMatch);
+        try {
+          publicPageUrl = regenerateAndPublishDealPage(newMatch, photoFiles);
+        } catch (pageErr) {
+          // The page failed: still keep the photos (one commit), or forget their paths if even that fails.
+          if (photoFiles.length) {
+            const kept = publishFilesToGithub(photoFiles, 'Publish photos for deal ' + dealId);
+            if (!kept.length) { sheet.getRange(newMatch._row, getColumnIndex(sheet, 'ArtifactPhotoPaths')).setValue(''); photoCount = 0; }
+          }
+          throw pageErr;
+        }
         sheet.getRange(newMatch._row, getColumnIndex(sheet, 'PublicPageUrl')).setValue(publicPageUrl);
         sheet.getRange(newMatch._row, getColumnIndex(sheet, 'LastPriceSyncAt')).setValue(now);
       }
@@ -1882,9 +1897,9 @@ const MAX_PUBLISHED_PHOTOS_PER_DEAL = 24;
 // published everything" apart from "there are more than we published,"
 // which is what decides whether the generated page needs a link back to
 // the full Drive folder (see regenerateAndPublishDealPage).
-function publishDealPhotosFromDrive(dealId, picturesLink) {
+function collectDealPhotosFromDrive(dealId, picturesLink) {
   const parsed = parseDriveLink(picturesLink);
-  if (!parsed) return { paths: [], totalFound: 0, isDriveLink: false };
+  if (!parsed) return { files: [], paths: [], totalFound: 0, isDriveLink: false };
 
   let allFiles = [];
   try {
@@ -1902,35 +1917,106 @@ function publishDealPhotosFromDrive(dealId, picturesLink) {
   }
 
   const totalFound = allFiles.length;
-  const files = allFiles.slice(0, MAX_PUBLISHED_PHOTOS_PER_DEAL);
+  const driveFiles = allFiles.slice(0, MAX_PUBLISHED_PHOTOS_PER_DEAL);
 
+  const files = [];
+  driveFiles.forEach(function (file, i) {
+    const blob = file.getBlob();
+    const bytes = blob.getBytes();
+    if (bytes.length > 900000) return; // skip -- see comment above
+    const ext = (blob.getContentType() || '').indexOf('png') !== -1 ? 'png' : ((blob.getContentType() || '').indexOf('webp') !== -1 ? 'webp' : 'jpg');
+    files.push({ path: 'deals/' + encodeURIComponent(dealId) + '/photos/' + (i + 1) + '.' + ext, bytes: bytes });
+  });
+  return { files: files, paths: files.map(function (f) { return f.path; }), totalFound: totalFound, isDriveLink: true };
+}
+
+// Returns { paths, totalFound, isDriveLink } and commits the photos to GitHub
+// as ONE commit. (It used to PUT each photo on its own: 24 photos = 24
+// commits, and every commit starts a GitHub Pages build. Twenty-odd builds
+// in a minute jam the Pages queue for several minutes, and the deal page
+// that comes right after the photos answered 404 until the last build ran.)
+function publishDealPhotosFromDrive(dealId, picturesLink) {
+  const got = collectDealPhotosFromDrive(dealId, picturesLink);
+  if (!got.files.length) return { paths: [], totalFound: got.totalFound, isDriveLink: got.isDriveLink };
+  const published = publishFilesToGithub(got.files, 'Publish ' + got.files.length + ' photo(s) for deal ' + dealId);
+  return { paths: got.paths.filter(function (p) { return published.indexOf(p) !== -1; }), totalFound: got.totalFound, isDriveLink: true };
+}
+
+function githubSettings() {
   const props = PropertiesService.getScriptProperties();
   const token = props.getProperty('GITHUB_TOKEN');
   if (!token) throw new Error('GITHUB_TOKEN script property is not set.');
-  const repo = props.getProperty('GITHUB_REPO') || 'pharaohm33/dispositions-crm';
-  const branch = props.getProperty('GITHUB_BRANCH') || 'main';
-  const headers = { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json' };
+  return {
+    repo: props.getProperty('GITHUB_REPO') || 'pharaohm33/dispositions-crm',
+    branch: props.getProperty('GITHUB_BRANCH') || 'main',
+    headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json' }
+  };
+}
 
-  const published = [];
-  files.forEach(function (file, i) {
-    const blob = file.getBlob();
-    if (blob.getBytes().length > 900000) return; // skip -- see comment above
-    const ext = (blob.getContentType() || '').indexOf('png') !== -1 ? 'png' : ((blob.getContentType() || '').indexOf('webp') !== -1 ? 'webp' : 'jpg');
-    const path = 'deals/' + encodeURIComponent(dealId) + '/photos/' + (i + 1) + '.' + ext;
-    const apiUrl = 'https://api.github.com/repos/' + repo + '/contents/' + path;
-    try {
-      let sha = null;
-      const getRes = UrlFetchApp.fetch(apiUrl + '?ref=' + encodeURIComponent(branch), { headers: headers, muteHttpExceptions: true });
-      if (getRes.getResponseCode() === 200) sha = JSON.parse(getRes.getContentText()).sha;
-      const payload = { message: 'Publish photo ' + (i + 1) + ' for deal ' + dealId, content: Utilities.base64Encode(blob.getBytes()), branch: branch };
-      if (sha) payload.sha = sha;
-      const putRes = UrlFetchApp.fetch(apiUrl, { method: 'put', contentType: 'application/json', headers: headers, muteHttpExceptions: true, payload: JSON.stringify(payload) });
-      if (putRes.getResponseCode() < 300) published.push(path);
-    } catch (err) {
-      // Skip this one photo, keep going -- see comment above.
-    }
+// One commit that adds or updates several files at once (Git Data API:
+// blobs -> tree -> commit -> move the branch). One commit = one GitHub Pages
+// build, however many files. files = [{ path, bytes | text }]. Blobs are
+// uploaded first (they do not touch the branch), so a failure there changes
+// nothing; if someone else pushed in the meantime the branch move is
+// retried on top of the newest commit.
+function githubCommitFiles(files, message) {
+  const g = githubSettings();
+  const base = 'https://api.github.com/repos/' + g.repo;
+  const call = function (method, path, payload) {
+    const opts = { method: method, headers: g.headers, muteHttpExceptions: true };
+    if (payload) { opts.contentType = 'application/json'; opts.payload = JSON.stringify(payload); }
+    const res = UrlFetchApp.fetch(base + path, opts);
+    const code = res.getResponseCode();
+    if (code >= 300) throw new Error('GitHub ' + method.toUpperCase() + ' ' + path + ' failed: HTTP ' + code + ' ' + String(res.getContentText()).slice(0, 200));
+    return JSON.parse(res.getContentText());
+  };
+  const entries = files.map(function (f) {
+    const content = f.bytes ? Utilities.base64Encode(f.bytes) : Utilities.base64Encode(f.text, Utilities.Charset.UTF_8);
+    const blob = call('post', '/git/blobs', { content: content, encoding: 'base64' });
+    return { path: f.path, mode: '100644', type: 'blob', sha: blob.sha };
   });
-  return { paths: published, totalFound: totalFound, isDriveLink: true };
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const head = call('get', '/git/ref/heads/' + g.branch).object.sha;
+    const parentTree = call('get', '/git/commits/' + head).tree.sha;
+    const tree = call('post', '/git/trees', { base_tree: parentTree, tree: entries });
+    const commit = call('post', '/git/commits', { message: message, tree: tree.sha, parents: [head] });
+    try {
+      call('patch', '/git/refs/heads/' + g.branch, { sha: commit.sha, force: false });
+      return { commit: commit.sha, files: files.length };
+    } catch (err) {
+      if (attempt === 3 || !/HTTP (409|422)/.test(String(err))) throw err;
+      Utilities.sleep(1500 * (attempt + 1));
+    }
+  }
+}
+
+// The old one-file-per-commit way, kept ONLY as a fallback for when the
+// single-commit way fails (for example a token without the right scope).
+function githubPutFileLegacy(path, base64Content, message) {
+  const g = githubSettings();
+  const apiUrl = 'https://api.github.com/repos/' + g.repo + '/contents/' + path;
+  let sha = null;
+  const getRes = UrlFetchApp.fetch(apiUrl + '?ref=' + encodeURIComponent(g.branch), { headers: g.headers, muteHttpExceptions: true });
+  if (getRes.getResponseCode() === 200) sha = JSON.parse(getRes.getContentText()).sha;
+  const payload = { message: message, content: base64Content, branch: g.branch };
+  if (sha) payload.sha = sha;
+  const putRes = UrlFetchApp.fetch(apiUrl, { method: 'put', contentType: 'application/json', headers: g.headers, muteHttpExceptions: true, payload: JSON.stringify(payload) });
+  return putRes.getResponseCode() < 300;
+}
+
+// Publishes [{path, bytes}] -- one commit, falling back to one file at a
+// time. Returns the paths that made it.
+function publishFilesToGithub(files, message) {
+  try {
+    githubCommitFiles(files, message);
+    return files.map(function (f) { return f.path; });
+  } catch (err) {
+    const ok = [];
+    files.forEach(function (f, i) {
+      try { if (githubPutFileLegacy(f.path, Utilities.base64Encode(f.bytes), message + ' [' + (i + 1) + ']')) ok.push(f.path); } catch (e2) { /* skip this one, keep going */ }
+    });
+    return ok;
+  }
 }
 
 // One Messages API call that turns a deal's full source listing copy into
@@ -2375,23 +2461,32 @@ function requestAddressButtonHtml(dealId) {
 // path for a given dealId, so a link shared once stays correct forever --
 // this is the "old links show new updates automatically" behavior, not a
 // separate feature.
-function publishDealPageToGithub(dealId, html) {
-  const props = PropertiesService.getScriptProperties();
-  const token = props.getProperty('GITHUB_TOKEN');
-  if (!token) throw new Error('GITHUB_TOKEN script property is not set.');
-  const repo = props.getProperty('GITHUB_REPO') || 'pharaohm33/dispositions-crm';
-  const branch = props.getProperty('GITHUB_BRANCH') || 'main';
+function publishDealPageToGithub(dealId, html, extraFiles) {
+  const g = githubSettings();
+  const repo = g.repo, branch = g.branch, headers = g.headers;
   const path = 'deals/' + encodeURIComponent(dealId) + '.html';
   const apiUrl = 'https://api.github.com/repos/' + repo + '/contents/' + path;
-  const headers = { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json' };
+  const pageUrl = 'https://sendmybuyer.com/deals/' + dealId + '.html';
 
   let sha = null;
   const getRes = UrlFetchApp.fetch(apiUrl + '?ref=' + encodeURIComponent(branch), { headers: headers, muteHttpExceptions: true });
   if (getRes.getResponseCode() === 200) sha = JSON.parse(getRes.getContentText()).sha;
   else if (getRes.getResponseCode() !== 404) throw new Error('GitHub lookup failed: HTTP ' + getRes.getResponseCode() + ' ' + getRes.getContentText());
+  const message = (sha ? 'Update' : 'Publish') + ' deal page ' + dealId + ' (auto price sync)';
+
+  // New deal with photos: the page and its photos go up as ONE commit (one
+  // Pages build) instead of one commit per photo plus one for the page.
+  if (extraFiles && extraFiles.length) {
+    try {
+      githubCommitFiles([{ path: path, text: html }].concat(extraFiles), message + ' + ' + extraFiles.length + ' photo(s)');
+      return pageUrl;
+    } catch (err) {
+      publishFilesToGithub(extraFiles, 'Publish photos for deal ' + dealId);   // fall back to the old way for the photos, then the page below
+    }
+  }
 
   const payload = {
-    message: (sha ? 'Update' : 'Publish') + ' deal page ' + dealId + ' (auto price sync)',
+    message: message,
     content: Utilities.base64Encode(html, Utilities.Charset.UTF_8),
     branch: branch
   };
@@ -2406,7 +2501,26 @@ function publishDealPageToGithub(dealId, html) {
   });
   if (putRes.getResponseCode() >= 300) throw new Error('GitHub publish failed: HTTP ' + putRes.getResponseCode() + ' ' + putRes.getContentText());
 
-  return 'https://sendmybuyer.com/deals/' + dealId + '.html';
+  return pageUrl;
+}
+
+// Is the public page actually reachable yet? GitHub Pages deploys a minute
+// or more after the commit (longer when several builds are queued), and
+// until then the link answers 404 even though the file is in the repo.
+function adminCheckPageLive(body) {
+  if (!body.dealId) return { ok: false, error: 'Missing dealId.' };
+  const sheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const match = sheetToObjects(sheet).find(function (d) { return d['DealID'] === body.dealId; });
+  if (!match) return { ok: false, error: 'Deal not found.' };
+  const url = match['PublicPageUrl'];
+  if (!url) return { ok: true, hasPage: false, live: false };
+  let status = 0;
+  try {
+    status = UrlFetchApp.fetch(url + '?check=' + new Date().getTime(), { muteHttpExceptions: true, followRedirects: true }).getResponseCode();
+  } catch (err) {
+    return { ok: true, hasPage: true, live: false, status: 0, url: url, error: String(err) };
+  }
+  return { ok: true, hasPage: true, live: status === 200, status: status, url: url };
 }
 
 // Works out whether the page should show a "view all photos" link, and to
@@ -2441,7 +2555,7 @@ function findMorePhotosLink(match, photoPaths) {
 // need re-publishing just because the price moved), and regenerates +
 // republishes the page. Requires SourceLink; throws if it's missing so
 // callers can decide how to surface that.
-function regenerateAndPublishDealPage(match) {
+function regenerateAndPublishDealPage(match, extraFiles) {
   if (!match['SourceLink']) throw new Error('This deal has no Source Link set.');
   let sourceText = '';
   try {
@@ -2453,7 +2567,7 @@ function regenerateAndPublishDealPage(match) {
   const photoPaths = match['ArtifactPhotoPaths'] ? String(match['ArtifactPhotoPaths']).split(',').filter(Boolean) : [];
   const morePhotosLink = findMorePhotosLink(match, photoPaths);
   const html = generateDealPageHtml(match, sourceText, photoPaths, morePhotosLink);
-  return publishDealPageToGithub(match['DealID'], html);
+  return publishDealPageToGithub(match['DealID'], html, extraFiles);
 }
 
 // Checks one deal's Source Link for its current asking price and, only if
@@ -2653,12 +2767,14 @@ function adminCreateDealArtifactPage(body) {
   if (!match['SourceLink']) return { ok: false, error: 'This deal has no Source Link set. Add one under Private Admin Notes first.' };
 
   const picturesLink = (body.picturesLink || '').trim();
+  let photoFiles = [];
   if (picturesLink) {
     sheet.getRange(match._row, getColumnIndex(sheet, 'ArtifactPicturesLink')).setValue(picturesLink);
     match['ArtifactPicturesLink'] = picturesLink;
     let photoResult;
     try {
-      photoResult = publishDealPhotosFromDrive(match['DealID'], picturesLink);
+      photoResult = collectDealPhotosFromDrive(match['DealID'], picturesLink);     // read now, committed together with the page below (one commit, one Pages build)
+      photoFiles = photoResult.files;
     } catch (err) {
       return { ok: false, error: String(err) };
     }
@@ -2684,8 +2800,9 @@ function adminCreateDealArtifactPage(body) {
 
   let pageUrl;
   try {
-    pageUrl = regenerateAndPublishDealPage(match);
+    pageUrl = regenerateAndPublishDealPage(match, photoFiles);
   } catch (err) {
+    if (photoFiles.length) publishFilesToGithub(photoFiles, 'Publish photos for deal ' + match['DealID']);      // the page failed: keep the photos
     return { ok: false, error: String(err) };
   }
   sheet.getRange(match._row, getColumnIndex(sheet, 'PublicPageUrl')).setValue(pageUrl);

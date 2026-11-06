@@ -1,0 +1,27 @@
+#!/usr/bin/osascript -l JavaScript
+// Runs tests/publish_tests.js against the publishing functions of backend/Code.gs with a fake GitHub, Drive and Apps Script.
+//   osascript -l JavaScript tests/publish_driver.jxa
+ObjC.import('Foundation');
+function read(p) { return ObjC.unwrap($.NSString.stringWithContentsOfFileEncodingError($(p), $.NSUTF8StringEncoding, null)); }
+var here = ObjC.unwrap($.NSProcessInfo.processInfo.environment.objectForKey('PWD')) || '.';
+var root = $.NSFileManager.defaultManager.currentDirectoryPath.js;
+var code = read(root + '/backend/Code.gs');
+var tests = read(root + '/tests/publish_tests.js');
+function extract(name) {                      // the source of one top-level function, by brace matching
+  var i = code.indexOf('\nfunction ' + name + '(');
+  if (i < 0) throw new Error('no function ' + name);
+  var j = code.indexOf('{', i), depth = 0, k = j, inStr = null, esc = false;
+  for (; k < code.length; k++) {
+    var c = code[k];
+    if (inStr) { if (esc) esc = false; else if (c === '\\') esc = true; else if (c === inStr) inStr = null; continue; }
+    if (c === "'" || c === '"' || c === '`') { inStr = c; continue; }
+    if (c === '/' && code[k + 1] === '/') { while (code[k] !== '\n') k++; continue; }
+    if (c === '{') depth++;
+    if (c === '}') { depth--; if (depth === 0) break; }
+  }
+  return code.slice(i + 1, k + 1);
+}
+var names = ['parseDriveLink', 'githubSettings', 'githubCommitFiles', 'githubPutFileLegacy', 'publishFilesToGithub', 'collectDealPhotosFromDrive', 'publishDealPhotosFromDrive', 'publishDealPageToGithub'];
+var src = 'var MAX_PUBLISHED_PHOTOS_PER_DEAL = 24;\n' + names.map(extract).join('\n') + '\n' + tests;
+var out = eval(src);
+out;

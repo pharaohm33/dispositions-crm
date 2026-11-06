@@ -3392,7 +3392,7 @@ document.getElementById("deal-modal-save").addEventListener("click", async funct
   document.getElementById("deal-modal").hidden = true;
   await loadAdminDeals();
   let msg = assignMode ? "Deal added and assigned to " + res.assignedCount + " rep(s)." : "Deal added.";
-  if (res.publicPageUrl) msg += " Public page published" + (res.photoCount ? " with " + res.photoCount + " photo(s)." : ".");
+  if (res.publicPageUrl) msg += " Public page published" + (res.photoCount ? " with " + res.photoCount + " photo(s)." : ".") + " GitHub Pages takes a few minutes to put it live: open the deal and press Check If Live.";
   else if (res.pageGenError) msg += " Public page could not be built yet (" + res.pageGenError + ") — try Create Deal Artifact Page from the deal detail once Script Properties are set.";
   showToast(msg, !!res.pageGenError && !res.publicPageUrl && !!data.sourceLink);
 });
@@ -3686,7 +3686,7 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
         '<div class="nav-row" style="justify-content:flex-start; margin-top:6px;"><button class="btn secondary small" id="sync-deal-pricing-btn">Sync Price From Source &amp; Republish Page</button><span class="small-muted" id="sync-deal-pricing-result"></span></div>' +
         '<p class="small-muted">Reads the current asking price off the Source Link. If it doesn\'t match Price below, updates Price here and regenerates + republishes this deal\'s public page at the same sendmybuyer.com link every time — so a link already shared with a buyer keeps showing the current price with nothing to reissue.</p>' +
         (deal.PublicPageUrl
-          ? '<p class="small-muted">Public page: <a href="' + esc(deal.PublicPageUrl) + '" target="_blank" rel="noopener">' + esc(deal.PublicPageUrl) + '</a>' + (deal.LastPriceSyncAt ? ' &mdash; last synced ' + esc(new Date(deal.LastPriceSyncAt).toLocaleString()) : "") + '</p>'
+          ? '<p class="small-muted">Public page: <a href="' + esc(deal.PublicPageUrl) + '" target="_blank" rel="noopener">' + esc(deal.PublicPageUrl) + '</a>' + (deal.LastPriceSyncAt ? ' &mdash; last synced ' + esc(new Date(deal.LastPriceSyncAt).toLocaleString()) : "") + ' <span id="page-live-chip" class="status-pill"></span> <button class="link-btn" id="page-live-btn" type="button">Check If Live</button></p>'
           : "") +
         '<div class="section-title" style="margin-top:22px;">Create Deal Link <span class="small-muted">(Admin Facing Only)</span></div>' +
         '<label class="field-label">Pictures Link <span class="small-muted">(Google Drive folder or file — leave blank to keep what\'s already saved)</span></label>' +
@@ -3794,6 +3794,23 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
     btn.disabled = false;
     showToast("Private notes saved.");
   });
+
+  // Is the public page reachable yet? GitHub Pages deploys a minute or more after the commit;
+  // until then the link answers 404 even though the page is saved. Checked once on open and on demand.
+  const pageLiveBtn = document.getElementById("page-live-btn");
+  if (pageLiveBtn) {
+    const chip = document.getElementById("page-live-chip");
+    const checkPageLive = async function () {
+      pageLiveBtn.disabled = true; chip.textContent = "checking…"; chip.className = "status-pill";
+      const res = await api("adminCheckPageLive", { dealId: deal.DealID });
+      pageLiveBtn.disabled = false;
+      if (!res.ok) { chip.textContent = "could not check"; return; }
+      if (res.live) { chip.textContent = "live"; chip.className = "status-pill status-active"; pageLiveBtn.hidden = true; }
+      else { chip.textContent = "deploying (usually 1–5 min)"; chip.className = "status-pill status-on-hold"; pageLiveBtn.textContent = "Check again"; }
+    };
+    pageLiveBtn.addEventListener("click", checkPageLive);
+    checkPageLive();
+  }
 
   const checkLiveBtn = document.getElementById("check-deal-live-btn");
   if (checkLiveBtn) {
