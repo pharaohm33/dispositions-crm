@@ -251,6 +251,15 @@
   .toast.show { opacity: 1; transform: translateY(0); }
   .toast .toast-icon { font-size: 16px; line-height: 1; }
 
+  .sms-consent { align-items: flex-start !important; font-weight: 400 !important; font-size: 12.5px !important; line-height: 1.5; color: var(--muted); margin: 12px 0 4px !important; }
+  .sms-consent input { margin-top: 3px; flex: 0 0 auto; }
+  .sms-consent a { color: var(--accent); }
+  .public-about a { color: var(--accent); }
+  .public-about h3 { font-family: var(--serif); font-size: 17px; margin: 0 0 6px; }
+  .public-about p, .public-about li { font-size: 13.5px; margin: 6px 0; }
+  .public-about ul { padding-left: 20px; margin: 6px 0; }
+  .public-about .co-block { font-size: 13.5px; line-height: 1.6; }
+  footer.site-foot a { color: var(--muted); margin: 0 6px; }
   [hidden] { display: none !important; }
   footer.site-foot { text-align: center; padding: 24px 16px 32px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--border); margin-top: 24px; }
 </style>
@@ -300,8 +309,12 @@
     <input type="text" id="signup-name" autocomplete="name">
     <label class="field-label">Email</label>
     <input type="email" id="signup-email" autocomplete="email">
-    <label class="field-label">Phone <span class="small-muted">(optional)</span></label>
-    <input type="text" id="signup-phone" autocomplete="tel">
+    <label class="field-label">Mobile phone <span class="small-muted">(optional)</span></label>
+    <input type="tel" id="signup-phone" autocomplete="tel">
+    <label class="checkbox-row sms-consent" for="signup-sms-consent">
+      <input type="checkbox" id="signup-sms-consent">
+      <span id="signup-sms-consent-text">By checking this box and providing your mobile number, you agree to receive recurring text messages from Suede Buffalo LLC (SendMyBuyer) about off-market real estate deals and opportunities that may match your buy box, and related account updates. Message frequency varies. Msg&amp;Data rates may apply. Reply STOP to unsubscribe at any time, or HELP for help. Consent is not a condition of signing up or of any purchase. See our <a href="/terms#sms" target="_blank" rel="noopener">Terms</a> and <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a>.</span>
+    </label>
     <label class="field-label">I am a...</label>
     <select id="signup-persontype">
       <option value="">&mdash; select one &mdash;</option>
@@ -377,6 +390,24 @@
   <div class="card" id="join-contact-card" hidden>
     <p class="small-muted" style="margin:0;" id="join-contact-text"></p>
   </div>
+
+  <section class="card public-about" id="public-about" aria-labelledby="public-about-title">
+    <h3 id="public-about-title">About SendMyBuyer</h3>
+    <p>SendMyBuyer is the disposition arm of <strong>Suede Buffalo LLC</strong>, an Arizona-based real estate company. We find off-market and wholesale real estate opportunities across the United States, including single-family homes, land, and lots, and share them with buyers, investors, and builders who want them.</p>
+    <h3 style="margin-top:14px;">What we offer</h3>
+    <ul>
+      <li><strong>Buyers and builders:</strong> free access to a private feed of deals matched to your buy box (location, strategy, asset class, financing).</li>
+      <li><strong>Wholesalers and realtors:</strong> a disposition team to help sell your contracts and listings to our network of buyers.</li>
+      <li><strong>Submit a deal:</strong> send us a property you have under contract or want to sell through <a href="https://sendmyseller.com" target="_blank" rel="noopener">SendMySeller</a>.</li>
+    </ul>
+    <h3 style="margin-top:14px;">Contact</h3>
+    <p class="co-block"><strong>Suede Buffalo LLC</strong> (dba SendMyBuyer)<br>
+      5820 S Birchwood Dr<br>
+      Tucson, Arizona 85746<br>
+      Phone: <a href="tel:+15206336437">520-633-6437</a><br>
+      Email: <a href="mailto:info@sendmybuyer.com">info@sendmybuyer.com</a></p>
+    <p class="small-muted" style="margin-top:10px;">Text messages: if you choose to receive texts, message frequency varies, Msg&amp;Data rates may apply, reply STOP to opt out or HELP for help. Read our <a href="/privacy">Privacy Policy</a> and <a href="/terms">Terms of Service</a>, including the <a href="/terms#sms">SMS Terms</a>.</p>
+  </section>
 </div>
 
 <!-- ================= REP VIEW ================= -->
@@ -875,7 +906,7 @@ Put it in a table with the owner name, LLC name (if any), phone, email and maili
       <button class="btn primary" id="add-rep-btn">+ Add Team Member</button>
     </div>
     <table class="crm-table">
-      <thead><tr><th>Name</th><th>Username</th><th>Phone</th><th>Email</th><th>Type</th><th>All-Deal Access</th><th>Admin</th><th>Active</th><th>Deals They're Told To Work On</th><th>Bulk Assign Override</th><th>Last Active</th><th>Preferred Buyer-Lead Area</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Name</th><th>Username</th><th>Phone</th><th>Email</th><th>Type</th><th>SMS Consent</th><th>All-Deal Access</th><th>Admin</th><th>Active</th><th>Deals They're Told To Work On</th><th>Bulk Assign Override</th><th>Last Active</th><th>Preferred Buyer-Lead Area</th><th>Actions</th></tr></thead>
       <tbody id="reps-tbody"></tbody>
     </table>
     <div id="reps-empty" class="small-muted" style="padding:20px;" hidden>No team members yet.</div>
@@ -1572,6 +1603,7 @@ Put it in a table with the owner name, LLC name (if any), phone, email and maili
 
 <footer class="site-foot">
   <p>This site is owned and operated by Suede Buffalo LLC.</p>
+  <p><a href="/privacy">Privacy Policy</a> &middot; <a href="/terms">Terms of Service</a> &middot; <a href="/terms#sms">SMS Terms</a> &middot; <a href="mailto:info@sendmybuyer.com">Contact</a></p>
 </footer>
 
 <!-- ================= HELP CHAT ================= -->
@@ -1590,6 +1622,6 @@ Put it in a table with the owner name, LLC name (if any), phone, email and maili
 </div>
 
 <script src="config.js?v=91"></script>
-<script src="app.js?v=92"></script>
+<script src="app.js?v=93"></script>
 </body>
 </html>

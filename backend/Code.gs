@@ -93,14 +93,19 @@ const REP_COLUMNS = ['Username', 'Name', 'Phone', 'Email', 'PasswordHash', 'Salt
   // flag -- only ever read when BUYER_ADDRESS_AUTO_DISCLOSE_MODE is
   // 'on_after_contact' (see requestAddressAccess/publicRequestAddressAccess).
   // Never set automatically by anything else.
-  'BuyerContactConfirmed'];
+  'BuyerContactConfirmed',
+  // Proof of text-message (SMS) consent captured by the optional, unchecked
+  // checkbox on the public Sign Up form (see publicSignup). Needed to show
+  // carriers/SignalWire how a number opted in: when, which number, the exact
+  // wording shown, and the page. Admin-only; never in a rep-facing response.
+  'SmsConsent', 'SmsConsentAt', 'SmsConsentPhone', 'SmsConsentText', 'SmsConsentSource'];
 
 // Never sent to any rep-facing response (getMyPitches, a rep's own
 // profile, anywhere else a rep session reads their own or another rep's
 // record) -- admin-only, same treatment as a buyer lead's PropertyURL. See
 // where these are stripped in publicSignup's response and any rep-facing
 // rep-list endpoint.
-const ADMIN_ONLY_REP_FIELDS = ['PaymentEntityName', 'PaymentDriveLink'];
+const ADMIN_ONLY_REP_FIELDS = ['PaymentEntityName', 'PaymentDriveLink', 'SmsConsent', 'SmsConsentAt', 'SmsConsentPhone', 'SmsConsentText', 'SmsConsentSource'];
 
 // A Buyer's self-reported purchase criteria, collected at signup (see
 // publicSignup) -- Deal Type is a fixed strategy list (does this buyer
@@ -839,8 +844,19 @@ function publicSignup(body) {
   // BUY, not where they want to sell deals for us).
   const dealAreaStates = isBuyerSignup ? [] : splitCommaList(body.dealAreaStates);
   const dealAreaCities = isBuyerSignup ? [] : splitCommaList(body.dealAreaCities);
+  // Text-message consent: only counts if the box was ticked AND there is a
+  // real mobile number (10+ digits) to consent for. The server stamps the
+  // time itself, so a client can't backdate it. Apps Script can't see the
+  // visitor's IP, so the exact wording + page + browser are kept instead.
+  const signupPhone = String(body.phone || '').trim();
+  const smsConsent = (body.smsConsent === true || body.smsConsent === 'true') && signupPhone.replace(/\D/g, '').length >= 10;
   appendRowByHeaders(sheet, {
-    'Username': email, 'Name': name, 'Phone': String(body.phone || '').trim(), 'Email': email,
+    'SmsConsent': smsConsent,
+    'SmsConsentAt': smsConsent ? now : '',
+    'SmsConsentPhone': smsConsent ? signupPhone : '',
+    'SmsConsentText': smsConsent ? String(body.smsConsentText || '').trim().slice(0, 1500) : '',
+    'SmsConsentSource': smsConsent ? ('Sign Up form: ' + String(body.smsConsentPage || 'sendmybuyer.com').slice(0, 200) + ' | ' + String(body.smsConsentUserAgent || '').slice(0, 200)) : '',
+    'Username': email, 'Name': name, 'Phone': signupPhone, 'Email': email,
     'PasswordHash': hashPassword(password, salt), 'Salt': salt,
     'AllAccess': isBuyerSignup, 'IsAdmin': false, 'Active': true, 'CreatedAt': now, 'LastActive': '',
     'PreferredCity': '', 'PreferredState': '', 'PreferredZip': '', 'PersonType': personType,
@@ -2915,6 +2931,8 @@ function adminGetReps(body) {
       // Admin-only -- this whole function requires withAdminSession, so
       // it's safe to include here; never add these to any rep-facing list.
       paymentEntityName: r['PaymentEntityName'] || '', paymentDriveLink: r['PaymentDriveLink'] || '',
+      smsConsent: r['SmsConsent'] === true || r['SmsConsent'] === 'TRUE',
+      smsConsentAt: r['SmsConsentAt'] || '', smsConsentPhone: r['SmsConsentPhone'] || '',
       buyerContactConfirmed: r['BuyerContactConfirmed'] === true || r['BuyerContactConfirmed'] === 'TRUE'
     };
   });

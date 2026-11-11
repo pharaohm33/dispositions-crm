@@ -764,6 +764,7 @@ document.getElementById("signup-btn").addEventListener("click", async function (
   const name = document.getElementById("signup-name").value.trim();
   const email = document.getElementById("signup-email").value.trim();
   const phone = document.getElementById("signup-phone").value.trim();
+  const smsConsent = document.getElementById("signup-sms-consent").checked;
   const personType = document.getElementById("signup-persontype").value;
   const password = document.getElementById("signup-password").value;
   const confirm = document.getElementById("signup-confirm").value;
@@ -776,6 +777,13 @@ document.getElementById("signup-btn").addEventListener("click", async function (
   }
   if (!personType) {
     errorEl.textContent = "Select what best describes you.";
+    errorEl.classList.add("show");
+    return;
+  }
+  // The SMS box is optional and unchecked by default -- but if someone
+  // ticks it, there has to be a real mobile number to consent for.
+  if (smsConsent && phone.replace(/\D/g, "").length < 10) {
+    errorEl.textContent = "Enter your full mobile number to receive text messages, or uncheck the text message box.";
     errorEl.classList.add("show");
     return;
   }
@@ -804,6 +812,12 @@ document.getElementById("signup-btn").addEventListener("click", async function (
   btn.disabled = true;
   const signupRes = await api("publicSignup", Object.assign({
     name: name, email: email, phone: phone, personType: personType, password: password,
+    // Proof of consent: the exact wording the person saw, where, and when
+    // (the server stamps the time) -- carriers can ask for this any time.
+    smsConsent: smsConsent,
+    smsConsentText: document.getElementById("signup-sms-consent-text").textContent.replace(/\s+/g, " ").trim(),
+    smsConsentPage: location.origin + location.pathname,
+    smsConsentUserAgent: navigator.userAgent || "",
     captchaTargetX: signupCaptcha.targetX, captchaExpiresAt: signupCaptcha.expiresAt,
     captchaToken: signupCaptcha.token, captchaSubmittedX: sliderX
   }, personType === "Buyer" ? collectSignupBuyBox() : collectSignupDealArea()));
@@ -4274,6 +4288,7 @@ function renderReps() {
       '<td>' + esc(r.phone || "") + '</td>' +
       '<td>' + esc(r.email || "") + '</td>' +
       '<td class="small-muted">' + (r.personType ? esc(r.personType) : "&mdash;") + '</td>' +
+      '<td class="small-muted" title="' + (r.smsConsent ? "Opted in to texts at sign-up: " + esc(r.smsConsentPhone || "") + (r.smsConsentAt ? " on " + esc(formatDate(r.smsConsentAt)) : "") : "No text consent on file -- do not text this number from the Buyer Outreach campaign") + '">' + (r.smsConsent ? '<span class="status-pill status-negotiating">Opted in</span>' : "&mdash;") + '</td>' +
       '<td><label class="toggle-row"><input type="checkbox" class="rep-toggle" data-username="' + esc(r.username) + '" data-field="allAccess"' + (r.allAccess ? " checked" : "") + '></label></td>' +
       '<td><label class="toggle-row"><input type="checkbox" class="rep-toggle" data-username="' + esc(r.username) + '" data-field="isAdmin"' + (r.isAdmin ? " checked" : "") + '></label></td>' +
       '<td><label class="toggle-row"><input type="checkbox" class="rep-toggle" data-username="' + esc(r.username) + '" data-field="active"' + (r.active ? " checked" : "") + '></label></td>' +
