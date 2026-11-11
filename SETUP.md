@@ -72,7 +72,7 @@ text (`fetchSourceListingText`), reformatted by Claude per the rules in
 `generateDealPageHtml` — every disclosed fact kept (cleaning up means
 reformatting, never trimming real information), the underlying property's
 address always redacted in favor of "available upon request," every
-contact in the source swapped for JNA Dynamic Holdings LLC's own contact
+contact in the source swapped for Suede Buffalo LLC's own contact
 info, and any field the source simply doesn't disclose left out entirely —
 never shown as "N/A," "—," "Not specified," or similar placeholder text.
 
@@ -96,7 +96,7 @@ file, shared so this app's own Google account can see it) and click
    reformat everything into one clean page **without dropping any fact**
    from the source, and to replace **every** contact name/phone/email/company
    found in that source text with the fixed template — `520-633-6437` /
-   `montanoemmanuel@gmail.com` / JNA Dynamic Holdings LLC.
+   `info@sendmybuyer.com` / Suede Buffalo LLC.
 4. Also re-checks the asking price from the same Source Link fetch and
    updates Price if it moved.
 5. Publishes the resulting HTML to `deals/<DealID>.html`

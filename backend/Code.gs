@@ -1161,8 +1161,8 @@ function resolveDealContactInfo(deal) {
   const props = PropertiesService.getScriptProperties();
   return {
     phone: (deal && deal['ContactPhone']) || props.getProperty('DEFAULT_CONTACT_PHONE') || '520-633-6437',
-    email: (deal && deal['ContactEmail']) || props.getProperty('DEFAULT_CONTACT_EMAIL') || 'montanoemmanuel@gmail.com',
-    company: (deal && deal['CompanyName']) || props.getProperty('DEFAULT_COMPANY_NAME') || 'JNA Dynamic Holdings LLC'
+    email: (deal && deal['ContactEmail']) || props.getProperty('DEFAULT_CONTACT_EMAIL') || 'info@sendmybuyer.com',
+    company: (deal && deal['CompanyName']) || props.getProperty('DEFAULT_COMPANY_NAME') || 'Suede Buffalo LLC'
   };
 }
 
@@ -1171,8 +1171,8 @@ function adminGetContactDefaults(body) {
   return {
     ok: true,
     phone: props.getProperty('DEFAULT_CONTACT_PHONE') || '520-633-6437',
-    email: props.getProperty('DEFAULT_CONTACT_EMAIL') || 'montanoemmanuel@gmail.com',
-    company: props.getProperty('DEFAULT_COMPANY_NAME') || 'JNA Dynamic Holdings LLC'
+    email: props.getProperty('DEFAULT_CONTACT_EMAIL') || 'info@sendmybuyer.com',
+    company: props.getProperty('DEFAULT_COMPANY_NAME') || 'Suede Buffalo LLC'
   };
 }
 
@@ -1203,6 +1203,35 @@ function adminSnapshotContactInfoForAllDeals() {
     updatedCount++;
   });
   return { ok: true, updatedCount: updatedCount };
+}
+
+// ONE-TIME, run by hand from the Apps Script editor (select
+// migrateCompanyToSuedeBuffalo, press Run). Deals lock their own company and
+// contact at creation, so changing the defaults alone does not touch deals
+// already saved. This points the site defaults and every saved deal that
+// still names JNA Dynamic Holdings LLC (or the old Gmail contact) at
+// Suede Buffalo LLC / info@sendmybuyer.com. Safe to run again.
+function migrateCompanyToSuedeBuffalo() {
+  const props = PropertiesService.getScriptProperties();
+  props.setProperty('DEFAULT_COMPANY_NAME', 'Suede Buffalo LLC');
+  props.setProperty('DEFAULT_CONTACT_EMAIL', 'info@sendmybuyer.com');
+  const sheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
+  const deals = sheetToObjects(sheet);
+  const companyCol = getColumnIndex(sheet, 'CompanyName');
+  const emailCol = getColumnIndex(sheet, 'ContactEmail');
+  let companyFixed = 0, emailFixed = 0;
+  deals.forEach(function (d) {
+    if (/JNA/i.test(String(d['CompanyName'] || ''))) {
+      sheet.getRange(d._row, companyCol).setValue('Suede Buffalo LLC');
+      companyFixed++;
+    }
+    if (String(d['ContactEmail'] || '').trim().toLowerCase() === 'montanoemmanuel@gmail.com') {
+      sheet.getRange(d._row, emailCol).setValue('info@sendmybuyer.com');
+      emailFixed++;
+    }
+  });
+  Logger.log('Company updated on ' + companyFixed + ' deals, contact email on ' + emailFixed + ' deals.');
+  return { ok: true, companyFixed: companyFixed, emailFixed: emailFixed };
 }
 
 function computeGrossMargin(deal) {
@@ -2168,15 +2197,15 @@ function generateDealPageHtml(deal, sourceListingText, photoPaths, morePhotosLin
     'does NOT apply to tenant/lease duration facts (e.g. "tenant in place since March 2026," "lease ' +
     'through 6/30/27," "3.5+ years") -- those describe the property\'s income history, not the ' +
     'listing\'s marketplace activity, and must still be kept per the general rule above.\n\n' +
-    'Never disclose sourcing. This page must read as JNA Dynamic Holdings LLC\'s own deal, not as a ' +
+    'Never disclose sourcing. This page must read as Suede Buffalo LLC\'s own deal, not as a ' +
     'repost of someone else\'s listing. Do not add any sentence, note, or section (e.g. a "Source ' +
     'Notes" or "Listing Activity" heading) that says or implies where this information came from -- ' +
     'no mentioning "the marketplace listing," "the original listing," that a field was "gated behind ' +
     'login," that images/details were "not reproduced here," or similar. If a field is simply absent ' +
     'from sourceListingText, just omit it silently the way you would for any other missing structured ' +
     'fact -- do not explain why it\'s missing or where it would normally come from. This is separate ' +
-    'from the standard, expected disclaimer that figures haven\'t been independently verified by JNA ' +
-    'Dynamic Holdings LLC (keep that -- it\'s a normal liability disclaimer, not a sourcing reveal), ' +
+    'from the standard, expected disclaimer that figures haven\'t been independently verified by ' +
+    'Suede Buffalo LLC (keep that -- it\'s a normal liability disclaimer, not a sourcing reveal), ' +
     'and separate from crediting the underlying property owner\'s contract (also keep that, per the ' +
     'assignment-of-contract disclosure already required elsewhere).\n\n' +
     'Contact/attribution swap (do this everywhere, no exceptions): sourceListingText may contain ' +
@@ -2191,7 +2220,7 @@ function generateDealPageHtml(deal, sourceListingText, photoPaths, morePhotosLin
     'directly in the HTML. Never write a placeholder, template expression, or variable reference of ' +
     'any kind anywhere in the output (not ${...}, not {{...}}, not {facts.company} or {facts.x}, not ' +
     'any other bracket/brace syntax) -- if you write facts.company or company or {{COMPANY}} instead ' +
-    'of typing JNA Dynamic Holdings LLC itself, that text will appear verbatim, uninterpreted, on the ' +
+    'of typing Suede Buffalo LLC itself, that text will appear verbatim, uninterpreted, on the ' +
     'live page exactly as you wrote it.\n\n' +
     'photoPaths below (if any) are image files already published on this same site, given as paths ' +
     'relative to the site root -- reference each one as <img src="/' + '<the exact path string>"> ' +

@@ -3706,7 +3706,7 @@ function renderAdminDealDetail(deal, allReps, assignedUsernames, buyers, fbReque
         '<label class="field-label">Pictures Link <span class="small-muted">(Google Drive folder or file — leave blank to keep what\'s already saved)</span></label>' +
         '<input type="text" id="deal-artifact-pictures-edit" value="' + esc(deal.ArtifactPicturesLink || "") + '" placeholder="https://drive.google.com/drive/folders/...">' +
         '<p class="small-muted">Source Link: uses the link above — already inside the page.</p>' +
-        '<p class="small-muted">Contact Information: auto-filled from template — +1 520-633-6437, montanoemmanuel@gmail.com. Any contact info found on the source page gets replaced with this everywhere.' +
+        '<p class="small-muted">Contact Information: auto-filled from template — +1 520-633-6437, info@sendmybuyer.com. Any contact info found on the source page gets replaced with this everywhere.' +
           (deal.ArtifactPhotoPaths ? ' &mdash; ' + String(deal.ArtifactPhotoPaths).split(',').filter(Boolean).length + ' photo(s) currently published.' : '') + '</p>' +
         '<div class="nav-row" style="justify-content:flex-start; margin-top:6px;"><button class="btn primary small" id="create-deal-artifact-btn">Create Deal Artifact Page</button><span class="small-muted" id="create-deal-artifact-result"></span></div>' +
         '<p class="small-muted">Pulls the full listing off the Source Link and every photo from the Pictures Link, cleans and reformats all of it into one page without dropping any information, swaps in the contact template above, and publishes it to this deal\'s permanent sendmybuyer.com link. Safe to re-run any time — e.g. after adding more photos to the Drive folder.</p>'
