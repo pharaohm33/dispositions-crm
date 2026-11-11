@@ -1215,6 +1215,10 @@ function migrateCompanyToSuedeBuffalo() {
   const props = PropertiesService.getScriptProperties();
   props.setProperty('DEFAULT_COMPANY_NAME', 'Suede Buffalo LLC');
   props.setProperty('DEFAULT_CONTACT_EMAIL', 'info@sendmybuyer.com');
+  // The "Need help after signing up?" card on the public login page reads
+  // this separate setting; move it off the old Gmail address too.
+  const joinEmail = String(props.getProperty('JOIN_CONTACT_EMAIL') || '').trim().toLowerCase();
+  if (!joinEmail || joinEmail === 'montanoemmanuel@gmail.com') props.setProperty('JOIN_CONTACT_EMAIL', 'info@sendmybuyer.com');
   const sheet = getSheet(DEALS_SHEET, DEAL_COLUMNS);
   const deals = sheetToObjects(sheet);
   const companyCol = getColumnIndex(sheet, 'CompanyName');
