@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adams Creek Rd Area Lot — Havelock, NC | Suede Buffalo LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #f6f1e9;
+    color: #2a2520;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    color: #211d18;
+  }
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  header.top {
+    border-bottom: 1px solid #ddd3c2;
+    padding-top: 28px;
+    padding-bottom: 20px;
+  }
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.75rem;
+    color: #8a6d46;
+    font-weight: 600;
+  }
+  header.top h1 {
+    font-size: 2.1rem;
+    margin-top: 10px;
+    margin-bottom: 8px;
+  }
+  .loc-line {
+    font-size: 1.05rem;
+    color: #4a4237;
+    margin-bottom: 4px;
+  }
+  .addr-note {
+    font-size: 0.92rem;
+    color: #7a5a2f;
+    font-style: italic;
+    margin-top: 8px;
+    margin-bottom: 0;
+  }
+  .price-block {
+    margin-top: 28px;
+    margin-bottom: 28px;
+    background: #fffdf9;
+    border: 1px solid #e4d9c4;
+    border-radius: 6px;
+    padding: 24px 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .price-block .amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: #1f1a14;
+  }
+  .price-block .sub {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8a6d46;
+    margin-bottom: 4px;
+  }
+  .price-meta {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .price-meta div {
+    font-size: 0.95rem;
+    color: #4a4237;
+  }
+  .price-meta strong {
+    display: block;
+    font-size: 1rem;
+    color: #211d18;
+  }
+  .gallery-section {
+    margin-top: 10px;
+    margin-bottom: 36px;
+  }
+  .gallery {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-snap-type: x mandatory;
+  }
+  .gallery img {
+    height: 230px;
+    width: auto;
+    flex: 0 0 auto;
+    border-radius: 4px;
+    object-fit: cover;
+    scroll-snap-align: start;
+    border: 1px solid #e4d9c4;
+  }
+  .more-photos {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #8a6d46;
+    text-decoration: underline;
+  }
+  section.block {
+    margin-top: 36px;
+    margin-bottom: 36px;
+  }
+  section.block h2 {
+    font-size: 1.4rem;
+    border-bottom: 1px solid #ddd3c2;
+    padding-bottom: 10px;
+    margin-bottom: 16px;
+  }
+  ul.plain {
+    padding-left: 20px;
+    margin: 0;
+  }
+  ul.plain li {
+    margin-bottom: 8px;
+  }
+  table.deal-terms {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fffdf9;
+    border: 1px solid #e4d9c4;
+  }
+  table.deal-terms td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #ece3d2;
+    font-size: 0.95rem;
+    vertical-align: top;
+  }
+  table.deal-terms tr:last-child td {
+    border-bottom: none;
+  }
+  table.deal-terms td.label {
+    width: 42%;
+    color: #8a6d46;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+  }
+  .disclosure-box {
+    background: #f1e8d6;
+    border: 1px solid #ddcba5;
+    border-radius: 6px;
+    padding: 18px 22px;
+    font-size: 0.92rem;
+    color: #4a3c22;
+  }
+  .disclosure-box p { margin: 0 0 10px 0; }
+  .disclosure-box p:last-child { margin-bottom: 0; }
+  .disclaimer {
+    font-size: 0.82rem;
+    color: #7a7265;
+    margin-top: 30px;
+    margin-bottom: 10px;
+  }
+  .cta-band {
+    margin-top: 48px;
+    background: #211d18;
+    color: #f6f1e9;
+    padding: 46px 0 50px 0;
+  }
+  .cta-band .wrap {
+    text-align: center;
+  }
+  .cta-band h2 {
+    color: #f6f1e9;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+  }
+  .cta-band p {
+    color: #d8cfbf;
+    margin-bottom: 22px;
+    font-size: 1rem;
+  }
+  .cta-contacts {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .cta-contacts a {
+    color: #f6f1e9;
+    background: #8a6d46;
+    padding: 12px 26px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+  footer.bottom {
+    text-align: center;
+    padding: 22px 0 30px 0;
+    font-size: 0.8rem;
+    color: #8a7f6c;
+    background: #211d18;
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=128a1a55-293a-43b0-a305-e97ad3ec030a&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F128a1a55-293a-43b0-a305-e97ad3ec030a.html">Request the Address</a></div></noscript>
+
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">Suede Buffalo LLC &middot; Deal NC-13 (Land)</div>
+    <h1>Residential Homesite — Adams Creek Rd Area</h1>
+    <div class="loc-line">Havelock, North Carolina &middot; Craven County &middot; ZIP 28532</div>
+    <p class="addr-note">Address available upon request — reach out below and we'll send the full parcel address and location details.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="price-block">
+    <div>
+      <div class="sub">Asking Price</div>
+      <div class="amount">$25,000</div>
+    </div>
+    <div class="price-meta">
+      <div><strong>0.468 acres</strong>Lot Size</div>
+      <div><strong>Land</strong>Asset Type</div>
+      <div><strong>Craven County, NC</strong>Market</div>
+    </div>
+  </div>
+
+  <div class="gallery-section">
+    <div class="gallery">
+      <img src="/deals/128a1a55-293a-43b0-a305-e97ad3ec030a/photos/1.webp" alt="Vacant residential lot view, Havelock NC">
+      <img src="/deals/128a1a55-293a-43b0-a305-e97ad3ec030a/photos/2.webp" alt="Vacant residential lot view, Havelock NC">
+      <img src="/deals/128a1a55-293a-43b0-a305-e97ad3ec030a/photos/3.webp" alt="Vacant residential lot view, Havelock NC">
+      <img src="/deals/128a1a55-293a-43b0-a305-e97ad3ec030a/photos/4.webp" alt="Vacant residential lot view, Havelock NC">
+      <img src="/deals/128a1a55-293a-43b0-a305-e97ad3ec030a/photos/5.webp" alt="Vacant residential lot view, Havelock NC">
+      <img src="/deals/128a1a55-293a-43b0-a305-e97ad3ec030a/photos/6.webp" alt="Vacant residential lot view, Havelock NC">
+      <img src="/deals/128a1a55-293a-43b0-a305-e97ad3ec030a/photos/7.webp" alt="Vacant residential lot view, Havelock NC">
+      <img src="/deals/128a1a55-293a-43b0-a305-e97ad3ec030a/photos/8.webp" alt="Vacant residential lot view, Havelock NC">
+      <img src="/deals/128a1a55-293a-43b0-a305-e97ad3ec030a/photos/9.webp" alt="Vacant residential lot view, Havelock NC">
+      <img src="/deals/128a1a55-293a-43b0-a305-e97ad3ec030a/photos/10.webp" alt="Vacant residential lot view, Havelock NC">
+    </div>
+  </div>
+
+  <section class="block">
+    <h2>Overview</h2>
+    <p>Opportunity to acquire vacant residential land along Adams Creek Rd in Havelock, NC. The property sits within an established residential pocket, with existing homes and other developed lots nearby. At a $25,000 asking price, this is positioned for a local builder, owner-builder, or land investor looking for an affordable entry point in the Havelock / Craven County market.</p>
+    <p>The exact property location is provided to qualified buyers upon request.</p>
+  </section>
+
+  <section class="block">
+    <h2>Property Highlights</h2>
+    <ul class="plain">
+      <li>Vacant residential land</li>
+      <li>Adams Creek Rd location</li>
+      <li>Established residential surroundings</li>
+      <li>Road access</li>
+      <li>Nearby improved homes and residential lots</li>
+      <li>Convenient Havelock / Craven County location</li>
+      <li>Lot size: 0.468 acres</li>
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2>Why Buyers Should Look At This</h2>
+    <p>The strongest angle is straightforward pricing supported by nearby land activity:</p>
+    <ul class="plain">
+      <li>A nearby 0.45-acre lot on Adams Creek Rd has sold.</li>
+      <li>A nearby lot of approximately 0.86 acres sold around $30,900.</li>
+      <li>A superior nearby lot has also traded materially higher.</li>
+    </ul>
+    <p>At $25,000, the subject is positioned within the range of recent surrounding land sales rather than requiring a buyer to underwrite an aggressive premium.</p>
+  </section>
+
+  <section class="block">
+    <h2>Builder / Investor Angle</h2>
+    <p>This is best suited for a buyer looking to evaluate a residential homesite in an already established area rather than isolated rural acreage. Buyer should confirm the building envelope, access, utilities, wastewater feasibility, and any site-specific development requirements before construction.</p>
+  </section>
+
+  <section class="block">
+    <h2>Buyer Due Diligence</h2>
+    <p>Buyer to independently verify: exact acreage, survey boundaries, zoning, permitted use, setbacks, building envelope, road frontage, utilities, water and sewer availability, septic feasibility, soils, flood conditions, wetlands, drainage, easements, title, and all construction costs.</p>
+    <p>No representation is made that the property is permit-ready, perc-approved, septic-approved, utility-served, waterfront, or guaranteed buildable.</p>
+  </section>
+
+  <section class="block">
+    <h2>Price History</h2>
+    <table class="deal-terms">
+      <tr><td class="label">Last Sold</td><td>October 2023 — $3,500</td></tr>
+      <tr><td class="label">Current Asking Price</td><td>$25,000</td></tr>
+    </table>
+  </section>
+
+  <section class="block">
+    <h2>Deal Terms</h2>
+    <table class="deal-terms">
+      <tr><td class="label">Purchase Price</td><td>$25,000</td></tr>
+      <tr><td class="label">Payment Type</td><td>Cash or hard money</td></tr>
+      <tr><td class="label">Contract Type</td><td>Assignment of contract</td></tr>
+      <tr><td class="label">Closing Costs</td><td>Buyer pays closing costs</td></tr>
+      <tr><td class="label">Transaction Coordinator Fee</td><td>$425, paid by buyer as part of buyer's closing costs</td></tr>
+      <tr><td class="label">Condition</td><td>Property sold as-is</td></tr>
+      <tr><td class="label">Buyer Requirement</td><td>Proof of funds required</td></tr>
+      <tr><td class="label">Financing Type</td><td>Investment loan (e.g. hard money, bridge, DSCR, new construction loan)</td></tr>
+      <tr><td class="label">Lot Size</td><td>0.468 acres</td></tr>
+    </table>
+  </section>
+
+  <section class="block">
+    <h2>Assignment Disclosure</h2>
+    <div class="disclosure-box">
+      <p>This is a wholesale assignment of contract, not a direct sale. Suede Buffalo LLC does not hold title to the underlying property and is not acting on behalf of, and is not in direct contact with, the underlying seller. The end buyer will receive an assignment of the existing purchase contract.</p>
+      <p>JNA Dynamic Holdings LLC holds equitable interest in the subject transaction under the underlying purchase contract being assigned.</p>
+    </div>
+    <p class="disclaimer">Figures and details above have not been independently verified by Suede Buffalo LLC. Buyer is responsible for independently verifying all acreage, zoning, utility, title, and other information prior to closing.</p>
+  </section>
+
+</div>
+
+<div class="cta-band">
+  <div class="wrap">
+    <h2>Havelock, NC &middot; Asking $25,000</h2>
+    <p>Adams Creek Rd location. Established residential surroundings. Nearby land sales in the high-$20Ks to low-$30Ks range. Reach out for parcel information, maps, property photos, and available due-diligence materials.</p>
+    <div class="cta-contacts">
+      <a href="tel:520-633-6437">Call 520-633-6437</a>
+      <a href="mailto:info@sendmybuyer.com">Email info@sendmybuyer.com</a>
+    </div>
+  </div>
+</div>
+
+<footer class="bottom">
+  Suede Buffalo LLC &middot; Deal NC-13 (Land) &middot; Havelock, Craven County, NC
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
