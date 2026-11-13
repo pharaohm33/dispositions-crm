@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Strawberry Mansion Rowhome Assignment — Philadelphia, PA | Suede Buffalo LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e9;
+    --ink:#2a241d;
+    --sub:#5c5346;
+    --rule:#ded4c3;
+    --accent:#8a4a2f;
+    --card:#fffdfa;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    line-height:1.55;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    margin:0;
+  }
+  .wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+  header.top{
+    border-bottom:1px solid var(--rule);
+    padding-top:28px;
+    padding-bottom:28px;
+  }
+  .brand{
+    font-family:'Fraunces',serif;
+    font-size:15px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--accent);
+  }
+  .tag{
+    margin-top:6px;
+    font-size:13px;
+    color:var(--sub);
+    letter-spacing:0.03em;
+  }
+  section.hero{
+    padding-top:40px;
+    padding-bottom:20px;
+  }
+  .dealcode{
+    display:inline-block;
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--sub);
+    border:1px solid var(--rule);
+    border-radius:20px;
+    padding:4px 12px;
+    margin-bottom:14px;
+  }
+  h1.title{
+    font-size:38px;
+    line-height:1.15;
+    margin-bottom:10px;
+  }
+  .loc{
+    font-size:17px;
+    color:var(--sub);
+    margin-bottom:6px;
+  }
+  .addr-note{
+    font-size:14px;
+    color:var(--accent);
+    font-style:italic;
+    margin-bottom:4px;
+  }
+  .more-photos-link{
+    font-size:14px;
+    margin-top:10px;
+  }
+  .more-photos-link a{
+    color:var(--accent);
+    text-decoration:underline;
+  }
+  section.price-block{
+    padding-top:22px;
+    padding-bottom:22px;
+  }
+  .price-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+    margin-top:18px;
+  }
+  .price-card{
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:10px;
+    padding:18px 22px;
+    flex:1 1 180px;
+  }
+  .price-card .label{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--sub);
+    margin-bottom:6px;
+  }
+  .price-card .value{
+    font-family:'Fraunces',serif;
+    font-size:26px;
+    color:var(--ink);
+  }
+  .price-card.main{
+    border-color:var(--accent);
+  }
+  .price-card.main .value{
+    color:var(--accent);
+  }
+  section.gallery{
+    padding-top:10px;
+    padding-bottom:30px;
+  }
+  .gallery-scroll{
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    padding-bottom:10px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .gallery-scroll img{
+    height:260px;
+    width:auto;
+    border-radius:8px;
+    flex:0 0 auto;
+    border:1px solid var(--rule);
+    object-fit:cover;
+  }
+  section.block{
+    padding-top:36px;
+    padding-bottom:36px;
+    border-top:1px solid var(--rule);
+  }
+  h2.sec-title{
+    font-size:26px;
+    margin-bottom:16px;
+  }
+  p{
+    margin:0 0 12px 0;
+    color:var(--ink);
+  }
+  ul{
+    margin:0 0 12px 0;
+    padding-left:20px;
+  }
+  li{
+    margin-bottom:6px;
+  }
+  table.terms{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+  }
+  table.terms tr{
+    border-bottom:1px solid var(--rule);
+  }
+  table.terms td{
+    padding:11px 4px;
+    font-size:15px;
+    vertical-align:top;
+  }
+  table.terms td.k{
+    color:var(--sub);
+    width:42%;
+  }
+  table.terms td.v{
+    font-weight:500;
+  }
+  .comps-list{
+    margin-top:6px;
+  }
+  .comps-list li{
+    font-size:15px;
+  }
+  .sub-head{
+    font-family:'Fraunces',serif;
+    font-size:18px;
+    margin-top:22px;
+    margin-bottom:8px;
+  }
+  .note-box{
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:10px;
+    padding:16px 20px;
+    margin-top:16px;
+    font-size:14px;
+    color:var(--sub);
+  }
+  section.cta{
+    background:var(--accent);
+    color:#fbf4ea;
+    padding-top:48px;
+    padding-bottom:48px;
+    border-top:1px solid var(--rule);
+  }
+  section.cta h2{
+    color:#fbf4ea;
+    font-size:30px;
+    margin-bottom:12px;
+  }
+  section.cta p{
+    color:#f3e4d7;
+  }
+  .cta-contacts{
+    margin-top:18px;
+    display:flex;
+    gap:28px;
+    flex-wrap:wrap;
+  }
+  .cta-contacts a{
+    color:#fbf4ea;
+    font-size:18px;
+    font-weight:600;
+    text-decoration:none;
+    border-bottom:1px solid #fbf4ea;
+    padding-bottom:2px;
+  }
+  footer.disclaimer{
+    padding-top:26px;
+    padding-bottom:40px;
+  }
+  footer.disclaimer p{
+    font-size:12.5px;
+    color:var(--sub);
+    line-height:1.6;
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=63a7f9f7-6621-4ce6-a75a-f41c8375b33c&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F63a7f9f7-6621-4ce6-a75a-f41c8375b33c.html">Request the Address</a></div></noscript>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">Suede Buffalo LLC</div>
+    <div class="tag">Wholesale Deal Marketing</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <span class="dealcode">Deal PA-1 (SFH)</span>
+    <h1 class="title">Strawberry Mansion Rowhome — Mostly Rehabbed, Flip or Hold</h1>
+    <div class="loc">Philadelphia, PA 19132 &middot; Philadelphia County</div>
+    <div class="addr-note">Address available upon request — contact us for the full street address.</div>
+    <div class="more-photos-link"><a href="https://drive.google.com/drive/folders/1372Xn6PD08khV51Wd9VGgrEkCM4WUbq3" target="_blank" rel="noopener">View full photo set</a></div>
+  </div>
+</section>
+
+<section class="price-block">
+  <div class="wrap">
+    <div class="price-grid">
+      <div class="price-card main">
+        <div class="label">Assignment Price</div>
+        <div class="value">$104,999</div>
+      </div>
+      <div class="price-card">
+        <div class="label">After Repair Value (ARV)</div>
+        <div class="value">$184,999</div>
+      </div>
+      <div class="price-card">
+        <div class="label">Estimated Repairs</div>
+        <div class="value">$10,000</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="gallery">
+  <div class="wrap">
+    <div class="gallery-scroll">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/1.webp" alt="Strawberry Mansion rowhome interior view 1">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/2.webp" alt="Strawberry Mansion rowhome interior view 2">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/3.webp" alt="Strawberry Mansion rowhome interior view 3">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/4.webp" alt="Strawberry Mansion rowhome interior view 4">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/5.webp" alt="Strawberry Mansion rowhome interior view 5">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/6.webp" alt="Strawberry Mansion rowhome interior view 6">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/7.webp" alt="Strawberry Mansion rowhome interior view 7">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/8.webp" alt="Strawberry Mansion rowhome interior view 8">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/9.webp" alt="Strawberry Mansion rowhome interior view 9">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/10.webp" alt="Strawberry Mansion rowhome interior view 10">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/11.webp" alt="Strawberry Mansion rowhome interior view 11">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/12.webp" alt="Strawberry Mansion rowhome interior view 12">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/13.webp" alt="Strawberry Mansion rowhome interior view 13">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/14.webp" alt="Strawberry Mansion rowhome interior view 14">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/15.webp" alt="Strawberry Mansion rowhome interior view 15">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/16.webp" alt="Strawberry Mansion rowhome interior view 16">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/17.webp" alt="Strawberry Mansion rowhome interior view 17">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/18.webp" alt="Strawberry Mansion rowhome interior view 18">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/19.webp" alt="Strawberry Mansion rowhome interior view 19">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/20.webp" alt="Strawberry Mansion rowhome interior view 20">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/21.webp" alt="Strawberry Mansion rowhome interior view 21">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/22.webp" alt="Strawberry Mansion rowhome interior view 22">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/23.webp" alt="Strawberry Mansion rowhome interior view 23">
+      <img src="/deals/63a7f9f7-6621-4ce6-a75a-f41c8375b33c/photos/24.webp" alt="Strawberry Mansion rowhome interior view 24">
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2 class="sec-title">Property Overview</h2>
+    <table class="terms">
+      <tr><td class="k">Property Type</td><td class="v">Single Family Rowhome</td></tr>
+      <tr><td class="k">Bedrooms</td><td class="v">3</td></tr>
+      <tr><td class="k">Bathrooms</td><td class="v">2</td></tr>
+      <tr><td class="k">Size</td><td class="v">1,510 sq ft</td></tr>
+      <tr><td class="k">Lot Size</td><td class="v">1,680 sq ft</td></tr>
+      <tr><td class="k">Year Built</td><td class="v">1915</td></tr>
+      <tr><td class="k">Occupancy</td><td class="v">Vacant</td></tr>
+      <tr><td class="k">Neighborhood</td><td class="v">Strawberry Mansion, North Philadelphia</td></tr>
+      <tr><td class="k">Walk Score</td><td class="v">58</td></tr>
+      <tr><td class="k">Local School Ratings</td><td class="v">Area schools rated below average (3)</td></tr>
+    </table>
+
+    <h3 class="sub-head">Highlights</h3>
+    <ul>
+      <li>Off-market opportunity in Strawberry Mansion, North Philadelphia</li>
+      <li>Roughly 85–90% rehabbed: new flooring, new bathrooms, new water heater, recessed lighting, dual pane windows, and brick facade</li>
+      <li>Unfinished basement with framing already started for an extra room — added upside for the buyer</li>
+      <li>Buyer pays all closing costs</li>
+    </ul>
+
+    <h3 class="sub-head">Repairs Needed</h3>
+    <p>Only finishing touches remain to bring the property to rent-ready or retail-ready condition.</p>
+    <p>Estimated repair cost: approximately $10,000.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2 class="sec-title">ARV &amp; Comparable Sales</h2>
+    <p>ARV of <strong>$184,999</strong> is supported by the following comparable sales in Philadelphia, PA:</p>
+    <ul class="comps-list">
+      <li>Philadelphia, PA — renovated, sold for $188,000 on 09/24/2026 (address available on request)</li>
+      <li>Philadelphia, PA — full rehab, sold for $199,990 on 06/09/2026 (address available on request)</li>
+      <li>Philadelphia, PA — renovated, sold for $190,000 on 03/30/2026 (address available on request)</li>
+      <li>Philadelphia, PA — renovated, sold for $184,900 on 06/30/2026 (address available on request)</li>
+      <li>Philadelphia, PA — renovated, approximately 300 sq ft smaller, sold for $170,000 on 07/16/2026 (address available on request)</li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2 class="sec-title">Rent Potential</h2>
+    <ul>
+      <li>Area 3-bedroom rents run approximately $1,450 – $1,500 per month</li>
+      <li>Philadelphia Housing Authority 3-bedroom payment standard is $1,851 — strong Section 8 potential</li>
+      <li>Flip it or rent it: roughly $80,000 of spread between the $104,999 price and the $184,999 ARV, before finishing costs</li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2 class="sec-title">Deal Terms</h2>
+    <table class="terms">
+      <tr><td class="k">Deal Code</td><td class="v">PA-1 (SFH)</td></tr>
+      <tr><td class="k">Asset Type</td><td class="v">Single Family</td></tr>
+      <tr><td class="k">Deal Types</td><td class="v">Fix and Flip, Buy and Hold</td></tr>
+      <tr><td class="k">City / State</td><td class="v">Philadelphia, PA</td></tr>
+      <tr><td class="k">County</td><td class="v">Philadelphia County</td></tr>
+      <tr><td class="k">Assignment Price</td><td class="v">$104,999</td></tr>
+      <tr><td class="k">ARV</td><td class="v">$184,999</td></tr>
+      <tr><td class="k">Estimated Rehab</td><td class="v">$10,000</td></tr>
+      <tr><td class="k">Suggested Financing</td><td class="v">Investment loan (e.g., hard money, bridge, DSCR, new construction loan)</td></tr>
+      <tr><td class="k">Closing Costs</td><td class="v">Buyer responsible for all closing costs</td></tr>
+    </table>
+    <div class="note-box">
+      This offering is an assignment of contract. Suede Buffalo LLC holds an equitable interest under contract with the underlying property owner and is marketing that contract for assignment; this is not a direct sale by, or on behalf of, the owner, and this page does not constitute an offer to contact the owner directly. Figures above — including price, ARV, rehab estimate, square footage, rents, and comparable sales — are provided for informational purposes and have not been independently verified by Suede Buffalo LLC. Buyers should perform their own due diligence before closing.
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <h2>Ready to Move on This Deal?</h2>
+    <p>Contact us for the full property address, additional documentation, or to submit an offer on this assignment.</p>
+    <div class="cta-contacts">
+      <a href="tel:520-633-6437">520-633-6437</a>
+      <a href="mailto:info@sendmybuyer.com">info@sendmybuyer.com</a>
+    </div>
+  </div>
+</section>
+
+<footer class="disclaimer">
+  <div class="wrap">
+    <p>Suede Buffalo LLC is marketing this property as an assignment of contract and holds an equitable interest in the underlying purchase agreement with the property owner; this is not a direct offer of sale by the owner. All figures, measurements, and estimates on this page, including price, ARV, repair costs, rents, and comparable sales, are believed to be accurate but have not been independently verified by Suede Buffalo LLC and should be confirmed by the buyer during due diligence.</p>
+  </div>
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
