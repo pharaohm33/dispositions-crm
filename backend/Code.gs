@@ -1965,6 +1965,17 @@ function collectDealPhotosFromDrive(dealId, picturesLink) {
     throw new Error('Could not read the Pictures Link from Drive: ' + String(err));
   }
 
+  // Drive's getFiles() has no defined order (in practice it came back newest first, which
+  // published a deal's photos in reverse and dropped the first ones past the cap). Pictures
+  // saved by the InvestorLift agent are named 001.webp, 002.webp ... in gallery order, so
+  // when every file name starts with a number that number sets the order. Anything else
+  // keeps Drive's own order, as before.
+  if (allFiles.length > 1 && allFiles.every(function (f) { return /^\d+/.test(String(f.getName() || '')); })) {
+    allFiles.sort(function (a, b) {
+      return (parseInt(a.getName(), 10) - parseInt(b.getName(), 10)) || String(a.getName()).localeCompare(String(b.getName()));
+    });
+  }
+
   const totalFound = allFiles.length;
   const driveFiles = allFiles.slice(0, MAX_PUBLISHED_PHOTOS_PER_DEAL);
 
@@ -2136,10 +2147,82 @@ function restoreDeadDealPage(deal) {
   }
 }
 
-function generateDealPageHtml(deal, sourceListingText, photoPaths, morePhotosLink) {
+// Which model writes a deal page. Claude first (script property ANTHROPIC_API_KEY); when that is
+// missing, out of credit, rate limited or down, DeepSeek writes the same page instead (script
+// property DeepSeek_API -- already used for buyer matching), which costs a few tenths of a cent a
+// page. Script property PAGE_MODEL = 'deepseek' skips Claude altogether (to save its credits);
+// 'claude' never falls back. The prompt keeps its fixed instructions first and the deal's own data
+// last, so DeepSeek's automatic prompt cache covers most of the input on every page after the first.
+function generatePageModelHtml(prompt) {
   const props = PropertiesService.getScriptProperties();
-  const apiKey = props.getProperty('ANTHROPIC_API_KEY');
-  if (!apiKey) throw new Error('ANTHROPIC_API_KEY script property is not set.');
+  const mode = String(props.getProperty('PAGE_MODEL') || '').toLowerCase();
+  const claudeKey = props.getProperty('ANTHROPIC_API_KEY');
+  const deepseekKey = props.getProperty('DeepSeek_API');
+  let claudeError = '';
+  if (mode !== 'deepseek' && claudeKey) {
+    try {
+      return cleanPageHtml(callClaudeForPage(claudeKey, prompt), 'Claude');
+    } catch (err) {
+      claudeError = String(err);
+      if (mode === 'claude' || !deepseekKey) throw err;
+    }
+  }
+  if (!deepseekKey) throw new Error('No page model is set up: add ANTHROPIC_API_KEY or DeepSeek_API as a script property.');
+  try {
+    return cleanPageHtml(callDeepSeekForPage(deepseekKey, prompt), 'DeepSeek');
+  } catch (err) {
+    throw new Error((claudeError ? 'Claude failed (' + claudeError.slice(0, 200) + '); ' : '') + 'DeepSeek failed: ' + String(err));
+  }
+}
+
+function callClaudeForPage(apiKey, prompt) {
+  const res = UrlFetchApp.fetch('https://api.anthropic.com/v1/messages', {
+    method: 'post',
+    contentType: 'application/json',
+    headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+    muteHttpExceptions: true,
+    payload: JSON.stringify({
+      model: 'claude-sonnet-5',
+      max_tokens: 16000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  if (res.getResponseCode() >= 300) throw new Error('Claude API returned HTTP ' + res.getResponseCode() + ': ' + res.getContentText());
+  const data = JSON.parse(res.getContentText());
+  return (data.content || []).map(function (b) { return b.text || ''; }).join('');
+}
+
+function callDeepSeekForPage(apiKey, prompt) {
+  const res = UrlFetchApp.fetch('https://api.deepseek.com/chat/completions', {
+    method: 'post',
+    contentType: 'application/json',
+    headers: { Authorization: 'Bearer ' + apiKey },
+    muteHttpExceptions: true,
+    payload: JSON.stringify({
+      model: 'deepseek-chat',
+      max_tokens: 8000,                 // deepseek-chat's own ceiling is 8192; a page is well inside it
+      temperature: 0.3,
+      messages: [
+        { role: 'system', content: 'You write one self-contained HTML document exactly as the user asks. Reply with the raw HTML only.' },
+        { role: 'user', content: prompt }
+      ]
+    })
+  });
+  if (res.getResponseCode() >= 300) throw new Error('DeepSeek API returned HTTP ' + res.getResponseCode() + ': ' + res.getContentText().slice(0, 300));
+  const body = JSON.parse(res.getContentText());
+  const choice = body && body.choices && body.choices[0];
+  return (choice && choice.message && choice.message.content) || '';
+}
+
+function cleanPageHtml(text, who) {
+  const html = String(text || '').replace(/^```(?:html)?\s*/i, '').replace(/```\s*$/, '').trim();
+  if (html.toLowerCase().indexOf('<!doctype') === -1 && html.toLowerCase().indexOf('<html') === -1) {
+    throw new Error(who + ' did not return an HTML document.');
+  }
+  return html;
+}
+
+function generateDealPageHtml(deal, sourceListingText, photoPaths, morePhotosLink) {
 
   const facts = {
     dealCode: deal['DealCode'] || '',
@@ -2267,24 +2350,7 @@ function generateDealPageHtml(deal, sourceListingText, photoPaths, morePhotosLin
     'morePhotosLink:\n' + (morePhotosLink || '(none)') + '\n\n' +
     'sourceListingText:\n' + (sourceListingText || '(none provided)');
 
-  const res = UrlFetchApp.fetch('https://api.anthropic.com/v1/messages', {
-    method: 'post',
-    contentType: 'application/json',
-    headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
-    muteHttpExceptions: true,
-    payload: JSON.stringify({
-      model: 'claude-sonnet-5',
-      max_tokens: 16000,
-      messages: [{ role: 'user', content: prompt }]
-    })
-  });
-  if (res.getResponseCode() >= 300) throw new Error('Claude API returned HTTP ' + res.getResponseCode() + ': ' + res.getContentText());
-  const data = JSON.parse(res.getContentText());
-  const text = (data.content || []).map(function (b) { return b.text || ''; }).join('');
-  const html = text.replace(/^```(?:html)?\s*/i, '').replace(/```\s*$/, '').trim();
-  if (html.toLowerCase().indexOf('<!doctype') === -1 && html.toLowerCase().indexOf('<html') === -1) {
-    throw new Error('Claude did not return an HTML document.');
-  }
+  const html = generatePageModelHtml(prompt);
   // The real "Request the Address" mechanism is inserted here in fixed
   // code, not left to the prompt above -- Claude's copy already says an
   // address is available on request (see the address-redaction rule
