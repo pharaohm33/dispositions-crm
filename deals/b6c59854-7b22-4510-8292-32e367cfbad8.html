@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Annandale, VA — 0.24-Acre Infill Lot | Fairfax County Land Opportunity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background-color: #f6f1e9;
+    color: #2b2621;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+  }
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    color: #1f1b16;
+  }
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  header.top {
+    background-color: #2b2621;
+    color: #f6f1e9;
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+  header.top .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  header.top .brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.02em;
+  }
+  header.top .tag {
+    font-size: 0.8rem;
+    opacity: 0.8;
+  }
+  section.hero {
+    padding-top: 40px;
+    padding-bottom: 20px;
+  }
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.78rem;
+    color: #8a6d3b;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  h1.title {
+    font-size: 2.3rem;
+    margin-top: 0;
+    margin-bottom: 10px;
+    line-height: 1.15;
+  }
+  .location-line {
+    font-size: 1.05rem;
+    color: #4a433b;
+    margin-bottom: 6px;
+  }
+  .address-note {
+    font-size: 0.95rem;
+    color: #7a5230;
+    font-style: italic;
+    margin-top: 4px;
+    margin-bottom: 18px;
+  }
+  .price-block {
+    background-color: #fffaf2;
+    border: 1px solid #e3d8c4;
+    border-radius: 10px;
+    padding: 22px 26px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  .price-block .price {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: #1f1b16;
+    font-weight: 700;
+  }
+  .price-block .price-sub {
+    font-size: 0.95rem;
+    color: #6b6155;
+    margin-top: 6px;
+  }
+  .price-history {
+    font-size: 0.9rem;
+    color: #8a6d3b;
+    margin-top: 10px;
+  }
+  a.photos-link {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #7a5230;
+    text-decoration: underline;
+  }
+  section.gallery {
+    padding-top: 10px;
+    padding-bottom: 30px;
+  }
+  .gallery-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .gallery-scroll img {
+    height: 230px;
+    width: auto;
+    border-radius: 8px;
+    flex-shrink: 0;
+    border: 1px solid #e3d8c4;
+    object-fit: cover;
+  }
+  section.block {
+    padding-top: 28px;
+    padding-bottom: 28px;
+    border-top: 1px solid #e3d8c4;
+  }
+  h2.section-title {
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+  p { margin-top: 0; margin-bottom: 14px; color: #3a342c; }
+  ul.clean-list {
+    padding-left: 20px;
+    margin-top: 0;
+    margin-bottom: 14px;
+  }
+  ul.clean-list li { margin-bottom: 8px; color: #3a342c; }
+  table.facts-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+  table.facts-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #e3d8c4;
+    font-size: 0.96rem;
+  }
+  table.facts-table td.label {
+    color: #6b6155;
+    width: 42%;
+  }
+  table.facts-table td.value {
+    color: #1f1b16;
+    font-weight: 500;
+  }
+  .disclosure {
+    background-color: #fffaf2;
+    border: 1px solid #e3d8c4;
+    border-radius: 10px;
+    padding: 18px 20px;
+    font-size: 0.9rem;
+    color: #6b6155;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  section.cta {
+    background-color: #2b2621;
+    color: #f6f1e9;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    margin-top: 10px;
+  }
+  section.cta h2 {
+    color: #f6f1e9;
+    font-size: 1.8rem;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  section.cta p {
+    color: #d9d0c3;
+    margin-bottom: 20px;
+  }
+  .cta-contacts {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .cta-contacts a {
+    color: #f6f1e9;
+    font-size: 1.15rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 2px solid #8a6d3b;
+    padding-bottom: 2px;
+  }
+  footer.foot {
+    padding-top: 20px;
+    padding-bottom: 30px;
+    font-size: 0.8rem;
+    color: #8a7f6f;
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=b6c59854-7b22-4510-8292-32e367cfbad8&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2Fb6c59854-7b22-4510-8292-32e367cfbad8.html">Request the Address</a></div></noscript>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">Suede Buffalo LLC</div>
+    <div class="tag">Wholesale Land &amp; Infill Opportunities</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Deal Code: VA-1 (Land)</div>
+    <h1 class="title">0.24-Acre Custom-Home / Infill Lot</h1>
+    <div class="location-line">Annandale, VA 22003 &middot; Fairfax County, Virginia</div>
+    <div class="address-note">Address available upon request — contact us for the full property address.</div>
+
+    <div class="price-block">
+      <div class="price">$310,000</div>
+      <div class="price-sub">Current asking price &middot; Assignment of contract</div>
+      <div class="price-history">Previously listed at $369,000 — an $81,000 reduction from the original $450,000 asking price — and since reduced further to the current $310,000 asking price.</div>
+    </div>
+
+    <a class="photos-link" href="#gallery">View property photos below</a>
+  </div>
+</section>
+
+<section class="gallery" id="gallery">
+  <div class="wrap">
+    <div class="gallery-scroll">
+      <img src="/deals/b6c59854-7b22-4510-8292-32e367cfbad8/photos/1.webp" alt="Annandale, VA vacant infill lot photo 1">
+      <img src="/deals/b6c59854-7b22-4510-8292-32e367cfbad8/photos/2.webp" alt="Annandale, VA vacant infill lot photo 2">
+      <img src="/deals/b6c59854-7b22-4510-8292-32e367cfbad8/photos/3.webp" alt="Annandale, VA vacant infill lot photo 3">
+      <img src="/deals/b6c59854-7b22-4510-8292-32e367cfbad8/photos/4.webp" alt="Annandale, VA vacant infill lot photo 4">
+      <img src="/deals/b6c59854-7b22-4510-8292-32e367cfbad8/photos/5.webp" alt="Annandale, VA vacant infill lot photo 5">
+      <img src="/deals/b6c59854-7b22-4510-8292-32e367cfbad8/photos/6.webp" alt="Annandale, VA vacant infill lot photo 6">
+      <img src="/deals/b6c59854-7b22-4510-8292-32e367cfbad8/photos/7.webp" alt="Annandale, VA vacant infill lot photo 7">
+      <img src="/deals/b6c59854-7b22-4510-8292-32e367cfbad8/photos/8.webp" alt="Annandale, VA vacant infill lot photo 8">
+      <img src="/deals/b6c59854-7b22-4510-8292-32e367cfbad8/photos/9.webp" alt="Annandale, VA vacant infill lot photo 9">
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2 class="section-title">Here Is What We Have</h2>
+    <p>An opportunity to acquire a vacant residential infill lot in established Annandale, Virginia. The property contains approximately 0.24 acre (0.246 acres per lot records) in Fairfax County and is positioned for a builder or custom-home buyer looking for a development opportunity in the Northern Virginia market.</p>
+    <p>Supporting Fairfax County property documentation is available for review regarding the lot and its development history.</p>
+
+    <table class="facts-table">
+      <tr><td class="label">Asset Type</td><td class="value">Vacant residential land</td></tr>
+      <tr><td class="label">Lot Size</td><td class="value">Approximately 0.24 acre (0.246 acres)</td></tr>
+      <tr><td class="label">County</td><td class="value">Fairfax County, Virginia</td></tr>
+      <tr><td class="label">City / State / ZIP</td><td class="value">Annandale, VA 22003</td></tr>
+      <tr><td class="label">Sewer</td><td class="value">Reported available</td></tr>
+      <tr><td class="label">Water</td><td class="value">Well required</td></tr>
+      <tr><td class="label">Last Sold</td><td class="value">February 2017 for $5,000</td></tr>
+      <tr><td class="label">Schools (Nearby)</td><td class="value">3 schools rated below average</td></tr>
+      <tr><td class="label">Walk Score</td><td class="value">21</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2 class="section-title">Why Builders Should Look At This</h2>
+    <p>The primary value here is location and infill development opportunity. This is a vacant homesite within an established Annandale residential market rather than isolated raw acreage. For a builder evaluating a new custom home or spec build, the property offers an opportunity to enter a high-value Northern Virginia housing market with surrounding residential development already in place.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2 class="section-title">Property Documentation</h2>
+    <p>Supporting property documents are available for buyer review and provide additional information regarding the lot and prior Fairfax County determinations. Interested builders should review the complete package and independently confirm the remaining requirements for their specific house design before proceeding.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2 class="section-title">Buyer Due Diligence</h2>
+    <p>Buyer is to independently verify the following prior to closing:</p>
+    <ul class="clean-list">
+      <li>Zoning and permitted use</li>
+      <li>Building footprint, setbacks, and lot coverage</li>
+      <li>Utility connections, sewer availability, and connection requirements</li>
+      <li>Well feasibility</li>
+      <li>Driveway access and grading</li>
+      <li>Stormwater requirements and engineering</li>
+      <li>Current permit requirements and all remaining Fairfax County approvals</li>
+    </ul>
+    <p>No representation is made that a specific home design, building footprint, or final building permit has already been approved.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2 class="section-title">Deal Terms</h2>
+    <table class="facts-table">
+      <tr><td class="label">Purchase Price</td><td class="value">$310,000</td></tr>
+      <tr><td class="label">Prior Asking Price</td><td class="value">$369,000 ($81,000 reduction from original $450,000)</td></tr>
+      <tr><td class="label">Financing</td><td class="value">Cash or hard money / Investment loan (e.g., hard money, bridge, DSCR, new construction loan)</td></tr>
+      <tr><td class="label">Transaction Type</td><td class="value">Assignment of contract</td></tr>
+      <tr><td class="label">Closing Costs</td><td class="value">Paid by buyer</td></tr>
+      <tr><td class="label">Transaction Coordinator Fee</td><td class="value">$425, paid by buyer as part of closing costs</td></tr>
+      <tr><td class="label">Condition</td><td class="value">Property sold as-is</td></tr>
+      <tr><td class="label">Proof of Funds</td><td class="value">Required with offer</td></tr>
+      <tr><td class="label">Offer Requirements</td><td class="value">Submit offers with requested due diligence period and proposed closing timeline</td></tr>
+    </table>
+
+    <div class="disclosure">
+      This is a wholesale assignment of contract, not a direct sale. Suede Buffalo LLC holds equitable interest in the subject transaction pursuant to its contract with the underlying property owner; the end buyer will receive an assignment of that contract rather than purchasing directly from the owner. Figures above are provided by the parties involved and have not been independently verified by Suede Buffalo LLC — buyers should perform their own due diligence before proceeding.
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <h2>Annandale, VA &middot; Fairfax County &middot; Approximately 0.24-Acre Infill Lot</h2>
+    <p>Asking $310,000. Supporting county documentation available. Contact us for the complete property package, including the full address, supporting documents, and access information.</p>
+    <div class="cta-contacts">
+      <a href="tel:520-633-6437">520-633-6437</a>
+      <a href="mailto:info@sendmybuyer.com">info@sendmybuyer.com</a>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    Suede Buffalo LLC &middot; Fairfax County, Virginia land opportunity &middot; Assignment of contract. All figures are believed accurate but not independently verified by Suede Buffalo LLC; buyer to perform independent due diligence.
+  </div>
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
