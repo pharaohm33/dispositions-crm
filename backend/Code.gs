@@ -1801,6 +1801,9 @@ function adminArchiveAllDeadDealPages() {
 // copy if the class-based marker isn't found, since that wording has shown
 // up consistently across listings too.
 const PRICE_MARKER_PATTERNS = [
+  // InvestorLift's page since Nov 2026 (investorlift.com/buy/deals/<id>): the server-rendered
+  // title carries the price ("Off-Market Single Family in TOLEDO, OH 43608 · $22,000 | Investorlift").
+  /<title>[^<]*\u00b7\s*\$([\d,]+)\s*\|/i,
   /priceBlock-cost["'][^>]*>\s*\$([\d,]+)/i,
   /Asking Price:?\s*\$([\d,]+)/i
 ];
@@ -1839,6 +1842,8 @@ function checkSourceLinkPrice(url) {
     const m = html.match(PRICE_MARKER_PATTERNS[i]);
     if (m) return { ok: true, price: '$' + m[1] };
   }
+  const raw = html.match(/"price"\s*:\s*(\d{3,9})\b/);                      // the page's data blob, when the title has no price
+  if (raw) return { ok: true, price: '$' + String(raw[1]).replace(/\B(?=(\d{3})+(?!\d))/g, ',') };
   return { ok: true, price: null };
 }
 
@@ -1906,6 +1911,17 @@ function fetchSourceListingText(url) {
       // Payload didn't parse as expected -- fall through to the generic
       // approach below instead of failing the whole fetch over it.
     }
+  }
+
+  // InvestorLift's page since Nov 2026 draws the seller's description into the server-rendered HTML
+  // (a block whose class contains "descriptionBody", ending before "More About This Property").
+  const descAt = html.indexOf('_descriptionBody_');
+  if (descAt !== -1) {
+    const start = html.lastIndexOf('<', descAt);
+    const endAt = html.indexOf('More About This Property', descAt);
+    const fragment = html.slice(start, endAt > descAt ? endAt : descAt + 60000);
+    const text = htmlFragmentToPlainText(fragment.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' '));
+    if (text.length > 80) return text.slice(0, 20000);
   }
 
   const stripped = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<svg[\s\S]*?<\/svg>/gi, ' ');
