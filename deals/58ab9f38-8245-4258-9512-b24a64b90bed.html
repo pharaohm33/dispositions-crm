@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reidsville, NC SFH — Fix &amp; Flip Assignment | Suede Buffalo LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e9;
+    --ink:#2a241c;
+    --ink-soft:#5a5248;
+    --line:#ddd3c3;
+    --accent:#8a3b2a;
+    --accent-dark:#6e2e20;
+    --card:#fffaf2;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.55;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    color:var(--ink);
+    letter-spacing:0.2px;
+  }
+  .wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+  header.top{
+    background:var(--ink);
+    color:#f3ece0;
+    padding-top:14px;
+    padding-bottom:14px;
+  }
+  header.top .wrap{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  header.top .brand{
+    font-family:'Fraunces',serif;
+    font-size:1.15rem;
+    letter-spacing:0.5px;
+  }
+  header.top .dealcode{
+    font-size:0.8rem;
+    color:#c9bfae;
+    letter-spacing:1px;
+    text-transform:uppercase;
+  }
+  .hero{
+    padding-top:40px;
+    padding-bottom:10px;
+  }
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:2px;
+    font-size:0.75rem;
+    color:var(--accent);
+    font-weight:600;
+    margin-top:0;
+    margin-bottom:10px;
+  }
+  .hero h1{
+    font-size:2.4rem;
+    margin-top:0;
+    margin-bottom:10px;
+  }
+  .location-line{
+    font-size:1.05rem;
+    color:var(--ink-soft);
+    margin-top:0;
+    margin-bottom:6px;
+  }
+  .address-note{
+    display:inline-block;
+    background:#eee2cd;
+    border:1px solid var(--line);
+    color:var(--ink);
+    padding:8px 14px;
+    border-radius:4px;
+    font-size:0.9rem;
+    margin-top:10px;
+    margin-bottom:10px;
+  }
+  .more-photos{
+    font-size:0.9rem;
+    margin-top:6px;
+    margin-bottom:6px;
+  }
+  .more-photos a{color:var(--accent-dark);}
+
+  .price-block{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:26px 28px;
+    margin-top:26px;
+    margin-bottom:26px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:30px;
+    align-items:center;
+  }
+  .price-block .main-price{
+    font-family:'Fraunces',serif;
+    font-size:2.6rem;
+    color:var(--accent-dark);
+    margin:0;
+  }
+  .price-block .main-price-label{
+    font-size:0.8rem;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    color:var(--ink-soft);
+    display:block;
+    margin-bottom:4px;
+  }
+  .price-sub{
+    display:flex;
+    gap:28px;
+    flex-wrap:wrap;
+  }
+  .price-sub div{min-width:110px;}
+  .price-sub .num{
+    font-family:'Fraunces',serif;
+    font-size:1.4rem;
+    display:block;
+  }
+  .price-sub .lab{
+    font-size:0.75rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:var(--ink-soft);
+  }
+
+  .gallery{
+    display:flex;
+    gap:14px;
+    overflow-x:auto;
+    padding-bottom:10px;
+    margin-top:10px;
+    margin-bottom:10px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .gallery img{
+    height:260px;
+    width:auto;
+    border-radius:6px;
+    flex:0 0 auto;
+    border:1px solid var(--line);
+    object-fit:cover;
+  }
+
+  section{
+    margin-top:38px;
+    margin-bottom:38px;
+  }
+  section h2{
+    font-size:1.5rem;
+    border-bottom:2px solid var(--accent);
+    display:inline-block;
+    padding-bottom:4px;
+    margin-top:0;
+    margin-bottom:18px;
+  }
+
+  .facts-table{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:6px;
+    overflow:hidden;
+  }
+  .facts-table td{
+    padding:10px 16px;
+    border-bottom:1px solid var(--line);
+    font-size:0.95rem;
+  }
+  .facts-table tr:last-child td{border-bottom:none;}
+  .facts-table td.label{
+    color:var(--ink-soft);
+    width:46%;
+    font-weight:500;
+  }
+
+  .deal-terms{
+    width:100%;
+    border-collapse:collapse;
+  }
+  .deal-terms th{
+    text-align:left;
+    background:var(--ink);
+    color:#f3ece0;
+    padding:10px 16px;
+    font-weight:500;
+    font-size:0.85rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+  }
+  .deal-terms td{
+    padding:12px 16px;
+    border-bottom:1px solid var(--line);
+    background:var(--card);
+    font-size:0.95rem;
+  }
+
+  .notes p{margin-top:0;margin-bottom:14px;}
+  .notes ul{padding-left:20px;}
+  .notes li{margin-bottom:6px;}
+
+  .condition-box, .upside-box{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:18px 22px;
+    margin-top:14px;
+    margin-bottom:14px;
+  }
+
+  .deadline-flag{
+    background:#f1e1c9;
+    border:1px solid #d9b989;
+    border-radius:6px;
+    padding:14px 20px;
+    font-weight:600;
+    color:var(--accent-dark);
+    margin-top:10px;
+    margin-bottom:10px;
+  }
+
+  .disclosure{
+    font-size:0.85rem;
+    color:var(--ink-soft);
+    border-top:1px solid var(--line);
+    padding-top:18px;
+    margin-top:30px;
+    margin-bottom:30px;
+  }
+
+  .cta-band{
+    background:var(--ink);
+    color:#f3ece0;
+    padding-top:46px;
+    padding-bottom:46px;
+    margin-top:10px;
+  }
+  .cta-band h2{
+    color:#f3ece0;
+    border-bottom:2px solid #c98b63;
+    margin-bottom:16px;
+  }
+  .cta-band p{color:#d8cfbf;}
+  .cta-contacts{
+    display:flex;
+    gap:24px;
+    flex-wrap:wrap;
+    margin-top:18px;
+  }
+  .cta-contacts a{
+    color:#f3ece0;
+    background:var(--accent);
+    padding:12px 22px;
+    border-radius:4px;
+    text-decoration:none;
+    font-weight:600;
+    display:inline-block;
+  }
+  .cta-contacts a:hover{background:var(--accent-dark);}
+
+  footer.foot{
+    padding-top:20px;
+    padding-bottom:30px;
+  }
+  footer.foot p{
+    font-size:0.78rem;
+    color:var(--ink-soft);
+  }
+
+  @media (max-width:600px){
+    .hero h1{font-size:1.8rem;}
+    .price-block .main-price{font-size:2rem;}
+    .gallery img{height:190px;}
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=58ab9f38-8245-4258-9512-b24a64b90bed&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F58ab9f38-8245-4258-9512-b24a64b90bed.html">Request the Address</a></div></noscript>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">Suede Buffalo LLC</div>
+    <div class="dealcode">Deal Code: NC-12 (SFH)</div>
+  </div>
+</header>
+
+<div class="wrap hero">
+  <p class="eyebrow">Fix &amp; Flip Opportunity · Assignment of Contract</p>
+  <h1>Reidsville, North Carolina — 2 Bed / 1 Bath Single Family</h1>
+  <p class="location-line">Reidsville, NC 27320 &middot; Rockingham County</p>
+  <span class="address-note">Address available upon request — contact us below and we'll send the full property address.</span>
+</div>
+
+<div class="wrap">
+  <div class="price-block">
+    <div>
+      <span class="main-price-label">Assignment Price</span>
+      <p class="main-price">$42,000</p>
+    </div>
+    <div class="price-sub">
+      <div>
+        <span class="num">$140,000</span>
+        <span class="lab">After Repair Value</span>
+      </div>
+      <div>
+        <span class="num">$50,000</span>
+        <span class="lab">Est. Rehab</span>
+      </div>
+      <div>
+        <span class="num">810 sqft</span>
+        <span class="lab">2 bd / 1 ba</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="gallery">
+    <img src="/deals/58ab9f38-8245-4258-9512-b24a64b90bed/photos/1.webp" alt="Interior view of the Reidsville, NC single family property">
+    <img src="/deals/58ab9f38-8245-4258-9512-b24a64b90bed/photos/2.webp" alt="Interior view of the Reidsville, NC single family property">
+    <img src="/deals/58ab9f38-8245-4258-9512-b24a64b90bed/photos/3.webp" alt="Interior view of the Reidsville, NC single family property">
+    <img src="/deals/58ab9f38-8245-4258-9512-b24a64b90bed/photos/4.webp" alt="Interior view of the Reidsville, NC single family property">
+  </div>
+</div>
+
+<div class="wrap">
+  <section id="overview">
+    <h2>Overview</h2>
+    <p>A 2 bed, 1 bath single family home in Reidsville, NC, priced at $42,000 cash — well under recent renovated sale prices in town. This is being offered as an assignment of contract: Suede Buffalo LLC holds a contractual interest in this property and is assigning that interest to a buyer; this is not a direct sale by the underlying property owner, and all figures below should be independently verified before you close.</p>
+    <p>Sold as-is, first come first served, cash or hard money. Vacant at closing, with lockbox access for walkthroughs.</p>
+  </section>
+
+  <section id="facts">
+    <h2>Property Facts</h2>
+    <table class="facts-table">
+      <tr><td class="label">Asset Type</td><td>Single Family</td></tr>
+      <tr><td class="label">Deal Type</td><td>Fix and Flip</td></tr>
+      <tr><td class="label">Beds</td><td>2</td></tr>
+      <tr><td class="label">Baths</td><td>1</td></tr>
+      <tr><td class="label">Square Footage</td><td>810 sq ft</td></tr>
+      <tr><td class="label">Year Built</td><td>1928</td></tr>
+      <tr><td class="label">Stories</td><td>One story</td></tr>
+      <tr><td class="label">Lot Size</td><td>8,082 sq ft (about 0.19 acre)</td></tr>
+      <tr><td class="label">Heat</td><td>Forced-air heat on record</td></tr>
+      <tr><td class="label">Occupancy</td><td>Vacant at closing</td></tr>
+      <tr><td class="label">Access</td><td>Lockbox</td></tr>
+      <tr><td class="label">Flood Zone</td><td>Zone X — area of minimal flood hazard</td></tr>
+      <tr><td class="label">Last Sold</td><td>January 2009 for $60,000</td></tr>
+      <tr><td class="label">Schools</td><td>3 nearby schools rated below average</td></tr>
+      <tr><td class="label">Walk Score</td><td>40</td></tr>
+      <tr><td class="label">County</td><td>Rockingham County, NC</td></tr>
+    </table>
+  </section>
+
+  <section id="condition">
+    <h2>Condition</h2>
+    <div class="condition-box">
+      <p>This is a full gut rehab and needs everything. Photos show peeling plaster and paint, damaged flooring, debris, and unhung doors.</p>
+      <ul>
+        <li>Roof: condition unknown</li>
+        <li>HVAC: forced-air unit, condition unknown</li>
+        <li>Foundation: condition unknown</li>
+        <li>Electrical: unknown</li>
+        <li>Plumbing: unknown</li>
+      </ul>
+      <p>Estimated repairs: about $50,000 for a complete rehab of the 810 sq ft home.</p>
+    </div>
+  </section>
+
+  <section id="upside">
+    <h2>Upside</h2>
+    <div class="upside-box">
+      <p>Renovated and average-condition 2 bed homes of similar size in Reidsville have sold from about $145,000 to $151,000 in the last 6 months.</p>
+      <p>Area rents for 2 bed homes run about $950 to $1,150 per month — a strong fit for a buy-and-hold rental or a budget flip.</p>
+    </div>
+  </section>
+
+  <section id="terms">
+    <h2>Deal Terms</h2>
+    <table class="deal-terms">
+      <tr><th>Term</th><th>Detail</th></tr>
+      <tr><td>Asking Price</td><td>$42,000 cash</td></tr>
+      <tr><td>After Repair Value (ARV)</td><td>$140,000</td></tr>
+      <tr><td>Estimated Rehab</td><td>$50,000</td></tr>
+      <tr><td>Financing</td><td>Investment Loan (e.g., Hard Money, Bridge, DSCR, New Construction Loan) or cash</td></tr>
+      <tr><td>Sale Condition</td><td>Sold as-is</td></tr>
+      <tr><td>Selection</td><td>First come, first served</td></tr>
+      <tr><td>Access</td><td>Lockbox</td></tr>
+      <tr><td>Contract Type</td><td>Assignment of contract</td></tr>
+    </table>
+    <div class="deadline-flag">Offer deadline: Monday, November 17 at 5:00 PM ET</div>
+  </section>
+
+  <div class="disclosure">
+    <p>Figures above — including ARV, rehab estimate, and comparable sales — are provided for informational purposes and have not been independently verified by Suede Buffalo LLC. Buyers should perform their own due diligence, inspections, and valuation before making an offer. This offering is an assignment of a contractual interest held by Suede Buffalo LLC under contract with the property's owner; Suede Buffalo LLC is not the titled owner of the property and this communication does not constitute a direct offer from the underlying seller.</p>
+  </div>
+</div>
+
+<div class="cta-band">
+  <div class="wrap">
+    <h2>Ready to Move on This Deal?</h2>
+    <p>Contact Suede Buffalo LLC to request a walkthrough, receive the full property address, or submit an offer before the Monday, November 17, 5:00 PM ET deadline.</p>
+    <div class="cta-contacts">
+      <a href="tel:520-633-6437">Call / Text 520-633-6437</a>
+      <a href="mailto:info@sendmybuyer.com">Email info@sendmybuyer.com</a>
+    </div>
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>&copy; Suede Buffalo LLC. This property is offered subject to assignment of contract; all information is deemed reliable but is not guaranteed and should be independently verified.</p>
+  </div>
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
