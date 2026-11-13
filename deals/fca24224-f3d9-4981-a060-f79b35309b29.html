@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TN-2 (SFH) — Clarksville, TN | Single Family Assignment Opportunity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e7;
+    --paper-dark:#ece4d3;
+    --ink:#2a2420;
+    --ink-soft:#5a5248;
+    --brick:#9c4a3a;
+    --line:#d8cdb8;
+    --accent:#7a6a4f;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.55;
+  }
+  h1,h2,h3,h4{
+    font-family:'Playfair Display',serif;
+    color:var(--ink);
+    font-weight:600;
+    letter-spacing:0.2px;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding-left:24px;
+    padding-right:24px;
+  }
+  a{color:var(--brick);}
+
+  header.top{
+    background:var(--paper-dark);
+    border-bottom:1px solid var(--line);
+    padding-top:18px;
+    padding-bottom:18px;
+  }
+  .brand{
+    font-family:'Playfair Display',serif;
+    font-size:1.05rem;
+    font-weight:700;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+    color:var(--brick);
+  }
+  .deal-code{
+    font-size:0.8rem;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+
+  section.hero{
+    padding-top:40px;
+    padding-bottom:20px;
+  }
+  .hero h1{
+    font-size:2.4rem;
+    margin-top:0;
+    margin-bottom:10px;
+  }
+  .loc-line{
+    font-size:1.05rem;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .addr-note{
+    display:inline-block;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:6px 12px;
+    font-size:0.92rem;
+    color:var(--brick);
+    font-weight:600;
+    margin-top:10px;
+    margin-bottom:18px;
+  }
+  .assignment-note{
+    font-size:0.88rem;
+    color:var(--ink-soft);
+    font-style:italic;
+    max-width:620px;
+    margin-top:0;
+    margin-bottom:0;
+  }
+
+  .price-block{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:24px 28px;
+    margin-top:24px;
+    margin-bottom:10px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+  }
+  .price-item .label{
+    font-size:0.75rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .price-item .value{
+    font-family:'Playfair Display',serif;
+    font-size:1.6rem;
+    font-weight:700;
+    color:var(--ink);
+  }
+  .price-item .value.highlight{
+    color:var(--brick);
+  }
+
+  .gallery-wrap{
+    padding-top:6px;
+    padding-bottom:30px;
+  }
+  .gallery{
+    display:flex;
+    overflow-x:auto;
+    gap:12px;
+    padding-bottom:10px;
+    scroll-snap-type:x mandatory;
+  }
+  .gallery img{
+    height:260px;
+    width:auto;
+    border-radius:6px;
+    flex:0 0 auto;
+    scroll-snap-align:start;
+    border:1px solid var(--line);
+  }
+  .more-photos{
+    display:block;
+    margin-top:8px;
+    font-size:0.9rem;
+  }
+
+  section.block{
+    padding-top:34px;
+    padding-bottom:34px;
+    border-top:1px solid var(--line);
+  }
+  section.block h2{
+    font-size:1.5rem;
+    margin-top:0;
+    margin-bottom:18px;
+  }
+  section.block h3{
+    font-size:1.1rem;
+    margin-top:22px;
+    margin-bottom:8px;
+    color:var(--brick);
+  }
+  p{margin-top:0;margin-bottom:12px;}
+  ul{padding-left:20px;margin-top:0;margin-bottom:12px;}
+  li{margin-bottom:6px;}
+
+  table.facts{
+    width:100%;
+    border-collapse:collapse;
+    background:#fff;
+    border:1px solid var(--line);
+  }
+  table.facts td{
+    padding:10px 14px;
+    border-bottom:1px solid var(--line);
+    font-size:0.95rem;
+  }
+  table.facts tr:last-child td{border-bottom:none;}
+  table.facts td.k{
+    color:var(--ink-soft);
+    width:40%;
+    font-weight:500;
+  }
+  table.facts td.v{font-weight:600;}
+
+  .grid-2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+  }
+  @media (max-width:700px){
+    .grid-2{grid-template-columns:1fr;}
+  }
+
+  .note{
+    font-size:0.85rem;
+    color:var(--ink-soft);
+  }
+
+  .cta-band{
+    background:var(--ink);
+    color:var(--paper);
+    padding-top:48px;
+    padding-bottom:48px;
+    margin-top:0;
+  }
+  .cta-band h2{
+    color:#fff;
+    font-size:1.8rem;
+    margin-top:0;
+    margin-bottom:10px;
+  }
+  .cta-band p{
+    color:#cfc6b4;
+    margin-bottom:20px;
+    max-width:600px;
+  }
+  .cta-contacts{
+    display:flex;
+    gap:28px;
+    flex-wrap:wrap;
+  }
+  .cta-contacts a{
+    color:#fff;
+    font-weight:600;
+    font-size:1.1rem;
+    text-decoration:none;
+    border-bottom:1px solid var(--brick);
+  }
+  footer.legal{
+    padding-top:22px;
+    padding-bottom:40px;
+  }
+  footer.legal p{
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    margin-bottom:8px;
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=fca24224-f3d9-4981-a060-f79b35309b29&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2Ffca24224-f3d9-4981-a060-f79b35309b29.html">Request the Address</a></div></noscript>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">Suede Buffalo LLC</div>
+    <div class="deal-code">Deal Code: TN-2 (SFH) &mdash; Assignment of Contract Opportunity</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <h1>One-Story Brick Ranch on 1.18 Acres</h1>
+    <div class="loc-line">Clarksville, Montgomery County, Tennessee &middot; ZIP 37042</div>
+    <div class="addr-note">Address available upon request &mdash; contact us for the full property address.</div>
+    <p class="assignment-note">This offering is being marketed as an assignment of the existing purchase &amp; sale contract held with the underlying property owner &mdash; not a direct sale by Suede Buffalo LLC, and not a direct transaction with the seller.</p>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="price-block">
+    <div class="price-item">
+      <div class="label">Assignment Price</div>
+      <div class="value highlight">$198,000</div>
+    </div>
+    <div class="price-item">
+      <div class="label">After Repair Value (ARV)</div>
+      <div class="value">$315,000</div>
+    </div>
+    <div class="price-item">
+      <div class="label">Estimated Rehab</div>
+      <div class="value">$38,000</div>
+    </div>
+    <div class="price-item">
+      <div class="label">Asset Type</div>
+      <div class="value">Single Family</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap gallery-wrap">
+  <div class="gallery">
+    <img src="/deals/fca24224-f3d9-4981-a060-f79b35309b29/photos/1.webp" alt="Single family ranch home exterior, Clarksville TN">
+    <img src="/deals/fca24224-f3d9-4981-a060-f79b35309b29/photos/2.webp" alt="Single family ranch home, Clarksville TN">
+    <img src="/deals/fca24224-f3d9-4981-a060-f79b35309b29/photos/3.webp" alt="Property photo, Clarksville TN">
+    <img src="/deals/fca24224-f3d9-4981-a060-f79b35309b29/photos/4.webp" alt="Property photo, Clarksville TN">
+    <img src="/deals/fca24224-f3d9-4981-a060-f79b35309b29/photos/5.webp" alt="Property photo, Clarksville TN">
+    <img src="/deals/fca24224-f3d9-4981-a060-f79b35309b29/photos/6.webp" alt="Property photo, Clarksville TN">
+    <img src="/deals/fca24224-f3d9-4981-a060-f79b35309b29/photos/7.webp" alt="Property photo, Clarksville TN">
+    <img src="/deals/fca24224-f3d9-4981-a060-f79b35309b29/photos/8.webp" alt="Property photo, Clarksville TN">
+    <img src="/deals/fca24224-f3d9-4981-a060-f79b35309b29/photos/9.webp" alt="Property photo, Clarksville TN">
+    <img src="/deals/fca24224-f3d9-4981-a060-f79b35309b29/photos/10.webp" alt="Property photo, Clarksville TN">
+    <img src="/deals/fca24224-f3d9-4981-a060-f79b35309b29/photos/11.webp" alt="Property photo, Clarksville TN">
+    <img src="/deals/fca24224-f3d9-4981-a060-f79b35309b29/photos/12.webp" alt="Property photo, Clarksville TN">
+    <img src="/deals/fca24224-f3d9-4981-a060-f79b35309b29/photos/13.webp" alt="Property photo, Clarksville TN">
+    <img src="/deals/fca24224-f3d9-4981-a060-f79b35309b29/photos/14.webp" alt="Property photo, Clarksville TN">
+    <img src="/deals/fca24224-f3d9-4981-a060-f79b35309b29/photos/15.webp" alt="Property photo, Clarksville TN">
+    <img src="/deals/fca24224-f3d9-4981-a060-f79b35309b29/photos/16.webp" alt="Property photo, Clarksville TN">
+    <img src="/deals/fca24224-f3d9-4981-a060-f79b35309b29/photos/17.webp" alt="Property photo, Clarksville TN">
+    <img src="/deals/fca24224-f3d9-4981-a060-f79b35309b29/photos/18.webp" alt="Property photo, Clarksville TN">
+  </div>
+</div>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Property Overview</h2>
+    <table class="facts">
+      <tr><td class="k">Type</td><td class="v">Single Family Residence &mdash; one-story ranch</td></tr>
+      <tr><td class="k">Bed / Bath / Sq. Ft. (per description)</td><td class="v">4 bed / 3 bath, 1,840 sq ft</td></tr>
+      <tr><td class="k">Bed / Bath / Sq. Ft. (per listing header)</td><td class="v">4 bed / 2 bath, 1,904 sq ft &mdash; buyer to verify exact specs</td></tr>
+      <tr><td class="k">Lot Size</td><td class="v">1.18 acres (52,708 sq ft)</td></tr>
+      <tr><td class="k">Year Built</td><td class="v">1985</td></tr>
+      <tr><td class="k">Exterior</td><td class="v">Brick construction</td></tr>
+      <tr><td class="k">Zoning</td><td class="v">R-1, with rezoning potential (buyer to verify with Montgomery County Planning)</td></tr>
+      <tr><td class="k">Location</td><td class="v">Clarksville, TN 37042 &mdash; address available upon request</td></tr>
+      <tr><td class="k">County</td><td class="v">Montgomery County</td></tr>
+      <tr><td class="k">APN</td><td class="v">054F A 02601 00007054F</td></tr>
+      <tr><td class="k">Water</td><td class="v">Municipal</td></tr>
+      <tr><td class="k">HOA</td><td class="v">None</td></tr>
+      <tr><td class="k">Deal Types</td><td class="v">Fix and Flip, Buy and Hold</td></tr>
+      <tr><td class="k">2025 Property Tax</td><td class="v">$2,080</td></tr>
+      <tr><td class="k">Walk Score</td><td class="v">47</td></tr>
+      <tr><td class="k">Nearby Schools</td><td class="v">2 average, 1 below average overall; Byrns L. Darden Elementary School rated 6/10 on GreatSchools</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Property Highlights</h2>
+    <ul>
+      <li>$198,000 starting price in a market where Redfin's AVM independently values this property at $311,653 &mdash; $113K+ in instant equity for the buyer</li>
+      <li>1.18 acres &mdash; one of the largest parcels in the 37042 corridor at this price band, a strong lot premium for a retail exit</li>
+      <li>Zoned R-1 with rezoning potential &mdash; unlocks a possible future density play, multifamily conversion, or lot split (buyer to verify with Montgomery County Planning)</li>
+      <li>One-story ranch layout on durable brick construction &mdash; a high-demand floor plan for both retail buyers and the aging-in-place market</li>
+      <li>Near the neighborhood Walmart on Dover Rd &mdash; a walkable retail corridor</li>
+      <li>10 minutes to Fort Campbell &mdash; one of the largest military installations in the US and the #1 rental demand driver in Clarksville</li>
+      <li>Nashville metro growth corridor &mdash; 45 minutes northwest of downtown Nashville</li>
+      <li>37042 median home value: $319,000 (up 1% year-over-year); Clarksville metro median: $356,000</li>
+      <li>Clarksville remains one of the fastest-growing midsize MSAs in Tennessee</li>
+      <li>Multiple exit strategies: fix-and-flip, BRRRR, buy-and-hold military rental, or long-hold with rezoning upside</li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Repairs Needed</h2>
+    <ul>
+      <li>Interior cosmetic renovation</li>
+      <li>Kitchen and bath updates</li>
+      <li>System verification during due diligence (HVAC, plumbing, electrical)</li>
+      <li>Standard 1985 brick ranch rehab scope</li>
+      <li>Estimated repair costs: $30,000 &ndash; $45,000 (seller's range); independently estimated range of $21,500 &ndash; $45,000; Suede Buffalo LLC working estimate: $38,000</li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>ARV &amp; Comparable Sales</h2>
+    <p>ARV target: $315,000 (also referenced as $310,000 in independent-validation figures below).</p>
+    <ul>
+      <li>Redfin AVM: $311,653 (at the ARV target)</li>
+      <li>Movoto AVM: $276,855 (conservative floor)</li>
+      <li>Nearby comp &mdash; Clarksville, 4BR/2BA, 1,900 sq ft: $300,000</li>
+      <li>37042 median home value: $319,000</li>
+      <li>Clarksville market median: $356,000</li>
+      <li>Nearby recent sale: $237,500 (3BR/2BA, 1,200 sq ft)</li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>The Numbers</h2>
+    <div class="grid-2">
+      <div>
+        <h3>Fix-and-Flip Math</h3>
+        <table class="facts">
+          <tr><td class="k">Sells for (ARV)</td><td class="v">$315,000</td></tr>
+          <tr><td class="k">Asking price</td><td class="v">&minus;$198,000</td></tr>
+          <tr><td class="k">Repairs</td><td class="v">&minus;$37,500</td></tr>
+          <tr><td class="k">Loan, holding, closing (20% down, 12% interest, 2 points, 75 days)</td><td class="v">&minus;$22,464</td></tr>
+          <tr><td class="k">Projected profit</td><td class="v">$57,036 (18.1% of ARV)</td></tr>
+          <tr><td class="k">All-in basis (alt. estimate)</td><td class="v">~$250,000 (purchase + rehab + holding/closing/sale)</td></tr>
+          <tr><td class="k">Gross spread at $310K exit</td><td class="v">$60,000</td></tr>
+          <tr><td class="k">Net profit (alt. estimate)</td><td class="v">~$40,000&ndash;$50,000</td></tr>
+          <tr><td class="k">Target cycle</td><td class="v">90&ndash;120 days</td></tr>
+          <tr><td class="k">Flipper ceiling</td><td class="v">Works for a flipper up to $221,000</td></tr>
+        </table>
+      </div>
+      <div>
+        <h3>BRRRR Math</h3>
+        <table class="facts">
+          <tr><td class="k">All-in</td><td class="v">~$235,000 (purchase + rehab)</td></tr>
+          <tr><td class="k">Refi at 75% LTV on $310K stabilized BPO</td><td class="v">$232,000 cash-out</td></tr>
+          <tr><td class="k">Capital recovered</td><td class="v">99%, leaving a cash-flowing rental with virtually zero cash left in the deal</td></tr>
+          <tr><td class="k">Lot upside</td><td class="v">1.18-acre lot adds appreciation optionality independent of the structure</td></tr>
+        </table>
+      </div>
+    </div>
+    <h3>Rental Returns</h3>
+    <p>Clarksville 4BR/3BA homes rent at $1,700&ndash;$2,100/mo given Fort Campbell military demand and the 1.18-acre lot premium. At $1,900/mo gross ($22,800 annual), less 40% expenses = $13,680 NOI. On a ~$240,000 all-in basis, that is roughly a 5.7% cap rate, with appreciation upside in a growing MSA. Note: as configured, this deal is flagged as working well for flippers but offering a comparatively low return for buy-and-hold landlords at the current numbers.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Ways to Win</h2>
+    <h3>1) Cosmetic Rehab + Retail Flip (Primary Play)</h3>
+    <p>Standard cosmetic refresh, exit to a retail buyer looking for a one-story brick home on acreage. Fort Campbell families, Nashville commuters, and local Clarksville buyers all actively hunt this product profile.</p>
+    <h3>2) BRRRR + Military Rental</h3>
+    <p>Clarksville's rental market is driven by Fort Campbell soldiers and their families. A 4BR on acreage rents fast to military families, and refi math recovers nearly all capital.</p>
+    <h3>3) R-1 Rezoning / Future Density Play</h3>
+    <p>1.18 acres is substantially larger than most Clarksville residential lots. Explore rezoning to higher-density residential (R-2 or R-3), or a lot-split, with Montgomery County Planning. Long-term upside independent of the structure.</p>
+    <h3>4) Buy-and-Hold Appreciation</h3>
+    <p>Clarksville is a top-growth MSA in Tennessee, with the 37042 ZIP up 1% year-over-year in a soft national market. A long-term hold captures continued military and Nashville spillover growth.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Location Fundamentals</h2>
+    <ul>
+      <li>10 minutes to Fort Campbell (105,000+ military/civilian personnel and their families)</li>
+      <li>45 minutes to downtown Nashville</li>
+      <li>Walkable to the Dover Rd Walmart retail corridor</li>
+      <li>Austin Peay State University nearby</li>
+      <li>I-24 access to the Nashville metro</li>
+      <li>Growing Clarksville MSA &mdash; one of the top 5 fastest-growing midsize MSAs in Tennessee</li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Ideal Buyer</h2>
+    <ul>
+      <li>Clarksville / Nashville metro flippers</li>
+      <li>Fort Campbell military rental operators</li>
+      <li>BRRRR investors seeking a strong refi cash-out on a sub-$250K acquisition</li>
+      <li>Buy-and-hold landlords building Clarksville portfolios</li>
+      <li>Investor-developers exploring R-1 rezoning / lot-split plays on acreage</li>
+      <li>1031 exchange buyers targeting Tennessee growth markets</li>
+      <li>Section 8 landlords (Montgomery County voucher demand is strong)</li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Deal Terms</h2>
+    <table class="facts">
+      <tr><td class="k">Starting Price</td><td class="v">$198,000</td></tr>
+      <tr><td class="k">Earnest Money Deposit</td><td class="v">$5,000</td></tr>
+      <tr><td class="k">Close of Escrow</td><td class="v">11/27/2026</td></tr>
+      <tr><td class="k">Financing</td><td class="v">Cash or Hard Money only &mdash; Proof of Funds required</td></tr>
+      <tr><td class="k">Financing Type (suggested)</td><td class="v">Investment Loan (e.g. Hard Money, Bridge, DSCR, New Construction Loan)</td></tr>
+      <tr><td class="k">Transaction Structure</td><td class="v">Assignment of Contract</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <p class="note">This is an assignment of an existing purchase &amp; sale contract between the underlying property owner and Suede Buffalo LLC. Buyer will be acquiring Suede Buffalo LLC's equitable interest in that contract, not purchasing directly from, or contracting directly with, the underlying seller. All figures above &mdash; including price, ARV, rehab estimates, rent estimates, comparable sales, tax, zoning, and school data &mdash; are provided for informational purposes only and have not been independently verified by Suede Buffalo LLC. Buyers should perform their own due diligence, including title, survey, zoning/rezoning feasibility with Montgomery County Planning, and property condition, before submitting an offer.</p>
+  </div>
+</section>
+
+<div class="cta-band">
+  <div class="wrap">
+    <h2>Ready to Move on TN-2 (SFH)?</h2>
+    <p>Cash or hard money buyers with proof of funds &mdash; reach out today for the full address, documents, and to discuss terms on this Clarksville assignment opportunity.</p>
+    <div class="cta-contacts">
+      <a href="tel:520-633-6437">520-633-6437</a>
+      <a href="mailto:info@sendmybuyer.com">info@sendmybuyer.com</a>
+    </div>
+  </div>
+</div>
+
+<footer class="legal">
+  <div class="wrap">
+    <p>&copy; Suede Buffalo LLC. This material is for informational purposes only and does not constitute an offer to sell real property. This is an assignment of contract; Suede Buffalo LLC holds an equitable interest in the underlying purchase agreement and is marketing that interest for assignment. All figures are believed accurate but are not independently verified and are subject to buyer due diligence.</p>
+  </div>
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
