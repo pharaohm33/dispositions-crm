@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>West Orange, NJ — Two-Family Value-Add | Suede Buffalo LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e9;
+    --paper-dark:#efe7da;
+    --ink:#2a241d;
+    --ink-soft:#5c5245;
+    --line:#d9cfbe;
+    --accent:#8a5a35;
+    --accent-dark:#5f3d22;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    line-height:1.55;
+  }
+  h1,h2,h3{
+    font-family:'Playfair Display',serif;
+    color:var(--ink);
+    font-weight:600;
+  }
+  .wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+
+  /* ---------- Top band ---------- */
+  .topband{
+    background:var(--paper-dark);
+    border-bottom:1px solid var(--line);
+    padding-top:28px;
+    padding-bottom:22px;
+  }
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:12.5px;
+    color:var(--accent-dark);
+    font-weight:600;
+    margin-bottom:10px;
+  }
+  .headline{
+    font-size:38px;
+    line-height:1.15;
+    margin-top:0;
+    margin-bottom:10px;
+  }
+  .location-line{
+    font-size:17px;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .address-note{
+    font-size:14.5px;
+    color:var(--accent-dark);
+    font-style:italic;
+    margin-top:6px;
+    margin-bottom:0;
+  }
+
+  /* ---------- Price block ---------- */
+  .price-block{
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:22px 26px;
+    margin-top:22px;
+    margin-bottom:0;
+  }
+  .price-item{
+    min-width:140px;
+  }
+  .price-item .label{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .price-item .value{
+    font-family:'Playfair Display',serif;
+    font-size:26px;
+    font-weight:700;
+    color:var(--accent-dark);
+  }
+  .price-item .value.small{
+    font-size:20px;
+  }
+
+  /* ---------- Gallery ---------- */
+  .gallery-section{
+    margin-top:34px;
+    margin-bottom:34px;
+  }
+  .gallery-scroll{
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    padding-bottom:12px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .gallery-scroll img{
+    height:220px;
+    width:auto;
+    flex:0 0 auto;
+    border-radius:8px;
+    object-fit:cover;
+    border:1px solid var(--line);
+  }
+  .more-photos{
+    display:inline-block;
+    margin-top:10px;
+    font-size:14px;
+    color:var(--accent-dark);
+    text-decoration:underline;
+  }
+
+  /* ---------- Section generic ---------- */
+  section.block{
+    margin-top:40px;
+    margin-bottom:40px;
+  }
+  section.block h2{
+    font-size:26px;
+    border-bottom:2px solid var(--accent);
+    padding-bottom:8px;
+    margin-bottom:18px;
+  }
+  p{
+    margin-top:0;
+    margin-bottom:14px;
+    color:var(--ink);
+  }
+  .ink-soft{color:var(--ink-soft);}
+
+  /* ---------- Facts grid ---------- */
+  .facts-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    margin-top:10px;
+  }
+  .fact{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:14px 16px;
+  }
+  .fact .label{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.07em;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .fact .value{
+    font-size:16px;
+    font-weight:600;
+  }
+
+  /* ---------- Tables ---------- */
+  table{
+    width:100%;
+    border-collapse:collapse;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden;
+  }
+  table caption{
+    text-align:left;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:8px;
+    caption-side:top;
+  }
+  th,td{
+    text-align:left;
+    padding:11px 14px;
+    border-bottom:1px solid var(--line);
+    font-size:15px;
+  }
+  th{
+    background:var(--paper-dark);
+    font-family:'Playfair Display',serif;
+    font-weight:600;
+    width:46%;
+  }
+  tr:last-child td, tr:last-child th{
+    border-bottom:none;
+  }
+
+  ul.plain{
+    margin:0;
+    padding-left:20px;
+  }
+  ul.plain li{
+    margin-bottom:6px;
+  }
+
+  .systems-list{
+    list-style:none;
+    padding:0;
+    margin:0;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:10px;
+  }
+  .systems-list li{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 14px;
+    font-size:15px;
+  }
+  .systems-list li strong{
+    color:var(--accent-dark);
+  }
+
+  .disclaimer{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    border-top:1px dashed var(--line);
+    padding-top:16px;
+    margin-top:30px;
+  }
+
+  /* ---------- CTA band ---------- */
+  .cta-band{
+    background:var(--accent-dark);
+    color:#f6f1e9;
+    padding-top:40px;
+    padding-bottom:40px;
+    margin-top:0;
+  }
+  .cta-band h2{
+    color:#f6f1e9;
+    font-size:30px;
+    margin-bottom:10px;
+    border:none;
+  }
+  .cta-band p{
+    color:#e7ddcc;
+    font-size:16px;
+  }
+  .cta-contacts{
+    display:flex;
+    flex-wrap:wrap;
+    gap:24px;
+    margin-top:18px;
+  }
+  .cta-contacts a{
+    color:#f6f1e9;
+    font-size:19px;
+    font-weight:600;
+    text-decoration:none;
+    border-bottom:2px solid #c99a63;
+    padding-bottom:3px;
+  }
+  .cta-foot{
+    font-size:13px;
+    color:#cdbfa6;
+    margin-top:26px;
+    border-top:1px solid #6b4a2b;
+    padding-top:16px;
+  }
+
+  @media (max-width:600px){
+    .headline{font-size:28px;}
+    .price-item .value{font-size:22px;}
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=7c1b2b8d-8e32-474d-9d7b-be2737c39204&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F7c1b2b8d-8e32-474d-9d7b-be2737c39204.html">Request the Address</a></div></noscript>
+
+  <div class="topband">
+    <div class="wrap">
+      <div class="eyebrow">Deal Ref. NJ-1 (MF) &middot; Multifamily &middot; Assignment of Contract</div>
+      <h1 class="headline">Vacant Two-Family Value-Add in West Orange, NJ</h1>
+      <div class="location-line">West Orange, NJ 07052 &middot; Essex County</div>
+      <p class="address-note">Address available upon request &mdash; contact us below for the full property address.</p>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <div class="price-block">
+      <div class="price-item">
+        <div class="label">Asking Price</div>
+        <div class="value">$550,000</div>
+      </div>
+      <div class="price-item">
+        <div class="label">After-Repair Value (ARV)</div>
+        <div class="value">$700,000+</div>
+      </div>
+      <div class="price-item">
+        <div class="label">Estimated Rehab</div>
+        <div class="value small">$60,000</div>
+      </div>
+      <div class="price-item">
+        <div class="label">Financing Type</div>
+        <div class="value small">Investment Loan</div>
+      </div>
+    </div>
+
+    <div class="gallery-section">
+      <div class="gallery-scroll">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/1.webp" alt="West Orange NJ two-family exterior">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/2.webp" alt="West Orange NJ two-family exterior angle">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/3.webp" alt="West Orange NJ two-family interior">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/4.webp" alt="West Orange NJ two-family interior">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/5.webp" alt="West Orange NJ two-family kitchen">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/6.webp" alt="West Orange NJ two-family bathroom">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/7.webp" alt="West Orange NJ two-family bedroom">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/8.webp" alt="West Orange NJ two-family bedroom">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/9.webp" alt="West Orange NJ two-family unit">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/10.webp" alt="West Orange NJ two-family unit">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/11.webp" alt="West Orange NJ two-family interior detail">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/12.webp" alt="West Orange NJ two-family interior detail">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/13.webp" alt="West Orange NJ two-family second unit kitchen">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/14.webp" alt="West Orange NJ two-family second unit bathroom">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/15.webp" alt="West Orange NJ two-family hallway">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/16.webp" alt="West Orange NJ two-family staircase">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/17.webp" alt="West Orange NJ two-family basement">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/18.webp" alt="West Orange NJ two-family exterior yard">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/19.webp" alt="West Orange NJ two-family driveway">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/20.webp" alt="West Orange NJ two-family garage">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/21.webp" alt="West Orange NJ two-family exterior rear">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/22.webp" alt="West Orange NJ two-family unfinished room">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/23.webp" alt="West Orange NJ two-family finished bedroom">
+        <img src="/deals/7c1b2b8d-8e32-474d-9d7b-be2737c39204/photos/24.webp" alt="West Orange NJ two-family exterior view">
+      </div>
+      <a class="more-photos" href="https://drive.google.com/drive/folders/12FPRmU5V4fv7TrNj3Guorvg-L8qBq9Zs" target="_blank" rel="noopener">View full photo set &rarr;</a>
+    </div>
+
+    <section class="block">
+      <h2>Overview</h2>
+      <p>A vacant two-family in West Orange, NJ, priced at $550,000 with an estimated ARV of $700,000+. Both units deliver vacant at closing, making this a clean value-add opportunity in an established Essex County town.</p>
+      <p>Finish the main unit, then rent both sides, house-hack, or sell as a fully renovated two-family. Parking for multiple vehicles plus a detached garage is a real plus for this area.</p>
+      <p class="ink-soft">This offering is an assignment of the underlying purchase contract. Suede Buffalo LLC holds contract rights to this property and is assigning those rights to the buyer; this is not a direct sale by, and does not imply direct contact with, the underlying property owner.</p>
+    </section>
+
+    <section class="block">
+      <h2>Key Facts</h2>
+      <div class="facts-grid">
+        <div class="fact"><div class="label">Asset Type</div><div class="value">Multifamily &mdash; Two-Family</div></div>
+        <div class="fact"><div class="label">Configuration</div><div class="value">2-story, two units (2 bed / 1 bath each)</div></div>
+        <div class="fact"><div class="label">Total Beds / Baths</div><div class="value">4 bd / 2 full ba (one per unit)</div></div>
+        <div class="fact"><div class="label">Size</div><div class="value">1,536 sq ft</div></div>
+        <div class="fact"><div class="label">Year Built</div><div class="value">1910</div></div>
+        <div class="fact"><div class="label">Lot Size</div><div class="value">0.20 acres</div></div>
+        <div class="fact"><div class="label">Zoning</div><div class="value">R-T Two-Family District</div></div>
+        <div class="fact"><div class="label">Parking</div><div class="value">Full-length driveway + detached garage</div></div>
+        <div class="fact"><div class="label">Annual Property Tax</div><div class="value">$11,811 (2025)</div></div>
+        <div class="fact"><div class="label">Parcel</div><div class="value">Block 120.01, Lot 50 &mdash; Essex County</div></div>
+        <div class="fact"><div class="label">Occupancy</div><div class="value">Vacant at closing, both units</div></div>
+        <div class="fact"><div class="label">Deal Types</div><div class="value">Fix and Flip, Buy and Hold</div></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Systems &amp; Condition</h2>
+      <ul class="systems-list">
+        <li><strong>Roof:</strong> Unknown</li>
+        <li><strong>Heat:</strong> Gas hot-water baseboard, separate boiler for each unit</li>
+        <li><strong>A/C:</strong> Unknown</li>
+        <li><strong>Foundation:</strong> Stone</li>
+        <li><strong>Electrical:</strong> Unknown</li>
+        <li><strong>Plumbing:</strong> Unknown</li>
+        <li><strong>Utilities:</strong> Separate PSE&amp;G gas meters; gas water heater</li>
+      </ul>
+      <p style="margin-top:18px;">The main unit has been opened up and is ready to finish, including the kitchen and the main bath with the tub already set. Several bedrooms already have finished floors and fresh paint. The second unit's knotty pine kitchen and full bath are intact and usable.</p>
+    </section>
+
+    <section class="block">
+      <h2>Deal Terms</h2>
+      <table>
+        <tbody>
+          <tr><th>Asking Price</th><td>$550,000</td></tr>
+          <tr><th>After-Repair Value (ARV)</th><td>$700,000+ (seller estimate)</td></tr>
+          <tr><th>Estimated Rehab Cost</th><td>$60,000 (seller estimate; independent estimates range $48,000&ndash;$86,000)</td></tr>
+          <tr><th>Financing Type</th><td>Investment loan (e.g. hard money, bridge, DSCR, new construction loan)</td></tr>
+          <tr><th>Deal Types</th><td>Fix and Flip, Buy and Hold</td></tr>
+          <tr><th>Condition</th><td>Sold as-is, where-is</td></tr>
+          <tr><th>Offer Deadline</th><td>Monday, November 17, 2026 at 5:00 PM ET</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="block">
+      <h2>Deal Economics</h2>
+      <table>
+        <caption>Illustrative flip-scenario figures at the $550,000 asking price. All figures are estimates; verify independently before you close.</caption>
+        <tbody>
+          <tr><th>Projected Resale (ARV)</th><td>$700,000</td></tr>
+          <tr><th>Asking Price</th><td>&minus;$550,000</td></tr>
+          <tr><th>Estimated Repairs</th><td>&minus;$60,000 (range estimate: $48,000&ndash;$86,000)</td></tr>
+          <tr><th>Est. Loan / Holding / Closing Costs</th><td>&minus;$58,451 (basis: 20% down, 12% interest, 2 points, 84-day hold)</td></tr>
+          <tr><th>Estimated Flip Profit</th><td>$31,549 (&asymp;4.5% of ARV)</td></tr>
+          <tr><th>Flip Margin at This Price</th><td>Tight for flippers &mdash; works more comfortably at a purchase price of $514,000 or less</td></tr>
+          <tr><th>Buy &amp; Hold Note</th><td>At current asking price, a straight rental hold would run at a loss on the numbers above</td></tr>
+          <tr><th>Alternate ARV Estimate</th><td>An independent valuation estimate places value near $612,000</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="block">
+      <h2>Neighborhood</h2>
+      <ul class="plain">
+        <li>Nearby schools rated 1 average, 2 below average</li>
+        <li>Walk Score: 74</li>
+        <li>Located in Essex County, near East Orange and Newark</li>
+      </ul>
+    </section>
+
+    <div class="disclaimer">
+      All figures &mdash; price, ARV, rehab estimates, tax amounts, square footage, and deal economics &mdash; are provided as estimates and have not been independently verified by Suede Buffalo LLC. Buyers are responsible for their own inspection, due diligence, and verification of all facts and figures before closing. This property is offered as an assignment of contract; Suede Buffalo LLC holds equitable/contract rights and is assigning those rights, and is not the record owner of the property.
+    </div>
+
+  </div>
+
+  <div class="cta-band">
+    <div class="wrap">
+      <h2>Interested in This Deal?</h2>
+      <p>Request the full property address, additional documentation, and submit your offer before the deadline of Monday, November 17, 2026 at 5:00 PM ET.</p>
+      <div class="cta-contacts">
+        <a href="tel:5206336437">520-633-6437</a>
+        <a href="mailto:info@sendmybuyer.com">info@sendmybuyer.com</a>
+      </div>
+      <div class="cta-foot">Suede Buffalo LLC &middot; Deal Ref. NJ-1 (MF) &middot; West Orange, NJ 07052, Essex County &middot; This is an assignment of contract, not a direct sale.</div>
+    </div>
+  </div>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
