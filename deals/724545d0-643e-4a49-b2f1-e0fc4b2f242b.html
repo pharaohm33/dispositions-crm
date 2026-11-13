@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AZ-10 (Land) — 0.45-Acre Level Pine Homesite in Lake of the Woods, AZ | Suede Buffalo LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e8;
+    --paper-2:#efe7da;
+    --ink:#241f1a;
+    --ink-soft:#5b5248;
+    --rule:#d8cdbb;
+    --accent:#6b4f2a;
+    --accent-2:#8a6a3f;
+    --band:#2b241d;
+    --band-ink:#f3ece1;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:16px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:1080px;
+    margin:0 auto;
+    padding-left:24px;
+    padding-right:24px;
+  }
+  h1,h2,h3,.display{
+    font-family:"Fraunces",Georgia,"Times New Roman",serif;
+    font-weight:500;
+    letter-spacing:-0.01em;
+    line-height:1.15;
+    color:var(--ink);
+  }
+  h1{font-size:clamp(2rem,4.6vw,3.35rem);margin:0 0 14px;}
+  h2{font-size:clamp(1.4rem,2.6vw,1.95rem);margin:0 0 14px;}
+  h3{font-size:1.1rem;margin:0 0 8px;}
+  p{margin:0 0 14px;}
+  a{color:var(--accent);}
+  .eyebrow{
+    font-size:.72rem;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    font-weight:600;
+    color:var(--accent-2);
+    margin:0 0 12px;
+  }
+  .rule{height:1px;background:var(--rule);border:0;margin:0;}
+
+  /* Header */
+  .site-head{
+    border-bottom:1px solid var(--rule);
+    background:var(--paper);
+  }
+  .site-head .wrap{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:8px 24px;
+    padding-top:18px;
+    padding-bottom:18px;
+  }
+  .brand{
+    font-family:"Fraunces",Georgia,serif;
+    font-size:1.15rem;
+    letter-spacing:.02em;
+    font-weight:600;
+  }
+  .brand span{color:var(--accent-2);font-weight:400;}
+  .head-meta{
+    font-size:.8rem;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+
+  /* Hero */
+  .hero{padding-top:44px;padding-bottom:8px;}
+  .hero-loc{
+    font-size:.85rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin:0 0 16px;
+  }
+  .hero-sub{
+    font-size:1.08rem;
+    color:var(--ink-soft);
+    max-width:62ch;
+    margin:0 0 10px;
+  }
+  .addr-note{
+    display:inline-block;
+    font-size:.82rem;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    font-weight:600;
+    color:var(--accent);
+    border:1px solid var(--rule);
+    background:var(--paper-2);
+    padding:7px 14px;
+    border-radius:2px;
+    margin:6px 0 0;
+  }
+
+  /* Price block */
+  .price-block{
+    margin-top:28px;
+    margin-bottom:8px;
+    border-top:2px solid var(--ink);
+    border-bottom:1px solid var(--rule);
+    padding:22px 0;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:18px 32px;
+  }
+  .price-main .label{
+    font-size:.72rem;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    font-weight:600;
+    display:block;
+    margin-bottom:4px;
+  }
+  .price-main .amount{
+    font-family:"Fraunces",Georgia,serif;
+    font-size:clamp(2.2rem,5vw,3rem);
+    font-weight:600;
+    line-height:1;
+    letter-spacing:-0.02em;
+  }
+  .price-facts{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px 34px;
+    font-size:.92rem;
+  }
+  .price-facts div{min-width:110px;}
+  .price-facts .k{
+    display:block;
+    font-size:.68rem;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    font-weight:600;
+    margin-bottom:2px;
+  }
+  .price-facts .v{font-weight:600;}
+
+  /* Gallery */
+  .gallery-section{padding-top:26px;padding-bottom:6px;}
+  .gallery{
+    display:flex;
+    gap:14px;
+    overflow-x:auto;
+    padding-bottom:14px;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+  }
+  .gallery figure{
+    margin:0;
+    flex:0 0 auto;
+    width:min(78vw,420px);
+    scroll-snap-align:start;
+  }
+  .gallery img{
+    display:block;
+    width:100%;
+    height:280px;
+    object-fit:cover;
+    border-radius:3px;
+    background:var(--paper-2);
+  }
+  .gallery figcaption{
+    font-size:.72rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-top:8px;
+  }
+
+  /* Sections */
+  section{padding-top:38px;padding-bottom:38px;}
+  .section-head{
+    border-top:1px solid var(--rule);
+    padding-top:26px;
+    margin-bottom:20px;
+  }
+  .lead{font-size:1.05rem;color:var(--ink-soft);max-width:70ch;}
+
+  /* Highlights */
+  .highlights{
+    list-style:none;
+    padding:0;
+    margin:0;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+    gap:0 32px;
+  }
+  .highlights li{
+    padding:11px 0 11px 22px;
+    border-bottom:1px solid var(--rule);
+    position:relative;
+    font-size:.97rem;
+  }
+  .highlights li::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:19px;
+    width:7px;
+    height:7px;
+    background:var(--accent-2);
+    transform:rotate(45deg);
+  }
+
+  /* Two-column prose */
+  .cols{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:0 48px;
+  }
+
+  /* Tables */
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:.95rem;
+  }
+  caption{
+    text-align:left;
+    font-size:.72rem;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    font-weight:600;
+    padding-bottom:10px;
+  }
+  th,td{
+    text-align:left;
+    padding:12px 14px 12px 0;
+    border-bottom:1px solid var(--rule);
+    vertical-align:top;
+  }
+  th{
+    font-weight:600;
+    color:var(--ink-soft);
+    width:42%;
+    font-size:.82rem;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+  }
+  td{font-weight:500;}
+
+  /* Market comps */
+  .comps{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:18px;
+    margin-bottom:18px;
+  }
+  .comp{
+    background:var(--paper-2);
+    border:1px solid var(--rule);
+    border-radius:3px;
+    padding:18px 20px;
+  }
+  .comp .comp-price{
+    font-family:"Fraunces",Georgia,serif;
+    font-size:1.6rem;
+    font-weight:600;
+    line-height:1.1;
+    margin-bottom:6px;
+  }
+  .comp .comp-meta{font-size:.88rem;color:var(--ink-soft);}
+  .fine{font-size:.85rem;color:var(--ink-soft);}
+
+  /* CTA band */
+  .cta{
+    background:var(--band);
+    color:var(--band-ink);
+    padding-top:52px;
+    padding-bottom:52px;
+  }
+  .cta h2{color:var(--band-ink);margin-bottom:10px;}
+  .cta p{color:#d9cfc0;max-width:60ch;}
+  .cta .contact-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px 18px;
+    margin-top:22px;
+  }
+  .cta a.btn{
+    display:inline-block;
+    text-decoration:none;
+    font-weight:600;
+    font-size:.95rem;
+    letter-spacing:.03em;
+    padding:13px 24px;
+    border-radius:2px;
+    border:1px solid #b79a6d;
+    color:var(--band-ink);
+  }
+  .cta a.btn.solid{
+    background:#b79a6d;
+    color:#241f1a;
+    border-color:#b79a6d;
+  }
+  .cta .company{
+    margin-top:26px;
+    font-family:"Fraunces",Georgia,serif;
+    font-size:1.05rem;
+    letter-spacing:.02em;
+    color:var(--band-ink);
+  }
+
+  /* Footer */
+  .site-foot{
+    background:var(--paper-2);
+    border-top:1px solid var(--rule);
+    padding-top:30px;
+    padding-bottom:34px;
+    font-size:.82rem;
+    color:var(--ink-soft);
+  }
+  .site-foot p{margin:0 0 10px;max-width:80ch;}
+
+  @media (max-width:640px){
+    .gallery img{height:210px;}
+    th{width:46%;}
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=724545d0-643e-4a49-b2f1-e0fc4b2f242b&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F724545d0-643e-4a49-b2f1-e0fc4b2f242b.html">Request the Address</a></div></noscript>
+
+<header class="site-head">
+  <div class="wrap">
+    <div class="brand">Suede Buffalo <span>LLC</span></div>
+    <div class="head-meta">Deal AZ-10 (Land) &middot; Wholesale Assignment</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Land &middot; Apache Cove &middot; White Mountains</p>
+      <h1>A 0.45-Acre Level Pine Homesite in Lake of the Woods, Arizona</h1>
+      <p class="hero-loc">Lake of the Woods, AZ 85929 &middot; Navajo County &middot; Apache Cove Amended</p>
+      <p class="hero-sub">Approximately 0.45 acre of level residential land in the established Apache Cove area of Lakeside, Arizona — heavily treed with tall ponderosa pines, a rectangular lot configuration and concrete road access.</p>
+      <p class="addr-note">Address available upon request</p>
+
+      <div class="price-block">
+        <div class="price-main">
+          <span class="label">Asking Price</span>
+          <span class="amount">$39,990</span>
+        </div>
+        <div class="price-facts">
+          <div><span class="k">Lot Size</span><span class="v">0.45 acres</span></div>
+          <div><span class="k">Dimensions</span><span class="v">~97' &times; 198'</span></div>
+          <div><span class="k">Zoning</span><span class="v">R1-10 reported</span></div>
+          <div><span class="k">HOA</span><span class="v">None</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="gallery-section">
+    <div class="wrap">
+      <div class="gallery">
+        <figure><img src="/deals/724545d0-643e-4a49-b2f1-e0fc4b2f242b/photos/1.webp" alt="Wooded residential lot in Apache Cove, Lake of the Woods, Arizona"><figcaption>Photo 1</figcaption></figure>
+        <figure><img src="/deals/724545d0-643e-4a49-b2f1-e0fc4b2f242b/photos/2.webp" alt="Tall ponderosa pines on the parcel"><figcaption>Photo 2</figcaption></figure>
+        <figure><img src="/deals/724545d0-643e-4a49-b2f1-e0fc4b2f242b/photos/3.webp" alt="Level terrain across the lot"><figcaption>Photo 3</figcaption></figure>
+        <figure><img src="/deals/724545d0-643e-4a49-b2f1-e0fc4b2f242b/photos/4.webp" alt="Concrete road access to the property"><figcaption>Photo 4</figcaption></figure>
+        <figure><img src="/deals/724545d0-643e-4a49-b2f1-e0fc4b2f242b/photos/5.webp" alt="Wooded mountain setting in the White Mountains"><figcaption>Photo 5</figcaption></figure>
+        <figure><img src="/deals/724545d0-643e-4a49-b2f1-e0fc4b2f242b/photos/6.webp" alt="Rectangular lot configuration view"><figcaption>Photo 6</figcaption></figure>
+        <figure><img src="/deals/724545d0-643e-4a49-b2f1-e0fc4b2f242b/photos/7.webp" alt="Pine trees on the homesite"><figcaption>Photo 7</figcaption></figure>
+        <figure><img src="/deals/724545d0-643e-4a49-b2f1-e0fc4b2f242b/photos/8.webp" alt="Surrounding residential area in Apache Cove"><figcaption>Photo 8</figcaption></figure>
+        <figure><img src="/deals/724545d0-643e-4a49-b2f1-e0fc4b2f242b/photos/9.webp" alt="Nearby existing residential construction"><figcaption>Photo 9</figcaption></figure>
+        <figure><img src="/deals/724545d0-643e-4a49-b2f1-e0fc4b2f242b/photos/10.webp" alt="City and wooded views reported from the area"><figcaption>Photo 10</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- OVERVIEW -->
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Here Is What We Have</p>
+        <h2>An Opportunity in the Established Apache Cove Area</h2>
+      </div>
+      <p class="lead">Opportunity to acquire approximately 0.45 acre of level residential land in the established Apache Cove area of Lakeside, Arizona. The parcel features a heavily treed mountain setting with tall ponderosa pines, a rectangular lot configuration and concrete road access.</p>
+      <p class="lead">Current asking price: <strong>$39,990</strong>.</p>
+    </div>
+  </section>
+
+  <!-- HIGHLIGHTS -->
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Property Highlights</p>
+        <h2>The Parcel at a Glance</h2>
+      </div>
+      <ul class="highlights">
+        <li>Approximately 0.44–0.45 acre / 19,294 SF</li>
+        <li>Approximately 97' x 198'</li>
+        <li>Level topography</li>
+        <li>Rectangular lot configuration</li>
+        <li>Tall pine / wooded setting</li>
+        <li>Apache Cove Amended</li>
+        <li>R1-10 zoning reported</li>
+        <li>Single-family residential use reported</li>
+        <li>No HOA</li>
+        <li>Concrete road access</li>
+        <li>Public sewer reported</li>
+        <li>City-franchise water reported</li>
+        <li>City / wooded views reported</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- WHY -->
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Why Buyers Should Look at This</p>
+        <h2>Straightforward Residential Land, Wooded Setting, No HOA</h2>
+      </div>
+      <div class="cols">
+        <div>
+          <p>This is a relatively straightforward residential lot in an established Lakeside neighborhood with level terrain and municipal water/sewer infrastructure reported.</p>
+          <p>The parcel provides a wooded White Mountains setting without the added burden of an HOA.</p>
+        </div>
+        <div>
+          <p>For a builder, future homeowner or land investor, the combination of usable lot shape, level topography, tall pines and nearby existing residential construction makes this worth reviewing.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARKET SUPPORT -->
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Recent Land Market Support</p>
+        <h2>Nearby Vacant-Land Transactions</h2>
+      </div>
+      <p class="lead">Nearby vacant-land transactions provide useful market context.</p>
+      <div class="comps">
+        <div class="comp">
+          <div class="comp-price">$73,000</div>
+          <div class="comp-meta">
+            <strong>Lockwood Dr</strong> — approximately 0.4 mile from the subject<br>
+            Sold October 2026 &middot; approximately 0.26 acre
+          </div>
+        </div>
+        <div class="comp">
+          <div class="comp-price">$76,700</div>
+          <div class="comp-meta">
+            <strong>Hideaway Dr</strong> — approximately 0.52 mile from the subject<br>
+            Sold May 2026 &middot; approximately 0.67 acre
+          </div>
+        </div>
+      </div>
+      <p class="fine">These sales are provided as general market references only. Buyers should independently evaluate differences in utilities, subdivision, site conditions and development readiness.</p>
+    </div>
+  </section>
+
+  <!-- BUILD ANGLE -->
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Build / End-Buyer Angle</p>
+        <h2>Who This Parcel May Appeal To</h2>
+      </div>
+      <ul class="highlights">
+        <li>Local residential builders</li>
+        <li>Custom-home buyers</li>
+        <li>Future owner-builders</li>
+        <li>White Mountains land investors</li>
+        <li>Buyers seeking a wooded mountain homesite without an HOA</li>
+      </ul>
+      <p class="lead" style="margin-top:22px;">The level terrain and approximately 97' x 198' configuration should give prospective buyers a useful starting point for evaluating home placement, subject to all applicable setbacks and development requirements.</p>
+    </div>
+  </section>
+
+  <!-- UTILITIES -->
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Utilities</p>
+        <h2>What Is Reported — and What Is Not</h2>
+      </div>
+      <table>
+        <tbody>
+          <tr><th scope="row">Water</th><td>City-franchise water reported</td></tr>
+          <tr><th scope="row">Sewer</th><td>Public sewer reported</td></tr>
+          <tr><th scope="row">Electric</th><td>No electric service currently shown on the parcel</td></tr>
+          <tr><th scope="row">Natural Gas</th><td>No gas service currently shown on the parcel</td></tr>
+        </tbody>
+      </table>
+      <p class="fine" style="margin-top:16px;">Buyer should independently verify connection points, provider availability, capacity, tap fees, extension costs and service requirements for all utilities.</p>
+    </div>
+  </section>
+
+  <!-- LOCATION -->
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Location / Setting</p>
+        <h2>Lakeside, Navajo County, and the Broader White Mountains</h2>
+      </div>
+      <div class="cols">
+        <div>
+          <p>Located in Lakeside within Navajo County and the broader White Mountains market.</p>
+          <p>The property offers a wooded residential setting while remaining near Lakeside shopping, dining, schools, parks and outdoor recreation.</p>
+        </div>
+        <div>
+          <p>Woodland Lake and the surrounding White Mountains provide nearby access to hiking, fishing, boating and other outdoor recreation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DUE DILIGENCE -->
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Buyer Due Diligence</p>
+        <h2>Verify Before You Close</h2>
+      </div>
+      <p class="lead">Buyer to independently verify exact acreage, parcel boundaries, zoning, permitted use, building standards, setbacks, minimum home requirements, deed restrictions, legal access, utility locations, water and sewer connections, electric service, gas service, tap and extension fees, drainage, soils, flood conditions, title, easements and all current Navajo County / local development requirements.</p>
+      <p class="lead">No representation is being made that utility taps are installed, that electric or gas service is currently connected, or that the parcel is permit-ready.</p>
+    </div>
+  </section>
+
+  <!-- DEAL TERMS -->
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Deal Terms</p>
+        <h2>Assignment of Contract</h2>
+      </div>
+      <table>
+        <caption>Terms of this wholesale assignment</caption>
+        <tbody>
+          <tr><th scope="row">Purchase Price</th><td>$39,990</td></tr>
+          <tr><th scope="row">Funds</th><td>Cash or approved funds</td></tr>
+          <tr><th scope="row">Transaction Type</th><td>Assignment of contract</td></tr>
+          <tr><th scope="row">Closing Costs</th><td>Buyer pays closing costs</td></tr>
+          <tr><th scope="row">Transaction Coordinator Fee</th><td>Buyer to pay a $425 Transaction Coordinator fee as part of buyer's closing costs</td></tr>
+          <tr><th scope="row">Condition</th><td>Property sold as-is</td></tr>
+          <tr><th scope="row">Offers</th><td>Proof of funds required with offers</td></tr>
+        </tbody>
+      </table>
+      <p class="fine" style="margin-top:18px;">This is a wholesale assignment. Suede Buffalo LLC holds equitable interest in the subject transaction. The end buyer will receive an assignment of contract.</p>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="wrap">
+      <p class="eyebrow" style="color:#c8a878;">0.45 Acre. Level Pine Lot. Apache Cove. No HOA.</p>
+      <h2>Public Sewer + City Water Reported. Concrete Road Access. Asking $39,990.</h2>
+      <p>Contact Suede Buffalo LLC for parcel maps, aerials, photos and available property information. Address available upon request.</p>
+      <div class="contact-row">
+        <a class="btn solid" href="tel:5206336437">Call 520-633-6437</a>
+        <a class="btn" href="mailto:info@sendmybuyer.com">Email info@sendmybuyer.com</a>
+      </div>
+      <div class="company">Suede Buffalo LLC</div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <p>This is a wholesale assignment of contract. Suede Buffalo LLC holds equitable interest in the subject transaction; the end buyer will receive an assignment of contract. Suede Buffalo LLC is not the owner of record and does not represent the underlying seller.</p>
+    <p>Figures are provided by the seller unless a line says otherwise and have not been independently verified by Suede Buffalo LLC. Verify all details before you close.</p>
+  </div>
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
