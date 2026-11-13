@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hartford Office/Flex Asset — 286,415 SF | Suede Buffalo LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #f6f1e9;
+    color: #2a2622;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.55;
+  }
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    color: #1f1b16;
+  }
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  a { color: #8a5a2b; }
+
+  /* top bar */
+  .topbar {
+    background: #1f1b16;
+    color: #e9ddc9;
+    padding: 14px 0;
+  }
+  .topbar .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.02em;
+  }
+  .topbar .badge {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #c9b89a;
+  }
+
+  /* hero */
+  .hero {
+    background: #f6f1e9;
+    padding-top: 44px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e3d9c6;
+  }
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.78rem;
+    color: #8a5a2b;
+    margin-bottom: 10px;
+  }
+  .hero h1 {
+    font-size: 2.3rem;
+    margin: 0 0 12px 0;
+    line-height: 1.15;
+  }
+  .location-line {
+    font-size: 1.05rem;
+    color: #4a443c;
+    margin-bottom: 6px;
+  }
+  .address-note {
+    display: inline-block;
+    background: #ece2cc;
+    border: 1px solid #d9c9a8;
+    color: #5c4a2c;
+    font-size: 0.88rem;
+    padding: 6px 12px;
+    border-radius: 3px;
+    margin-top: 8px;
+    margin-bottom: 20px;
+  }
+
+  .price-block {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    align-items: baseline;
+    border-top: 1px solid #e3d9c6;
+    padding-top: 22px;
+    margin-top: 10px;
+  }
+  .price-block .price {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.6rem;
+    color: #1f1b16;
+  }
+  .price-block .price small {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: #6b6052;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .stat-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+    margin-top: 18px;
+    margin-bottom: 8px;
+  }
+  .stat {
+    min-width: 140px;
+  }
+  .stat .num {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f1b16;
+  }
+  .stat .lbl {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #8a8072;
+  }
+
+  /* gallery */
+  .gallery-section {
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
+  .gallery {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scrollbar-width: thin;
+  }
+  .gallery img {
+    height: 230px;
+    width: auto;
+    flex: 0 0 auto;
+    border-radius: 4px;
+    object-fit: cover;
+    border: 1px solid #e3d9c6;
+  }
+  .more-photos {
+    font-size: 0.88rem;
+    margin-top: 8px;
+    display: inline-block;
+  }
+
+  section.block {
+    margin-top: 42px;
+    margin-bottom: 42px;
+  }
+  section.block h2 {
+    font-size: 1.5rem;
+    border-bottom: 2px solid #1f1b16;
+    padding-bottom: 8px;
+    margin-bottom: 18px;
+  }
+  section.block p {
+    color: #3a352c;
+  }
+  ul.facts-list {
+    padding-left: 20px;
+    margin: 0;
+  }
+  ul.facts-list li {
+    margin-bottom: 8px;
+    color: #3a352c;
+  }
+
+  table.deal-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 6px;
+  }
+  table.deal-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #e3d9c6;
+    font-size: 0.95rem;
+  }
+  table.deal-table td:first-child {
+    color: #6b6052;
+    width: 42%;
+  }
+  table.deal-table td:last-child {
+    color: #1f1b16;
+    font-weight: 600;
+  }
+
+  .tenant-card {
+    border: 1px solid #e3d9c6;
+    border-radius: 4px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    background: #fbf8f2;
+  }
+  .tenant-card h3 {
+    font-size: 1.05rem;
+    margin: 0 0 8px 0;
+  }
+  .tenant-card p {
+    margin: 4px 0;
+    font-size: 0.93rem;
+    color: #3a352c;
+  }
+
+  .disclosure-box {
+    background: #efe7d6;
+    border: 1px solid #d9c9a8;
+    border-radius: 4px;
+    padding: 18px 20px;
+    font-size: 0.88rem;
+    color: #5c5444;
+  }
+  .disclosure-box p {
+    margin: 6px 0;
+  }
+
+  .cta-band {
+    background: #1f1b16;
+    color: #f1e9d8;
+    padding: 46px 0;
+    margin-top: 10px;
+  }
+  .cta-band h2 {
+    color: #f6f1e9;
+    font-size: 1.8rem;
+    margin: 0 0 10px 0;
+  }
+  .cta-band p {
+    color: #cfc4ad;
+    margin: 0 0 20px 0;
+  }
+  .cta-contacts {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  .cta-contacts a {
+    color: #f1e9d8;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid #8a5a2b;
+    padding-bottom: 2px;
+  }
+
+  footer {
+    background: #f6f1e9;
+    padding: 24px 0 40px 0;
+    font-size: 0.8rem;
+    color: #9a9080;
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=431b4e1e-aae9-454c-94b4-bf5fcfa37d8c&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F431b4e1e-aae9-454c-94b4-bf5fcfa37d8c.html">Request the Address</a></div></noscript>
+
+  <div class="topbar">
+    <div class="wrap">
+      <div class="brand">Suede Buffalo LLC</div>
+      <div class="badge">Deal Ref: CT-1 (Comm)</div>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Commercial · Office / Flex · Buy and Hold</div>
+      <h1>Hartford Office/Flex Asset — 286,415 SF, I‑84 Visibility, Anchor Tenants Staying Per Seller</h1>
+      <div class="location-line">Hartford, Hartford County, CT 06115</div>
+      <div class="address-note">Address available upon request — contact us for the full property address.</div>
+
+      <div class="price-block">
+        <div class="price">$4,950,000 <small>Asking Price</small></div>
+      </div>
+
+      <div class="stat-strip">
+        <div class="stat"><div class="num">286,415 SF</div><div class="lbl">Rentable Building Area</div></div>
+        <div class="stat"><div class="num">≈ $17.28</div><div class="lbl">Price Per SF</div></div>
+        <div class="stat"><div class="num">≈ 4.39 Acres</div><div class="lbl">Land</div></div>
+        <div class="stat"><div class="num">$4,950,000</div><div class="lbl">ARV (Per Listing)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap gallery-section">
+    <div class="gallery">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/1.webp" alt="Hartford office/flex building exterior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/2.webp" alt="Hartford office/flex building exterior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/3.webp" alt="Hartford office/flex building exterior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/4.webp" alt="Hartford office/flex building exterior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/5.webp" alt="Hartford office/flex building exterior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/6.webp" alt="Hartford office/flex building exterior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/7.webp" alt="Hartford office/flex building interior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/8.webp" alt="Hartford office/flex building interior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/9.webp" alt="Hartford office/flex building interior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/10.webp" alt="Hartford office/flex building interior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/11.webp" alt="Hartford office/flex building interior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/12.webp" alt="Hartford office/flex building interior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/13.webp" alt="Hartford office/flex building interior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/14.webp" alt="Hartford office/flex building interior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/15.webp" alt="Hartford office/flex building interior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/16.webp" alt="Hartford office/flex building interior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/17.webp" alt="Hartford office/flex building interior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/18.webp" alt="Hartford office/flex building interior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/19.webp" alt="Hartford office/flex building interior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/20.webp" alt="Hartford office/flex building interior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/21.webp" alt="Hartford office/flex building interior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/22.webp" alt="Hartford office/flex building interior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/23.webp" alt="Hartford office/flex building interior">
+      <img src="/deals/431b4e1e-aae9-454c-94b4-bf5fcfa37d8c/photos/24.webp" alt="Hartford office/flex building interior">
+    </div>
+    <a class="more-photos" href="https://drive.google.com/drive/folders/1lbXB0hamllon5EeERHte2uzXgSYXXnsh" target="_blank" rel="noopener">View full photo set →</a>
+  </div>
+
+  <div class="wrap">
+
+    <section class="block">
+      <h2>Overview</h2>
+      <p>Large office/flex asset with I-84 visibility and heavy existing infrastructure. Per the seller, both current tenants, FOX61 and the Hartford Courant, are staying, and the seller reports a letter of intent from a logistics company for additional space. The play is commercial lease-up and stabilization, with potential adaptive reuse subject to approvals.</p>
+    </section>
+
+    <section class="block">
+      <h2>Property Snapshot</h2>
+      <ul class="facts-list">
+        <li>Commercial office/flex building; built/expanded 1928, 1970, and 1987</li>
+        <li>Zoning: CX-1 and MX-2</li>
+        <li>Offices, studios, production space, multi-level warehouse, cafeteria, and conference space</li>
+        <li>Production-room ceiling height approximately 39 ft 8 in</li>
+        <li>Three passenger and two freight elevators; three independent power feeds</li>
+        <li>423 parking spaces reported, including 186 City-leased spaces through March 31, 2028 at $40 per space per month ($89,280/year). Transferability to be verified.</li>
+        <li>I-84 frontage, with quick access to I-84/I-91, near Union Station</li>
+        <li>Land: approximately 4.39 acres</li>
+        <li>2024 property tax: $326,658</li>
+        <li>Walk Score: 89; area schools reported as 3 below average</li>
+        <li>Tenant occupied</li>
+      </ul>
+    </section>
+
+    <section class="block">
+      <h2>Tenants</h2>
+      <div class="tenant-card">
+        <h3>FOX61 (TEGNA)</h3>
+        <p>53,000 SF leased.</p>
+        <p>Base rent $106,000/month plus a $371,000/year HVAC contribution, per the offering memorandum.</p>
+        <p>Listed lease expires November 30, 2026; seller reports FOX is staying. Renewal terms to be provided.</p>
+      </div>
+      <div class="tenant-card">
+        <h3>Hartford Courant</h3>
+        <p>12,000 SF leased.</p>
+        <p>Listed lease expired March 31, 2026; seller reports the Courant is staying. Current terms to be provided.</p>
+      </div>
+      <div class="tenant-card">
+        <h3>Logistics Company (LOI)</h3>
+        <p>Seller reports a signed letter of intent for additional space. Space, rent, and term to be provided.</p>
+      </div>
+      <p>Per the offering memorandum: 65,000 SF leased (22.7%) and 221,415 SF vacant (77.3%). Over 220,000 SF is available for lease-up.</p>
+    </section>
+
+    <section class="block">
+      <h2>Financials — 2026 Budget (Not Actual T12)</h2>
+      <ul class="facts-list">
+        <li>With both tenants in place, the supplied 2026 budget shows the building operating at roughly break-even before debt service.</li>
+        <li>Budgeted utilities: approximately $720,873</li>
+        <li>Budgeted property taxes: $360,000</li>
+        <li>Budgeted repairs and maintenance: $522,566, including temporary rented-chiller costs</li>
+        <li>Upside: leasing the vacant space, and replacing the rented chiller with a permanent system would cut roughly $265,000/year in temporary cooling costs</li>
+        <li>Buyer to review actual operating statements, rent roll, leases, and renewal documents</li>
+      </ul>
+    </section>
+
+    <section class="block">
+      <h2>Condition</h2>
+      <ul class="facts-list">
+        <li>Major repair. Cooling currently runs on a rented chiller; permanent replacement should be priced into the capital plan.</li>
+        <li>Roof and HVAC ages unknown. Buyer to complete inspections.</li>
+      </ul>
+    </section>
+
+    <section class="block">
+      <h2>Exit Strategies</h2>
+      <ul class="facts-list">
+        <li>Commercial lease-up and stabilization around the anchor tenants</li>
+        <li>Reposition existing office/flex, studio, and warehouse space</li>
+        <li>Potential adaptive reuse / residential, subject to feasibility, zoning, and municipal approvals</li>
+      </ul>
+    </section>
+
+    <section class="block">
+      <h2>Deal Terms</h2>
+      <table class="deal-table">
+        <tr><td>Asking Price</td><td>$4,950,000</td></tr>
+        <tr><td>ARV (Per Listing)</td><td>$4,950,000</td></tr>
+        <tr><td>Estimated Rehab</td><td>$63,000</td></tr>
+        <tr><td>Asset Type</td><td>Commercial</td></tr>
+        <tr><td>Deal Type</td><td>Buy and Hold</td></tr>
+        <tr><td>Financing Type</td><td>Investment Loan (e.g., Hard Money, Bridge, DSCR, New Construction Loan)</td></tr>
+        <tr><td>Contract Status</td><td>Under contract — assignment of contract</td></tr>
+        <tr><td>Earnest Money Deposit</td><td>$100,000</td></tr>
+        <tr><td>Closing Date</td><td>December 17, 2026</td></tr>
+        <tr><td>Funding</td><td>Cash or institutional financing</td></tr>
+        <tr><td>Showings</td><td>By appointment only</td></tr>
+      </table>
+    </section>
+
+    <section class="block">
+      <h2>Disclosures</h2>
+      <div class="disclosure-box">
+        <p>This is an assignment of contract. Suede Buffalo LLC holds an equitable/contractual interest in this property and is marketing and assigning its contract rights — this is not a direct sale by, and does not imply direct contact with, the underlying property owner.</p>
+        <p>JNA Dynamic Holdings LLC holds an underlying equitable interest in this property under its own contract with the owner.</p>
+        <p>Information herein is from the seller and supplied marketing materials and has not been independently verified by Suede Buffalo LLC. Buyer is responsible for independently verifying square footage, zoning, condition, environmental status, title, leases, lease renewals, parking rights, and redevelopment feasibility prior to closing.</p>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="cta-band">
+    <div class="wrap">
+      <h2>Interested in this asset?</h2>
+      <p>Reach out for the full address, due diligence materials, and the assignment contract details. Address available upon request.</p>
+      <div class="cta-contacts">
+        <a href="tel:520-633-6437">520-633-6437</a>
+        <a href="mailto:info@sendmybuyer.com">info@sendmybuyer.com</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="wrap">
+      Suede Buffalo LLC. This offering is an assignment of contract and not a direct sale of real property. Figures and facts above are provided by the seller and related marketing materials and have not been independently verified by Suede Buffalo LLC; buyer to verify all information prior to closing.
+    </div>
+  </footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
