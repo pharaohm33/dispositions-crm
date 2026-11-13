@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campbell Commons — Central Phoenix Infill Development Opportunity | Suede Buffalo LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #f6f1e9;
+    color: #2b2621;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+  }
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    color: #231f1b;
+    font-weight: 600;
+  }
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  a { color: #8a4b2e; }
+
+  header.top {
+    padding-top: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e3dac9;
+  }
+  header.top .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    letter-spacing: 0.02em;
+  }
+  .brand span { color: #8a4b2e; }
+  .deal-tag {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6b5f4f;
+    background: #ece3d3;
+    padding: 6px 12px;
+    border-radius: 20px;
+  }
+
+  section.hero {
+    padding-top: 40px;
+    padding-bottom: 10px;
+  }
+  .hero h1 {
+    font-size: 2.3rem;
+    margin-top: 0;
+    margin-bottom: 10px;
+    line-height: 1.2;
+  }
+  .location-line {
+    font-size: 1.05rem;
+    color: #5c5245;
+    margin-top: 0;
+    margin-bottom: 4px;
+  }
+  .address-note {
+    font-size: 0.92rem;
+    color: #8a4b2e;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 26px;
+  }
+
+  .price-block {
+    background: #231f1b;
+    color: #f6f1e9;
+    border-radius: 10px;
+    padding: 26px 30px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0;
+    margin-bottom: 28px;
+  }
+  .price-block .price {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+  }
+  .price-block .price small {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #c9b9a0;
+    margin-bottom: 4px;
+  }
+  .stat-row {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  .stat-row div {
+    text-align: left;
+  }
+  .stat-row div span.label {
+    display: block;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #c9b9a0;
+    margin-bottom: 2px;
+  }
+  .stat-row div span.val {
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+
+  .more-photos-link {
+    font-size: 0.88rem;
+    margin-top: 0;
+    margin-bottom: 18px;
+    display: inline-block;
+  }
+
+  .gallery-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    margin-top: 0;
+    margin-bottom: 8px;
+    scrollbar-width: thin;
+  }
+  .gallery-scroll img {
+    height: 240px;
+    width: auto;
+    border-radius: 8px;
+    flex-shrink: 0;
+    object-fit: cover;
+    border: 1px solid #e3dac9;
+  }
+
+  section.block {
+    padding-top: 36px;
+    padding-bottom: 6px;
+  }
+  section.block h2 {
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 14px;
+    border-bottom: 2px solid #d8caa f;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #ddcfb5;
+  }
+  section.block p {
+    margin-top: 0;
+    margin-bottom: 14px;
+    color: #39332c;
+  }
+  ul.bullets {
+    padding-left: 20px;
+    margin-top: 0;
+    margin-bottom: 14px;
+  }
+  ul.bullets li {
+    margin-bottom: 8px;
+    color: #39332c;
+  }
+
+  .note-box {
+    background: #ece3d3;
+    border-left: 3px solid #8a4b2e;
+    padding: 14px 18px;
+    border-radius: 4px;
+    font-size: 0.93rem;
+    color: #4a4335;
+    margin-top: 0;
+    margin-bottom: 18px;
+  }
+
+  table.terms {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 4px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+  }
+  table.terms tr {
+    border-bottom: 1px solid #e3dac9;
+  }
+  table.terms td {
+    padding: 11px 6px;
+    vertical-align: top;
+  }
+  table.terms td.k {
+    color: #6b5f4f;
+    width: 42%;
+    font-weight: 500;
+  }
+  table.terms td.v {
+    color: #231f1b;
+    font-weight: 600;
+  }
+
+  .disclaimer {
+    font-size: 0.82rem;
+    color: #7a6f5e;
+    margin-top: 10px;
+    margin-bottom: 34px;
+    line-height: 1.55;
+  }
+
+  .cta-band {
+    background: #8a4b2e;
+    color: #f6f1e9;
+    padding-top: 42px;
+    padding-bottom: 42px;
+    margin-top: 30px;
+  }
+  .cta-band h2 {
+    color: #f6f1e9;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.7rem;
+  }
+  .cta-band p {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #f1e2d2;
+  }
+  .cta-contacts {
+    display: flex;
+    gap: 26px;
+    flex-wrap: wrap;
+  }
+  .cta-contacts a {
+    color: #f6f1e9;
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-decoration: none;
+    border-bottom: 2px solid #f1e2d2;
+    padding-bottom: 2px;
+  }
+
+  footer.bottom {
+    padding-top: 22px;
+    padding-bottom: 30px;
+  }
+  footer.bottom p {
+    font-size: 0.8rem;
+    color: #8c8371;
+    margin-top: 0;
+    margin-bottom: 6px;
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=e5867015-64c1-4a73-b499-222064c334f7&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2Fe5867015-64c1-4a73-b499-222064c334f7.html">Request the Address</a></div></noscript>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">Suede <span>Buffalo</span> LLC</div>
+    <div class="deal-tag">Deal Code: AZ-6 (Land)</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <h1>Campbell Commons — Central Phoenix Infill Development Opportunity</h1>
+    <p class="location-line">Phoenix, AZ 85014 &middot; Maricopa County &middot; near 12th Street &amp; Campbell Avenue</p>
+    <p class="address-note">Address available upon request — contact us for the full property address.</p>
+
+    <div class="price-block">
+      <div class="price">
+        <small>Asking Price</small>
+        $624,900
+      </div>
+      <div class="stat-row">
+        <div><span class="label">Lot Size</span><span class="val">0.458 acres (~19,952 SF)</span></div>
+        <div><span class="label">Zoning</span><span class="val">R-3 (per supplied plans)</span></div>
+        <div><span class="label">Asset Type</span><span class="val">Land / Development Package</span></div>
+        <div><span class="label">Deal Type</span><span class="val">Assignment of Contract</span></div>
+      </div>
+    </div>
+
+    <div class="gallery-scroll">
+      <img src="/deals/e5867015-64c1-4a73-b499-222064c334f7/photos/1.webp" alt="Campbell Commons site photo 1">
+      <img src="/deals/e5867015-64c1-4a73-b499-222064c334f7/photos/2.webp" alt="Campbell Commons site photo 2">
+      <img src="/deals/e5867015-64c1-4a73-b499-222064c334f7/photos/3.webp" alt="Campbell Commons site photo 3">
+      <img src="/deals/e5867015-64c1-4a73-b499-222064c334f7/photos/4.webp" alt="Campbell Commons site photo 4">
+      <img src="/deals/e5867015-64c1-4a73-b499-222064c334f7/photos/5.webp" alt="Campbell Commons site photo 5">
+      <img src="/deals/e5867015-64c1-4a73-b499-222064c334f7/photos/6.webp" alt="Campbell Commons site photo 6">
+      <img src="/deals/e5867015-64c1-4a73-b499-222064c334f7/photos/7.webp" alt="Campbell Commons site photo 7">
+      <img src="/deals/e5867015-64c1-4a73-b499-222064c334f7/photos/8.webp" alt="Campbell Commons site photo 8">
+      <img src="/deals/e5867015-64c1-4a73-b499-222064c334f7/photos/9.webp" alt="Campbell Commons site photo 9">
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Property Overview</h2>
+    <p>Central Phoenix infill development opportunity featuring a recorded seven-lot final plat, a City-approved final site plan, and substantial planning and engineering documentation available for builder review.</p>
+    <p>Offered at $624,900 for the land and development package. The proposed homes are not built.</p>
+    <p>The supplied plans depict seven attached, two-story, three-bedroom homes arranged as two duplex buildings and one triplex. Each proposed home includes approximately 1,810 livable SF and a two-car garage, totaling approximately 12,670 livable SF across all seven homes, subject to final plan verification.</p>
+    <p>Located near 12th Street and Campbell Avenue, Campbell Commons offers an experienced builder or developer a documented starting point for evaluating construction, scheduling, and individual resale of seven attached homes.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Project Highlights</h2>
+    <ul class="bullets">
+      <li>Recorded final plat depicting seven residential lots plus common Tracts A and B</li>
+      <li>Approximately 19,952 SF / 0.458 acre net site area</li>
+      <li>R-3 zoning shown on supplied plans</li>
+      <li>City-stamped final site plan dated April 8, 2026</li>
+      <li>Seven proposed two-story, three-bedroom homes</li>
+      <li>Approximately 1,810 livable SF per home</li>
+      <li>Proposed two-car garage for each home</li>
+      <li>Two duplex buildings and one triplex building</li>
+      <li>Shared private drive and two additional unreserved parking spaces</li>
+      <li>Planned rear common area with picnic/BBQ space</li>
+      <li>Landscaping and stormwater-retention improvements shown on supplied plans</li>
+    </ul>
+    <div class="note-box">The gross planning area includes adjacent road right-of-way and should not be interpreted as additional buildable acreage.</div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Available Documentation</h2>
+    <ul class="bullets">
+      <li>Recorded Campbell Commons Final Plat — Book 1885, Page 36</li>
+      <li>Final Site Plan 2506656-SCSR — approved April 8, 2026</li>
+      <li>Grading &amp; Drainage Plans 2500669-CPGD — approved June 27, 2025</li>
+      <li>Landscape Plans 2506763-LSPL — approved December 19, 2025</li>
+      <li>Watford II Duplex and Watford III Triplex building-plan sets</li>
+      <li>Vann geotechnical compliance letter dated May 29, 2026</li>
+    </ul>
+    <p>The existing design and approval work provides a basis for builder diligence. The Watford building plans are older standard-plan sets; their approval does not establish current project-specific building-permit approval or authorization to begin construction.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Buyer Diligence</h2>
+    <p>The supplied civil plans identify floodplain/elevation considerations and site-improvement requirements. Buyer must independently verify current permit and approval status, outstanding conditions and fees, code acceptance, rights to use the plans, utility connections and capacity, completed and remaining site work, floodplain/elevation requirements, geotechnical and structural coordination, and total development costs.</p>
+    <p>The property is offered with the documentation described above. Construction readiness, completed infrastructure, and connected utilities have not been independently confirmed.</p>
+    <p>Renderings depict illustrative concepts, not existing improvements or guaranteed finished construction. Approved drawings govern the proposed layout and specifications, subject to applicable requirements and approved revisions.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Area &amp; Tax Context</h2>
+    <ul class="bullets">
+      <li>2025 property tax: $283</li>
+      <li>Schools in the surrounding area: 2 average, 1 below average</li>
+      <li>Walk Score: 71</li>
+      <li>Nearby comparable rentals (within 1.5 miles of the site) list at a median of approximately $1,021/mo, with most similar rentals ranging from $910 to $1,340/mo — provided as area context only and not a figure for the subject development.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>Deal Terms</h2>
+    <table class="terms">
+      <tr><td class="k">Asking Price</td><td class="v">$624,900</td></tr>
+      <tr><td class="k">Deal Structure</td><td class="v">Assignment of Contract</td></tr>
+      <tr><td class="k">Financing</td><td class="v">Cash or approved funds; Investment Loan (e.g. Hard Money, Bridge, DSCR, New Construction Loan)</td></tr>
+      <tr><td class="k">Condition</td><td class="v">Property sold as-is</td></tr>
+      <tr><td class="k">Closing Costs</td><td class="v">Buyer pays closing costs</td></tr>
+      <tr><td class="k">Transaction Coordinator Fee</td><td class="v">$425, paid by buyer as part of closing costs</td></tr>
+      <tr><td class="k">Offer Requirement</td><td class="v">Proof of funds required with offers</td></tr>
+      <tr><td class="k">Lot Size</td><td class="v">0.458 acres (~19,952 SF net site area)</td></tr>
+      <tr><td class="k">Zoning</td><td class="v">R-3 (per supplied plans)</td></tr>
+      <tr><td class="k">2025 Property Tax</td><td class="v">$283</td></tr>
+    </table>
+
+    <div class="note-box">This is a wholesale assignment of contract, not a direct sale. Suede Buffalo LLC holds equitable interest in the subject transaction under contract with the property owner. The end buyer will receive an assignment of that contract; Suede Buffalo LLC does not act as, and this page does not imply, direct contact with the underlying seller.</div>
+
+    <p class="disclaimer">All figures, measurements, dates, and representations on this page are provided as a matter of convenience and have not been independently verified by Suede Buffalo LLC. Buyer is responsible for independently confirming all permit, zoning, plan, utility, floodplain, geotechnical, tax, and development-cost information prior to closing.</p>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="wrap">
+    <h2>Interested in Campbell Commons?</h2>
+    <p>Contact Suede Buffalo LLC for the complete available document package, aerials, parcel information, closing terms, and to coordinate site access. Individual property address available upon request.</p>
+    <div class="cta-contacts">
+      <a href="tel:520-633-6437">520-633-6437</a>
+      <a href="mailto:info@sendmybuyer.com">info@sendmybuyer.com</a>
+    </div>
+  </div>
+</section>
+
+<footer class="bottom">
+  <div class="wrap">
+    <p>&copy; 2026 Suede Buffalo LLC. This offering is an assignment of contract and is subject to prior sale, price change, or withdrawal without notice.</p>
+  </div>
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
