@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>North Toledo 2BR Fix & Flip | OH-1 (SFH) — Suede Buffalo LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #f5f0e8;
+    color: #2b2621;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.55;
+  }
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  h1, h2, h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    color: #1d1a16;
+  }
+  .top-bar {
+    background: #1d1a16;
+    color: #f5f0e8;
+    padding: 10px 0;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .top-bar .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  header.hero {
+    padding-top: 48px;
+    padding-bottom: 12px;
+  }
+  .kicker {
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #8a6a3f;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  h1.title {
+    font-size: 42px;
+    margin: 0 0 14px 0;
+    line-height: 1.1;
+  }
+  .location-line {
+    font-size: 18px;
+    color: #4a433a;
+    margin-bottom: 6px;
+  }
+  .addr-note {
+    font-size: 14.5px;
+    color: #6b5a3f;
+    background: #ece2cf;
+    border: 1px solid #d9c9a3;
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 6px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+  .badges {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .badge {
+    background: #efe6d4;
+    border: 1px solid #ddcca2;
+    color: #5a4a2f;
+    font-size: 13px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-weight: 500;
+  }
+
+  .price-block {
+    background: #1d1a16;
+    color: #f5f0e8;
+    border-radius: 14px;
+    padding: 30px 32px;
+    margin-top: 10px;
+    margin-bottom: 36px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    justify-content: space-between;
+  }
+  .price-main .num {
+    font-family: 'Fraunces', serif;
+    font-size: 48px;
+    font-weight: 600;
+  }
+  .price-main .label {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #c9bfa8;
+    margin-bottom: 6px;
+  }
+  .price-sub {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  .price-sub-item .num {
+    font-size: 24px;
+    font-weight: 600;
+    font-family: 'Fraunces', serif;
+  }
+  .price-sub-item .label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #c9bfa8;
+  }
+
+  .gallery {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 14px;
+    margin-bottom: 8px;
+    scrollbar-width: thin;
+  }
+  .gallery img {
+    height: 240px;
+    width: auto;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid #ddcca2;
+  }
+  .more-photos {
+    font-size: 14px;
+    margin-top: 0;
+    margin-bottom: 36px;
+    display: inline-block;
+    color: #8a6a3f;
+    font-weight: 600;
+    text-decoration: underline;
+  }
+
+  section {
+    margin-top: 44px;
+    margin-bottom: 44px;
+  }
+  section h2 {
+    font-size: 26px;
+    margin: 0 0 16px 0;
+    border-bottom: 2px solid #d9c9a3;
+    padding-bottom: 10px;
+  }
+  p { margin: 0 0 14px 0; }
+
+  .fact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    margin-top: 16px;
+  }
+  .fact-card {
+    background: #fffdf8;
+    border: 1px solid #e3d7b9;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .fact-card .label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #8a7a56;
+    margin-bottom: 4px;
+  }
+  .fact-card .value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2b2621;
+  }
+
+  table.terms {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    background: #fffdf8;
+    border: 1px solid #e3d7b9;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  table.terms td {
+    padding: 13px 18px;
+    border-bottom: 1px solid #ece2cf;
+    font-size: 15px;
+  }
+  table.terms tr:last-child td { border-bottom: none; }
+  table.terms td:first-child {
+    font-weight: 600;
+    color: #5a4a2f;
+    width: 42%;
+  }
+
+  .condition-list, .upside-list {
+    padding-left: 20px;
+    margin: 0;
+  }
+  .condition-list li, .upside-list li {
+    margin-bottom: 8px;
+  }
+
+  .note-box {
+    background: #ece2cf;
+    border-left: 4px solid #8a6a3f;
+    padding: 14px 18px;
+    border-radius: 6px;
+    font-size: 14.5px;
+    color: #4a3f2a;
+    margin-top: 18px;
+  }
+
+  .disclaimer {
+    font-size: 13px;
+    color: #74685235;
+    color: #6b5f4a;
+    margin-top: 10px;
+  }
+
+  .cta-band {
+    background: #1d1a16;
+    color: #f5f0e8;
+    border-radius: 14px;
+    padding: 40px 36px;
+    text-align: center;
+    margin-top: 48px;
+    margin-bottom: 20px;
+  }
+  .cta-band h2 {
+    border: none;
+    color: #f5f0e8;
+    font-size: 30px;
+    margin-bottom: 10px;
+  }
+  .cta-band p {
+    color: #d9cdb4;
+    margin-bottom: 22px;
+  }
+  .cta-contacts {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .cta-contacts a {
+    background: #f5f0e8;
+    color: #1d1a16;
+    text-decoration: none;
+    font-weight: 700;
+    padding: 12px 26px;
+    border-radius: 999px;
+    font-size: 15px;
+  }
+  footer {
+    text-align: center;
+    font-size: 12.5px;
+    color: #8a7a56;
+    margin-top: 20px;
+    margin-bottom: 40px;
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=10c0824a-95c3-4db3-9b1c-6261692e4cfb&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F10c0824a-95c3-4db3-9b1c-6261692e4cfb.html">Request the Address</a></div></noscript>
+
+<div class="top-bar">
+  <div class="wrap">
+    <span>Suede Buffalo LLC</span>
+    <span>Assignment of Contract Opportunity</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">Deal Code: OH-1 (SFH) · Fix and Flip</div>
+    <h1 class="title">North Toledo Single Family — Gut-Rehab Opportunity</h1>
+    <div class="location-line">Toledo, Lucas County, OH 43608</div>
+    <div class="addr-note">Address available upon request — contact us for the full property address.</div>
+    <div class="badges">
+      <span class="badge">2 Bed / 1 Bath</span>
+      <span class="badge">819 Sq. Ft.</span>
+      <span class="badge">Built 1922</span>
+      <span class="badge">Single Family</span>
+      <span class="badge">Vacant</span>
+    </div>
+  </header>
+
+  <div class="gallery">
+    <img src="/deals/10c0824a-95c3-4db3-9b1c-6261692e4cfb/photos/1.webp" alt="North Toledo single family exterior">
+    <img src="/deals/10c0824a-95c3-4db3-9b1c-6261692e4cfb/photos/2.webp" alt="North Toledo single family photo 2">
+    <img src="/deals/10c0824a-95c3-4db3-9b1c-6261692e4cfb/photos/3.webp" alt="North Toledo single family photo 3">
+    <img src="/deals/10c0824a-95c3-4db3-9b1c-6261692e4cfb/photos/4.webp" alt="North Toledo single family photo 4">
+    <img src="/deals/10c0824a-95c3-4db3-9b1c-6261692e4cfb/photos/5.webp" alt="North Toledo single family photo 5">
+    <img src="/deals/10c0824a-95c3-4db3-9b1c-6261692e4cfb/photos/6.webp" alt="North Toledo single family photo 6">
+    <img src="/deals/10c0824a-95c3-4db3-9b1c-6261692e4cfb/photos/7.webp" alt="North Toledo single family photo 7">
+    <img src="/deals/10c0824a-95c3-4db3-9b1c-6261692e4cfb/photos/8.webp" alt="North Toledo single family photo 8">
+    <img src="/deals/10c0824a-95c3-4db3-9b1c-6261692e4cfb/photos/9.webp" alt="North Toledo single family photo 9">
+    <img src="/deals/10c0824a-95c3-4db3-9b1c-6261692e4cfb/photos/10.webp" alt="North Toledo single family photo 10">
+    <img src="/deals/10c0824a-95c3-4db3-9b1c-6261692e4cfb/photos/11.webp" alt="North Toledo single family photo 11">
+    <img src="/deals/10c0824a-95c3-4db3-9b1c-6261692e4cfb/photos/12.webp" alt="North Toledo single family photo 12">
+  </div>
+
+  <div class="price-block">
+    <div class="price-main">
+      <div class="label">Asking Price</div>
+      <div class="num">$22,000</div>
+    </div>
+    <div class="price-sub">
+      <div class="price-sub-item">
+        <div class="label">After Repair Value</div>
+        <div class="num">$52,000</div>
+      </div>
+      <div class="price-sub-item">
+        <div class="label">Estimated Rehab</div>
+        <div class="num">$25,000</div>
+      </div>
+    </div>
+  </div>
+
+  <section>
+    <h2>Overview</h2>
+    <p>This North Toledo 2 bedroom, 1 bath single family home is priced at $22,000 cash — well under the neighborhood's renovated sale prices. It is being marketed as an assignment of contract: Suede Buffalo LLC holds an assignable purchase contract on this property and is offering the right to step into that contract. This is not a direct sale by the underlying property owner, and buyers should not attempt to contact the owner directly.</p>
+    <p>Built in 1922, the home sits on a 6,900 sq. ft. lot (60' x 115') with off-street gravel parking. It is currently vacant.</p>
+  </section>
+
+  <section>
+    <h2>Key Facts</h2>
+    <div class="fact-grid">
+      <div class="fact-card"><div class="label">Beds</div><div class="value">2</div></div>
+      <div class="fact-card"><div class="label">Baths</div><div class="value">1</div></div>
+      <div class="fact-card"><div class="label">Sq. Ft.</div><div class="value">819</div></div>
+      <div class="fact-card"><div class="label">Year Built</div><div class="value">1922</div></div>
+      <div class="fact-card"><div class="label">Lot Size</div><div class="value">6,900 sq ft (60' x 115') / 0.16 acres</div></div>
+      <div class="fact-card"><div class="label">Basement</div><div class="value">770 sq ft, with laundry hookups</div></div>
+      <div class="fact-card"><div class="label">Parking</div><div class="value">Off-street, gravel</div></div>
+      <div class="fact-card"><div class="label">Utilities</div><div class="value">Public water & sewer, natural gas</div></div>
+      <div class="fact-card"><div class="label">Occupancy</div><div class="value">Vacant</div></div>
+      <div class="fact-card"><div class="label">Annual Taxes</div><div class="value">About $660/year</div></div>
+      <div class="fact-card"><div class="label">Last Sold</div><div class="value">December 2025 for $8,500</div></div>
+      <div class="fact-card"><div class="label">Walk Score</div><div class="value">66</div></div>
+    </div>
+    <p class="disclaimer" style="margin-top:16px;">Area schools are rated below average (3 schools noted).</p>
+  </section>
+
+  <section>
+    <h2>Condition</h2>
+    <p>This is a full rehab property. Buyers should budget for:</p>
+    <ul class="condition-list">
+      <li>Gutted kitchen</li>
+      <li>Missing front door</li>
+      <li>Damaged plaster and flooring throughout</li>
+      <li>Debris on-site</li>
+      <li>Exposed wiring</li>
+      <li><strong>Roof:</strong> shingle; condition unknown</li>
+      <li><strong>HVAC:</strong> forced-air gas furnace; condition unknown — prior listing noted major systems removed</li>
+      <li><strong>Foundation:</strong> block; condition unknown</li>
+      <li><strong>Electrical:</strong> circuit breaker panel; needs work; condition unknown</li>
+      <li><strong>Plumbing:</strong> condition unknown</li>
+    </ul>
+    <p>Estimated repairs: approximately $25,000 (outside estimates for this scope have ranged as high as $43,500–$72,500, depending on finish level — buyers should run their own numbers).</p>
+  </section>
+
+  <section>
+    <h2>Upside & Exit Strategy</h2>
+    <ul class="upside-list">
+      <li>Renovated 2-bedroom homes within half a mile have sold from about $46,000 to $57,000 in the last 6 months.</li>
+      <li>Area rents run approximately $820–$1,000 per month.</li>
+      <li>There is room to add living space upstairs.</li>
+      <li>A strong fit for a buy-and-hold rental or a light-budget flip.</li>
+    </ul>
+    <div class="note-box">
+      Sample flip math at this price: ARV $52,000 − purchase $22,000 − repairs $25,000 − estimated loan/holding/closing costs of roughly $2,977 (based on 20% down, 12% interest, 2 points, 70-day hold) leaves an estimated margin of roughly $2,023 (about 3.9% of ARV). An independent value estimate for the property in its current condition has also been put at approximately $38,000. Run your own numbers before offering — this works best for a flipper near $19,000 or a buy-and-hold landlord.
+    </div>
+  </section>
+
+  <section>
+    <h2>Deal Terms</h2>
+    <table class="terms">
+      <tr><td>Asking Price</td><td>$22,000 cash</td></tr>
+      <tr><td>After Repair Value (ARV)</td><td>$52,000</td></tr>
+      <tr><td>Estimated Rehab</td><td>$25,000</td></tr>
+      <tr><td>Asset Type</td><td>Single Family</td></tr>
+      <tr><td>Deal Type</td><td>Fix and Flip</td></tr>
+      <tr><td>Financing</td><td>Investment Loan (e.g. Hard Money, Bridge, DSCR, New Construction Loan)</td></tr>
+      <tr><td>Terms</td><td>Cash or hard money, sold as-is; buyer pays all closing costs</td></tr>
+      <tr><td>Closing Deadline</td><td>On or before November 25, 2026</td></tr>
+      <tr><td>Offer Deadline</td><td>Tuesday, November 18 by 5:00 PM ET</td></tr>
+      <tr><td>Contract Structure</td><td>Assignment of contract</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Important Disclosures</h2>
+    <p class="disclaimer">This offering is an assignment of a purchase contract, not a direct sale of real property. Suede Buffalo LLC holds an equitable interest under contract with the underlying property owner and is marketing the assignment of that contract to an end buyer; closing will be structured accordingly. Suede Buffalo LLC has not independently verified all figures, conditions, or measurements referenced above (including square footage, repair costs, rents, and comparable sales) and makes no warranty as to their accuracy. Buyers should perform their own due diligence, inspections, and underwriting before making an offer.</p>
+  </section>
+
+</div>
+
+<div class="wrap">
+  <div class="cta-band">
+    <h2>Interested in OH-1 (SFH)?</h2>
+    <p>Contact us for the full property address, additional photos, and to request access or submit an offer before the deadline.</p>
+    <div class="cta-contacts">
+      <a href="tel:5206336437">Call/Text: 520-633-6437</a>
+      <a href="mailto:info@sendmybuyer.com">info@sendmybuyer.com</a>
+    </div>
+  </div>
+  <footer>
+    &copy; Suede Buffalo LLC. Offered as an assignment of contract. Information deemed reliable but not guaranteed.
+  </footer>
+</div>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
