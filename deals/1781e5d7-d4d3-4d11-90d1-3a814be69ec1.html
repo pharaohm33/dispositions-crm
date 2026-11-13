@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PA-2 (Comm) — 50-Unit Downtown Masonry Building | Shamokin, PA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e8;
+    --paper-alt:#efe7d8;
+    --ink:#2b2520;
+    --ink-soft:#5a5248;
+    --line:#d8cdb8;
+    --brick:#8a3b2b;
+    --brick-dark:#6e2e21;
+    --gold:#a6782f;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    line-height:1.55;
+  }
+  h1,h2,h3,h4{
+    font-family:'Playfair Display',serif;
+    font-weight:600;
+    color:var(--ink);
+    margin:0;
+  }
+  .wrap{
+    max-width:1040px;
+    margin:0 auto;
+    padding:0 28px;
+  }
+  a{color:var(--brick-dark);}
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:0.14em;
+    font-size:12px;
+    font-weight:600;
+    color:var(--gold);
+  }
+  /* ---------- HERO ---------- */
+  .hero{
+    padding-top:48px;
+    padding-bottom:36px;
+    border-bottom:1px solid var(--line);
+  }
+  .hero-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    flex-wrap:wrap;
+    gap:16px;
+    margin-bottom:22px;
+  }
+  .tag-pill{
+    display:inline-block;
+    border:1px solid var(--ink);
+    border-radius:999px;
+    padding:4px 12px;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:0.04em;
+  }
+  h1.title{
+    font-size:38px;
+    line-height:1.18;
+    margin-top:8px;
+    margin-bottom:10px;
+  }
+  .loc-line{
+    font-size:17px;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .addr-note{
+    font-size:14px;
+    font-weight:600;
+    color:var(--brick-dark);
+    background:#fff6e9;
+    border:1px solid var(--line);
+    display:inline-block;
+    padding:6px 12px;
+    border-radius:6px;
+    margin-top:10px;
+  }
+  .deal-type-tags{
+    margin-top:16px;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .deal-type-tags span{
+    background:var(--paper-alt);
+    border:1px solid var(--line);
+    padding:5px 11px;
+    border-radius:999px;
+    font-size:13px;
+  }
+  /* ---------- PRICE BLOCK ---------- */
+  .price-block{
+    margin-top:30px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:0;
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    background:#fffefb;
+  }
+  .price-cell{
+    flex:1 1 160px;
+    padding:20px 22px;
+    border-right:1px solid var(--line);
+  }
+  .price-cell:last-child{border-right:none;}
+  .price-cell .label{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .price-cell .value{
+    font-family:'Playfair Display',serif;
+    font-size:26px;
+    font-weight:700;
+    color:var(--brick-dark);
+  }
+  .price-cell .value.small{font-size:20px;}
+  /* ---------- GALLERY ---------- */
+  .gallery-section{
+    padding-top:30px;
+    padding-bottom:30px;
+    background:var(--paper-alt);
+    border-bottom:1px solid var(--line);
+  }
+  .gallery-scroll{
+    display:flex;
+    gap:14px;
+    overflow-x:auto;
+    padding-bottom:8px;
+    scroll-snap-type:x mandatory;
+  }
+  .gallery-scroll img{
+    height:320px;
+    width:auto;
+    border-radius:8px;
+    object-fit:cover;
+    scroll-snap-align:start;
+    border:1px solid var(--line);
+    flex:0 0 auto;
+  }
+  .more-photos{
+    display:inline-block;
+    margin-top:14px;
+    font-size:14px;
+    font-weight:600;
+    text-decoration:underline;
+  }
+  /* ---------- SECTIONS ---------- */
+  section.block{
+    padding-top:44px;
+    padding-bottom:44px;
+    border-bottom:1px solid var(--line);
+  }
+  section.block.alt{background:var(--paper-alt);}
+  h2.sec-title{
+    font-size:26px;
+    margin-bottom:18px;
+  }
+  p.lead{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:760px;
+  }
+  .narrative p{margin:0 0 14px 0;}
+  .narrative strong{color:var(--brick-dark);}
+  ul.clean-list{
+    margin:0 0 14px 0;
+    padding-left:20px;
+  }
+  ul.clean-list li{margin-bottom:6px;}
+  table.terms{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+    background:#fffefb;
+  }
+  table.terms th, table.terms td{
+    text-align:left;
+    padding:10px 14px;
+    border-bottom:1px solid var(--line);
+    font-size:15px;
+  }
+  table.terms th{
+    width:40%;
+    color:var(--ink-soft);
+    font-weight:600;
+  }
+  .two-col{
+    display:flex;
+    gap:36px;
+    flex-wrap:wrap;
+  }
+  .two-col > div{flex:1 1 320px;}
+  .note-box{
+    margin-top:18px;
+    padding:16px 18px;
+    background:#fff6e9;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:14px;
+    color:var(--ink-soft);
+  }
+  /* ---------- CTA ---------- */
+  .cta-band{
+    background:var(--brick);
+    color:#fdf6ec;
+    padding-top:50px;
+    padding-bottom:50px;
+  }
+  .cta-band h2{
+    color:#fdf6ec;
+    font-size:30px;
+    margin-bottom:12px;
+  }
+  .cta-band p{
+    font-size:16px;
+    color:#f1dfca;
+    max-width:600px;
+    margin-bottom:22px;
+  }
+  .cta-contacts{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+  }
+  .cta-contacts a{
+    display:inline-block;
+    background:#fdf6ec;
+    color:var(--brick-dark);
+    font-weight:700;
+    padding:12px 22px;
+    border-radius:6px;
+    text-decoration:none;
+    font-size:15px;
+  }
+  footer.foot{
+    padding-top:26px;
+    padding-bottom:30px;
+    font-size:12px;
+    color:var(--ink-soft);
+    background:var(--paper);
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=1781e5d7-d4d3-4d11-90d1-3a814be69ec1&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F1781e5d7-d4d3-4d11-90d1-3a814be69ec1.html">Request the Address</a></div></noscript>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-top">
+      <div>
+        <span class="eyebrow">Deal Code: PA-2 (Comm)</span>
+        <h1 class="title">50-Unit Downtown Masonry Building<br>Shamokin, Pennsylvania</h1>
+        <div class="loc-line">Shamokin, PA 17872 &middot; Northumberland County</div>
+        <div class="addr-note">Address available upon request — contact us for the full property address.</div>
+      </div>
+      <span class="tag-pill">Commercial / Multifamily</span>
+    </div>
+
+    <div class="deal-type-tags">
+      <span>Fix and Flip</span>
+      <span>Buy and Hold</span>
+      <span>Seller Financing Available</span>
+    </div>
+
+    <div class="price-block">
+      <div class="price-cell">
+        <div class="label">Asking Price</div>
+        <div class="value">$1,400,000</div>
+      </div>
+      <div class="price-cell">
+        <div class="label">After-Repair Value (ARV)</div>
+        <div class="value">$8,000,000</div>
+      </div>
+      <div class="price-cell">
+        <div class="label">Rehab Estimate</div>
+        <div class="value small">$1,550,000</div>
+      </div>
+      <div class="price-cell">
+        <div class="label">Financing Type</div>
+        <div class="value small">Seller Financing</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="gallery-section">
+  <div class="wrap">
+    <h2 class="sec-title">Photos</h2>
+    <div class="gallery-scroll">
+      <img src="/deals/1781e5d7-d4d3-4d11-90d1-3a814be69ec1/photos/1.webp" alt="Downtown Shamokin masonry apartment building exterior">
+      <img src="/deals/1781e5d7-d4d3-4d11-90d1-3a814be69ec1/photos/2.webp" alt="Five-story masonry apartment building street view">
+      <img src="/deals/1781e5d7-d4d3-4d11-90d1-3a814be69ec1/photos/3.webp" alt="Ground-floor former commercial space">
+      <img src="/deals/1781e5d7-d4d3-4d11-90d1-3a814be69ec1/photos/4.webp" alt="Interior hallway of apartment building">
+      <img src="/deals/1781e5d7-d4d3-4d11-90d1-3a814be69ec1/photos/5.webp" alt="Vacant one-bedroom unit interior">
+      <img src="/deals/1781e5d7-d4d3-4d11-90d1-3a814be69ec1/photos/6.webp" alt="Original iron stairwell interior">
+      <img src="/deals/1781e5d7-d4d3-4d11-90d1-3a814be69ec1/photos/7.webp" alt="Central boiler plant room">
+      <img src="/deals/1781e5d7-d4d3-4d11-90d1-3a814be69ec1/photos/8.webp" alt="Apartment unit bathroom">
+      <img src="/deals/1781e5d7-d4d3-4d11-90d1-3a814be69ec1/photos/9.webp" alt="Apartment unit kitchen">
+      <img src="/deals/1781e5d7-d4d3-4d11-90d1-3a814be69ec1/photos/10.webp" alt="Building exterior along downtown streetscape">
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap narrative">
+    <h2 class="sec-title">Overview</h2>
+    <p class="lead">50 doors for $800K down. Seller carries $1,000,000.</p>
+    <p>This five-story masonry building sits in the center of downtown on Independence Street in Shamokin, PA (Northumberland County) — <strong>address available on request</strong>. The property consists of 49 one-bedroom/one-bath apartments over a full ground-floor commercial space, formerly occupied by a Dollar General. The building is being delivered vacant and broom-clean, ready for a contractor walkthrough.</p>
+    <p>This is being offered as an assignment of contract. <strong>Suede Buffalo LLC</strong> holds a contractual, equitable interest in this property under an executed purchase agreement with the owner and is marketing that contractual position for assignment to a qualified buyer. Suede Buffalo LLC is not the titled owner of the property, and closing occurs under the terms of that assignment — this is not a direct sale by the underlying seller, and buyers should not expect or attempt direct contact with the property owner.</p>
+  </div>
+</section>
+
+<section class="block alt">
+  <div class="wrap">
+    <h2 class="sec-title">Price &amp; Terms (Per Seller)</h2>
+    <table class="terms">
+      <tr><th>Full Price</th><td>$1,825,000 ($36K/door, $51/SF)</td></tr>
+      <tr><th>Cash at Closing</th><td>$825,000</td></tr>
+      <tr><th>Seller Financing</th><td>$1,000,000</td></tr>
+      <tr><th>Rate / Term / Timing</th><td>Negotiable — seller is open to interest-only or deferred payments through renovation and lease-up</td></tr>
+    </table>
+    <div class="note-box">Note: the current assignment asking price offered by Suede Buffalo LLC is $1,400,000 (shown in the price block above). The $1,825,000 figure and its $825,000/$1,000,000 cash/financing split reflect the underlying seller's stated pricing structure for the property itself.</div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2 class="sec-title">Property Details</h2>
+    <table class="terms">
+      <tr><th>Asset Type</th><td>Commercial / Multifamily</td></tr>
+      <tr><th>Year Built</th><td>1920</td></tr>
+      <tr><th>Building Size</th><td>35,100 SF</td></tr>
+      <tr><th>Lot Size</th><td>7,850 SF (approx. 7,500 SF per floor)</td></tr>
+      <tr><th>Unit Mix</th><td>49 x 1BR/1BA apartments, plus full-floor ground commercial space</td></tr>
+      <tr><th>Zoning</th><td>CB (Central Business)</td></tr>
+      <tr><th>APN</th><td>017-01-009-238</td></tr>
+      <tr><th>Utilities</th><td>Units separately metered; owner pays water only</td></tr>
+      <tr><th>Fire Suppression</th><td>Sprinkler system in place (needs pressure test, estimated $5,000)</td></tr>
+      <tr><th>Mechanical / Structural</th><td>Central boiler plant; original iron stairwells</td></tr>
+      <tr><th>Condition</th><td>Delivered vacant and broom-clean</td></tr>
+      <tr><th>Walk Score</th><td>79</td></tr>
+      <tr><th>Nearby Schools</th><td>3 schools rated below average</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="block alt">
+  <div class="wrap">
+    <h2 class="sec-title">Pro Forma Numbers (Seller Estimates — Verify Independently)</h2>
+    <table class="terms">
+      <tr><th>Rehab Estimate</th><td>$1,500,000 (approx. $25K/unit plus common areas and contingency)</td></tr>
+      <tr><th>All-In Cost</th><td>$3,325,000 ($66.5K/door, $95/SF)</td></tr>
+      <tr><th>Market Rent, Renovated 1BR</th><td>$900–$1,000/mo</td></tr>
+      <tr><th>Stabilized NOI at $1,000 Rent</th><td>Approx. $345,000 (10.4% yield on cost; estimated value ~$4.2M)</td></tr>
+      <tr><th>Veteran Housing (HUD-VASH) at Est. $1,300 Rent</th><td>Approx. $465,000 NOI (14.0% yield on cost; estimated value ~$5.6M)</td></tr>
+    </table>
+
+    <h2 class="sec-title" style="margin-top:34px;">Deal Economics Snapshot</h2>
+    <table class="terms">
+      <tr><th>ARV</th><td>$8,000,000</td></tr>
+      <tr><th>Asking Price</th><td>$1,400,000</td></tr>
+      <tr><th>Repairs — Seller's Range</th><td>$1,500,000 – $1,600,000</td></tr>
+      <tr><th>Repairs — Used in Model</th><td>$1,550,000 (alternate range considered: $446,500 – $930,500)</td></tr>
+      <tr><th>Financing / Holding Costs</th><td>20% down, 12% interest, 2 points, 365-day term — estimated cost −$438,800</td></tr>
+      <tr><th>Projected Profit</th><td>$4,611,200 (57.6% of ARV)</td></tr>
+      <tr><th>Flipper Feasibility</th><td>Works for a flipper purchase price up to $4,737,000</td></tr>
+    </table>
+    <div class="note-box">All rehab and income figures are estimates, not guarantees, and have not been independently verified by Suede Buffalo LLC. Buyer to verify all information prior to closing.</div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap narrative">
+    <h2 class="sec-title">Demand &amp; Location</h2>
+    <ul class="clean-list">
+      <li>The Shamokin Housing Authority is located on the same street: 225 Housing Choice Vouchers, with the waiting list reopened in March 2026 after being closed since 2019.</li>
+      <li>A $2.675M federally funded Independence Street Streetscape Project is underway on this corridor, with completion due in fall 2027.</li>
+      <li>The city has voiced interest in a restaurant for the ground-floor commercial space.</li>
+      <li>The building's age and character may merit National Register evaluation; a 20% credit on qualified rehab expenditures could approach $300,000 against a $1.5M scope.</li>
+      <li>Possible incentives to investigate: historic tax credit, RACP, LERTA, Main Street Matters, PHFA funds, and project-based vouchers — none guaranteed and none priced into the numbers above.</li>
+    </ul>
+    <p>A full investment packet, interior photos, and a walkthrough video are available on request.</p>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="wrap">
+    <h2>Interested in this assignment?</h2>
+    <p>This opportunity is being marketed as an assignment of contract by Suede Buffalo LLC. Reach out today for the full address, the investment packet, interior photos, and walkthrough video.</p>
+    <div class="cta-contacts">
+      <a href="tel:520-633-6437">Call 520-633-6437</a>
+      <a href="mailto:info@sendmybuyer.com">Email info@sendmybuyer.com</a>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>Suede Buffalo LLC is marketing an assignment of its equitable interest under an existing purchase agreement with the property owner; this is not a direct sale by the owner and Suede Buffalo LLC is not the titled seller of record. All prices, square footages, income projections, rehab estimates, and other figures presented above are based on information believed reliable but have not been independently verified by Suede Buffalo LLC. Buyer is responsible for independently verifying all information, including condition, title, zoning, financing terms, and projected returns, prior to entering into any transaction.</p>
+  </div>
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
