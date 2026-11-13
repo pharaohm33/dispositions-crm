@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AZ-8 (Comm) — Mesa, AZ Medical Office | Suede Buffalo LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e9;
+    --paper-dark:#efe7d9;
+    --ink:#2b2621;
+    --ink-soft:#5b5248;
+    --line:#dcd1bd;
+    --accent:#7a5c3e;
+    --accent-dark:#4d3822;
+    --good:#3f5d44;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    line-height:1.6;
+  }
+  h1,h2,h3{
+    font-family:'Playfair Display',serif;
+    color:var(--ink);
+    font-weight:600;
+    letter-spacing:0.2px;
+  }
+  .wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+  .section{
+    margin-top:56px;
+    margin-bottom:0;
+  }
+  .section:first-of-type{margin-top:0;}
+
+  .topbar{
+    background:var(--ink);
+    color:#efe7d9;
+    padding:10px 0;
+    font-size:13px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    text-align:center;
+  }
+
+  header.hero{
+    padding-top:48px;
+    padding-bottom:8px;
+  }
+  .deal-code{
+    display:inline-block;
+    background:var(--accent-dark);
+    color:#f6f1e9;
+    font-size:12.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    padding:5px 12px;
+    border-radius:3px;
+    margin-bottom:16px;
+  }
+  h1.title{
+    font-size:2.5rem;
+    line-height:1.15;
+    margin:0 0 14px 0;
+  }
+  .loc-line{
+    font-size:1.05rem;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .addr-note{
+    font-size:0.95rem;
+    color:var(--accent-dark);
+    font-weight:600;
+    background:#eee1c9;
+    display:inline-block;
+    padding:6px 12px;
+    border-radius:4px;
+    margin-top:6px;
+    margin-bottom:4px;
+  }
+  .tags{
+    margin-top:18px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .tag{
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    font-size:12.5px;
+    padding:5px 10px;
+    border-radius:20px;
+    background:#fbf8f2;
+  }
+
+  .price-block{
+    margin-top:32px;
+    border:1px solid var(--line);
+    background:#fbf8f2;
+    border-radius:8px;
+    padding:28px 28px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    justify-content:space-between;
+  }
+  .price-main .label{
+    font-size:12.5px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .price-main .value{
+    font-family:'Playfair Display',serif;
+    font-size:2.6rem;
+    font-weight:700;
+    color:var(--accent-dark);
+  }
+  .price-sub{
+    display:flex;
+    gap:32px;
+    flex-wrap:wrap;
+  }
+  .price-sub div .label{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.07em;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .price-sub div .value{
+    font-size:1.25rem;
+    font-weight:600;
+    font-family:'Playfair Display',serif;
+    color:var(--ink);
+  }
+
+  .gallery-wrap{
+    margin-top:28px;
+    overflow-x:auto;
+    white-space:nowrap;
+    border-radius:8px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .gallery-wrap img{
+    height:300px;
+    width:auto;
+    display:inline-block;
+    margin-right:10px;
+    border-radius:6px;
+    object-fit:cover;
+    vertical-align:top;
+  }
+  .more-photos{
+    display:inline-block;
+    margin-top:12px;
+    font-size:14px;
+    color:var(--accent-dark);
+    text-decoration:underline;
+  }
+
+  h2.section-title{
+    font-size:1.5rem;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:10px;
+    margin-bottom:22px;
+  }
+
+  p{color:var(--ink);}
+  .lede p{font-size:1.02rem;}
+
+  table.data{
+    width:100%;
+    border-collapse:collapse;
+    background:#fbf8f2;
+    border:1px solid var(--line);
+    border-radius:6px;
+    overflow:hidden;
+  }
+  table.data tr{border-bottom:1px solid var(--line);}
+  table.data tr:last-child{border-bottom:none;}
+  table.data td{
+    padding:12px 16px;
+    font-size:15px;
+    vertical-align:top;
+  }
+  table.data td.k{
+    width:38%;
+    color:var(--ink-soft);
+    font-weight:600;
+  }
+
+  ul.plain{
+    margin:0;
+    padding-left:20px;
+  }
+  ul.plain li{
+    margin-bottom:8px;
+  }
+
+  .two-col{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+  }
+  @media (max-width:700px){
+    .two-col{grid-template-columns:1fr;}
+    h1.title{font-size:1.9rem;}
+    .price-main .value{font-size:2.1rem;}
+  }
+
+  .note-box{
+    background:#efe4cf;
+    border-left:4px solid var(--accent);
+    padding:14px 18px;
+    font-size:14.5px;
+    color:var(--ink-soft);
+    border-radius:4px;
+    margin-top:18px;
+  }
+
+  .disclaimer{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    border-top:1px solid var(--line);
+    padding-top:20px;
+    margin-top:40px;
+  }
+
+  .cta-band{
+    margin-top:64px;
+    background:var(--ink);
+    color:#f3ecdf;
+    padding:48px 0;
+  }
+  .cta-band h2{
+    color:#f3ecdf;
+    font-size:1.9rem;
+    margin-top:0;
+    margin-bottom:10px;
+  }
+  .cta-band p{
+    color:#cfc4ae;
+    margin-bottom:22px;
+    max-width:600px;
+  }
+  .cta-links{
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .cta-links a{
+    display:inline-block;
+    background:#efe4cf;
+    color:var(--ink);
+    text-decoration:none;
+    font-weight:600;
+    padding:13px 24px;
+    border-radius:4px;
+    font-size:15px;
+  }
+  .cta-links a.secondary{
+    background:transparent;
+    border:1px solid #cfc4ae;
+    color:#f3ecdf;
+  }
+
+  footer{
+    padding:28px 0 48px 0;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=253ce57a-97a9-4006-8345-693ca6c1bf8f&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F253ce57a-97a9-4006-8345-693ca6c1bf8f.html">Request the Address</a></div></noscript>
+
+<div class="topbar">Assignment of Contract Opportunity &mdash; Suede Buffalo LLC</div>
+
+<div class="wrap">
+
+  <header class="hero section">
+    <span class="deal-code">Deal AZ-8 (Comm)</span>
+    <h1 class="title">9,100 SF NNN Medical Office<br>National Dermatology Tenant In Place</h1>
+    <div class="loc-line">Mesa, AZ 85204 &middot; Maricopa County, Arizona</div>
+    <div class="addr-note">Address available upon request &mdash; contact us for the full property address.</div>
+    <div class="tags">
+      <span class="tag">Commercial &mdash; Medical Office</span>
+      <span class="tag">Fix and Flip</span>
+      <span class="tag">Buy and Hold</span>
+      <span class="tag">Seller Financing Available</span>
+    </div>
+  </header>
+
+  <section class="price-block">
+    <div class="price-main">
+      <div class="label">Asking Price</div>
+      <div class="value">$2,250,000</div>
+    </div>
+    <div class="price-sub">
+      <div>
+        <div class="label">ARV</div>
+        <div class="value">$2,500,000</div>
+      </div>
+      <div>
+        <div class="label">Est. Rehab</div>
+        <div class="value">$37,000</div>
+      </div>
+      <div>
+        <div class="label">Financing</div>
+        <div class="value">Seller Carry</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="gallery-wrap">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/1.webp" alt="Mesa medical office exterior view">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/2.webp" alt="Mesa medical office exterior view">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/3.webp" alt="Mesa medical office building">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/4.webp" alt="Mesa medical office parking lot">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/5.webp" alt="Mesa medical office building exterior">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/6.webp" alt="Mesa medical office interior suite">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/7.webp" alt="Mesa medical office interior reception">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/8.webp" alt="Mesa medical office interior hallway">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/9.webp" alt="Mesa medical office interior suite">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/10.webp" alt="Mesa medical office interior">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/11.webp" alt="Mesa medical office signage">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/12.webp" alt="Mesa medical office building exterior">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/13.webp" alt="Mesa medical office interior suite">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/14.webp" alt="Mesa medical office interior break room">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/15.webp" alt="Mesa medical office restroom">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/16.webp" alt="Mesa medical office exterior">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/17.webp" alt="Mesa medical office parking area">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/18.webp" alt="Mesa medical office interior suite">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/19.webp" alt="Mesa medical office interior office">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/20.webp" alt="Mesa medical office interior suite">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/21.webp" alt="Mesa medical office signage exterior">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/22.webp" alt="Mesa medical office exterior view">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/23.webp" alt="Mesa medical office building">
+      <img src="/deals/253ce57a-97a9-4006-8345-693ca6c1bf8f/photos/24.webp" alt="Mesa medical office exterior">
+    </div>
+    <a class="more-photos" href="https://drive.google.com/drive/folders/1zZksA1F0Vmt89c7EGA1kfQylUaq28EcO" target="_blank" rel="noopener">View full photo set &rarr;</a>
+  </section>
+
+  <section class="section lede">
+    <h2 class="section-title">The Opportunity</h2>
+    <p>Two things make this deal, and we're putting both at the top.</p>
+    <p>First, the leases are NNN. Tenants carry taxes, insurance and maintenance. You are not the one writing the check when a compressor goes down or the tax bill lands. On a 9,100 square foot medical campus with an $18,869 annual tax bill, that structure is worth real money every year you own it.</p>
+    <p>Second, the seller will carry $1,225,000. Entry is $1,100,000. That puts a buyer into a Mesa medical office campus with roughly 47 percent down and no bank underwriting for eight weeks before declining.</p>
+    <p>The capital work is already done. Roof is three years old. All newer AC units. New asphalt across a 66-space lot. New paint, lighting and signage. Roof, HVAC and asphalt are the three line items that gut a commercial pro forma in the first five years, and every one of them has been addressed.</p>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">The Asset</h2>
+    <table class="data">
+      <tr><td class="k">Address</td><td>Available upon request</td></tr>
+      <tr><td class="k">County</td><td>Maricopa County, Arizona</td></tr>
+      <tr><td class="k">Property Type</td><td>Office &mdash; Medical subtype</td></tr>
+      <tr><td class="k">Building Class</td><td>Class B</td></tr>
+      <tr><td class="k">Building Size</td><td>9,100 SF across two buildings</td></tr>
+      <tr><td class="k">Lot Size</td><td>1.25 acres</td></tr>
+      <tr><td class="k">Year Built</td><td>1996</td></tr>
+      <tr><td class="k">Construction</td><td>Brick exterior</td></tr>
+      <tr><td class="k">Zoning</td><td>C-N, Neighborhood Commercial</td></tr>
+      <tr><td class="k">Parcel Number</td><td>139-09-003-A</td></tr>
+      <tr><td class="k">Parking</td><td>66 spaces &mdash; 7.25 per 1,000 SF leased</td></tr>
+      <tr><td class="k">Utilities</td><td>Water and municipal sewer</td></tr>
+      <tr><td class="k">HOA</td><td>None</td></tr>
+      <tr><td class="k">Annual Property Taxes</td><td>$18,868.90 &mdash; tenant recoverable under NNN</td></tr>
+      <tr><td class="k">Lease Structure</td><td>NNN</td></tr>
+      <tr><td class="k">Last Sold</td><td>January 2022 for $2,250,000</td></tr>
+    </table>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Tenancy &amp; Income</h2>
+    <table class="data">
+      <tr><td class="k">Tenant 1</td><td>Pinnacle Dermatology Management LLC &mdash; 4,800 SF &mdash; $8,064 per month &mdash; lease term through 11/30/2026</td></tr>
+      <tr><td class="k">Tenant 2</td><td>Second tenant &mdash; $5,535 per month &mdash; lease term through 10/31/2028</td></tr>
+      <tr><td class="k">In-Place Rent</td><td>$13,599 per month &mdash; $163,188 annually</td></tr>
+    </table>
+    <p style="margin-top:18px;">Pinnacle Dermatology Management is a multi-state dermatology platform. A regional healthcare operator anchoring more than half the building is a different credit profile than a single-practitioner local tenant, and it is the kind of tenancy that tends to survive a soft office cycle.</p>
+    <div class="note-box">Rent roll and trailing financials provided were dated March 2024. Current lease status, renewal status and current rents should be verified directly through lease review. The Pinnacle lease term shown runs through November 2026, and any buyer should confirm renewal status as a condition of proceeding.</div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">The Returns</h2>
+    <table class="data">
+      <tr><td class="k">Total Consideration</td><td>$2,325,000</td></tr>
+      <tr><td class="k">In-Place Gross Rent</td><td>$163,188 annually</td></tr>
+      <tr><td class="k">Expense Structure</td><td>NNN &mdash; taxes, insurance and maintenance recoverable from tenants</td></tr>
+    </table>
+    <p style="margin-top:18px;">A buyer taking in-place rent against recoverable operating expenses and a market management load lands in the mid six cap range at this structure. Run your own normalized NOI off the lease file and your own expense assumptions &mdash; confirm independently before relying on any cap rate figure.</p>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">The Structure &mdash; Seller Financing</h2>
+    <table class="data">
+      <tr><td class="k">Entry</td><td>$1,100,000</td></tr>
+      <tr><td class="k">Seller Carry</td><td>$1,225,000</td></tr>
+      <tr><td class="k">Total Consideration</td><td>$2,325,000</td></tr>
+      <tr><td class="k">Illustrative Terms</td><td>7.00% fixed, 30-year amortization</td></tr>
+      <tr><td class="k">Illustrative P&amp;I</td><td>Approximately $8,150 per month, $97,800 annually</td></tr>
+    </table>
+    <div class="note-box">Rate, term, amortization, balloon and prepayment provisions are subject to negotiation with the seller and have not been finalized. Existing financing on the property and the seller carry's lien position are to be confirmed in writing before any buyer proceeds. Verify all figures with your own lender, CPA and insurance broker.</div>
+  </section>
+
+  <section class="section two-col">
+    <div>
+      <h2 class="section-title">Recent Capital Improvements</h2>
+      <ul class="plain">
+        <li>Roof: 3 years old</li>
+        <li>HVAC: all newer units, packaged system</li>
+        <li>Parking lot: new asphalt</li>
+        <li>Interior and exterior paint, lighting, signage</li>
+      </ul>
+    </div>
+    <div>
+      <h2 class="section-title">Building Features</h2>
+      <ul class="plain">
+        <li>Modern suites with glass offices</li>
+        <li>Reception areas and break rooms</li>
+        <li>ADA compliant restrooms</li>
+        <li>24 hour access</li>
+        <li>Fenced lot</li>
+        <li>Building and monument signage</li>
+        <li>Wheelchair accessible</li>
+        <li>Central heating and air conditioning</li>
+        <li>Recessed lighting, drop ceiling</li>
+        <li>Natural light, Wi-Fi</li>
+        <li>Plug and play condition</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Location</h2>
+    <p>Baseline Road in Mesa, minutes from freeway access and surrounding retail, sitting near the East Valley medical corridor. Healthcare tenants cluster deliberately for referral proximity, and they renew when they get it &mdash; the quiet reason medical office tends to hold occupancy through cycles that hollow out general office.</p>
+    <table class="data" style="margin-top:16px;">
+      <tr><td class="k">Nearby Schools</td><td>2 rated above average, 1 rated average</td></tr>
+      <tr><td class="k">Walk Score</td><td>64</td></tr>
+    </table>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Exit &amp; Hold Strategies</h2>
+    <ul class="plain">
+      <li><strong>Buy and hold:</strong> NNN medical office with recent capital improvements and minimal landlord responsibility</li>
+      <li><strong>Seller finance entry:</strong> Into a $2.3 million commercial asset with $1.1 million down and no bank</li>
+      <li><strong>Refinance play:</strong> Season the asset, then refinance the carry into conventional commercial debt</li>
+      <li><strong>Owner user plus income:</strong> A practice occupies one suite while the other tenant carries the building</li>
+      <li><strong>Value add on rollover:</strong> Mark rents to market as leases roll in a corridor where medical demand is durable</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Deal Terms</h2>
+    <table class="data">
+      <tr><td class="k">Entry</td><td>$1,100,000, with seller carry of $1,225,000</td></tr>
+      <tr><td class="k">EMD</td><td>Contact for terms</td></tr>
+      <tr><td class="k">COE</td><td>Contact for terms</td></tr>
+      <tr><td class="k">Title</td><td>Contact for details</td></tr>
+      <tr><td class="k">Access</td><td>By appointment &mdash; property is tenant occupied</td></tr>
+      <tr><td class="k">Diligence</td><td>Proof of funds required before the lease file and financials are released</td></tr>
+    </table>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Assignment of Contract</h2>
+    <p>Suede Buffalo LLC is not the record owner of this property. We hold, or are in the process of securing, an equitable interest in the property under a purchase and sale agreement with the underlying property owner, and we are marketing that equitable interest for assignment. This is an assignment of an equitable interest in a real estate contract, not a direct sale of the real property, and we are not acting as agent for the seller or for any buyer.</p>
+    <p>The property is tenant occupied. Do not contact tenants directly. All showings are coordinated through Suede Buffalo LLC by appointment.</p>
+  </section>
+
+  <div class="disclaimer section">
+    <p>Rent roll and operating figures above are taken from documents dated March 2024 and have not been independently verified by Suede Buffalo LLC. Lease structure, reimbursement obligations, current occupancy and renewal status are to be confirmed through lease review. Buyer is responsible for their own due diligence on condition, square footage, lease terms, tenant creditworthiness, rent roll accuracy, operating expenses, existing financing and lien position, zoning and permitted use, title, environmental condition, and value. Figures in this summary have not been independently verified by Suede Buffalo LLC and should be confirmed before closing.</p>
+  </div>
+
+</div>
+
+<div class="cta-band">
+  <div class="wrap">
+    <h2>Bring Proof of Funds &mdash; We'll Get You the Lease File</h2>
+    <p>Mesa medical office, two buildings, 1.25 acres, NNN leases, new roof and HVAC, a national dermatology tenant anchoring it, and a seller carrying $1,225,000. Contact Suede Buffalo LLC to request the full address, lease file, and deal documents.</p>
+    <div class="cta-links">
+      <a href="tel:520-633-6437">Call 520-633-6437</a>
+      <a class="secondary" href="mailto:info@sendmybuyer.com">info@sendmybuyer.com</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>&copy; Suede Buffalo LLC. This offering is an assignment of equitable contract interest and is not a listing of real property by a licensed broker. All figures are subject to buyer verification and independent due diligence.</p>
+  </div>
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
