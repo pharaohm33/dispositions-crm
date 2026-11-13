@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S 6th Ave Corridor Land Assembly — Tucson, AZ | Suede Buffalo LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e9;
+    --paper-dark:#efe7d9;
+    --ink:#241f1a;
+    --ink-soft:#5a5248;
+    --line:#d8cdb9;
+    --accent:#8a6a3f;
+    --accent-dark:#5f4a2c;
+  }
+
+  *{box-sizing:border-box;}
+
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    line-height:1.6;
+  }
+
+  h1,h2,h3{
+    font-family:'Playfair Display',serif;
+    font-weight:600;
+    color:var(--ink);
+    margin:0;
+  }
+
+  .wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding-left:28px;
+    padding-right:28px;
+  }
+
+  a{color:var(--accent-dark);}
+
+  header.site{
+    border-bottom:1px solid var(--line);
+    padding-top:22px;
+    padding-bottom:22px;
+  }
+
+  header.site .brand{
+    font-family:'Playfair Display',serif;
+    font-size:1.15rem;
+    letter-spacing:0.02em;
+  }
+
+  header.site .brand span{
+    color:var(--accent-dark);
+  }
+
+  .hero{
+    padding-top:48px;
+    padding-bottom:28px;
+  }
+
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:0.14em;
+    font-size:0.78rem;
+    color:var(--accent-dark);
+    font-weight:600;
+    margin-bottom:14px;
+  }
+
+  .hero h1{
+    font-size:2.5rem;
+    line-height:1.15;
+    margin-bottom:10px;
+  }
+
+  .hero .locline{
+    font-size:1.05rem;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+
+  .address-note{
+    display:inline-block;
+    background:var(--paper-dark);
+    border:1px solid var(--line);
+    padding:9px 14px;
+    border-radius:4px;
+    font-size:0.92rem;
+    color:var(--ink-soft);
+    margin-top:14px;
+    margin-bottom:6px;
+  }
+
+  .price-block{
+    margin-top:30px;
+    margin-bottom:10px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:34px;
+    align-items:baseline;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    padding-top:22px;
+    padding-bottom:22px;
+  }
+
+  .price-block .price{
+    font-family:'Playfair Display',serif;
+    font-size:2.6rem;
+    font-weight:700;
+    color:var(--accent-dark);
+  }
+
+  .price-block .price-sub{
+    font-size:0.88rem;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    margin-bottom:4px;
+  }
+
+  .price-tags{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+
+  .tag{
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:6px 14px;
+    font-size:0.82rem;
+    color:var(--ink-soft);
+    background:#fff;
+  }
+
+  .gallery-section{
+    margin-top:30px;
+    margin-bottom:10px;
+  }
+
+  .gallery{
+    display:flex;
+    gap:14px;
+    overflow-x:auto;
+    padding-bottom:10px;
+    scroll-snap-type:x mandatory;
+  }
+
+  .gallery img{
+    height:320px;
+    width:auto;
+    border-radius:6px;
+    flex-shrink:0;
+    scroll-snap-align:start;
+    border:1px solid var(--line);
+    object-fit:cover;
+  }
+
+  .more-photos{
+    display:inline-block;
+    margin-top:10px;
+    font-size:0.9rem;
+    font-weight:600;
+  }
+
+  section.block{
+    margin-top:46px;
+    margin-bottom:10px;
+  }
+
+  section.block h2{
+    font-size:1.5rem;
+    margin-bottom:16px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:10px;
+  }
+
+  section.block p{
+    color:var(--ink);
+    margin-top:0;
+    margin-bottom:14px;
+  }
+
+  ul.cleanlist{
+    padding-left:20px;
+    margin-top:0;
+    margin-bottom:0;
+  }
+
+  ul.cleanlist li{
+    margin-bottom:9px;
+  }
+
+  table.facts{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:6px;
+  }
+
+  table.facts tr{
+    border-bottom:1px solid var(--line);
+  }
+
+  table.facts td{
+    padding:11px 8px;
+    vertical-align:top;
+  }
+
+  table.facts td.label{
+    width:38%;
+    color:var(--ink-soft);
+    font-weight:600;
+    font-size:0.92rem;
+  }
+
+  .subhead{
+    font-family:'Playfair Display',serif;
+    font-size:1.08rem;
+    margin-top:22px;
+    margin-bottom:10px;
+    color:var(--accent-dark);
+  }
+
+  .disclaimer{
+    font-size:0.85rem;
+    color:var(--ink-soft);
+    border-top:1px solid var(--line);
+    padding-top:16px;
+    margin-top:30px;
+  }
+
+  .cta-band{
+    margin-top:60px;
+    margin-bottom:0;
+    background:var(--ink);
+    color:var(--paper);
+    padding-top:50px;
+    padding-bottom:50px;
+  }
+
+  .cta-band h2{
+    color:var(--paper);
+    font-size:1.9rem;
+    margin-bottom:14px;
+  }
+
+  .cta-band p{
+    color:#d8d0c2;
+    margin-bottom:24px;
+    max-width:560px;
+  }
+
+  .cta-contacts{
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+  }
+
+  .cta-contacts a{
+    display:inline-block;
+    background:var(--paper);
+    color:var(--ink);
+    padding:13px 22px;
+    border-radius:4px;
+    text-decoration:none;
+    font-weight:600;
+    font-size:0.95rem;
+  }
+
+  footer.site{
+    padding-top:26px;
+    padding-bottom:40px;
+    font-size:0.8rem;
+    color:var(--ink-soft);
+  }
+
+  @media (max-width:600px){
+    .hero h1{font-size:1.9rem;}
+    .price-block .price{font-size:2.1rem;}
+    .gallery img{height:220px;}
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=6b339f36-4d01-4e03-a09b-fb100af097b5&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F6b339f36-4d01-4e03-a09b-fb100af097b5.html">Request the Address</a></div></noscript>
+
+<header class="site">
+  <div class="wrap">
+    <div class="brand">Suede Buffalo <span>LLC</span></div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Off-Market Land Assembly · Deal Code AZ-7</div>
+    <h1>S 6th Avenue Corridor Land Assembly</h1>
+    <div class="locline">Tucson, Arizona 85706 · Pima County</div>
+    <div class="address-note">Individual parcel addresses available upon request — contact us for the full address list.</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="price-block">
+    <div>
+      <div class="price-sub">Asking Price</div>
+      <div class="price">$235,000</div>
+    </div>
+    <div class="price-tags">
+      <span class="tag">Land · ~1.90 gross acres</span>
+      <span class="tag">Two adjoining tax parcels</span>
+      <span class="tag">Assignment of Contract</span>
+    </div>
+  </div>
+
+  <div class="gallery-section">
+    <div class="gallery">
+      <img src="/deals/6b339f36-4d01-4e03-a09b-fb100af097b5/photos/1.webp" alt="S 6th Avenue corridor land parcel view, Tucson, AZ">
+    </div>
+  </div>
+
+  <section class="block">
+    <h2>The Opportunity</h2>
+    <p>This is an opportunity to acquire approximately 1.90 gross acres across two adjoining tax parcels along the S 6th Avenue corridor in Tucson, Arizona. The package combines a 0.643-acre upper parcel with an adjoining 1.255-acre lower parcel, creating a larger infill development footprint with paved S 6th Avenue frontage, nearby transit, sidewalk infrastructure, and established development surrounding the site.</p>
+    <p>Current asking price is $235,000 total for both parcels.</p>
+  </section>
+
+  <section class="block">
+    <h2>Property Facts</h2>
+    <table class="facts">
+      <tr><td class="label">Upper Parcel</td><td>Approximately 0.643 acre, triangular configuration</td></tr>
+      <tr><td class="label">Lower Parcel</td><td>Approximately 1.255 acres, broader overall footprint</td></tr>
+      <tr><td class="label">Combined Size</td><td>Approximately 1.90 gross acres</td></tr>
+      <tr><td class="label">Property Type</td><td>Two adjoining vacant tax parcels</td></tr>
+      <tr><td class="label">Frontage</td><td>Paved S 6th Avenue frontage</td></tr>
+      <tr><td class="label">Site Character</td><td>Largely open site with sidewalk infrastructure and nearby overhead utilities visible from the street</td></tr>
+      <tr><td class="label">Zoning</td><td>City records identify R-2 for the upper parcel, and R-2 / C-2 for the lower parcel. The exact extent of the zoning split on the lower parcel remains subject to confirmation.</td></tr>
+      <tr><td class="label">2026 Property Tax</td><td>$1,127</td></tr>
+    </table>
+  </section>
+
+  <section class="block">
+    <h2>Why Buyers Should Look at This</h2>
+    <p>The primary opportunity is the ability to evaluate approximately 1.90 gross acres across two adjoining parcels as one infill development site.</p>
+    <ul class="cleanlist">
+      <li>The lower parcel provides the larger and broader portion of the site, while the adjoining upper parcel adds additional acreage and frontage that may improve overall site-planning flexibility.</li>
+      <li>The R-2 component creates a residential development angle for local infill builders and small developers. Tucson permits middle-housing uses within R-2, making duplex or small middle-housing concepts worth investigating.</li>
+      <li>A potential 3-4 dwelling concept may be worth evaluating with the City, but no specific unit count, subdivision layout, or development approval is being represented.</li>
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2>Transit &amp; Development Angle</h2>
+    <ul class="cleanlist">
+      <li>Both parcels screened within the mapped transit buffer associated with Route 27 Midvale / Valencia, with transit access immediately along the S 6th Avenue corridor.</li>
+      <li>Qualifying middle-housing projects within applicable transit areas may be eligible for parking-related relief, subject to project-specific City confirmation. No parking waiver is being represented as automatically available.</li>
+      <li>The combination of adjoining parcels, approximately 1.90 gross acres, paved frontage, nearby transit, and a residential zoning component creates a site worth evaluating for small-scale infill development.</li>
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2>Site &amp; Drainage</h2>
+    <ul class="cleanlist">
+      <li>FEMA screening indicates Zone X and shaded Zone X affecting portions of the two parcels being offered.</li>
+      <li>Additional county mapping identifies an Airport Wash South local flood-study overlap affecting part of the lower parcel, with Airport Wash running alongside the package.</li>
+      <li>Buyer should have the City of Tucson review floodplain, drainage, erosion setbacks, and site-engineering requirements as part of development feasibility.</li>
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2>Utilities</h2>
+    <ul class="cleanlist">
+      <li>Street-level conditions show nearby overhead utilities and sidewalk infrastructure.</li>
+      <li>Prior marketing referenced water, electric, gas, and telephone at or near the property, but utility connections have not been independently verified.</li>
+      <li>Sewer availability, capacity, connection requirements, and utility costs remain subject to buyer verification.</li>
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2>Neighborhood Notes</h2>
+    <ul class="cleanlist">
+      <li>Nearby schools: 1 average, 2 below average.</li>
+      <li>Walk Score: 33.</li>
+      <li>Nearby rental comps: median rent of $1,645/mo across similar rentals listed within 1 mile.</li>
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2>Buyer Due Diligence</h2>
+    <p>Buyer should independently verify zoning and the R-2 / C-2 boundary, permitted uses, parcel boundaries, setbacks, development standards, unit yield, driveway access, airport-overlay requirements, floodplain and drainage conditions, erosion setbacks, utility availability, sewer availability and capacity, connection costs, easements, title, and overall development feasibility.</p>
+    <p>No representation is being made regarding approved building lots, subdivision approval, entitlements, net buildable acreage, approved grading, connected utilities, or a specific home or unit count.</p>
+    <p>Reach out for parcel maps, aerial boundaries, zoning information, and available due-diligence materials.</p>
+  </section>
+
+  <section class="block">
+    <h2>Deal Terms</h2>
+    <table class="facts">
+      <tr><td class="label">Purchase Price</td><td>$235,000 for both parcels</td></tr>
+      <tr><td class="label">Financing</td><td>Cash or hard money (investment loan — e.g. hard money, bridge, DSCR, new-construction loan)</td></tr>
+      <tr><td class="label">Transaction Type</td><td>Assignment of contract</td></tr>
+      <tr><td class="label">Closing Costs</td><td>Paid by buyer</td></tr>
+      <tr><td class="label">Transaction Coordinator Fee</td><td>$425, paid by buyer as part of closing costs</td></tr>
+      <tr><td class="label">Condition</td><td>Property sold as-is</td></tr>
+      <tr><td class="label">Proof of Funds</td><td>Required</td></tr>
+      <tr><td class="label">Individual-Parcel Offers</td><td>May be considered, subject to seller approval and the ability to complete separate closings</td></tr>
+    </table>
+    <p class="subhead">Assignment Disclosure</p>
+    <p>This is a wholesale assignment of contract, not a direct sale. Suede Buffalo LLC holds equitable interest in the subject transaction under contract and is marketing that contract interest; this offering does not involve, and should not be understood as, direct contact with the underlying seller. The end buyer will receive an assignment of contract.</p>
+  </section>
+
+  <p class="disclaimer">Figures, acreage, zoning references, and site conditions above are believed accurate but have not been independently verified by Suede Buffalo LLC. Buyer is responsible for all independent due diligence prior to closing.</p>
+
+</div>
+
+<div class="cta-band">
+  <div class="wrap">
+    <h2>Interested in this assembly?</h2>
+    <p>Contact Suede Buffalo LLC for the full parcel address list, parcel maps, aerial boundaries, zoning information, and available due-diligence materials.</p>
+    <div class="cta-contacts">
+      <a href="tel:520-633-6437">Call 520-633-6437</a>
+      <a href="mailto:info@sendmybuyer.com">info@sendmybuyer.com</a>
+    </div>
+  </div>
+</div>
+
+<footer class="site">
+  <div class="wrap">
+    © Suede Buffalo LLC. This offering is an assignment of contract and is subject to prior sale, withdrawal, or correction without notice.
+  </div>
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
