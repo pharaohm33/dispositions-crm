@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Majestic Court Parcel — Travelers Rest, SC | 0.90± Acre Land Opportunity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #f6f1e9;
+    color: #2a2520;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+  }
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    color: #1f1b16;
+    font-weight: 600;
+  }
+  a { color: #7a5230; }
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  header.top {
+    background-color: #2a2520;
+    color: #f6f1e9;
+    padding-top: 36px;
+    padding-bottom: 36px;
+  }
+  header.top .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 12px;
+    color: #c9a876;
+    margin-bottom: 10px;
+  }
+  header.top h1 {
+    color: #faf6ee;
+    font-size: 40px;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  header.top .loc {
+    font-size: 17px;
+    color: #e4dccb;
+    margin-bottom: 6px;
+  }
+  header.top .addr-note {
+    font-size: 14px;
+    color: #c9a876;
+    font-style: italic;
+    margin-top: 6px;
+    margin-bottom: 0;
+  }
+
+  .price-band {
+    background-color: #ece3d3;
+    border-top: 1px solid #ddd0b8;
+    border-bottom: 1px solid #ddd0b8;
+    padding-top: 22px;
+    padding-bottom: 22px;
+  }
+  .price-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    align-items: baseline;
+  }
+  .price-grid .main-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 44px;
+    color: #1f1b16;
+    font-weight: 700;
+  }
+  .price-grid .sub {
+    font-size: 14px;
+    color: #5c5345;
+  }
+  .price-meta {
+    display: flex;
+    gap: 26px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    font-size: 14px;
+    color: #4a4336;
+  }
+  .price-meta strong { color: #1f1b16; }
+
+  section {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+  section.alt {
+    background-color: #efe8da;
+  }
+  h2.section-title {
+    font-size: 26px;
+    margin-top: 0;
+    margin-bottom: 18px;
+    border-bottom: 2px solid #c9a876;
+    padding-bottom: 10px;
+  }
+
+  .gallery-scroll {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+  .gallery-scroll img {
+    height: 230px;
+    width: auto;
+    border-radius: 6px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .more-photos {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: underline;
+  }
+
+  .snapshot-list, .terms-list, .community-list {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 0;
+  }
+  .snapshot-list li, .terms-list li, .community-list li {
+    padding: 8px 0;
+    border-bottom: 1px dashed #d7cbb0;
+    font-size: 15px;
+  }
+  .snapshot-list li:last-child, .terms-list li:last-child, .community-list li:last-child {
+    border-bottom: none;
+  }
+
+  table.deal-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+    background-color: #fffdf8;
+  }
+  table.deal-table th, table.deal-table td {
+    text-align: left;
+    padding: 12px 14px;
+    border-bottom: 1px solid #e4dccb;
+  }
+  table.deal-table th {
+    background-color: #ece3d3;
+    width: 40%;
+    font-weight: 600;
+    color: #3a332a;
+  }
+
+  .comp-box {
+    background-color: #fffdf8;
+    border: 1px solid #ddd0b8;
+    border-radius: 8px;
+    padding: 20px 22px;
+    margin-top: 10px;
+  }
+  .comp-box .comp-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: #1f1b16;
+    margin-bottom: 6px;
+  }
+  .disclaimer-box {
+    background-color: #f3ece0;
+    border-left: 4px solid #c9a876;
+    padding: 14px 18px;
+    font-size: 13.5px;
+    color: #4a4336;
+    margin-top: 18px;
+  }
+
+  footer.cta {
+    background-color: #1f1b16;
+    color: #f6f1e9;
+    padding-top: 48px;
+    padding-bottom: 48px;
+    text-align: center;
+  }
+  footer.cta h2 {
+    color: #faf6ee;
+    font-size: 30px;
+    margin-top: 0;
+    margin-bottom: 14px;
+  }
+  footer.cta p {
+    color: #d8cfbd;
+    font-size: 15px;
+    margin-top: 0;
+    margin-bottom: 22px;
+  }
+  .contact-line {
+    font-size: 19px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+  }
+  .contact-line a {
+    color: #e8c789;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .company-name {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #a99b7d;
+    margin-top: 20px;
+  }
+
+  .fine-print {
+    background-color: #ece3d3;
+    padding-top: 26px;
+    padding-bottom: 36px;
+    font-size: 12.5px;
+    color: #5c5345;
+  }
+  .fine-print p { margin-top: 0; margin-bottom: 12px; }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=a4d60aef-f69e-4c34-827c-7897d08bdcf8&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2Fa4d60aef-f69e-4c34-827c-7897d08bdcf8.html">Request the Address</a></div></noscript>
+
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">Suede Buffalo LLC &mdash; Land Opportunity &mdash; Deal SC-2 (Land)</div>
+    <h1>Cliffs Valley Area Homesite &mdash; 0.90± Acres</h1>
+    <div class="loc">Travelers Rest, South Carolina 29690 &middot; Greenville County</div>
+    <p class="addr-note">Address available upon request &mdash; contact us for the full parcel address and location details.</p>
+  </div>
+</header>
+
+<div class="price-band">
+  <div class="wrap">
+    <div class="price-grid">
+      <div class="main-price">$25,000</div>
+      <div class="sub">Asking price &middot; Assignment of contract</div>
+    </div>
+    <div class="price-meta">
+      <span><strong>Asset type:</strong> Land</span>
+      <span><strong>Lot size:</strong> 0.90± acre</span>
+      <span><strong>County:</strong> Greenville County</span>
+      <span><strong>Comparable same-size sale:</strong> $65,000</span>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Photo Gallery</h2>
+    <div class="gallery-scroll">
+      <img src="/deals/a4d60aef-f69e-4c34-827c-7897d08bdcf8/photos/1.webp" alt="Cliffs Valley area homesite photo 1, Travelers Rest, SC">
+      <img src="/deals/a4d60aef-f69e-4c34-827c-7897d08bdcf8/photos/2.webp" alt="Cliffs Valley area homesite photo 2, Travelers Rest, SC">
+      <img src="/deals/a4d60aef-f69e-4c34-827c-7897d08bdcf8/photos/3.webp" alt="Cliffs Valley area homesite photo 3, Travelers Rest, SC">
+      <img src="/deals/a4d60aef-f69e-4c34-827c-7897d08bdcf8/photos/4.webp" alt="Cliffs Valley area homesite photo 4, Travelers Rest, SC">
+      <img src="/deals/a4d60aef-f69e-4c34-827c-7897d08bdcf8/photos/5.webp" alt="Cliffs Valley area homesite photo 5, Travelers Rest, SC">
+      <img src="/deals/a4d60aef-f69e-4c34-827c-7897d08bdcf8/photos/6.webp" alt="Cliffs Valley area homesite photo 6, Travelers Rest, SC">
+      <img src="/deals/a4d60aef-f69e-4c34-827c-7897d08bdcf8/photos/7.webp" alt="Cliffs Valley area homesite photo 7, Travelers Rest, SC">
+      <img src="/deals/a4d60aef-f69e-4c34-827c-7897d08bdcf8/photos/8.webp" alt="Cliffs Valley area homesite photo 8, Travelers Rest, SC">
+      <img src="/deals/a4d60aef-f69e-4c34-827c-7897d08bdcf8/photos/9.webp" alt="Cliffs Valley area homesite photo 9, Travelers Rest, SC">
+      <img src="/deals/a4d60aef-f69e-4c34-827c-7897d08bdcf8/photos/10.webp" alt="Cliffs Valley area homesite photo 10, Travelers Rest, SC">
+      <img src="/deals/a4d60aef-f69e-4c34-827c-7897d08bdcf8/photos/11.webp" alt="Cliffs Valley area homesite photo 11, Travelers Rest, SC">
+      <img src="/deals/a4d60aef-f69e-4c34-827c-7897d08bdcf8/photos/12.webp" alt="Cliffs Valley area homesite photo 12, Travelers Rest, SC">
+      <img src="/deals/a4d60aef-f69e-4c34-827c-7897d08bdcf8/photos/13.webp" alt="Cliffs Valley area homesite photo 13, Travelers Rest, SC">
+      <img src="/deals/a4d60aef-f69e-4c34-827c-7897d08bdcf8/photos/14.webp" alt="Cliffs Valley area homesite photo 14, Travelers Rest, SC">
+      <img src="/deals/a4d60aef-f69e-4c34-827c-7897d08bdcf8/photos/15.webp" alt="Cliffs Valley area homesite photo 15, Travelers Rest, SC">
+      <img src="/deals/a4d60aef-f69e-4c34-827c-7897d08bdcf8/photos/16.webp" alt="Cliffs Valley area homesite photo 16, Travelers Rest, SC">
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <h2 class="section-title">Property Snapshot</h2>
+    <ul class="snapshot-list">
+      <li>Approximately 0.90± acre, vacant land</li>
+      <li>Located in Travelers Rest, SC 29690 &mdash; full street address available upon request</li>
+      <li>Greenville County, South Carolina</li>
+      <li>Neighborhood per public property data: The Cliffs Valley</li>
+      <li>HOA reported on the property; current dues and requirements to be confirmed</li>
+      <li>Exact location and parcel information available to qualified buyers</li>
+      <li>Last recorded sale: January 2005 for $10,000</li>
+      <li>Neighborhood walkability score of record: 0</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="section-title">The Community Appeal</h2>
+    <p>The Cliffs Valley combines a foothills setting with golf, dining, fitness, and outdoor recreation. Explore a potential custom-home opportunity in this established golf and wellness community setting. Community facilities include:</p>
+    <ul class="community-list">
+      <li>Ben Wright-designed golf course</li>
+      <li>Approximately 28,000-square-foot clubhouse with dining</li>
+      <li>Approximately 15,000-square-foot wellness center and outdoor fitness complex</li>
+      <li>Tennis, hiking, and cycling programs</li>
+    </ul>
+    <p>The Cliffs offers membership options with privileges across seven communities. Parcel-specific membership eligibility, fees, and amenity access must be confirmed directly with the club. Membership is not included in the asking price.</p>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <h2 class="section-title">Recent Same-Size Sale: $65,000</h2>
+    <div class="comp-box">
+      <div class="comp-price">$65,000 &mdash; Sold July 30, 2026</div>
+      <p style="margin-top:0;">Travelers Rest, SC 29690, Cliffs Valley (address available upon request)</p>
+      <ul class="snapshot-list" style="margin-bottom:0;">
+        <li>0.90 acre in Cliffs Valley</li>
+        <li>Sold July 30, 2026 for $65,000</li>
+        <li>Subject asking price: $25,000</li>
+      </ul>
+    </div>
+    <div class="disclaimer-box">
+      That sale advertised seasonal mountain and golf-course views, public water, and available club membership. Those features have not been confirmed for this subject parcel. This is a market reference only, not a representation of equivalent value or guaranteed profit.
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="section-title">Evaluate Your Custom-Home Plan</h2>
+    <p>For a custom-home buyer or builder, the opportunity is to assess a nearly one-acre parcel at a $25,000 acquisition price against the site work and community requirements for the intended residence.</p>
+    <p>Legal access and road frontage remain unverified. Utilities, septic suitability, usable building envelope, and construction eligibility also require confirmation. No golf frontage, mountain views, approved building plans, or development approvals are represented.</p>
+    <p>Buyer should verify parcel boundaries, vacant-land status, zoning, slope, drainage, flood/wetland conditions, easements, utility costs, HOA dues and assessments, architectural standards, minimum home size, and builder restrictions before closing.</p>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <h2 class="section-title">Deal Terms</h2>
+    <table class="deal-table">
+      <tr><th>Asking Price</th><td>$25,000</td></tr>
+      <tr><th>Deal Type</th><td>Land &mdash; Assignment of Contract</td></tr>
+      <tr><th>Financing</th><td>Cash or hard money; Investment Loan (e.g. hard money, bridge, DSCR, new construction loan)</td></tr>
+      <tr><th>Closing Costs</th><td>Buyer pays closing costs</td></tr>
+      <tr><th>Condition</th><td>Sold as-is</td></tr>
+      <tr><th>Proof of Funds</th><td>Required</td></tr>
+      <tr><th>Availability</th><td>Subject to availability and executed agreement</td></tr>
+      <tr><th>Transaction Coordinator Fee</th><td>Buyer to pay a $425 TC fee as part of buyer's closing costs</td></tr>
+    </table>
+    <div class="disclaimer-box">
+      This is a wholesale assignment of contract. Suede Buffalo LLC holds equitable interest in this transaction under contract with the property owner. The end buyer will receive an assignment of contract, not a direct deed from the underlying seller. Figures above have not been independently verified by Suede Buffalo LLC; buyers should perform their own due diligence before closing.
+    </div>
+  </div>
+</section>
+
+<footer class="cta">
+  <div class="wrap">
+    <h2>Request the Location, Parcel Details &amp; Contract Terms</h2>
+    <p>Reach out to lock in this 0.90± acre Cliffs Valley area opportunity in Travelers Rest, SC.</p>
+    <div class="contact-line">Phone: <a href="tel:5206336437">520-633-6437</a></div>
+    <div class="contact-line">Email: <a href="mailto:info@sendmybuyer.com">info@sendmybuyer.com</a></div>
+    <div class="company-name">Suede Buffalo LLC</div>
+  </div>
+</footer>
+
+<div class="fine-print">
+  <div class="wrap">
+    <p>Suede Buffalo LLC is marketing this property as a wholesale assignment of contract and holds equitable interest in the subject transaction via agreement with the property owner; the end buyer will receive an assignment of contract. All acreage, pricing, sale, and community figures are provided as general information and have not been independently verified by Suede Buffalo LLC. Buyers are encouraged to conduct independent due diligence, including verification of parcel boundaries, zoning, utilities, HOA requirements, and all representations herein, prior to entering any agreement.</p>
+  </div>
+</div>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
