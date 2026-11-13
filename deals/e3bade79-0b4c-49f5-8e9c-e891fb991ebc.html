@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coyote Pass at Starr Pass — Tucson, AZ Land Opportunity | Suede Buffalo LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: #f6f1e9;
+    color: #2b2621;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.55;
+  }
+
+  h1, h2, h3, .display {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    color: #211c17;
+  }
+
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  header.top {
+    border-bottom: 1px solid #ddd2bf;
+    padding-top: 28px;
+    padding-bottom: 20px;
+  }
+
+  .brand {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #7a5230;
+  }
+
+  .deal-code {
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #8a7c68;
+    margin-top: 6px;
+  }
+
+  h1.hero-title {
+    font-size: 2.4rem;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    line-height: 1.15;
+  }
+
+  .location-line {
+    font-size: 1.05rem;
+    color: #4a4136;
+    margin-bottom: 4px;
+  }
+
+  .address-note {
+    background: #fbe9d0;
+    border: 1px solid #e8cf9f;
+    color: #6b4a18;
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 0.92rem;
+    margin-top: 10px;
+    margin-bottom: 4px;
+  }
+
+  .price-block {
+    background: #211c17;
+    color: #f6f1e9;
+    border-radius: 10px;
+    padding: 28px 32px;
+    margin-top: 28px;
+    margin-bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .price-block .price {
+    font-family: 'Fraunces', serif;
+    font-size: 2.6rem;
+    font-weight: 700;
+  }
+
+  .price-block .price-sub {
+    font-size: 0.85rem;
+    color: #cdbfa6;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+
+  .price-block .meta {
+    font-size: 0.95rem;
+    color: #e8dfce;
+  }
+
+  .gallery {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 4px 0 16px 0;
+    margin-top: 10px;
+    margin-bottom: 8px;
+    scroll-snap-type: x mandatory;
+  }
+
+  .gallery img {
+    height: 230px;
+    width: auto;
+    border-radius: 8px;
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    object-fit: cover;
+    border: 1px solid #e3d8c3;
+  }
+
+  .more-photos {
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    display: inline-block;
+  }
+
+  .more-photos a {
+    color: #7a5230;
+    font-weight: 600;
+  }
+
+  section {
+    margin-top: 40px;
+    margin-bottom: 40px;
+  }
+
+  h2.section-title {
+    font-size: 1.5rem;
+    border-bottom: 2px solid #d8c9a9;
+    padding-bottom: 10px;
+    margin-bottom: 18px;
+  }
+
+  h3.sub-title {
+    font-size: 1.15rem;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    color: #4a3a22;
+  }
+
+  p { margin: 0 0 14px 0; }
+
+  ul.facts-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 24px;
+  }
+
+  ul.facts-list li {
+    padding: 10px 0;
+    border-bottom: 1px dashed #ddd0b5;
+    font-size: 0.96rem;
+  }
+
+  ul.facts-list li strong {
+    display: block;
+    color: #7a5230;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 3px;
+  }
+
+  table.terms-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.96rem;
+  }
+
+  table.terms-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e3d8c3;
+  }
+
+  table.terms-table td:first-child {
+    color: #7a5230;
+    font-weight: 600;
+    width: 42%;
+  }
+
+  .comp-card {
+    background: #fffdf8;
+    border: 1px solid #e3d8c3;
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-top: 14px;
+  }
+
+  .comp-card h4 {
+    font-family: 'Fraunces', serif;
+    margin: 0 0 10px 0;
+    color: #211c17;
+    font-size: 1.1rem;
+  }
+
+  .note {
+    font-size: 0.9rem;
+    color: #6b5f4d;
+    font-style: italic;
+  }
+
+  .disclosure-box {
+    background: #efe6d4;
+    border-left: 4px solid #b08a4e;
+    padding: 16px 20px;
+    font-size: 0.9rem;
+    color: #4a3f2d;
+    border-radius: 4px;
+  }
+
+  .cta-band {
+    background: #2d2114;
+    color: #f6f1e9;
+    text-align: center;
+    padding: 50px 24px;
+    margin-top: 50px;
+  }
+
+  .cta-band h2 {
+    color: #f6f1e9;
+    font-size: 1.9rem;
+    margin-bottom: 10px;
+  }
+
+  .cta-band p {
+    color: #d9c9a9;
+    margin-bottom: 24px;
+    font-size: 1.02rem;
+  }
+
+  .cta-contacts {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .cta-contacts a {
+    background: #f6f1e9;
+    color: #2d2114;
+    text-decoration: none;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.98rem;
+  }
+
+  footer.bottom {
+    text-align: center;
+    padding: 22px 24px 40px 24px;
+    font-size: 0.78rem;
+    color: #8a7c68;
+  }
+
+  @media (max-width: 640px) {
+    ul.facts-list { grid-template-columns: 1fr; }
+    .price-block { flex-direction: column; align-items: flex-start; }
+    h1.hero-title { font-size: 1.8rem; }
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=e3bade79-0b4c-49f5-8e9c-e891fb991ebc&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2Fe3bade79-0b4c-49f5-8e9c-e891fb991ebc.html">Request the Address</a></div></noscript>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">Suede Buffalo LLC</div>
+    <div class="deal-code">Deal Code: AZ-9 (Land)</div>
+    <h1 class="hero-title">Coyote Pass at Starr Pass — Custom Homesite</h1>
+    <div class="location-line">Tucson, Pima County, Arizona 85745</div>
+    <div class="address-note">Address available upon request — contact us below and we'll send the full parcel address.</div>
+  </header>
+
+  <div class="price-block">
+    <div>
+      <div class="price-sub">Asking Price</div>
+      <div class="price">$146,000</div>
+    </div>
+    <div class="meta">
+      Vacant Residential Land · 0.744± acres (32,441± SF)<br>
+      Coyote Pass at Starr Pass, Lot 4 · Gated Community
+    </div>
+  </div>
+
+  <div class="gallery">
+    <img src="/deals/e3bade79-0b4c-49f5-8e9c-e891fb991ebc/photos/1.webp" alt="Coyote Pass homesite view 1">
+    <img src="/deals/e3bade79-0b4c-49f5-8e9c-e891fb991ebc/photos/2.webp" alt="Coyote Pass homesite view 2">
+    <img src="/deals/e3bade79-0b4c-49f5-8e9c-e891fb991ebc/photos/3.webp" alt="Coyote Pass homesite view 3">
+    <img src="/deals/e3bade79-0b4c-49f5-8e9c-e891fb991ebc/photos/4.webp" alt="Coyote Pass homesite view 4">
+    <img src="/deals/e3bade79-0b4c-49f5-8e9c-e891fb991ebc/photos/5.webp" alt="Coyote Pass homesite view 5">
+    <img src="/deals/e3bade79-0b4c-49f5-8e9c-e891fb991ebc/photos/6.webp" alt="Coyote Pass homesite view 6">
+    <img src="/deals/e3bade79-0b4c-49f5-8e9c-e891fb991ebc/photos/7.webp" alt="Coyote Pass homesite view 7">
+    <img src="/deals/e3bade79-0b4c-49f5-8e9c-e891fb991ebc/photos/8.webp" alt="Coyote Pass homesite view 8">
+    <img src="/deals/e3bade79-0b4c-49f5-8e9c-e891fb991ebc/photos/9.webp" alt="Coyote Pass homesite view 9">
+    <img src="/deals/e3bade79-0b4c-49f5-8e9c-e891fb991ebc/photos/10.webp" alt="Coyote Pass homesite view 10">
+    <img src="/deals/e3bade79-0b4c-49f5-8e9c-e891fb991ebc/photos/11.webp" alt="Coyote Pass homesite view 11">
+    <img src="/deals/e3bade79-0b4c-49f5-8e9c-e891fb991ebc/photos/12.webp" alt="Coyote Pass homesite view 12">
+  </div>
+
+  <section>
+    <h2 class="section-title">Property Overview</h2>
+    <p>Off-market opportunity to acquire a 0.744± acre residential homesite in Coyote Pass, a gated custom-home community within Tucson's Starr Pass development.</p>
+    <p>The property is surrounded by established custom residences, paved streets, and Sonoran Desert scenery. The location offers a custom-home development opportunity within an existing residential community rather than an undeveloped subdivision.</p>
+    <p>A directly adjacent residence sold for $1,170,000 on November 24, 2025, demonstrating seven-figure finished-home demand on the same street (address available on request).</p>
+  </section>
+
+  <section>
+    <h2 class="section-title">Property Details</h2>
+    <ul class="facts-list">
+      <li><strong>Subdivision</strong>Coyote Pass at Starr Pass</li>
+      <li><strong>Lot</strong>Lot 4</li>
+      <li><strong>Lot Size</strong>0.744± acres / 32,441± SF</li>
+      <li><strong>Zoning</strong>R-1 Residential (buyer to verify)</li>
+      <li><strong>Property Type</strong>Vacant Residential Land</li>
+      <li><strong>Community</strong>Gated</li>
+      <li><strong>Access</strong>Paved Street</li>
+      <li><strong>Surroundings</strong>Established Custom Homes</li>
+      <li><strong>Utilities</strong>Public water, sewer and electric infrastructure reported within the community; subject connections to be verified</li>
+      <li><strong>HOA</strong>Applicable; current dues and architectural requirements to be confirmed</li>
+      <li><strong>Last Sold (Public Record)</strong>April 2010 for $90,000</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="section-title">Adjacent Finished-Home Sale</h2>
+    <div class="comp-card">
+      <h4>Adjacent Residence — Sold $1,170,000 | November 24, 2025</h4>
+      <p>Directly adjacent to the subject property (address available on request).</p>
+      <ul class="facts-list">
+        <li><strong>Bedrooms / Bathrooms</strong>4 Bed / 3.5 Bath</li>
+        <li><strong>Size</strong>Approximately 3,433 SF</li>
+        <li><strong>Homesite</strong>Approximately 0.74-acre</li>
+        <li><strong>Price Per SF</strong>Approximately $341 per finished square foot</li>
+      </ul>
+      <p class="note">This provides meaningful evidence of established custom-home values within the immediate neighborhood. Any proposed new construction will require independent evaluation of design, development expense, construction costs and resale value.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Historical Grading & Site-Plan Record</h2>
+    <p>The City of Tucson maintains a historical grading-plan record for a proposed residence at this specific lot.</p>
+    <ul class="facts-list">
+      <li><strong>City Record</strong>GR-2005-011</li>
+      <li><strong>Associated Reference</strong>T05BU02219</li>
+      <li><strong>Project</strong>Skamser Residence</li>
+      <li><strong>Historical Architect</strong>D. Alan Roberts Architects</li>
+    </ul>
+    <p>The historical record references grading and site-plan documentation. This provides a prior design and engineering record for a prospective buyer to investigate. It does not establish current permit approval, a transferable entitlement or a guaranteed buildable envelope.</p>
+  </section>
+
+  <section>
+    <h2 class="section-title">Starr Pass Location</h2>
+    <p>The property is located within Tucson's Starr Pass area, offering convenient access to downtown Tucson, the University of Arizona, JW Marriott Tucson Starr Pass Resort & Spa, The Club at Starr Pass and nearby Tucson Mountain recreation.</p>
+    <p>Coyote Pass offers gated access, established custom residences and a distinctive Sonoran Desert setting.</p>
+    <h3 class="sub-title">Neighborhood Notes</h3>
+    <p>Area schools rated as 2 average, 1 below average. Walk Score reported at 0.</p>
+    <h3 class="sub-title">Area Rental Context</h3>
+    <p>Median rent for comparable rentals within 5 miles is approximately $975/month, with most similar rentals ranging between $840 and $1,310/month. (Provided as general area context only; not directly applicable to a vacant land parcel.)</p>
+  </section>
+
+  <section>
+    <h2 class="section-title">Development Considerations</h2>
+    <p>Prospective buyers should evaluate the parcel's grading requirements, hillside development applicability, building envelope, drainage, geotechnical conditions, utility connections and HOA architectural guidelines.</p>
+    <p>The opportunity is suited for custom-home builders, end users and investors prepared to complete property-specific development due diligence.</p>
+  </section>
+
+  <section>
+    <h2 class="section-title">Deal Terms</h2>
+    <table class="terms-table">
+      <tr><td>Purchase Price</td><td>$146,000</td></tr>
+      <tr><td>Financing</td><td>Cash or Hard Money (Investment Loan: Hard Money, Bridge, DSCR, New Construction Loan)</td></tr>
+      <tr><td>Transaction Structure</td><td>Assignment of Contract, subject to confirmation of current contractual interest</td></tr>
+      <tr><td>Closing Costs</td><td>Buyer Pays Closing Costs</td></tr>
+      <tr><td>Condition</td><td>Property Offered As-Is</td></tr>
+      <tr><td>Proof of Funds</td><td>Required</td></tr>
+      <tr><td>Buyer Diligence</td><td>Buyer to independently verify acreage, zoning, utilities, site feasibility, topography, HOA requirements, architectural approvals, historical plans and all applicable development costs</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <div class="disclosure-box">
+      This offering is an assignment of contract. Suede Buffalo LLC holds a contractual interest in this property under an agreement with the underlying property owner and is marketing that contractual interest for assignment; this is not a direct sale by, or on behalf of, the property owner. Figures, acreage, zoning, utility, HOA, and historical record details above have not been independently verified by Suede Buffalo LLC and should be independently confirmed by the buyer prior to closing.
+    </div>
+  </section>
+</div>
+
+<div class="cta-band">
+  <h2>Interested in This Homesite?</h2>
+  <p>Contact Suede Buffalo LLC for the full property address, grading record documentation, and next steps on this assignment.</p>
+  <div class="cta-contacts">
+    <a href="tel:520-633-6437">Call 520-633-6437</a>
+    <a href="mailto:info@sendmybuyer.com">Email info@sendmybuyer.com</a>
+  </div>
+</div>
+
+<footer class="bottom">
+  © Suede Buffalo LLC. All figures believed accurate but not independently verified; buyer to conduct independent due diligence prior to closing.
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
