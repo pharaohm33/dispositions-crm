@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NC-14 (Land) — 1.10-Acre Residential Lot in Havelock, NC | Suede Buffalo LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e7;
+    --paper-2:#efe8da;
+    --ink:#241f1a;
+    --ink-soft:#4d453c;
+    --rule:#d8cdb9;
+    --accent:#7a4a2b;
+    --accent-soft:#a9764f;
+    --band:#241f1a;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:16px;
+    line-height:1.65;
+  }
+  .wrap{
+    max-width:1080px;
+    margin:0 auto;
+    padding-left:24px;
+    padding-right:24px;
+  }
+  h1,h2,h3,.display{
+    font-family:"Fraunces",Georgia,"Times New Roman",serif;
+    font-weight:600;
+    letter-spacing:-0.01em;
+    line-height:1.15;
+    color:var(--ink);
+  }
+  a{color:var(--accent);}
+  a:hover{color:var(--accent-soft);}
+
+  /* ---------- Masthead ---------- */
+  .masthead{
+    border-bottom:1px solid var(--rule);
+    background:var(--paper);
+  }
+  .masthead .wrap{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:8px 24px;
+    padding-top:18px;
+    padding-bottom:18px;
+  }
+  .brand{
+    font-family:"Fraunces",Georgia,serif;
+    font-size:1.05rem;
+    font-weight:700;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+  }
+  .brand-sub{
+    font-size:0.72rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding-top:52px;
+    padding-bottom:8px;
+  }
+  .eyebrow{
+    font-size:0.74rem;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:600;
+    margin:0 0 14px;
+  }
+  .hero h1{
+    font-size:clamp(2rem,4.6vw,3.35rem);
+    margin:0 0 18px;
+  }
+  .hero h1 em{
+    font-style:italic;
+    color:var(--accent);
+  }
+  .location-line{
+    font-size:0.95rem;
+    color:var(--ink-soft);
+    margin:0 0 6px;
+    letter-spacing:0.02em;
+  }
+  .address-note{
+    font-size:0.95rem;
+    font-weight:600;
+    color:var(--ink);
+    margin:0 0 26px;
+  }
+
+  /* ---------- Price block ---------- */
+  .price-block{
+    border-top:2px solid var(--ink);
+    border-bottom:1px solid var(--rule);
+    padding-top:22px;
+    padding-bottom:22px;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:18px 32px;
+  }
+  .price-label{
+    font-size:0.72rem;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin:0 0 4px;
+  }
+  .price-figure{
+    font-family:"Fraunces",Georgia,serif;
+    font-size:clamp(2.4rem,6vw,3.6rem);
+    font-weight:700;
+    line-height:1;
+    margin:0;
+  }
+  .price-meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px 28px;
+    font-size:0.9rem;
+    color:var(--ink-soft);
+  }
+  .price-meta strong{
+    display:block;
+    font-family:"Fraunces",Georgia,serif;
+    font-size:1.15rem;
+    color:var(--ink);
+    font-weight:600;
+  }
+  .price-meta span{
+    font-size:0.7rem;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+  }
+
+  /* ---------- Gallery ---------- */
+  .gallery-section{
+    padding-top:34px;
+    padding-bottom:10px;
+  }
+  .gallery{
+    display:flex;
+    gap:14px;
+    overflow-x:auto;
+    padding-bottom:14px;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+  }
+  .gallery figure{
+    margin:0;
+    flex:0 0 auto;
+    scroll-snap-align:start;
+    width:min(78vw,420px);
+  }
+  .gallery img{
+    display:block;
+    width:100%;
+    height:280px;
+    object-fit:cover;
+    border-radius:2px;
+    background:var(--paper-2);
+  }
+  .gallery figcaption{
+    font-size:0.72rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    padding-top:8px;
+  }
+
+  /* ---------- Sections ---------- */
+  section.block{
+    padding-top:44px;
+    padding-bottom:8px;
+  }
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:16px;
+    border-bottom:1px solid var(--rule);
+    padding-bottom:10px;
+    margin-bottom:22px;
+  }
+  .section-head h2{
+    font-size:clamp(1.4rem,2.6vw,1.9rem);
+    margin:0;
+  }
+  .section-head .num{
+    font-family:"Fraunces",Georgia,serif;
+    font-size:0.85rem;
+    color:var(--accent);
+    letter-spacing:0.1em;
+  }
+  .lede{
+    font-size:1.08rem;
+    color:var(--ink-soft);
+    max-width:70ch;
+    margin:0 0 18px;
+  }
+  p{margin:0 0 16px;}
+  .body-copy{max-width:72ch;}
+
+  /* ---------- Highlights ---------- */
+  .highlights{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+    gap:0 32px;
+  }
+  .highlights li{
+    position:relative;
+    padding:9px 0 9px 20px;
+    border-bottom:1px dotted var(--rule);
+    font-size:0.96rem;
+  }
+  .highlights li::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:18px;
+    width:7px;
+    height:7px;
+    background:var(--accent);
+    border-radius:50%;
+  }
+
+  /* ---------- Tables ---------- */
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.95rem;
+  }
+  caption{
+    text-align:left;
+    font-size:0.72rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    padding-bottom:10px;
+  }
+  th,td{
+    text-align:left;
+    vertical-align:top;
+    padding:12px 14px;
+    border-bottom:1px solid var(--rule);
+  }
+  th{
+    width:38%;
+    font-weight:600;
+    color:var(--ink);
+    background:var(--paper-2);
+  }
+  td{color:var(--ink-soft);}
+  tbody tr:first-child th,
+  tbody tr:first-child td{border-top:1px solid var(--rule);}
+
+  /* ---------- Two-column checklist ---------- */
+  .checklist{
+    list-style:none;
+    margin:0;
+    padding:0;
+    columns:2;
+    column-gap:36px;
+  }
+  .checklist li{
+    break-inside:avoid;
+    position:relative;
+    padding:6px 0 6px 22px;
+    font-size:0.95rem;
+    color:var(--ink-soft);
+  }
+  .checklist li::before{
+    content:"—";
+    position:absolute;
+    left:0;
+    color:var(--accent);
+  }
+  @media (max-width:640px){
+    .checklist{columns:1;}
+  }
+
+  .callout{
+    background:var(--paper-2);
+    border-left:3px solid var(--accent);
+    padding:16px 20px;
+    margin:22px 0 8px;
+    font-size:0.95rem;
+    color:var(--ink-soft);
+  }
+  .callout strong{color:var(--ink);}
+
+  /* ---------- CTA band ---------- */
+  .cta{
+    background:var(--band);
+    color:#f3ece0;
+    padding-top:52px;
+    padding-bottom:52px;
+    margin-top:56px;
+  }
+  .cta h2{
+    color:#f8f3ea;
+    font-size:clamp(1.7rem,3.6vw,2.5rem);
+    margin:0 0 12px;
+  }
+  .cta p{
+    color:#cfc4b3;
+    max-width:62ch;
+    margin:0 0 26px;
+  }
+  .cta-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px 48px;
+    align-items:flex-start;
+  }
+  .cta-item .k{
+    display:block;
+    font-size:0.7rem;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:#a99b86;
+    margin-bottom:4px;
+  }
+  .cta-item .v{
+    font-family:"Fraunces",Georgia,serif;
+    font-size:1.35rem;
+    font-weight:600;
+  }
+  .cta a{
+    color:#f3ece0;
+    text-decoration:none;
+    border-bottom:1px solid rgba(243,236,224,0.4);
+  }
+  .cta a:hover{color:#ffffff;border-bottom-color:#ffffff;}
+
+  /* ---------- Footer ---------- */
+  footer{
+    background:var(--paper-2);
+    border-top:1px solid var(--rule);
+    padding-top:30px;
+    padding-bottom:40px;
+    font-size:0.82rem;
+    color:var(--ink-soft);
+  }
+  footer p{margin:0 0 10px;max-width:88ch;}
+  footer .fine{
+    font-size:0.76rem;
+    color:#6b6154;
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=40a62420-903d-46a6-b6de-f030d4fccaa9&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F40a62420-903d-46a6-b6de-f030d4fccaa9.html">Request the Address</a></div></noscript>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="brand">Suede Buffalo LLC</div>
+    <div class="brand-sub">Wholesale Assignment &middot; Deal NC-14 (Land)</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <div class="wrap hero">
+    <p class="eyebrow">Land &middot; Vacant Residential Lot &middot; Assignment of Contract</p>
+    <h1>1.10-Acre Residential Lot in Havelock, North Carolina — <em>Mobile / Manufactured Home Potential</em></h1>
+    <p class="location-line">Havelock, Craven County, North Carolina &middot; Blades Village</p>
+    <p class="address-note">Address available upon request.</p>
+
+    <div class="price-block">
+      <div>
+        <p class="price-label">Asking Price</p>
+        <p class="price-figure">$40,000</p>
+      </div>
+      <div class="price-meta">
+        <div><span>Lot Size</span><strong>~1.10 Acres</strong></div>
+        <div><span>Square Feet</span><strong>~47,916 SF</strong></div>
+        <div><span>Sold in 2025</span><strong>$60,000</strong></div>
+        <div><span>2026 Taxes</span><strong>~$75 / yr</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GALLERY -->
+  <div class="wrap gallery-section">
+    <div class="gallery" aria-label="Property photo gallery">
+      <figure>
+        <img src="/deals/40a62420-903d-46a6-b6de-f030d4fccaa9/photos/1.webp" alt="Havelock NC residential lot photo 1">
+        <figcaption>Photo 01</figcaption>
+      </figure>
+      <figure>
+        <img src="/deals/40a62420-903d-46a6-b6de-f030d4fccaa9/photos/2.webp" alt="Havelock NC residential lot photo 2">
+        <figcaption>Photo 02</figcaption>
+      </figure>
+      <figure>
+        <img src="/deals/40a62420-903d-46a6-b6de-f030d4fccaa9/photos/3.webp" alt="Havelock NC residential lot photo 3">
+        <figcaption>Photo 03</figcaption>
+      </figure>
+      <figure>
+        <img src="/deals/40a62420-903d-46a6-b6de-f030d4fccaa9/photos/4.webp" alt="Havelock NC residential lot photo 4">
+        <figcaption>Photo 04</figcaption>
+      </figure>
+      <figure>
+        <img src="/deals/40a62420-903d-46a6-b6de-f030d4fccaa9/photos/5.webp" alt="Havelock NC residential lot photo 5">
+        <figcaption>Photo 05</figcaption>
+      </figure>
+      <figure>
+        <img src="/deals/40a62420-903d-46a6-b6de-f030d4fccaa9/photos/6.webp" alt="Havelock NC residential lot photo 6">
+        <figcaption>Photo 06</figcaption>
+      </figure>
+      <figure>
+        <img src="/deals/40a62420-903d-46a6-b6de-f030d4fccaa9/photos/7.webp" alt="Havelock NC residential lot photo 7">
+        <figcaption>Photo 07</figcaption>
+      </figure>
+      <figure>
+        <img src="/deals/40a62420-903d-46a6-b6de-f030d4fccaa9/photos/8.webp" alt="Havelock NC residential lot photo 8">
+        <figcaption>Photo 08</figcaption>
+      </figure>
+      <figure>
+        <img src="/deals/40a62420-903d-46a6-b6de-f030d4fccaa9/photos/9.webp" alt="Havelock NC residential lot photo 9">
+        <figcaption>Photo 09</figcaption>
+      </figure>
+      <figure>
+        <img src="/deals/40a62420-903d-46a6-b6de-f030d4fccaa9/photos/10.webp" alt="Havelock NC residential lot photo 10">
+        <figcaption>Photo 10</figcaption>
+      </figure>
+      <figure>
+        <img src="/deals/40a62420-903d-46a6-b6de-f030d4fccaa9/photos/11.webp" alt="Havelock NC residential lot photo 11">
+        <figcaption>Photo 11</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <!-- OVERVIEW -->
+  <section class="block">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="num">01</span>
+        <h2>Property Overview</h2>
+      </div>
+      <div class="body-copy">
+        <p class="lede">Approximately 1.10-acre residential lot in the Havelock area of Craven County, North Carolina.</p>
+        <p>The parcel offers significantly more acreage than a typical infill lot and may appeal to buyers evaluating a manufactured/mobile home, site-built residence, or other residential project subject to county requirements and any applicable community restrictions.</p>
+        <p><strong>Asking price: $40,000.</strong> A septic permit and plat are available. The subject sold in 2025 for $60,000.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HIGHLIGHTS -->
+  <section class="block">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="num">02</span>
+        <h2>Property Highlights</h2>
+      </div>
+      <ul class="highlights">
+        <li>Approximately 1.10 acres</li>
+        <li>Approximately 47,916 SF</li>
+        <li>Residential setting</li>
+        <li>Manufactured / mobile-home potential</li>
+        <li>Site-built homes also present in the surrounding area</li>
+        <li>Manufactured homes present along Blades Village Dr</li>
+        <li>Established neighborhood</li>
+        <li>Craven County location</li>
+        <li>Low annual property-tax profile</li>
+        <li>Septic permit + plat available</li>
+        <li>Subject sold in 2025 for $60,000</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- DETAILS -->
+  <section class="block">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="num">03</span>
+        <h2>Property Details</h2>
+      </div>
+      <table>
+        <caption>At a glance</caption>
+        <tbody>
+          <tr><th scope="row">Property Type</th><td>Vacant Residential Land</td></tr>
+          <tr><th scope="row">Lot Size</th><td>Approximately 1.10 acres (approximately 47,916 SF)</td></tr>
+          <tr><th scope="row">County</th><td>Craven County, North Carolina</td></tr>
+          <tr><th scope="row">Subdivision / Area</th><td>Blades Village</td></tr>
+          <tr><th scope="row">Location</th><td>Havelock area, Craven County, NC — address available upon request</td></tr>
+          <tr><th scope="row">Prior Sale</th><td>Subject sold in 2025 for $60,000</td></tr>
+          <tr><th scope="row">2026 Property Taxes</th><td>Approximately $75 annually</td></tr>
+          <tr><th scope="row">HOA</th><td>Public information reports approximately $99/month, but conflicting information exists and buyer should independently verify whether the parcel is currently subject to an HOA and the applicable dues.</td></tr>
+          <tr><th scope="row">Documentation</th><td>Septic permit + plat available</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- MOBILE / MANUFACTURED -->
+  <section class="block">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="num">04</span>
+        <h2>Mobile / Manufactured Home Potential</h2>
+      </div>
+      <div class="body-copy">
+        <p>One of the strongest angles for this property is potential manufactured/mobile-home use.</p>
+        <p>Surrounding properties along Blades Village Dr include manufactured homes as well as conventional site-built residences, indicating the immediate area is not exclusively limited to one housing type.</p>
+        <p>Buyer should independently confirm current manufactured-home eligibility for this specific parcel, including:</p>
+      </div>
+      <ul class="checklist">
+        <li>Single-wide eligibility</li>
+        <li>Double-wide eligibility</li>
+        <li>Home-age restrictions</li>
+        <li>Foundation and tie-down requirements</li>
+        <li>Minimum dwelling size</li>
+        <li>Setbacks</li>
+        <li>Permitting requirements</li>
+        <li>Subdivision restrictions</li>
+        <li>Septic requirements</li>
+      </ul>
+      <div class="callout">
+        <strong>No representation</strong> is being made that a specific mobile or manufactured home has already been approved for placement on the parcel.
+      </div>
+    </div>
+  </section>
+
+  <!-- SEPTIC / DEVELOPMENT -->
+  <section class="block">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="num">05</span>
+        <h2>Septic &amp; Development</h2>
+      </div>
+      <div class="body-copy">
+        <p>A septic system will be an important part of the buyer’s development review. Buyer should independently verify:</p>
+      </div>
+      <ul class="checklist">
+        <li>Current septic permit status</li>
+        <li>Soil suitability</li>
+        <li>Septic system design</li>
+        <li>Bedroom capacity</li>
+        <li>Permit expiration / renewal requirements</li>
+        <li>Exact building envelope</li>
+        <li>Driveway placement</li>
+        <li>All applicable Craven County development requirements</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- UTILITIES -->
+  <section class="block">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="num">06</span>
+        <h2>Utilities</h2>
+      </div>
+      <div class="body-copy">
+        <p>Buyer should independently verify parcel-specific availability and connection requirements for:</p>
+      </div>
+      <ul class="checklist">
+        <li>Electric service</li>
+        <li>Water</li>
+        <li>Septic / wastewater</li>
+        <li>Internet / communications</li>
+        <li>Any connection, tap, extension, or impact fees</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BUYER PROFILE -->
+  <section class="block">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="num">07</span>
+        <h2>Buyer Profile</h2>
+      </div>
+      <div class="body-copy">
+        <p>Strong fit for:</p>
+      </div>
+      <ul class="checklist">
+        <li>Manufactured-home investors</li>
+        <li>Mobile-home buyers</li>
+        <li>Owner-builders</li>
+        <li>Residential infill buyers</li>
+        <li>Land investors</li>
+        <li>Buyers seeking a larger homesite in the Havelock area</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- DUE DILIGENCE -->
+  <section class="block">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="num">08</span>
+        <h2>Buyer Due Diligence</h2>
+      </div>
+      <div class="body-copy">
+        <p>Buyer to independently verify acreage, parcel boundaries, zoning, manufactured/mobile-home eligibility, HOA status, restrictions, septic feasibility, utilities, road access, setbacks, flood conditions, wetlands, easements, title, permitting requirements, and all other development conditions.</p>
+      </div>
+      <div class="callout">
+        <strong>No representation</strong> is being made regarding approved buildability, mobile-home approval, installed utilities, or future value.
+      </div>
+    </div>
+  </section>
+
+  <!-- DEAL TERMS -->
+  <section class="block">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="num">09</span>
+        <h2>Deal Terms</h2>
+      </div>
+      <table>
+        <caption>Assignment of contract</caption>
+        <tbody>
+          <tr><th scope="row">Purchase Price</th><td>$40,000</td></tr>
+          <tr><th scope="row">Funds</th><td>Cash or approved funds</td></tr>
+          <tr><th scope="row">Transaction Type</th><td>Assignment of contract</td></tr>
+          <tr><th scope="row">Closing Costs</th><td>Buyer pays closing costs</td></tr>
+          <tr><th scope="row">Transaction Coordinator Fee</th><td>Buyer to pay a $425 Transaction Coordinator fee as part of buyer’s closing costs</td></tr>
+          <tr><th scope="row">Condition</th><td>Property sold as-is</td></tr>
+          <tr><th scope="row">Offers</th><td>Proof of funds required with offers</td></tr>
+          <tr><th scope="row">Financing</th><td>Investment Loan (Ex: Hard Money, Bridge, DSCR, New Construction Loan)</td></tr>
+        </tbody>
+      </table>
+      <div class="callout">
+        <strong>This is a wholesale assignment.</strong> Suede Buffalo LLC holds equitable interest in the subject transaction. The end buyer will receive an assignment of contract.
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="wrap">
+    <h2>1.10 Acres. Havelock NC. Mobile / Manufactured Home Potential.</h2>
+    <p>Established residential area. Asking $40,000. Exact property location and available property information provided to qualified buyers. Contact Suede Buffalo LLC for aerials, property information, available septic documentation, and transaction details.</p>
+    <div class="cta-grid">
+      <div class="cta-item">
+        <span class="k">Phone</span>
+        <span class="v"><a href="tel:5206336437">520-633-6437</a></span>
+      </div>
+      <div class="cta-item">
+        <span class="k">Email</span>
+        <span class="v"><a href="mailto:info@sendmybuyer.com">info@sendmybuyer.com</a></span>
+      </div>
+      <div class="cta-item">
+        <span class="k">Company</span>
+        <span class="v">Suede Buffalo LLC</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Disclosure:</strong> This is a wholesale assignment of contract. Suede Buffalo LLC holds equitable interest in the subject transaction; the end buyer will receive an assignment of contract. Suede Buffalo LLC is not the owner of record and does not represent the underlying property owner.</p>
+    <p class="fine">All figures, acreage, tax amounts, HOA information, and development details are provided for informational purposes and have not been independently verified by Suede Buffalo LLC. Buyer is responsible for independent verification of all property, zoning, permitting, septic, utility, HOA, and title matters. No representation is made regarding approved buildability, mobile-home approval, installed utilities, or future value.</p>
+  </div>
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
