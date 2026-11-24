@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AZ-11 (Land) — 1.03-Acre Custom Homesite in Gated Sierra Hills, Scottsdale, AZ — Suede Buffalo LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e8;
+    --paper-2:#efe7d9;
+    --ink:#241f1a;
+    --ink-soft:#4d453c;
+    --rule:#d8cdba;
+    --accent:#7a4a2b;
+    --accent-soft:#a9764f;
+    --band:#241f1a;
+    --band-ink:#f6f1e8;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:1080px;
+    margin:0 auto;
+    padding-left:24px;
+    padding-right:24px;
+  }
+  h1,h2,h3,.serif{
+    font-family:"Fraunces",Georgia,"Times New Roman",serif;
+    font-weight:600;
+    letter-spacing:-0.01em;
+    line-height:1.15;
+    color:var(--ink);
+  }
+  a{color:var(--accent);}
+  .eyebrow{
+    font-size:12px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    font-weight:600;
+    color:var(--accent);
+    margin:0 0 10px 0;
+  }
+  /* ---------- top bar ---------- */
+  .topbar{
+    border-bottom:1px solid var(--rule);
+    background:var(--paper);
+  }
+  .topbar .wrap{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:8px;
+    padding-top:18px;
+    padding-bottom:18px;
+  }
+  .brand{
+    font-family:"Fraunces",Georgia,serif;
+    font-size:19px;
+    font-weight:700;
+    letter-spacing:0.01em;
+  }
+  .dealcode{
+    font-size:12px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    font-weight:600;
+  }
+  /* ---------- hero ---------- */
+  .hero .wrap{
+    padding-top:44px;
+    padding-bottom:8px;
+  }
+  .hero h1{
+    font-size:clamp(30px,4.6vw,52px);
+    margin:0 0 16px 0;
+    max-width:20ch;
+  }
+  .location{
+    font-size:15px;
+    color:var(--ink-soft);
+    margin:0 0 6px 0;
+    font-weight:500;
+  }
+  .addr-note{
+    font-size:14px;
+    color:var(--accent);
+    font-weight:600;
+    margin:0 0 26px 0;
+  }
+  .priceblock{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-end;
+    gap:14px 28px;
+    border-top:1px solid var(--rule);
+    border-bottom:1px solid var(--rule);
+    padding:20px 0;
+    margin-bottom:8px;
+  }
+  .price{
+    font-family:"Fraunces",Georgia,serif;
+    font-size:clamp(34px,5vw,48px);
+    font-weight:700;
+    line-height:1;
+    color:var(--ink);
+  }
+  .price-label{
+    font-size:12px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    font-weight:600;
+    padding-bottom:6px;
+  }
+  .price-meta{
+    font-size:14px;
+    color:var(--ink-soft);
+    padding-bottom:6px;
+  }
+  .assignment-flag{
+    display:inline-block;
+    font-size:12px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    font-weight:700;
+    color:var(--paper);
+    background:var(--accent);
+    padding:6px 12px;
+    border-radius:2px;
+    margin-bottom:18px;
+  }
+  /* ---------- gallery ---------- */
+  .gallery{
+    margin-top:34px;
+    margin-bottom:10px;
+  }
+  .gallery-track{
+    display:flex;
+    gap:14px;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    padding-bottom:14px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .gallery-track img{
+    flex:0 0 auto;
+    width:min(78vw,520px);
+    height:340px;
+    object-fit:cover;
+    border-radius:3px;
+    scroll-snap-align:start;
+    background:var(--paper-2);
+    display:block;
+  }
+  .gallery-hint{
+    font-size:12px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    font-weight:600;
+  }
+  /* ---------- sections ---------- */
+  section{
+    padding-top:44px;
+    padding-bottom:44px;
+    border-bottom:1px solid var(--rule);
+  }
+  section h2{
+    font-size:clamp(22px,2.8vw,30px);
+    margin:0 0 18px 0;
+  }
+  section h3{
+    font-size:18px;
+    margin:26px 0 10px 0;
+  }
+  p{margin:0 0 14px 0;}
+  .lede{
+    font-size:18px;
+    color:var(--ink-soft);
+    max-width:68ch;
+  }
+  .cols{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:34px 48px;
+  }
+  @media (max-width:720px){
+    .cols{grid-template-columns:1fr;}
+    .gallery-track img{height:240px;}
+  }
+  ul.clean{
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+  ul.clean li{
+    position:relative;
+    padding:7px 0 7px 20px;
+    border-bottom:1px dotted var(--rule);
+    font-size:15px;
+  }
+  ul.clean li:last-child{border-bottom:none;}
+  ul.clean li::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:16px;
+    width:7px;
+    height:7px;
+    background:var(--accent-soft);
+    border-radius:50%;
+  }
+  /* ---------- details table ---------- */
+  table.spec{
+    width:100%;
+    border-collapse:collapse;
+    font-size:15px;
+  }
+  table.spec th,
+  table.spec td{
+    text-align:left;
+    padding:12px 14px;
+    border-bottom:1px solid var(--rule);
+    vertical-align:top;
+  }
+  table.spec th{
+    width:42%;
+    font-weight:600;
+    color:var(--ink-soft);
+    font-size:13px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+  }
+  table.spec tr:first-child th,
+  table.spec tr:first-child td{border-top:1px solid var(--rule);}
+  /* ---------- market cards ---------- */
+  .comps{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:16px;
+    margin-top:8px;
+  }
+  .comp{
+    background:var(--paper-2);
+    border:1px solid var(--rule);
+    border-radius:3px;
+    padding:18px 20px;
+  }
+  .comp .comp-size{
+    font-family:"Fraunces",Georgia,serif;
+    font-size:22px;
+    font-weight:600;
+    margin:0 0 4px 0;
+  }
+  .comp .comp-price{
+    font-size:15px;
+    color:var(--accent);
+    font-weight:600;
+    margin:0;
+  }
+  .note{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    font-style:italic;
+    margin-top:16px;
+  }
+  /* ---------- CTA band ---------- */
+  .cta{
+    background:var(--band);
+    color:var(--band-ink);
+    border-bottom:none;
+  }
+  .cta h2{color:var(--band-ink);}
+  .cta p{color:#ded4c4;}
+  .cta .contact-lines{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px 40px;
+    margin-top:22px;
+    align-items:baseline;
+  }
+  .cta a{
+    color:var(--band-ink);
+    text-decoration:none;
+    border-bottom:1px solid var(--accent-soft);
+    font-family:"Fraunces",Georgia,serif;
+    font-size:clamp(20px,2.6vw,26px);
+    font-weight:600;
+    padding-bottom:2px;
+  }
+  .cta a:hover{border-bottom-color:var(--band-ink);}
+  .cta .company{
+    font-size:13px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:#bfb2a0;
+    font-weight:600;
+    margin-top:26px;
+  }
+  /* ---------- footer ---------- */
+  footer{
+    padding-top:34px;
+    padding-bottom:48px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    line-height:1.65;
+  }
+  footer p{margin:0 0 10px 0;}
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=dbc841ab-0b35-41b1-9f6d-c7e9b7f0d082&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2Fdbc841ab-0b35-41b1-9f6d-c7e9b7f0d082.html">Request the Address</a></div></noscript>
+
+<div class="topbar">
+  <div class="wrap">
+    <span class="brand">Suede Buffalo LLC</span>
+    <span class="dealcode">Deal AZ-11 (Land)</span>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="assignment-flag">Wholesale Assignment of Contract</span>
+    <p class="eyebrow">Scottsdale Custom-Home Land Opportunity</p>
+    <h1>1.03-Acre Custom Homesite in Gated Sierra Hills</h1>
+    <p class="location">Scottsdale, AZ 85259 &middot; Sierra Hills &middot; Maricopa County, Arizona</p>
+    <p class="addr-note">Address available upon request.</p>
+
+    <div class="priceblock">
+      <span class="price">$830,000</span>
+      <span class="price-label">Asking Price</span>
+      <span class="price-meta">Approx. 1.03 gross acres &middot; 44,867 SF &middot; Vacant Residential Land</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="gallery">
+    <div class="gallery-track">
+      <img src="/deals/dbc841ab-0b35-41b1-9f6d-c7e9b7f0d082/photos/1.webp" alt="Sierra Hills custom homesite photo 1">
+      <img src="/deals/dbc841ab-0b35-41b1-9f6d-c7e9b7f0d082/photos/2.webp" alt="Sierra Hills custom homesite photo 2">
+      <img src="/deals/dbc841ab-0b35-41b1-9f6d-c7e9b7f0d082/photos/3.webp" alt="Sierra Hills custom homesite photo 3">
+      <img src="/deals/dbc841ab-0b35-41b1-9f6d-c7e9b7f0d082/photos/4.webp" alt="Sierra Hills custom homesite photo 4">
+      <img src="/deals/dbc841ab-0b35-41b1-9f6d-c7e9b7f0d082/photos/5.webp" alt="Sierra Hills custom homesite photo 5">
+      <img src="/deals/dbc841ab-0b35-41b1-9f6d-c7e9b7f0d082/photos/6.webp" alt="Sierra Hills custom homesite photo 6">
+      <img src="/deals/dbc841ab-0b35-41b1-9f6d-c7e9b7f0d082/photos/7.webp" alt="Sierra Hills custom homesite photo 7">
+      <img src="/deals/dbc841ab-0b35-41b1-9f6d-c7e9b7f0d082/photos/8.webp" alt="Sierra Hills custom homesite photo 8">
+      <img src="/deals/dbc841ab-0b35-41b1-9f6d-c7e9b7f0d082/photos/9.webp" alt="Sierra Hills custom homesite photo 9">
+      <img src="/deals/dbc841ab-0b35-41b1-9f6d-c7e9b7f0d082/photos/10.webp" alt="Sierra Hills custom homesite photo 10">
+      <img src="/deals/dbc841ab-0b35-41b1-9f6d-c7e9b7f0d082/photos/11.webp" alt="Sierra Hills custom homesite photo 11">
+      <img src="/deals/dbc841ab-0b35-41b1-9f6d-c7e9b7f0d082/photos/12.webp" alt="Sierra Hills custom homesite photo 12">
+    </div>
+    <span class="gallery-hint">Scroll for more photos &rarr;</span>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">Property Overview</p>
+    <h2>A custom-home opportunity inside gated Sierra Hills</h2>
+    <p class="lede">Custom-home opportunity consisting of approximately 1.03 gross acres inside gated Sierra Hills in Scottsdale. The parcel is positioned in the Shea Boulevard / 136th Street area and is best suited for a custom builder, architect-led buyer, or end user evaluating a luxury residence in an established Scottsdale community.</p>
+    <p class="lede">Asking price: <strong>$830,000</strong>.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">Property Details</p>
+    <h2>The parcel at a glance</h2>
+    <table class="spec">
+      <tr><th>Property Type</th><td>Vacant Residential Land / Custom Homesite</td></tr>
+      <tr><th>Lot Size</th><td>Approximately 1.03 Gross Acres</td></tr>
+      <tr><th>Approximate Gross Area</th><td>44,867 SF</td></tr>
+      <tr><th>Subdivision</th><td>Sierra Hills</td></tr>
+      <tr><th>Community</th><td>Gated</td></tr>
+      <tr><th>County</th><td>Maricopa County</td></tr>
+      <tr><th>Location</th><td>Scottsdale, AZ 85259 &middot; near Shea Boulevard and 136th Street</td></tr>
+      <tr><th>Address</th><td>Address available upon request</td></tr>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">Property Highlights</p>
+    <h2>What stands out</h2>
+    <div class="cols">
+      <ul class="clean">
+        <li>Approximately 1.03-acre custom homesite</li>
+        <li>Gated Sierra Hills community</li>
+        <li>Established luxury residential setting</li>
+        <li>Scottsdale 85259 area</li>
+        <li>Near Shea Boulevard and 136th Street</li>
+      </ul>
+      <ul class="clean">
+        <li>Plat reported available for review</li>
+        <li>Drainage easement documentation reported available</li>
+        <li>Community development standards reported available</li>
+        <li>Strong fit for custom-home builders and luxury end users</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">Why Builders Should Review It</p>
+    <h2>Acreage, location, and pricing in one parcel</h2>
+    <p>The primary value proposition is the combination of acreage, location, and pricing within the Scottsdale custom-home market.</p>
+    <p>A buyer can evaluate approximately 1.03 acres inside Sierra Hills at an $830,000 asking price while smaller custom-home lots in the surrounding market are currently being marketed at or above this level.</p>
+    <p>The key design question is how the proposed residence, garage, outdoor living areas, and site improvements fit within the parcel after accounting for the drainage easement, setbacks, and applicable community development standards.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">Current Market Positioning</p>
+    <h2>Active asking-price comparisons</h2>
+    <p>A currently marketed Sierra Hills lot of approximately 0.83 acre is asking $1,400,000. The subject offers approximately 0.20 additional gross acre at an asking price $535,000 below that property&rsquo;s current asking price.</p>
+    <p>Additional nearby Scottsdale custom-home lot competition includes:</p>
+    <div class="comps">
+      <div class="comp">
+        <p class="comp-size">Approx. 0.83 acre</p>
+        <p class="comp-price">Asking $1,400,000 &middot; Sierra Hills</p>
+      </div>
+      <div class="comp">
+        <p class="comp-size">Approx. 0.91 acre</p>
+        <p class="comp-price">Asking $1,050,000 &middot; Nearby Scottsdale</p>
+      </div>
+      <div class="comp">
+        <p class="comp-size">Approx. 1.03 gross acres</p>
+        <p class="comp-price">Asking $830,000 &middot; Subject property</p>
+      </div>
+    </div>
+    <p class="note">These are active asking-price comparisons and should not be interpreted as closed-sale comps or guaranteed future value.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">Site Documentation</p>
+    <h2>Reported documentation available for review</h2>
+    <ul class="clean">
+      <li>Plat</li>
+      <li>Drainage easement</li>
+      <li>Community development standards</li>
+    </ul>
+    <p style="margin-top:18px;">Buyer should review the complete document package before finalizing any proposed home design. Do not rely on gross acreage alone when determining usable building area.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">Builder Due Diligence</p>
+    <h2>Buyer should independently verify</h2>
+    <div class="cols">
+      <ul class="clean">
+        <li>Exact parcel boundaries</li>
+        <li>Usable building envelope</li>
+        <li>Drainage easement location and restrictions</li>
+        <li>Setbacks</li>
+        <li>Zoning</li>
+        <li>Community architectural requirements</li>
+        <li>HOA dues and assessments</li>
+      </ul>
+      <ul class="clean">
+        <li>Utilities and connection requirements</li>
+        <li>Grading and drainage requirements</li>
+        <li>Topography</li>
+        <li>Access</li>
+        <li>Permitting requirements</li>
+        <li>Flood conditions</li>
+        <li>Construction feasibility</li>
+        <li>All applicable City of Scottsdale and Sierra Hills requirements</li>
+      </ul>
+    </div>
+    <p class="note">No representation is being made regarding an approved home design, guaranteed buildable area, installed utilities, permit status, construction costs, future home value, or builder profit.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">Buyer Profile</p>
+    <h2>Strong fit for</h2>
+    <ul class="clean">
+      <li>Scottsdale custom-home builders</li>
+      <li>Builders working with an existing luxury-home client</li>
+      <li>Architect-led custom-home buyers</li>
+      <li>Luxury end users seeking a larger homesite</li>
+      <li>Residential land investors familiar with Scottsdale custom construction</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">Deal Terms</p>
+    <h2>Terms of this assignment</h2>
+    <table class="spec">
+      <tr><th>Purchase Price</th><td>$830,000</td></tr>
+      <tr><th>Funds</th><td>Cash or approved funds</td></tr>
+      <tr><th>Earnest Money Deposit</th><td>Earnest Money Deposit</td></tr>
+      <tr><th>Transaction Structure</th><td>Assignment of contract</td></tr>
+      <tr><th>Closing Costs</th><td>Buyer pays closing costs</td></tr>
+      <tr><th>Transaction Coordinator Fee</th><td>Buyer to pay a $425 Transaction Coordinator fee as part of buyer&rsquo;s closing costs</td></tr>
+      <tr><th>Condition</th><td>Property sold as-is</td></tr>
+      <tr><th>Offers</th><td>Proof of funds required with offers</td></tr>
+      <tr><th>Financing</th><td>Investment Loan (Ex: Hard Money, Bridge, DSCR, New Construction Loan)</td></tr>
+    </table>
+    <p style="margin-top:22px;"><strong>This is a wholesale assignment.</strong> Suede Buffalo LLC holds equitable interest in the subject transaction. The end buyer will receive an assignment of contract.</p>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <p class="eyebrow" style="color:var(--accent-soft);">Next Step</p>
+    <h2>1.03 acres. Gated Sierra Hills. Scottsdale custom-home opportunity.</h2>
+    <p>Plat + drainage easement + development standards reported available. Asking $830,000. Exact property location and available site documents will be provided to qualified buyers. Contact Suede Buffalo LLC for aerials, site documents, property information, and transaction details.</p>
+    <div class="contact-lines">
+      <a href="tel:5206336437">520-633-6437</a>
+      <a href="mailto:info@sendmybuyer.com">info@sendmybuyer.com</a>
+    </div>
+    <p class="company">Suede Buffalo LLC</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>This is a wholesale assignment of contract. Suede Buffalo LLC holds equitable interest in the subject transaction; the end buyer will receive an assignment of contract. Suede Buffalo LLC is not the owner of record and does not represent the underlying seller. Address available upon request.</p>
+    <p>Figures and details presented on this page have not been independently verified by Suede Buffalo LLC. All information is believed to be accurate but is not guaranteed. Buyers are responsible for their own independent due diligence and verification of all facts, figures, and property conditions.</p>
+  </div>
+</footer>
+
+<script src="/rep-link.js" defer></script></body>
+</html>
