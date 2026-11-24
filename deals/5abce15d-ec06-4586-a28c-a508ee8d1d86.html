@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>West Orange, NJ — Vacant 4BD/2.5BA Colonial | Suede Buffalo LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e7;
+    --paper-2:#efe7d8;
+    --ink:#241f1a;
+    --ink-soft:#5a5148;
+    --rule:#d8cdb9;
+    --accent:#7a4a2b;
+    --accent-deep:#5c3520;
+    --band:#241f1a;
+    --band-ink:#f6f1e7;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{
+    font-family:'Fraunces',Georgia,serif;
+    font-weight:600;
+    line-height:1.15;
+    letter-spacing:-0.01em;
+    margin:0;
+  }
+  a{color:var(--accent-deep);}
+  .wrap{
+    max-width:1080px;
+    margin:0 auto;
+    padding-left:24px;
+    padding-right:24px;
+  }
+  .eyebrow{
+    font-size:12px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    font-weight:600;
+    color:var(--accent);
+  }
+  /* ---------- Header ---------- */
+  .masthead{
+    border-bottom:1px solid var(--rule);
+    background:var(--paper);
+  }
+  .masthead .wrap{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding-top:18px;
+    padding-bottom:18px;
+    flex-wrap:wrap;
+  }
+  .brand{
+    font-family:'Fraunces',Georgia,serif;
+    font-size:20px;
+    font-weight:700;
+    letter-spacing:0.01em;
+  }
+  .brand span{color:var(--accent);}
+  .masthead-contact{
+    font-size:13px;
+    color:var(--ink-soft);
+    text-align:right;
+  }
+  .masthead-contact a{text-decoration:none;font-weight:600;color:var(--ink);}
+  /* ---------- Hero ---------- */
+  .hero{padding-top:44px;padding-bottom:8px;}
+  .hero-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:32px;
+    flex-wrap:wrap;
+  }
+  .hero-title{max-width:640px;}
+  .hero-title h1{
+    font-size:clamp(30px,4.6vw,48px);
+    margin-top:10px;
+  }
+  .hero-title .loc{
+    margin-top:14px;
+    font-size:15px;
+    color:var(--ink-soft);
+  }
+  .hero-title .loc strong{color:var(--ink);}
+  .addr-note{
+    margin-top:8px;
+    font-size:13.5px;
+    font-style:italic;
+    color:var(--accent-deep);
+  }
+  .price-block{
+    background:var(--paper-2);
+    border:1px solid var(--rule);
+    border-radius:4px;
+    padding:22px 26px;
+    min-width:250px;
+    flex:0 0 auto;
+  }
+  .price-block .label{
+    font-size:11px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    font-weight:600;
+    color:var(--ink-soft);
+  }
+  .price-block .price{
+    font-family:'Fraunces',Georgia,serif;
+    font-size:40px;
+    font-weight:700;
+    line-height:1.1;
+    margin-top:4px;
+  }
+  .price-block .price small{
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    display:block;
+    margin-top:2px;
+  }
+  .price-block .arv{
+    margin-top:14px;
+    padding-top:12px;
+    border-top:1px solid var(--rule);
+    font-size:14px;
+    color:var(--ink-soft);
+  }
+  .price-block .arv strong{
+    font-family:'Fraunces',Georgia,serif;
+    font-size:20px;
+    color:var(--ink);
+    display:block;
+    margin-top:2px;
+  }
+  .tag-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:22px;
+  }
+  .tag{
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    border:1px solid var(--rule);
+    background:#fbf7ef;
+    color:var(--ink-soft);
+    padding:5px 11px;
+    border-radius:999px;
+  }
+  .tag.accent{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fbf7ef;
+  }
+  /* ---------- Gallery ---------- */
+  .gallery-section{padding-top:32px;padding-bottom:8px;}
+  .gallery{
+    display:flex;
+    gap:14px;
+    overflow-x:auto;
+    padding-bottom:14px;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+  }
+  .gallery figure{
+    margin:0;
+    flex:0 0 auto;
+    scroll-snap-align:start;
+  }
+  .gallery img{
+    display:block;
+    height:300px;
+    width:auto;
+    max-width:82vw;
+    object-fit:cover;
+    border-radius:3px;
+    border:1px solid var(--rule);
+    background:var(--paper-2);
+  }
+  .gallery-hint{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
+  /* ---------- Sections ---------- */
+  section{padding-top:44px;padding-bottom:8px;}
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    border-bottom:1px solid var(--rule);
+    padding-bottom:10px;
+    margin-bottom:24px;
+  }
+  .section-head h2{
+    font-size:clamp(22px,3vw,30px);
+  }
+  .section-head .num{
+    font-family:'Fraunces',Georgia,serif;
+    font-size:14px;
+    color:var(--accent);
+    font-weight:600;
+  }
+  .lede{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:760px;
+  }
+  .lede strong{color:var(--ink);}
+  /* ---------- Numbers strip ---------- */
+  .numbers{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:1px;
+    background:var(--rule);
+    border:1px solid var(--rule);
+    border-radius:4px;
+    overflow:hidden;
+  }
+  .numbers .cell{
+    background:#fbf7ef;
+    padding:20px 20px 18px;
+  }
+  .numbers .cell .k{
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    font-weight:600;
+    color:var(--ink-soft);
+  }
+  .numbers .cell .v{
+    font-family:'Fraunces',Georgia,serif;
+    font-size:26px;
+    font-weight:700;
+    margin-top:6px;
+    line-height:1.1;
+  }
+  .numbers .cell .v small{
+    font-family:'Inter',sans-serif;
+    font-size:12px;
+    font-weight:600;
+    color:var(--ink-soft);
+    letter-spacing:0.04em;
+  }
+  /* ---------- Snapshot list ---------- */
+  .snapshot{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+    gap:0 40px;
+  }
+  .snapshot dl{margin:0;}
+  .snapshot .row{
+    display:flex;
+    justify-content:space-between;
+    gap:16px;
+    padding:11px 0;
+    border-bottom:1px solid var(--rule);
+    font-size:15px;
+  }
+  .snapshot .row dt{
+    color:var(--ink-soft);
+    font-weight:500;
+  }
+  .snapshot .row dd{
+    margin:0;
+    font-weight:600;
+    text-align:right;
+  }
+  /* ---------- Condition ---------- */
+  .condition-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:24px;
+  }
+  .note-card{
+    background:#fbf7ef;
+    border:1px solid var(--rule);
+    border-left:3px solid var(--accent);
+    border-radius:3px;
+    padding:20px 22px;
+  }
+  .note-card h3{
+    font-size:17px;
+    margin-bottom:8px;
+  }
+  .note-card p{
+    margin:0;
+    font-size:15px;
+    color:var(--ink-soft);
+  }
+  .note-card p + p{margin-top:10px;}
+  .disclaimer-inline{
+    margin-top:22px;
+    font-size:13.5px;
+    color:var(--ink-soft);
+    font-style:italic;
+  }
+  /* ---------- Comps table ---------- */
+  .table-scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:4px;background:#fbf7ef;}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+    min-width:720px;
+  }
+  thead th{
+    text-align:left;
+    font-size:11px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    font-weight:600;
+    color:var(--ink-soft);
+    padding:13px 16px;
+    border-bottom:1px solid var(--rule);
+    background:var(--paper-2);
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:12px 16px;
+    border-bottom:1px solid var(--rule);
+    vertical-align:top;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  tbody td.num{white-space:nowrap;font-variant-numeric:tabular-nums;}
+  tbody td.price{font-weight:600;}
+  .match-note{
+    display:block;
+    font-size:12px;
+    color:var(--accent-deep);
+    font-weight:600;
+    margin-top:2px;
+  }
+  /* ---------- Deal terms ---------- */
+  .terms{
+    border:1px solid var(--rule);
+    border-radius:4px;
+    overflow:hidden;
+    background:#fbf7ef;
+  }
+  .terms .trow{
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+    padding:15px 22px;
+    border-bottom:1px solid var(--rule);
+    font-size:15.5px;
+  }
+  .terms .trow:last-child{border-bottom:none;}
+  .terms .trow .k{
+    color:var(--ink-soft);
+    font-weight:500;
+  }
+  .terms .trow .v{
+    font-weight:600;
+    text-align:right;
+  }
+  .terms .trow.highlight{
+    background:var(--paper-2);
+  }
+  .terms .trow.highlight .v{
+    font-family:'Fraunces',Georgia,serif;
+    font-size:19px;
+  }
+  .terms-list{
+    margin:20px 0 0;
+    padding-left:20px;
+    font-size:15px;
+    color:var(--ink-soft);
+  }
+  .terms-list li{margin-bottom:6px;}
+  /* ---------- CTA band ---------- */
+  .cta-band{
+    background:var(--band);
+    color:var(--band-ink);
+    margin-top:56px;
+    padding-top:52px;
+    padding-bottom:52px;
+  }
+  .cta-band .wrap{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:32px;
+    flex-wrap:wrap;
+  }
+  .cta-band h2{
+    font-size:clamp(26px,3.6vw,38px);
+    color:var(--band-ink);
+    max-width:520px;
+  }
+  .cta-band p{
+    margin:12px 0 0;
+    color:#cfc4b2;
+    font-size:15px;
+    max-width:520px;
+  }
+  .cta-contact{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    min-width:260px;
+  }
+  .cta-contact .company{
+    font-size:12px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    font-weight:600;
+    color:#b9a98f;
+  }
+  .cta-contact a{
+    color:var(--band-ink);
+    text-decoration:none;
+    font-family:'Fraunces',Georgia,serif;
+    font-size:24px;
+    font-weight:600;
+    border-bottom:1px solid #4a4136;
+    padding-bottom:6px;
+  }
+  .cta-contact a:hover{border-bottom-color:var(--band-ink);}
+  /* ---------- Footer ---------- */
+  footer{
+    background:var(--band);
+    color:#a99c88;
+    border-top:1px solid #3a332b;
+    padding-top:26px;
+    padding-bottom:34px;
+    font-size:12.5px;
+    line-height:1.65;
+  }
+  footer .wrap{display:flex;flex-direction:column;gap:10px;}
+  footer strong{color:#d9cdb9;}
+  @media (max-width:640px){
+    .hero-top{flex-direction:column;}
+    .price-block{width:100%;}
+    .gallery img{height:220px;}
+    .terms .trow{flex-direction:column;gap:4px;}
+    .terms .trow .v{text-align:left;}
+  }
+</style>
+</head>
+<body><noscript><div style="padding:10px;text-align:center;font-family:Arial,sans-serif;"><a href="https://sendmybuyer.com/?requestAddress=5abce15d-ec06-4586-a28c-a508ee8d1d86&amp;returnTo=https%3A%2F%2Fsendmybuyer.com%2Fdeals%2F5abce15d-ec06-4586-a28c-a508ee8d1d86.html">Request the Address</a></div></noscript>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="brand">Suede Buffalo <span>LLC</span></div>
+    <div class="masthead-contact">
+      Deal <strong>NJ-2 (SFH)</strong> &nbsp;·&nbsp; <a href="tel:520-633-6437">520-633-6437</a> &nbsp;·&nbsp; <a href="mailto:info@sendmybuyer.com">info@sendmybuyer.com</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <div class="wrap hero">
+    <div class="hero-top">
+      <div class="hero-title">
+        <div class="eyebrow">Assignment of Contract · Single Family</div>
+        <h1>Vacant 4BD / 2.5BA Colonial in West Orange, NJ</h1>
+        <div class="loc">
+          <strong>West Orange, NJ 07052</strong> · Essex County
+        </div>
+        <div class="addr-note">Address available upon request.</div>
+        <div class="tag-row">
+          <span class="tag accent">Fix and Flip</span>
+          <span class="tag accent">Buy and Hold</span>
+          <span class="tag">Cash Buyers Only</span>
+          <span class="tag">Sold As-Is</span>
+          <span class="tag">Vacant</span>
+        </div>
+      </div>
+      <div class="price-block">
+        <div class="label">Asking Price</div>
+        <div class="price">$630,000<small>Cash</small></div>
+        <div class="arv">After Repair Value<strong>$1,000,000</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GALLERY -->
+  <div class="wrap gallery-section">
+    <div class="gallery">
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/1.webp" alt="West Orange NJ colonial — photo 1"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/2.webp" alt="West Orange NJ colonial — photo 2"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/3.webp" alt="West Orange NJ colonial — photo 3"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/4.webp" alt="West Orange NJ colonial — photo 4"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/5.webp" alt="West Orange NJ colonial — photo 5"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/6.webp" alt="West Orange NJ colonial — photo 6"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/7.webp" alt="West Orange NJ colonial — photo 7"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/8.webp" alt="West Orange NJ colonial — photo 8"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/9.webp" alt="West Orange NJ colonial — photo 9"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/10.webp" alt="West Orange NJ colonial — photo 10"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/11.webp" alt="West Orange NJ colonial — photo 11"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/12.webp" alt="West Orange NJ colonial — photo 12"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/13.webp" alt="West Orange NJ colonial — photo 13"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/14.webp" alt="West Orange NJ colonial — photo 14"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/15.webp" alt="West Orange NJ colonial — photo 15"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/16.webp" alt="West Orange NJ colonial — photo 16"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/17.webp" alt="West Orange NJ colonial — photo 17"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/18.webp" alt="West Orange NJ colonial — photo 18"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/19.webp" alt="West Orange NJ colonial — photo 19"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/20.webp" alt="West Orange NJ colonial — photo 20"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/21.webp" alt="West Orange NJ colonial — photo 21"></figure>
+      <figure><img src="/deals/5abce15d-ec06-4586-a28c-a508ee8d1d86/photos/22.webp" alt="West Orange NJ colonial — photo 22"></figure>
+    </div>
+    <div class="gallery-hint">Scroll horizontally to view the full photo set.</div>
+  </div>
+
+  <!-- OVERVIEW -->
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <span class="num">01</span>
+        <h2>Here Is What We Have</h2>
+      </div>
+      <p class="lede">
+        A <strong>vacant 4 bed, 2.5 bath Colonial</strong> in West Orange, NJ 07052, built in <strong>1927</strong>.
+        About <strong>2,036 sf per tax records</strong>, with a <strong>finished basement</strong>.
+        Light rehab, estimated repairs <strong>$40,720</strong>. Asking <strong>$630,000 cash</strong> against an
+        ARV of <strong>$1,000,000</strong>. Proof of funds required to access the property. Walkthrough videos are
+        available on request.
+      </p>
+      <p class="disclaimer-inline">
+        This is an assignment of contract offered by Suede Buffalo LLC, not a direct sale by the property owner.
+      </p>
+    </div>
+  </section>
+
+  <!-- THE NUMBERS -->
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <span class="num">02</span>
+        <h2>The Numbers</h2>
+      </div>
+      <div class="numbers">
+        <div class="cell">
+          <div class="k">Asking Price</div>
+          <div class="v">$630,000 <small>cash</small></div>
+        </div>
+        <div class="cell">
+          <div class="k">ARV</div>
+          <div class="v">$1,000,000</div>
+        </div>
+        <div class="cell">
+          <div class="k">Estimated Repairs</div>
+          <div class="v">$40,720</div>
+        </div>
+        <div class="cell">
+          <div class="k">EMD</div>
+          <div class="v">$10,000</div>
+        </div>
+        <div class="cell">
+          <div class="k">Taxes</div>
+          <div class="v">$16,429 <small>/yr</small></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROPERTY SNAPSHOT -->
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <span class="num">03</span>
+        <h2>Property Snapshot</h2>
+      </div>
+      <div class="snapshot">
+        <dl>
+          <div class="row"><dt>Location</dt><dd>West Orange, NJ 07052</dd></div>
+          <div class="row"><dt>County</dt><dd>Essex County</dd></div>
+          <div class="row"><dt>Bedrooms</dt><dd>4</dd></div>
+          <div class="row"><dt>Bathrooms</dt><dd>2.5</dd></div>
+          <div class="row"><dt>Square Footage</dt><dd>About 2,036 sf (per tax records)</dd></div>
+        </dl>
+        <dl>
+          <div class="row"><dt>Year Built</dt><dd>1927</dd></div>
+          <div class="row"><dt>Style</dt><dd>Colonial</dd></div>
+          <div class="row"><dt>Lot Size</dt><dd>50x130 (6,500 sf)</dd></div>
+          <div class="row"><dt>Block / Lot</dt><dd>Block 59 / Lot 14</dd></div>
+          <div class="row"><dt>Zoning</dt><dd>R-5</dd></div>
+          <div class="row"><dt>Basement</dt><dd>Finished</dd></div>
+          <div class="row"><dt>Occupancy</dt><dd>Vacant</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONDITION NOTES -->
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <span class="num">04</span>
+        <h2>Condition Notes</h2>
+      </div>
+      <div class="condition-grid">
+        <div class="note-card">
+          <h3>Rehab Scope</h3>
+          <p>Light rehab, estimated repairs <strong>$40,720</strong>.</p>
+        </div>
+        <div class="note-card">
+          <h3>Systems &amp; Structure</h3>
+          <p>Roof, heating, cooling and foundation condition: unknown.</p>
+        </div>
+        <div class="note-card">
+          <h3>Due Diligence</h3>
+          <p>Buyers are advised to conduct independent inspections. All condition information is provided from records.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPS -->
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <span class="num">05</span>
+        <h2>Why This Deal Makes Sense — Closed Renovated Comps</h2>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Comp</th>
+              <th>Distance</th>
+              <th>Sold</th>
+              <th>Price</th>
+              <th>Sq. Ft.</th>
+              <th>Beds</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Oakridge Rd, West Orange NJ 07052</td>
+              <td class="num">0.10 mi</td>
+              <td class="num">Jun 26, 2026</td>
+              <td class="num price">$999,999</td>
+              <td class="num">1,911 sf</td>
+              <td class="num">3 bed</td>
+            </tr>
+            <tr>
+              <td>Oakridge Rd, West Orange NJ 07052</td>
+              <td class="num">0.14 mi</td>
+              <td class="num">Apr 29, 2026</td>
+              <td class="num price">$837,000</td>
+              <td class="num">1,585 sf</td>
+              <td class="num">3 bed</td>
+            </tr>
+            <tr>
+              <td>Dartmouth Rd, West Orange NJ 07052<span class="match-note">Closest physical match</span></td>
+              <td class="num">0.55 mi</td>
+              <td class="num">May 14, 2026</td>
+              <td class="num price">$1,151,500</td>
+              <td class="num">1,911 sf</td>
+              <td class="num">4 bed</td>
+            </tr>
+            <tr>
+              <td>Bradford Ave, West Orange NJ 07052</td>
+              <td class="num">0.55 mi</td>
+              <td class="num">Apr 7, 2026</td>
+              <td class="num price">$1,100,200</td>
+              <td class="num">2,367 sf</td>
+              <td class="num">4 bed</td>
+            </tr>
+            <tr>
+              <td>Bradford Ave, West Orange NJ 07052</td>
+              <td class="num">0.61 mi</td>
+              <td class="num">Jul 7, 2026</td>
+              <td class="num price">$999,999</td>
+              <td class="num">2,012 sf</td>
+              <td class="num">3 bed</td>
+            </tr>
+            <tr>
+              <td>Benvenue Ave, West Orange NJ 07052</td>
+              <td class="num">0.71 mi</td>
+              <td class="num">Jun 23, 2026</td>
+              <td class="num price">$850,000</td>
+              <td class="num">1,625 sf</td>
+              <td class="num">3 bed</td>
+            </tr>
+            <tr>
+              <td>West Rd, West Orange NJ 07052</td>
+              <td class="num">0.80 mi</td>
+              <td class="num">Jun 10, 2026</td>
+              <td class="num price">$1,110,000</td>
+              <td class="num">2,391 sf</td>
+              <td class="num">5 bed</td>
+            </tr>
+            <tr>
+              <td>Lowell Pl, West Orange NJ 07052</td>
+              <td class="num">0.96 mi</td>
+              <td class="num">Jun 15, 2026</td>
+              <td class="num price">$999,000</td>
+              <td class="num">2,309 sf</td>
+              <td class="num">4 bed</td>
+            </tr>
+            <tr>
+              <td>Lessing Rd, West Orange NJ 07052</td>
+              <td class="num">1.10 mi</td>
+              <td class="num">Jun 23, 2026</td>
+              <td class="num price">$1,150,000</td>
+              <td class="num">2,440 sf</td>
+              <td class="num">3 bed</td>
+            </tr>
+            <tr>
+              <td>Edgewood Ave, West Orange NJ 07052</td>
+              <td class="num">1.23 mi</td>
+              <td class="num">Jul 7, 2026</td>
+              <td class="num price">$1,054,000</td>
+              <td class="num">2,235 sf</td>
+              <td class="num">3 bed</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEAL TERMS -->
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <span class="num">06</span>
+        <h2>Deal Terms</h2>
+      </div>
+      <div class="terms">
+        <div class="trow highlight">
+          <span class="k">Purchase Price</span>
+          <span class="v">$630,000 cash</span>
+        </div>
+        <div class="trow">
+          <span class="k">EMD</span>
+          <span class="v">$10,000</span>
+        </div>
+        <div class="trow">
+          <span class="k">Access</span>
+          <span class="v">Proof of funds required</span>
+        </div>
+        <div class="trow">
+          <span class="k">Expected Close Date</span>
+          <span class="v">12/04/2026</span>
+        </div>
+        <div class="trow">
+          <span class="k">Buyer Type</span>
+          <span class="v">Cash buyers only</span>
+        </div>
+        <div class="trow">
+          <span class="k">Condition</span>
+          <span class="v">Sold as-is — buyer responsible for full due diligence</span>
+        </div>
+      </div>
+      <ul class="terms-list">
+        <li>This transaction is an assignment of contract. Suede Buffalo LLC is the contract holder; the underlying property owner is not a party to your communications with us.</li>
+        <li>Proof of funds is required before property access is granted.</li>
+        <li>All figures are provided for informational purposes and have not been independently verified by Suede Buffalo LLC.</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<!-- CTA BAND -->
+<div class="cta-band">
+  <div class="wrap">
+    <div>
+      <h2>Ready to move on this West Orange deal?</h2>
+      <p>Reach out for the full address, walkthrough videos, and access details. Proof of funds required to schedule a walkthrough.</p>
+    </div>
+    <div class="cta-contact">
+      <span class="company">Suede Buffalo LLC</span>
+      <a href="tel:520-633-6437">520-633-6437</a>
+      <a href="mailto:info@sendmybuyer.com">info@sendmybuyer.com</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div><strong>Suede Buffalo LLC</strong> · Deal NJ-2 (SFH) · West Orange, NJ 07052 · Essex County</div>
+    <div>This is an assignment of contract. Suede Buffalo LLC is assigning its contractual interest and is not the owner of record. Figures, comps, and condition notes are provided for informational purposes and have not been independently verified by Suede Buffalo LLC. Buyers are advised to conduct their<script src="/rep-link.js" defer></script>
